@@ -1,0 +1,483 @@
+<!DOCTYPE html><html><head>
+      <title>Phase_EN</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({"extensions":["tex2jax.js"],"jax":["input/TeX","output/HTML-CSS"],"messageStyle":"none","tex2jax":{"processEnvironments":false,"processEscapes":true,"inlineMath":[["$","$"],["\\(","\\)"]],"displayMath":[["$$","$$"],["\\[","\\]"]]},"TeX":{"extensions":["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]},"HTML-CSS":{"availableFonts":["TeX"]}});
+        </script>
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js"></script>
+        
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <style>
+      /**
+ * prism.js Github theme based on GitHub's theme.
+ * @author Sam Clarke
+ */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #333;
+  background: none;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.4;
+
+  -moz-tab-size: 8;
+  -o-tab-size: 8;
+  tab-size: 8;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: .8em;
+  overflow: auto;
+  /* border: 1px solid #ddd; */
+  border-radius: 3px;
+  /* background: #fff; */
+  background: #f5f5f5;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+  background: #f5f5f5;
+}
+
+.token.comment,
+.token.blockquote {
+  color: #969896;
+}
+
+.token.cdata {
+  color: #183691;
+}
+
+.token.doctype,
+.token.punctuation,
+.token.variable,
+.token.macro.property {
+  color: #333;
+}
+
+.token.operator,
+.token.important,
+.token.keyword,
+.token.rule,
+.token.builtin {
+  color: #a71d5d;
+}
+
+.token.string,
+.token.url,
+.token.regex,
+.token.attr-value {
+  color: #183691;
+}
+
+.token.property,
+.token.number,
+.token.boolean,
+.token.entity,
+.token.atrule,
+.token.constant,
+.token.symbol,
+.token.command,
+.token.code {
+  color: #0086b3;
+}
+
+.token.tag,
+.token.selector,
+.token.prolog {
+  color: #63a35c;
+}
+
+.token.function,
+.token.namespace,
+.token.pseudo-element,
+.token.class,
+.token.class-name,
+.token.pseudo-class,
+.token.id,
+.token.url-reference .token.variable,
+.token.attr-name {
+  color: #795da3;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.title,
+.token.title .token.punctuation {
+  font-weight: bold;
+  color: #1d3e81;
+}
+
+.token.list {
+  color: #ed6a43;
+}
+
+.token.inserted {
+  background-color: #eaffea;
+  color: #55a532;
+}
+
+.token.deleted {
+  background-color: #ffecec;
+  color: #bd2c00;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+
+/* JSON */
+.language-json .token.property {
+  color: #183691;
+}
+
+.language-markup .token.tag .token.punctuation {
+  color: #333;
+}
+
+/* CSS */
+code.language-css,
+.language-css .token.function {
+  color: #0086b3;
+}
+
+/* YAML */
+.language-yaml .token.atrule {
+  color: #63a35c;
+}
+
+code.language-yaml {
+  color: #183691;
+}
+
+/* Ruby */
+.language-ruby .token.function {
+  color: #333;
+}
+
+/* Markdown */
+.language-markdown .token.url {
+  color: #795da3;
+}
+
+/* Makefile */
+.language-makefile .token.symbol {
+  color: #795da3;
+}
+
+.language-makefile .token.variable {
+  color: #183691;
+}
+
+.language-makefile .token.builtin {
+  color: #0086b3;
+}
+
+/* Bash */
+.language-bash .token.keyword {
+  color: #0086b3;
+}
+
+/* highlight */
+pre[data-line] {
+  position: relative;
+  padding: 1em 0 1em 3em;
+}
+pre[data-line] .line-highlight-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  display: block;
+  width: 100%;
+}
+
+pre[data-line] .line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: inherit 0;
+  margin-top: 1em;
+  background: hsla(24, 20%, 50%,.08);
+  background: linear-gradient(to right, hsla(24, 20%, 50%,.1) 70%, hsla(24, 20%, 50%,0));
+  pointer-events: none;
+  line-height: inherit;
+  white-space: pre;
+}
+
+pre[data-line] .line-highlight:before, 
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-start);
+  position: absolute;
+  top: .4em;
+  left: .6em;
+  min-width: 1em;
+  padding: 0 .5em;
+  background-color: hsla(24, 20%, 50%,.4);
+  color: hsl(24, 20%, 95%);
+  font: bold 65%/1.5 sans-serif;
+  text-align: center;
+  vertical-align: .3em;
+  border-radius: 999px;
+  text-shadow: none;
+  box-shadow: 0 1px white;
+}
+
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-end);
+  top: auto;
+  bottom: .4em;
+}html body{font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ul,html body>ol{margin-bottom:16px}html body ul,html body ol{padding-left:2em}html body ul.no-list,html body ol.no-list{padding:0;list-style-type:none}html body ul ul,html body ul ol,html body ol ol,html body ol ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:bold;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:bold}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em !important;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::before,html body code::after{letter-spacing:-0.2em;content:"\00a0"}html body pre>code{padding:0;margin:0;font-size:.85em !important;word-break:normal;white-space:pre;background:transparent;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;font-size:.85em !important;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:before,html body pre tt:before,html body pre code:after,html body pre tt:after{content:normal}html body p,html body blockquote,html body ul,html body ol,html body dl,html body pre{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body pre,html body code{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview .pagebreak,.markdown-preview .newpage{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center !important}.markdown-preview:not([for="preview"]) .code-chunk .btn-group{display:none}.markdown-preview:not([for="preview"]) .code-chunk .status{display:none}.markdown-preview:not([for="preview"]) .code-chunk .output-div{margin-bottom:16px}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0}@media screen and (min-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{font-size:14px !important;padding:1em}}@media print{html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,0.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{padding:0 1.6em;margin-top:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li{margin-bottom:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{list-style-type:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% -  300px);padding:2em calc(50% - 457px -  150px);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+    </head>
+    <body for="html-export">
+      <div class="mume markdown-preview  ">
+      <h1 class="mume-header" id="quantum-phase-estimation-qpe">Quantum Phase Estimation (QPE)</h1>
+
+<p>Quantum phase estimation plays an important role as a subroutine in many quantum programs and lays the foundation for the famous Shor&#x2019;s algorithm. The task is usually formulated as:</p>
+<blockquote>
+<p>Given a unitary operator <span class="mathjax-exps">$U$</span> and its eigenvector <span class="mathjax-exps">$|u\rangle$</span>, find the associated eigenvalue such that <span class="mathjax-exps">$U|u\rangle = e^{2\pi i\varphi} |u\rangle$</span> ( phase <span class="mathjax-exps">$\varphi$</span> unknown ). Since <span class="mathjax-exps">$U$</span> is unitary, we can say that <span class="mathjax-exps">$0\leq\varphi&lt;1$</span>.</p>
+</blockquote>
+<hr>
+<h2 class="mume-header" id="algorithm">Algorithm</h2>
+
+<p>To illustrate how phase estimation works, consider an example. Suppose<br>
+</p><div class="mathjax-exps">$$U =  \begin{bmatrix} 1 &amp;0 \\ 0 &amp; e^{2i\pi/5} \end{bmatrix}$$</div><br>
+with eigenvector <span class="mathjax-exps">$|u\rangle = |1\rangle$</span>. Thus, the phase we want to estimate is <span class="mathjax-exps">$\varphi = 1/5$</span> since <span class="mathjax-exps">$U|1\rangle = e^{2\pi i\varphi} |1\rangle$</span>. In general, the QPE algorithm can be divided into the following 4 steps:<p></p>
+<ul>
+<li>
+<p><strong>Pre-processing</strong><br>
+The phase estimation algorithm requires two registers. The first part is called counting register and it contains an <span class="mathjax-exps">$n$</span>-qubit state all initialized to <span class="mathjax-exps">$|0\rangle$</span>. They will estimate the unknown phase <span class="mathjax-exps">$\varphi$</span> in binary form. The number of <span class="mathjax-exps">$n$</span> depends on the accuracy we want to achieve. The second part contains <span class="mathjax-exps">$m$</span> qubits and we need to initialize it to the eigenstate <span class="mathjax-exps">$|u\rangle$</span>. In our case, <span class="mathjax-exps">$m=1$</span> and choose <span class="mathjax-exps">$n=3$</span> to begin with. We would expect bad precision with only 3 counting qubits. Thus, the overall initial state after preprocessing is:<br>
+</p><div class="mathjax-exps">$$|\psi_0\rangle = |0\rangle^{\otimes n} \otimes |u\rangle =|000\rangle \otimes |1\rangle$$</div><br>
+We can easily do this in our simulator:<p></p>
+<pre data-role="codeBlock" data-info="python" class="language-python">qubit_num <span class="token operator">=</span> <span class="token number">4</span>
+shots <span class="token operator">=</span> <span class="token number">1000</span>
+phase <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">5</span>
+
+
+<span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">&quot;&quot;&quot;
+    main
+    &quot;&quot;&quot;</span>
+    <span class="token comment"># Create environment</span>
+    env <span class="token operator">=</span> QuantumEnvironment<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment"># Choose backend machine</span>
+    env<span class="token punctuation">.</span>backend<span class="token punctuation">(</span>BackendName<span class="token punctuation">.</span>LocalBaiduSim2<span class="token punctuation">)</span>
+
+    <span class="token comment"># Initialize qubits</span>
+    q <span class="token operator">=</span> <span class="token punctuation">[</span>env<span class="token punctuation">.</span>Q<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>qubit_num<span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    <span class="token comment"># Prepare eigenstate |1&gt; = X|0&gt; on the ancilla qubit</span>
+    X<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+</pre></li>
+<li>
+<p><strong>Superposition <span class="mathjax-exps">$H$</span></strong><br>
+Next, we apply a layer of Hadamard gates to all zero-initialized <strong>counting qubits</strong> to prepare a uniform superposition state. The resulting superposition state <span class="mathjax-exps">$|\psi_1 \rangle$</span> is<br>
+</p><div class="mathjax-exps">$$|\psi_1\rangle = (H|0\rangle)^{\otimes n} \otimes |u\rangle = \frac{1}{\sqrt{2^n}}(|0\rangle + |1\rangle)^{\otimes n} \otimes |u\rangle\,.$$</div><br>
+In our case, <span class="mathjax-exps">$n=3$</span> and <span class="mathjax-exps">$|u\rangle = |1\rangle$</span>. Hence,<br>
+<div class="mathjax-exps">$$|\psi_1\rangle = \frac{1}{\sqrt{8}} (|0\rangle + |1\rangle)\otimes(|0\rangle + |1\rangle)\otimes(|0\rangle + |1\rangle) \otimes |1\rangle\,.$$</div><br>
+In our simulator, call the Hadamard gate with<p></p>
+<pre data-role="codeBlock" data-info="python" class="language-python">    <span class="token comment"># Superposition</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+</pre></li>
+<li>
+<p><strong>Oracle <span class="mathjax-exps">$\hat{O}$</span></strong><br>
+The oracle used in phase estimation algorithm is a bunch of controlled-unitaries by setting control on <span class="mathjax-exps">$j$</span>-th counting qubit and target <span class="mathjax-exps">$U^{2^j}$</span> on the ancilla qubits in eigenstate <span class="mathjax-exps">$|u\rangle$</span>. Let&#x2019;s see what happens if we apply <span class="mathjax-exps">$U^{2^j}$</span> to eigenstate <span class="mathjax-exps">$|u\rangle$</span>. Set <span class="mathjax-exps">$j = 2$</span>, we get<br>
+</p><div class="mathjax-exps">$$U^{4}|u\rangle =  U^{3}U|u\rangle = e^{2\pi i\varphi} U^{3}|u\rangle = e^{2\pi i(2^1\varphi)}U^{2}|u\rangle = \cdots = e^{2\pi i (2^2\varphi)} |u\rangle$$</div><br>
+Then, we can see a clear recursion relation where<br>
+<div class="mathjax-exps">$$U^{2^j}|u\rangle =  U^{2^j-1}U|u\rangle = U^{2^j-1}e^{2\pi i\varphi} |u\rangle = \cdots = e^{2 \pi i (2^j \varphi)} |u\rangle, \quad j\in [0, n-1]$$</div><br>
+After that, we need to figure out what controlled-unitaries do. Consider a general quantum state vector for counting qubits,<br>
+<div class="mathjax-exps">$$|\phi\rangle = \alpha|0\rangle + \beta|1\rangle$$</div><br>
+Apply the controlled-U gate and we get<br>
+<div class="mathjax-exps">$$CU|\phi\rangle \otimes  |u\rangle = \alpha|0\rangle \otimes  |u\rangle + \beta \cdot U|1\rangle \otimes  |u\rangle = \alpha|0\rangle \otimes  |u\rangle + \beta \cdot e^{2 \pi i\varphi}|1\rangle \otimes  |u\rangle$$</div><br>
+This trick is usually called the <strong>phase kickback</strong>. Note that the overall effect is adding the unknown phase <span class="mathjax-exps">$\varphi$</span> to the control qubit by applying a unitary to target ancilla qubits. This is opposite to common sense that the control bit should remain the same. Now, we apply the oracle <span class="mathjax-exps">$\hat{O}$</span> ( Controlled-<span class="mathjax-exps">$U^{2^j}$</span>) to the whole state <span class="mathjax-exps">$|\psi_1\rangle$</span>.<br>
+<div class="mathjax-exps">$$\hat{O} |\psi_1\rangle = \frac{1}{\sqrt{2^n}}(|0\rangle + e^{2\pi i (2^{n-1}\varphi)}|1\rangle) \otimes\cdots \otimes (|0\rangle + e^{2\pi i (2^{0}\varphi)}|1\rangle)  \otimes |u\rangle$$</div><br>
+In our 3-qubit case,<br>
+<div class="mathjax-exps">$$|\psi_2\rangle = \hat{O} |\psi_1\rangle =\frac{1}{\sqrt{8}}(|0\rangle + e^{2\pi i (4\varphi)}|1\rangle) \otimes(|0\rangle + e^{2\pi i (2\varphi)}|1\rangle) \otimes (|0\rangle + e^{2\pi i (1\varphi)}|1\rangle)  \otimes |1\rangle$$</div><br>
+So far, our quantum circuit looks like:<p></p>
+<p><img src="./PIC/circuit1.png" alt="cir"></p>
+<p>It may still seem confusing what <span class="mathjax-exps">$U^{2^j}$</span> means. It simply means repeating the controlled-unitary <span class="mathjax-exps">$2^j$</span> times.<br>
+<img src="./PIC/circuit2.png" alt="cir2"></p>
+<p>In our simulator, the controlled-U gates can be generated easily by setting a general controlled 3-parameter rotation gate, which is defined as<br>
+</p><div class="mathjax-exps">$$R(\theta, \phi, \varphi)  = \begin{bmatrix} \cos(\frac{\theta}{2})              &amp; -e^{i\varphi}\sin(\frac{\theta}{2})\\ e^{i\phi}\sin(\frac{\theta}{2})  &amp; e^{i(\phi+\varphi)} \cos(\frac{\theta}{2}) \end{bmatrix}$$</div><br>
+It is easy to see that this rotation gate reduces to the given unitary <span class="mathjax-exps">$U$</span> when <span class="mathjax-exps">$\varphi&apos; = 2\pi/5$</span>.<br>
+<div class="mathjax-exps">$$R(0, 0, \varphi&apos;)  = \begin{bmatrix} 1  &amp;0\\ 0  &amp; e^{i\varphi&apos;} \end{bmatrix}$$</div><br>
+Here is the code.<p></p>
+<pre data-role="codeBlock" data-info="python" class="language-python">    <span class="token comment"># Control-U gates</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+</pre></li>
+<li>
+<p><strong>Quantum Fourier Transform (QFT)</strong></p>
+<p>We are very close to the answer at this stage but it&#x2019;s in <strong>Fourier basis</strong>. We need to get back to the familiar computational basis to read out our 3-qubit phase estimation <span class="mathjax-exps">$\hat{\varphi}$</span>. We refer the details of QFT to another document. Before we explain what QFT does, let&#x2019;s introduce the notation <span class="mathjax-exps">$\varphi = 0.\varphi_0\cdots \varphi_{n-1}$</span> to represent the <strong>binary fraction</strong> <span class="mathjax-exps">$\varphi = \varphi_0/2+\cdots + \varphi_{n-1}/2^n$</span> and each <span class="mathjax-exps">$\varphi_i \in \{0,1\}$</span>. In our 3-qubit case, we choose <span class="mathjax-exps">$n=3$</span> and the best precision we can reach for <span class="mathjax-exps">$\varphi = 1/5$</span> is between<br>
+</p><div class="mathjax-exps">$$\varphi_0 =0, \varphi_1 =0, \varphi_2 = 1 \quad \Rightarrow \quad \hat{\varphi}_{-} = \frac{1}{2}\varphi_0 + \frac{1}{4}\varphi_1 + \frac{1}{8}\varphi_2  = \frac{1}{8}$$</div><br>
+and<br>
+<div class="mathjax-exps">$$\varphi_0 =0, \varphi_1 = 1,  \varphi_2 = 0   \quad \Rightarrow \quad   \hat{\varphi}_{+} = \frac{1}{2}\varphi_0 + \frac{1}{4}\varphi_1 + \frac{1}{8}\varphi_2    = \frac{1}{4}$$</div><br>
+We expect to see the probability amplitude in this range. If we want to increase the accuracy and narrow down this range, we have to increase the counting qubit number. In fact, we can always rewrite the state <span class="mathjax-exps">$|\psi_2 \rangle$</span> derived from last step as<br>
+<div class="mathjax-exps">$$|\psi_2\rangle =\frac{1}{\sqrt{8}}(|0\rangle + e^{2\pi i (0.\varphi_2)}|1\rangle) \otimes(|0\rangle + e^{2\pi i (0.\varphi_1\varphi_2)}|1\rangle) \otimes (|0\rangle + e^{2\pi i (0.\varphi_0\varphi_1\varphi_2)}|1\rangle)  \otimes |1\rangle$$</div><br>
+To illustrate this, consider<br>
+<div class="mathjax-exps">$$2^1 \varphi = 2^1* (0.\varphi_0\varphi_1\varphi_2)   = 2*( \frac{1}{2}\varphi_0 + \frac{1}{4}\varphi_1 + \frac{1}{8}\varphi_2)   = \varphi_0 + \frac{1}{2}\varphi_1 + \frac{1}{4}\varphi_2   = 0.\varphi_1\varphi_2$$</div><br>
+Similarly,<br>
+<div class="mathjax-exps">$$2^2 \varphi = 2^2* (0.\varphi_0\varphi_1\varphi_2)   = 4*( \frac{1}{2}\varphi_0 + \frac{1}{4}\varphi_1 + \frac{1}{8}\varphi_2)   = 2\varphi_0 + \varphi_1 + \frac{1}{2}\varphi_2   = 0.\varphi_2$$</div><br>
+This can be generalized to<br>
+<div class="mathjax-exps">$$2^j \varphi = 2^j* (0.\varphi_0\cdots\varphi_{n-1})   = 2^j*( \frac{1}{2}\varphi_0 + \cdots + \frac{1}{2^n}\varphi_{n-1})   = 2^{j-1}\varphi_0 + \cdots+ \frac{1}{2}\varphi_j + \cdots   = 0.\varphi_j\cdots\varphi_{n-1}$$</div><br>
+Now, we can understand what quantum fourier transform (QFT) does! It maps an n-bit binary string in computational basis into a so-called Fourier basis:<br>
+<div class="mathjax-exps">$$QFT_n |\varphi_0, \cdots, \varphi_{n-1}\rangle    = \frac{1}{\sqrt{2^n}} (|0\rangle + e^{2\pi i (0.\varphi_{n-1})}|1\rangle) \otimes \cdots \otimes (|0\rangle + e^{2\pi i (0.\varphi_0\cdots\varphi_{n-1})}|1\rangle)$$</div><br>
+This is exactly the form of <span class="mathjax-exps">$|\psi_2\rangle$</span> we have seen before. Then, we can apply 3-qubit inverse fourier transform to the counting qubits of <span class="mathjax-exps">$|\psi_2 \rangle$</span><br>
+<div class="mathjax-exps">$$QFT^{-1}_3\otimes I |\psi_2 \rangle = |\varphi_0, \varphi_1, \varphi_2\rangle \otimes  |u\rangle$$</div><br>
+The matrix representation for this operation is<br>
+<div class="mathjax-exps">$$QFT^{-1}_{3} = \frac{1}{\sqrt{8}}   \begin{bmatrix}   1 &amp;1 &amp;1 &amp;1 &amp;1 &amp;1 &amp;1 &amp;1\\   1 &amp;\sqrt{-i} &amp;-i &amp;-\sqrt{i} &amp;-1 &amp;-\sqrt{-i} &amp;i &amp;\sqrt{i}\\   1 &amp;-i &amp;-1 &amp;i &amp;1 &amp;-i &amp;-1 &amp;i\\   1 &amp;-\sqrt{i} &amp;i &amp;\sqrt{-i} &amp;-1 &amp;i &amp;-i &amp;-\sqrt{-i}\\   1 &amp;-1 &amp;1 &amp;-1 &amp;1 &amp;-1 &amp;1 &amp;-1\\   1 &amp;-\sqrt{-i} &amp;i &amp;\sqrt{i} &amp;-1 &amp;\sqrt{-i} &amp;-i &amp;-\sqrt{i}\\   1 &amp;i &amp;-1 &amp;-i &amp;1 &amp;i &amp;-1 &amp;-i\\   1 &amp;\sqrt{i} &amp;i &amp;-\sqrt{-i} &amp;-1 &amp;-\sqrt{i} &amp;-i &amp;\sqrt{-i}   \end{bmatrix}$$</div><br>
+And the circuit model is constructed as<br>
+<img src="./PIC/iQFT3.png" alt="iqft3"><br>
+Notice the equality between<br>
+<div class="mathjax-exps">$$R(0, 0, -\pi/4)    =    \begin{bmatrix}   1  &amp;0\\   0  &amp; e^{-i\frac{\pi}{4}}   \end{bmatrix}    =T^\dagger$$</div><br>
+and<br>
+<div class="mathjax-exps">$$R(0, 0, -\pi/2)    =    \begin{bmatrix}   1  &amp;0\\   0  &amp; e^{-i\frac{\pi}{2}}   \end{bmatrix}    =    \begin{bmatrix}   1  &amp;0\\   0  &amp; -i   \end{bmatrix}    =S^\dagger$$</div><br>
+In our simulator, this inverse QFT can be implemented by<p></p>
+<pre data-role="codeBlock" data-info="python" class="language-python">    <span class="token comment"># 3-qubit inverse QFT</span>
+    SWAP<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+</pre></li>
+<li>
+<p><strong>Read out and measurement</strong><br>
+After so many efforts, we finally reach the point where we read out the 3-qubit estimated phase <span class="mathjax-exps">$\hat{\varphi} = 0.\varphi_0\varphi_1\varphi_2$</span> in binary fraction.<br>
+<img src="./PIC/measure.png" alt="measure"><br>
+Combine all the steps above, we get the following measurement results:<br>
+<img src="./PIC/result.png" alt="result"><br>
+Here, we can see that the state with highest probability is <span class="mathjax-exps">$|\varphi_0, \varphi_1, \varphi_2\rangle = |010\rangle$</span> which corresponds to the estimated phase<br>
+</p><div class="mathjax-exps">$$\hat{\varphi}_{3-qubit} = 0.\varphi_0\varphi_1\varphi_2 = \frac{1}{2}\varphi_0 + \frac{1}{4}\varphi_1 + \frac{1}{8}\varphi_2 = 0.25$$</div><br>
+which is off by <span class="mathjax-exps">$25\%$</span> from the true value. But this is the best we can get using 3 counting qubits. If we use 5-qubits instead, the result will be much more accurate (error scales as <span class="mathjax-exps">$1/2^n$</span>).<p></p>
+</li>
+</ul>
+<h2 class="mume-header" id="code">Code</h2>
+
+<p>Here is the complete code. Please try it, change the parameters and see what happens.</p>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+<span class="token keyword">import</span> sys
+sys<span class="token punctuation">.</span>path<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">&apos;../../..&apos;</span><span class="token punctuation">)</span>  <span class="token comment"># &quot;from QCompute import *&quot; requires this</span>
+<span class="token keyword">from</span> QCompute <span class="token keyword">import</span> <span class="token operator">*</span>
+
+qubit_num <span class="token operator">=</span> <span class="token number">4</span>
+shots <span class="token operator">=</span> <span class="token number">1000</span>
+phase <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">5</span>
+
+
+<span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">&quot;&quot;&quot;
+    main
+    &quot;&quot;&quot;</span>
+    <span class="token comment"># Create environment</span>
+    env <span class="token operator">=</span> QuantumEnvironment<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment"># Choose backend machine</span>
+    env<span class="token punctuation">.</span>backend<span class="token punctuation">(</span>BackendName<span class="token punctuation">.</span>LocalBaiduSim2<span class="token punctuation">)</span>
+
+    <span class="token comment"># Initialize qubits</span>
+    q <span class="token operator">=</span> <span class="token punctuation">[</span>env<span class="token punctuation">.</span>Q<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>qubit_num<span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    <span class="token comment"># Prepare eigenstate |1&gt; = X|0&gt; on the ancilla qubit</span>
+    X<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Superposition</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Control-U gates</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> phase<span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># 3-qubit inverse QFT</span>
+    SWAP<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    CU<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>pi <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    H<span class="token punctuation">(</span>q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Measurement result</span>
+    MeasureZ<span class="token punctuation">(</span><span class="token punctuation">[</span>q<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    taskResult <span class="token operator">=</span> env<span class="token punctuation">.</span>commit<span class="token punctuation">(</span>shots<span class="token punctuation">,</span> fetchMeasure<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> taskResult<span class="token punctuation">[</span><span class="token string">&apos;counts&apos;</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">&apos;__main__&apos;</span><span class="token punctuation">:</span>
+    main<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</pre><hr>
+<h2 class="mume-header" id="discussion">Discussion</h2>
+
+<p>We can see that the algorithm itself is trying to find the eigenvalue of a given unitary. That&#x2019;s why it is also called <strong>eigenvalue estimation</strong>. Now, it&#x2019;s your turn to have a try. You may change the phase to <span class="mathjax-exps">$\varphi = 2\pi/3$</span> and generate meaningful explanations.</p>
+<hr>
+<h2 class="mume-header" id="reference">Reference</h2>
+
+<p><a href>Nielsen, Michael A. &amp; Isaac L. Chuang (2001). Quantum computation and quantum information (Repr. ed.). Cambridge [u.a.]: Cambridge Univ. Press. ISBN 978-0521635035.</a></p>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    </body></html>

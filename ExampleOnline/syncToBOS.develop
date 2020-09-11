@@ -1,0 +1,7 @@
+#!/bin/sh
+
+bcecmd bos rm -ry bos:/quantum-task-test/project/researcher
+bcecmd bos sync ./Researcher bos:/quantum-task-test/project/researcher
+
+bcecmd bos rm -ry bos:/quantum-task-test/project/starter
+bcecmd bos sync ./Starter bos:/quantum-task-test/project/starter
