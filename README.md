@@ -47,7 +47,7 @@ Coding requirements:
 1. If any questions, advices, suggestions, please contact us via Email: quantum@baidu.com ;
 2. Or, you can use internal feedback table in Quantum-hub to provide any feedbacks;
 3. Or, you are also welcomed to join our discussion QQ group:
-QQ Group：1147781135
+QQ Group Number：1147781135
 
 ![](https://release-data.cdn.bcebos.com/github-qleaf%2Fqrcode.png)
 
@@ -55,9 +55,9 @@ QQ Group：1147781135
 Institute of Quantum Computing, Baidu.
 
 ## Changelog
-The changelog of this project can be found in [CHANGELOG](https://github.com/baidu/QCompute/CHANGELOG.md).
+The changelog of this project can be found in [CHANGELOG.md](https://github.com/baidu/QCompute/blob/master/CHANGELOG.md).
 
 ## License
-This project is licensed under the Apache License 2.0 - see the [LICENSE.md](https://github.com/baidu/QCompute/LICENSE) file for details
+This project is licensed under the Apache License 2.0 - see the [LICENSE](https://github.com/baidu/QCompute/blob/master/LICENSE) file for details
 
 
