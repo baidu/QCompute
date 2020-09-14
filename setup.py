@@ -26,7 +26,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '0.0.1'
+SDK_VERSION = '1.0.0'
 
 with open('./README.md', 'r', encoding='utf-8') as srcfd:
     DESC = srcfd.read()
@@ -35,14 +35,13 @@ setup(
     name='qcompute',
     version=SDK_VERSION,
     install_requires=[
-        'protobuf==3.13.0',
-        'numpy==1.19.1',
-        'scipy==1.5.2',
-        'requests==2.24.0',
-        'pprint==0.1',
-        'bidict==0.21.0',
-        'bce-python-sdk-reborn==0.8.32',
-        'matplotlib==3.3.1',
+        'protobuf',
+        'numpy',
+        'scipy',
+        'requests',
+        'bidict',
+        'bce-python-sdk-reborn',
+        'matplotlib',
     ],
     python_requires='>=3.6, <4',
     packages=find_packages(),
