@@ -44,7 +44,7 @@ Values: MeasureFormat.Bin, MeasureFormat.Hex
 
 inProcessSimulator = True
 """
-Rum simulator in or out process.
+Run simulator in or out process.
 
 The 'inProcessSimulator' option can significantly accelerate the calculation of simulator while 
 the outProcessSimulator can enhance the stability of simulator.  
