@@ -10,11 +10,11 @@ Bennett & Wiesner于1992年发明量子超密编码，其是通过发送一个�
 
 ![avatar](./PIC/measure_QH.png)
 
-如果Alice想发送 $01$ 怎么办？很简单，她只需要先在自己的qubit上作用 $X$ 门，然后再把自己的 qubit 发送给 Bob。Bob 收到 Alice的qubit，同样是将两个 qubit 排好序（Alice的qubit在上）， 然后做用上图的电路，测得的结果恰好就是 $\lvert {01}\rangle$, 完整的过程如下：
+如果Alice想发送 $01$ 怎么办？很简单，她只需要先在自己的qubit上作用 $Z$ 门，然后再把自己的 qubit 发送给 Bob。Bob 收到 Alice的qubit，同样是将两个 qubit 排好序（Alice的qubit在上）， 然后做用上图的电路，测得的结果恰好就是 $\lvert {01}\rangle$, 完整的过程如下：
 
 ![avatar](./PIC/procedure_QH.png)
 
-如果 Alice 想发送$10$， 那么她需要先在自己的量子比特上作用 $Z$ 门，然后再把自己的量子比特发送给Bob。如果 Alice 想传输$11$，那么她需要先在自己的量子比特上作用 $Z$ 还有 $X$ 门，然后再把自己的量子比特发送给 Bob。关于发送$10$和$11$的完整示意图分别如下：
+如果 Alice 想发送$10$， 那么她需要先在自己的量子比特上作用 $X$ 门，然后再把自己的量子比特发送给Bob。如果 Alice 想传输$11$，那么她需要先在自己的量子比特上作用 $Z$ 还有 $X$ 门，然后再把自己的量子比特发送给 Bob。关于发送$10$和$11$的完整示意图分别如下：
 
 ![avatar](./PIC/message10_QH.png)
 ![avatar](./PIC/message_11_QH.png)
@@ -44,9 +44,9 @@ def main():
     CX(q[0], q[1])
 
     if message == '01':
-        X(q[0])
-    elif message == '10':
         Z(q[0])
+    elif message == '10':
+        X(q[0])
     elif message == '11':
         Z(q[0])
         X(q[0])

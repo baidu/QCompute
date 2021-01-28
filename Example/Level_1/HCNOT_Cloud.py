@@ -27,20 +27,31 @@ sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
 # Your token:
-Define.hubToken = ''
+# Define.hubToken = ''
 
+# Create environment
 env = QuantumEnvironment()
-# Baidu Cloud Quantum Simulator-Sim2
-env.backend(BackendName.CloudBaiduSim2)
+# Choose backend Baidu Cloud Quantum Simulator-Sim2
+env.backend(BackendName.CloudBaiduSim2Water)
 
+# Initialize the two-qubit circuit
 q = [env.Q[0], env.Q[1]]
 
-# X(q[0])
-H(q[0])
+# We apply an X gate on the 0th qubit firstly.
+# Also, you can comment it as you like.
+X(q[0])
+
+# Then we apply a Hadamard gate on the 0th qubit,
+# where we comment the gate in order to hint the user you to try yourself.
+# H(q[0])
+
+# We need a CX gate to generate an entangle quantum state
 CX(q[0], q[1])
 
+# Measure with the computational basis
 MeasureZ(q, range(2))
 
+# Commit the request with 1024 shots to the cloud
 taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

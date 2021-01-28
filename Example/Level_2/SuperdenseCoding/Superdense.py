@@ -19,13 +19,15 @@
 Superdense
 """
 import sys
+
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-# hyper-parameter
+# Set the shot number for each quest
 shots = 1024
 
-# The message that Alice want to send to Bob
+# The message that Alice want to send to Bob.
+# The user you can modify the massage to '00', '01' or '10' as you like
 message = '11'
 
 
@@ -33,24 +35,41 @@ def main():
     """
     main
     """
+    # Create environment
     env = QuantumEnvironment()
+    # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
+
+    # Initialize the two-qubit circuit
     q = [env.Q[0], env.Q[1]]
+
+    # Alice and Bob share a Bell state (|00>+|11>) / sqrt(2),
+    # where Alice holds q[0] and Bob holds q[1]
     H(q[0])
     CX(q[0], q[1])
 
+    # For different message, Alice applies different gates on q[0],
+    # where she applies nothing to indicate the message '00'
     if message == '01':
         X(q[0])
     elif message == '10':
         Z(q[0])
     elif message == '11':
-        Z(q[0])
+        # Here ZX = iY
         X(q[0])
+        Z(q[0])
 
+    # Alice sends her qubit q[0] to Bob,
+    # and then Bob decodes the two qubits.
+    # Bob needs to measure the two qubits with Bell basis,
+    # or transforms the state to computational basis
+    # and measures it with the computational basis
     CX(q[0], q[1])
     H(q[0])
 
+    # Measure with the computational basis
     MeasureZ(q, range(2))
+    # Commit the quest
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])
 

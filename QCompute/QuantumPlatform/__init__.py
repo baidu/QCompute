@@ -63,9 +63,13 @@ class BackendName(Enum):
 
     CloudBaiduSim2 = 'cloud_baidu_sim2'
     """
-    Cloud Baidu Sim2
+    Cloud Baidu Sim2 Deprecated
+    
+    Alias of cloud_baidu_sim2_water
     
     Param can be a Sim2Param enum or string.
+    
+    Default is Sim2Param.Dense_Matmul_Probability
     
     Example: 
     
@@ -80,6 +84,98 @@ class BackendName(Enum):
     or Added shots(must have space in string)
     
     env.backend(BackendName.CloudBaiduSim2, Sim2Param.Dense_Matmul_Probability.value + ' -s 1024')
+    """
+
+    CloudBaiduSim2Water = 'cloud_baidu_sim2_water'
+    """
+    Cloud Baidu Sim2 Water
+    
+    Python simulator
+    
+    Param can be a Sim2Param enum or string.
+    
+    Default is Sim2Param.Dense_Matmul_Probability
+    
+    Example: 
+    
+    env = QuantumEnvironment()
+    
+    env.backend(BackendName.CloudBaiduSim2Water)
+    
+    or
+    
+    env.backend(BackendName.CloudBaiduSim2Water, Sim2Param.Dense_Matmul_Probability)
+    
+    or Added shots(must have space in string)
+    
+    env.backend(BackendName.CloudBaiduSim2Water, Sim2Param.Dense_Matmul_Probability.value + ' -s 1024')
+    """
+
+    CloudBaiduSim2Earth = 'cloud_baidu_sim2_earth'
+    """
+    Cloud Baidu Sim2 Earth
+    
+    Python simulator high performance
+    
+    Param can be a Sim2Param enum or string.
+    
+    Default is Sim2Param.Dense_Matmul_Probability
+    
+    Example: 
+    
+    env = QuantumEnvironment()
+    
+    env.backend(BackendName.CloudBaiduSim2Earth)
+    
+    or
+    
+    env.backend(BackendName.CloudBaiduSim2Earth, Sim2Param.Dense_Matmul_Probability)
+    
+    or Added shots(must have space in string)
+    
+    env.backend(BackendName.CloudBaiduSim2Earth, Sim2Param.Dense_Matmul_Probability.value + ' -s 1024')
+    """
+
+    CloudBaiduSim2Thunder= 'cloud_baidu_sim2_thunder'
+    """
+    Cloud Baidu Sim2 Thunder
+    
+    Cpp simulator
+    
+    Dense_Matmul_Probability
+    
+    Param must be a string.
+    
+    Example: 
+    
+    env = QuantumEnvironment()
+    
+    env.backend(BackendName.CloudBaiduSim2Thunder)
+    
+    or
+    
+    env.backend(BackendName.CloudBaiduSim2Thunder, '-s 1024')
+    """
+
+    CloudBaiduSim2Heaven= 'cloud_baidu_sim2_heaven'
+    """
+    Cloud Baidu Sim2 Heaven
+    
+    Cpp simulator cluster
+    
+    Dense_Matmul_Probability
+    
+    Param must be a string.
+    
+    Example: 
+    
+    env = QuantumEnvironment()
+    
+    env.backend(BackendName.CloudBaiduSim2Heaven)
+    
+    or
+    
+    env.backend(BackendName.CloudBaiduSim2Heaven, '-s 1024')
     """
 
     CloudQpu = 'cloud_qpu'

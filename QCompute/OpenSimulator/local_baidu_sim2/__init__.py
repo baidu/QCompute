@@ -20,18 +20,20 @@ To adapt Sim2 to PySDK
 """
 
 import json
+import os
 import subprocess
-import tempfile
 from enum import Enum
-from os import path, fdopen
+from os import path
 from sys import executable
 
 from google.protobuf.json_format import MessageToJson
 
+from QCompute import outputPath
 from QCompute.Define.Settings import outputInfo, inProcessSimulator
 from QCompute.Define.Utils import _filterConsoleOutput
 from QCompute.OpenSimulator import QuantumImplement
 from QCompute.OpenSimulator.local_baidu_sim2.Simulator import runSimulator
+from QCompute.QuantumPlatform import Error
 
 
 class Backend(QuantumImplement):
@@ -70,6 +72,10 @@ class Backend(QuantumImplement):
         Or self.runOutProcess()  # in another process
         """
 
+        if len(self.program.head.usingQRegs) > 32:
+            raise Error.RuntimeError('The dimension of ndarray does not support more than 32 qubits. '
+                                     f'Currently, QReg in the program counts {self.program.head.usingQRegs}.')
+
         if inProcessSimulator:
             self.runInProcess()
         else:
@@ -80,14 +86,7 @@ class Backend(QuantumImplement):
         Executed in the process (for debugging purpose)
         """
 
-        self.result = runSimulator(self.makeParams(), self.program)
-        self.result.output = json.dumps({
-            'shots': self.result.shots,
-            'counts': self.result.counts,
-            'seed': self.result.seed,
-            'startTimeUtc': self.result.startTimeUtc,
-            'endTimeUtc': self.result.endTimeUtc,
-        })
+        self.result = runSimulator(self._makeParams(), self.program)
 
         if outputInfo:
             print('Shots', self.result.shots)
@@ -101,15 +100,15 @@ class Backend(QuantumImplement):
 
         jsonStr = MessageToJson(self.program, preserving_proto_field_name=True)
 
-        # write the qiskit qobj to a temporary json file
-        tmpFd, tmpFn = tempfile.mkstemp(suffix=".json")
-        with fdopen(tmpFd, "wt") as fObj:
-            fObj.write(jsonStr)
+        # write the circuit to a temporary json file
+        programFilePath = os.path.join(outputPath, 'program.json')
         if outputInfo:
-            print('json file:', tmpFn)  # print the json filename
+            print('program file:', programFilePath)  # print the output filename
+        with open(programFilePath, 'wt', encoding='utf-8') as file:
+            file.write(jsonStr)
 
-        cmd = (executable,) + (path.join(path.dirname(__file__), 'Simulator.py'),) + tuple(self.makeParams()) + (
-            '-inputFile', tmpFn)
+        cmd = (executable,) + (path.join(path.dirname(__file__), 'Simulator.py'),) + tuple(self._makeParams()) + (
+            '-inputFile', programFilePath)
         if outputInfo:
             print(f"{cmd}")
 
@@ -124,20 +123,20 @@ class Backend(QuantumImplement):
             print(self.result.output)
             return
 
-        self.result.output = _filterConsoleOutput(completedProcess.stdout)
-        result = json.loads(self.result.output)
-        self.result.shots = result['shots']
-        self.result.counts = result['counts']
-        self.result.seed = result['seed']
-        self.result.startTimeUtc = result['startTimeUtc']
-        self.result.endTimeUtc = result['endTimeUtc']
+        countsFilePath = os.path.join(outputPath, 'counts.json')
+        if outputInfo:
+            print('counts file:', countsFilePath)  # print the input filename
+        with open(countsFilePath, 'rt', encoding='utf-8') as file:
+            text = file.read()
+
+        self.result.fromJson(text)
 
         if outputInfo:
             print('Shots', self.result.shots)
             print('Counts', self.result.counts)
             print('Seed', self.result.seed)
 
-    def makeParams(self):
+    def _makeParams(self):
         """
         Generate params
         """

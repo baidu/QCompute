@@ -19,10 +19,13 @@
 Grover's Algorithm Test
 """
 import sys
+
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+# In this example we use 3 qubits in total
 qubit_num = 3
+# and set the shot number for each request
 shots = 1000
 
 
@@ -32,28 +35,31 @@ def main():
     """
     # Create environment
     env = QuantumEnvironment()
-    # Choose backend
+    # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
 
-    # Initialize a 3-qubit state
+    # Initialize the three-qubit circuit
     q = [env.Q[i] for i in range(qubit_num)]
 
-    # Superposition
+    # The first step of Grover's search algorithm, superposition
     H(q[0])
     H(q[1])
     H(q[2])
 
-    # Oracle for |101>
+    # Enter the first Grover iteration, the oracle Uf for |101>
     X(q[1])
     H(q[2])
     CCX(q[0], q[1], q[2])
     X(q[1])
     H(q[2])
 
-    # Diffusion Operator
+    # The first layer of Hadamard gates in the first Grover iteration
     H(q[0])
     H(q[1])
     H(q[2])
+
+    # The reflection gate 2|0><0|-I in the first Grover iteration, which is divided to three parts:
+    # two layer of X gates and a decomposition for the gate CCZ between the above two
     X(q[0])
     X(q[1])
     X(q[2])
@@ -65,14 +71,20 @@ def main():
     X(q[0])
     X(q[1])
     X(q[2])
+
+    # The second layer of Hadamard gates in the first Grover iteration
     H(q[0])
     H(q[1])
     H(q[2])
 
-    # Measurement result
+    # Measure with the computational basis;
+    # if the user you want to increase the number of Grover iteration,
+    # please repeat the code from the comment “Enter the first Grover iteration” to here,
+    # and then measure
     MeasureZ(q, range(qubit_num))
+    # Commit the quest
     taskResult = env.commit(shots, fetchMeasure=True)
-    return taskResult['counts']
+    print(taskResult['counts'])
 
 
 if __name__ == '__main__':

@@ -43,7 +43,7 @@ else:
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
 
-sdkVersion = 'Python 1.0.0'
+sdkVersion = 'Python 1.0.3'
 """
 SDK Version
 

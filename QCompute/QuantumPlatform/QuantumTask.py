@@ -30,7 +30,7 @@ import requests
 # Configuration of token
 # This could be read from configure file or environment variable
 from QCompute import Define
-from QCompute.Define import quantumHubAddr, quantumBucket, pollInterval, sdkVersion, taskSource
+from QCompute.Define import quantumHubAddr, quantumBucket, pollInterval, sdkVersion, taskSource, outputPath
 from QCompute.Define import waitTaskRetrys
 # the url for cloud service
 # SERVICE = "https://8yamgsew2cs2f.cfc-execute.gz.baidubce.com/"
@@ -140,7 +140,7 @@ def _uploadCircuit(file):
 
 
 @_retryWhileNetworkError
-def _createTask(token, circuitId, shots, backend, backendParam=None, modules=None):
+def _createTask(token, circuitId, qRegCount, shots, backend, backendParam=None, modules=None):
     """
     Create a task from the code
     """
@@ -148,6 +148,7 @@ def _createTask(token, circuitId, shots, backend, backendParam=None, modules=Non
     task = {
         "token": token,
         "circuitId": circuitId,
+        "qRegCount": qRegCount,
         "taskType": backend,
         "shots": shots,
         "sdkVersion": sdkVersion,
@@ -206,7 +207,7 @@ def _fetchResult(token, taskId):
     originUrl = result["originUrl"]
     # originSize = result["originSize"]
     try:
-        originFile, downSize = _downloadToFile(originUrl, f"./Output/{taskId}.origin.json")
+        originFile, downSize = _downloadToFile(originUrl, os.path.join(outputPath, f"remote.{taskId}.origin.json"))
     except Exception:
         # TODO split the disk write error
         raise Error.NetworkError(traceback.format_exc())
@@ -216,7 +217,7 @@ def _fetchResult(token, taskId):
     measureUrl = result["measureUrl"]
     # measureSize = result["measureSize"]
     try:
-        measureFile, downSize = _downloadToFile(measureUrl, f"./Output/{taskId}.measure.json")
+        measureFile, downSize = _downloadToFile(measureUrl, os.path.join(outputPath, f"remote.{taskId}.measure.json"))
     except Exception:
         # TODO split the disk write error
         raise Error.NetworkError(traceback.format_exc())
@@ -232,7 +233,7 @@ def _fetchMeasureResult(taskId):
     Dump the measurement content of the file from taskId
     """
 
-    localFile = f"./Output/{taskId}.measure.json"
+    localFile = f"./Output/remote.{taskId}.measure.json"
     if os.path.exists(localFile):
         with open(localFile, "rb") as fObj:
             data = json.loads(fObj.read())
@@ -246,6 +247,8 @@ def _waitTask(token, taskId, fetchMeasure=False, downloadResult=True):
     """
     Wait for a task from the taskId
     """
+    if outputInfo:
+        print(f'Task {taskId} is running, please wait...')
 
     task = {
         "token": token,

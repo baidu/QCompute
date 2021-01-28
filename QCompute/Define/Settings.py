@@ -66,3 +66,8 @@ Supporting local_baidu_sim2
 
 Values: True, False
 """
+
+linuxDirectSim2Thunder = False
+"""
+Use local sim2 thunder directly in linux.
+"""

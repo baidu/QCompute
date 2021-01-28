@@ -27,24 +27,31 @@ sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
 # Your token:
-Define.hubToken = ''
+# Define.hubToken = ''
 
+# Create environment
 env = QuantumEnvironment()
-# Baidu Cloud Quantum Simulator-Sim2
-env.backend(BackendName.CloudBaiduSim2)
+# Choose backend Baidu Cloud Quantum Simulator-Sim2
+env.backend(BackendName.CloudBaiduSim2Water)
 
+# We set the number of qubits in our quantum register as
 TotalNumQReg = 8
 
+# Initialize an empty quantum register firstly
 q = []
+# Then generate some qubits and append them into the register above
 for index in range(TotalNumQReg):
     q.append(env.Q[index])
 
+# We apply a Hadamard gate on each qubit in the register above,
+# and also other gates as you like such as a X gate.
 for index in range(TotalNumQReg):
     H(q[index])
     # X(q[index])
 
+# Measure with the computational basis
 MeasureZ(q, range(TotalNumQReg))
 
+# Commit the quest with 1000 shots to the cloud
 taskResult = env.commit(1000, fetchMeasure=True)
 pprint(taskResult)
-

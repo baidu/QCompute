@@ -26,19 +26,25 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-
+# Create environment
 env = QuantumEnvironment()
-# Baidu Local Quantum Simulator-Sim2
+# Choose backend Baidu Local Quantum Simulator-Sim2
 env.backend(BackendName.LocalBaiduSim2)
 
+# Initialize the three-qubit circuit
 q = [env.Q[0], env.Q[1], env.Q[2]]
 
+# Apply a Hadamard gate on the 0th qubit
 H(q[0])
+
+# Apply some CX gates where the 0th qubit controls flipping each other qubit
 CX(q[0], q[1])
 CX(q[0], q[2])
 
+# Measure with the computational basis
 MeasureZ(q, range(3))
 
+# Commit the quest with 1024 shots to the cloud
 taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

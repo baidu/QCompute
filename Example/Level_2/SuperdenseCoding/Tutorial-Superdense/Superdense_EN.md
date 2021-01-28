@@ -8,11 +8,11 @@ One can easily prepare a Bell state by applying this circuit on initial $|0\rang
 
 ![avatar](./PIC/measure_QH.png)
 
-Then he measured the whole system. Guess what he gets! He gets the $00$ message! That is exactly what Alice wants to send. Ok, what if Alice wants to transmit $01$ instead? All she needs to do is to implement an $X$ gate in her qubit before mailing it to Bob. Bob will take exactly the same procedure after he received Alice's qubit. This time, he will get a $01$ instead. The flowing picture shows the whole process.
+Then he measured the whole system. Guess what he gets! He gets the $00$ message! That is exactly what Alice wants to send. Ok, what if Alice wants to transmit $01$ instead? All she needs to do is to implement an $Z$ gate in her qubit before mailing it to Bob. Bob will take exactly the same procedure after he received Alice's qubit. This time, he will get a $01$ instead. The flowing picture shows the whole process.
 
 ![avatar](./PIC/procedure_EN_QH.png)
 
-If Alice wants to send $10$, she runs a $Z$ gate in her qubit before mailing it to Bob; if $11$, she runs a $Z$ gate and $X$ gate on her qubit. The process of sending $10$ and $11$ are shown in the two following pictures:
+If Alice wants to send $10$, she runs a $X$ gate in her qubit before mailing it to Bob; if $11$, she runs a $Z$ gate and $X$ gate on her qubit. The process of sending $10$ and $11$ are shown in the two following pictures:
 
 ![avatar](./PIC/message10_QH.png)
 ![avatar](./PIC/message_11_QH.png)
@@ -43,9 +43,9 @@ def main():
     CX(q[0], q[1])
 
     if message == '01':
-        X(q[0])
-    elif message == '10':
         Z(q[0])
+    elif message == '10':
+        X(q[0])
     elif message == '11':
         Z(q[0])
         X(q[0])

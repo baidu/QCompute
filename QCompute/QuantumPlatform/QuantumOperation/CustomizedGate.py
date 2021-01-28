@@ -68,6 +68,4 @@ class CustomizedGate(QuantumOperation):
         assert len(ret.qRegs) == len(qRegSet)  # Quantum registers of operators in circuit should not be duplicated
 
         _numpyMatrixToProtobufMatrix(self.matrix, ret.customizedGate.matrix)
-        self.matrix = self.matrix
-        mat = _protobufMatrixToNumpyMatrix(ret.customizedGate.matrix)
         return ret

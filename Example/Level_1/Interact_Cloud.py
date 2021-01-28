@@ -20,23 +20,23 @@ An example of coding on Quantum-Leaf with classical-quantum information interact
 Adjust parameter of rotation gate to eliminate '0' state.
 """
 
-from pprint import pprint
 import sys
 
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
 # Your token:
-Define.hubToken = ''
+# Define.hubToken = ''
 
 uValue = 1  # flag of intereactions
 for _ in range(15):
 
     print("uValue is :", uValue)
 
-    env = QuantumEnvironment()  # environment set-up
-
-    env.backend(BackendName.CloudBaiduSim2)  # set a backend to execute the quantum program
+    # Create environment
+    env = QuantumEnvironment()
+    # Choose backend Baidu Cloud Quantum Simulator-Sim2
+    env.backend(BackendName.CloudBaiduSim2Water)
 
     q = [env.Q[0]]  # define quantum registers in need
 
@@ -50,7 +50,7 @@ for _ in range(15):
 
     # interaction: change parameters of unitary in next experiment according to current result
     CountsDict = taskResult['counts']
-    if CountsDict['0'] > 5:
+    if CountsDict.get('0', 0) > 5:
         uValue = uValue * 2
     else:
         print("When the parameter is %d, 0 is eliminated." % uValue)

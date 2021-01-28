@@ -23,22 +23,31 @@ Results will be fetched from a local program.
 import sys
 from pprint import pprint
 
-
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+# Create environment
 env = QuantumEnvironment()
-# Baidu Local Quantum Simulator-Sim2
+# Choose backend Baidu Local Quantum Simulator-Sim2
 env.backend(BackendName.LocalBaiduSim2)
 
-q = [env.Q[0], env.Q[1], env.Q[2], env.Q[3], env.Q[4]]
+q = [env.Q[0], env.Q[1], env.Q[2], env.Q[3], env.Q[4]]  # More then used
 
-# X(q[0])
-H(q[0])
+# We apply an X gate on the 0th qubit firstly.
+# Also, you can comment it as you like.
+X(q[0])
+
+# Then we apply a Hadamard gate on the 0th qubit,
+# where we comment the gate in order to hint the user you to try yourself.
+# H(q[0])
+
+# We need a CX gate to generate an entangle quantum state
 CX(q[0], q[1])
 
-MeasureZ([q[0], q[1], q[2]], range(3))
+# Measure with the computational basis
+MeasureZ([q[0], q[1], q[2]], range(3))  # Interval and disorder
 
-taskResult = env.commit(1000, fetchMeasure=True)
+# Commit the request with 1024 shots to the cloud
+taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

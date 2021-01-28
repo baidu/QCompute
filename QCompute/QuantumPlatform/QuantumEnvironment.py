@@ -120,7 +120,7 @@ class QuantumEnvironment:
 
         # insert it into quantum programming environment
         if env.procedureMap.get(name) != None:
-            raise Error.ParamError(f'same procedure name "{name}"')
+            raise Error.ParamError(f'Duplicate procedure name "{name}"')
         env.procedureMap[name] = procedure
 
         # self destroy
@@ -208,7 +208,7 @@ class QuantumEnvironment:
             cRegCount = max(self.program.head.usingCRegs) + 1
             simulator.result.counts = _formatMeasure(simulator.result.counts, cRegCount)
 
-            originFd, originFn = tempfile.mkstemp(suffix=".json", prefix="local.", dir="./Output")
+            originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir="./Output")
             with os.fdopen(originFd, "wt") as fObj:
                 fObj.write(output)
             taskResult = {"status": "success", "origin": originFn}
@@ -216,7 +216,7 @@ class QuantumEnvironment:
             if kwargs.get("fetchMeasure", False):
                 taskResult["counts"] = simulator.result.counts
             else:
-                measureFd, measureFn = tempfile.mkstemp(suffix=".json", prefix="local.", dir="./Output")
+                measureFd, measureFn = tempfile.mkstemp(prefix="local.", suffix=".measure.json", dir="./Output")
                 with os.fdopen(measureFd, "wt") as fObj:
                     fObj.write(json.dumps(simulator.result.counts))
                 taskResult["measure"] = measureFn
@@ -251,7 +251,8 @@ class QuantumEnvironment:
             # todo process the file and upload failed case
             token, circuitId = _uploadCircuit(circuitPackageFile)
             backend = self.backendName[6:]  # omit the prefix `cloud_`
-            taskId = _createTask(token, circuitId, shots, backend, self.backendParam, modules)
+            taskId = _createTask(token, circuitId, len(self.program.head.usingQRegs), shots, backend, self.backendParam,
+                                 modules)
             if self.status is not None:
                 self.status.addTask(self.circuitSerialNumber, circuitId, taskId)
 
@@ -308,7 +309,7 @@ class QuantumEnvironment:
                 cRegCount = max(self.program.head.usingCRegs) + 1
                 agent.result.counts = _formatMeasure(agent.result.counts, cRegCount)
 
-                originFd, originFn = tempfile.mkstemp(suffix=".json", prefix="local.", dir="./Output")
+                originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir="./Output")
                 with os.fdopen(originFd, "wt") as fObj:
                     fObj.write(output)
                 taskResult = {"status": "success", "origin": originFn}
@@ -316,7 +317,7 @@ class QuantumEnvironment:
                 if kwargs.get("fetchMeasure", False):
                     taskResult["counts"] = agent.result.counts
                 else:
-                    measureFd, measureFn = tempfile.mkstemp(suffix=".json", prefix="local.", dir="./Output")
+                    measureFd, measureFn = tempfile.mkstemp(prefix="local.", suffix=".measure.json", dir="./Output")
                     with os.fdopen(measureFd, "wt") as fObj:
                         fObj.write(json.dumps(agent.result.counts))
                     taskResult["measure"] = measureFn

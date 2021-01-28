@@ -18,6 +18,8 @@
 """
 Quantum executor interface definition
 """
+import json
+
 from QCompute.Define import sdkVersion
 
 
@@ -65,6 +67,56 @@ class QuantumResult:
     """
     end utc time
     """
+
+    def fromJson(self, str):
+        """
+        fromJson
+        """
+        data = json.loads(str)
+        if 'sdkVersion' in data:
+            self.sdkVersion = data['sdkVersion']
+        if 'code' in data:
+            self.code = data['code']
+        if 'output' in data:
+            self.output = data['output']
+        if 'shots' in data:
+            self.shots = data['shots']
+        if 'counts' in data:
+            self.counts = data['counts']
+        if 'seed' in data:
+            self.seed = data['seed']
+        if 'startTimeUtc' in data:
+            self.startTimeUtc = data['startTimeUtc']
+        if 'endTimeUtc' in data:
+            self.endTimeUtc = data['endTimeUtc']
+
+    def toJsonInside(self):
+        """
+        toJsonInside
+        """
+        return json.dumps({
+            'sdkVersion': self.sdkVersion,
+            'code': self.code,
+            'output': self.output,
+            'shots': self.shots,
+            'counts': self.counts,
+            'seed': self.seed,
+            'startTimeUtc': self.startTimeUtc,
+            'endTimeUtc': self.endTimeUtc,
+        })
+
+    def toJson(self):
+        """
+        toJson
+        """
+        return json.dumps({
+            'sdkVersion': self.sdkVersion,
+            'shots': self.shots,
+            'counts': self.counts,
+            'seed': self.seed,
+            'startTimeUtc': self.startTimeUtc,
+            'endTimeUtc': self.endTimeUtc,
+        })
 
 
 class QuantumImplement:

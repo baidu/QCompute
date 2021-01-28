@@ -24,6 +24,7 @@ The initial state and gates are converted to tensors and gate implementation is 
 
 import argparse
 import json
+import os
 from datetime import datetime
 
 import numpy
@@ -33,6 +34,7 @@ import numpy
 from bidict import bidict
 from google.protobuf.json_format import Parse
 
+from QCompute import outputPath
 from QCompute.Define.Settings import doCompressGate
 from QCompute.OpenModule.CompositeGateModule import CompositeGate
 from QCompute.OpenModule.CompressGateModule import CompressGate
@@ -158,7 +160,7 @@ def core(program, matrixType, algorithm, measureMethod, shots, seed):
 
     # collect the result to simulator for the subsequent invoking
     result = QuantumResult()
-    result.startTimeUtc = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+    result.startTimeUtc = datetime.utcnow().isoformat()[:-3]+'Z'
 
     measured = False
     counts = {}
@@ -218,7 +220,7 @@ def core(program, matrixType, algorithm, measureMethod, shots, seed):
             raise Error.ParamError('unsupported operation')
     measuredCRegsList = list(measuredQRegsToCRegsBidict.keys())
 
-    result.endTimeUtc = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+    result.endTimeUtc = datetime.utcnow().isoformat()[:-3]+'Z'
     result.shots = shots
     result.counts = _filterMeasure(counts, measuredCRegsList)
     result.seed = int(seed)
@@ -242,10 +244,6 @@ def loadGates(matrixType, operationDict):
 
 if __name__ == '__main__':
     result = runSimulator(None, None)
-    print(json.dumps({
-        'shots': result.shots,
-        'counts': result.counts,
-        'seed': result.seed,
-        'startTimeUtc': result.startTimeUtc,
-        'endTimeUtc': result.endTimeUtc,
-    }))
+    countsFilePath = os.path.join(outputPath, 'counts.json')
+    with open(countsFilePath, 'wt', encoding='utf-8') as file:
+        file.write(result.toJsonInside())
