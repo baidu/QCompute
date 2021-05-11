@@ -30,7 +30,7 @@ def setup_environment(qRegs_number, backendname=None, seeds=normal_seed):
     """
     if backendname is None:
         backendname = BackendName.LocalBaiduSim2
-    env = QuantumEnvironment()
+    env = QEnv()
     if seeds is None:
         env.backend(backendname)
     else:
@@ -114,7 +114,7 @@ def localGateTest():
     env, q = setup_environment(N)
     Y(q[0])
     RX(PI)(q[0])  # This is like Y
-    ret = get_outcome(env, q, N, Module=UnrollCircuit())
+    ret = get_outcome(env, q, N, Module=UnrollCircuitModule())
     assert ret['counts']['0'] == 1024
 
     # Test RY
@@ -196,7 +196,7 @@ def localGateTest():
     N = 2
     env, q = setup_environment(N)
     RZZ(PI / 2, PI / 2, PI / 4)(q[0], q[1])
-    ret = get_outcome(env, q, N, Module=CompositeGate())
+    ret = get_outcome(env, q, N, Module=CompositeGateModule())
     assert ret['counts']['00'] == ret['counts']['10']
 
     # Test SWAP
@@ -259,5 +259,5 @@ def localGateTest():
     H(q[0])
     CX(q[0], q[1])
     X(q[1])
-    ret = get_outcome(env, q, N, Module=UnrollCircuit())
+    ret = get_outcome(env, q, N, Module=UnrollCircuitModule())
     assert ret['counts']['01'] == ret['counts']['10']

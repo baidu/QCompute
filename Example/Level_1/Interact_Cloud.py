@@ -25,26 +25,26 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # Your token:
 # Define.hubToken = ''
 
 uValue = 1  # flag of intereactions
 for _ in range(15):
 
-    print("uValue is :", uValue)
+    print('uValue is :', uValue)
 
     # Create environment
-    env = QuantumEnvironment()
+    env = QEnv()
     # Choose backend Baidu Cloud Quantum Simulator-Sim2
     env.backend(BackendName.CloudBaiduSim2Water)
 
-    q = [env.Q[0]]  # define quantum registers in need
-
     # apply gates and measurement operations to construct the circuit:
     u = RX(uValue)
-    u(q[0])
+    u(env.Q[0])
 
-    MeasureZ(q, range(1))
+    MeasureZ(*env.Q.toListPair())
 
     taskResult = env.commit(1024, fetchMeasure=True)  # submit the circuit, execute and get results
 
@@ -53,5 +53,5 @@ for _ in range(15):
     if CountsDict.get('0', 0) > 5:
         uValue = uValue * 2
     else:
-        print("When the parameter is %d, 0 is eliminated." % uValue)
+        print('When the parameter is %d, 0 is eliminated.' % uValue)
         break

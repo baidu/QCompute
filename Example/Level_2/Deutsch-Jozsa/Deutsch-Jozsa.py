@@ -22,6 +22,8 @@ Suppose: f1 = 0, f2 = first bit.
 
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # In this example we use 10 qubits as the main register,
 # and also an ancillary qubit else
 MainReg_num = 10
@@ -33,19 +35,16 @@ def main():
     """
     # Create two environment separately, and choose backend
     # We will execute D-J algorithm for f1 and f2 simultaneously
-    env1 = QuantumEnvironment()
+    env1 = QEnv()
     env1.backend(BackendName.LocalBaiduSim2)
-    env2 = QuantumEnvironment()
+    env2 = QEnv()
     env2.backend(BackendName.LocalBaiduSim2)
 
-    # Initial two registers with 11 qubits respectively,
+    # Initialize two registers on 11 qubits respectively,
     # where the last qubit in each register refers to the ancillary qubit,
     # and q1 and q2 correspond to f1 and f2 respectively.
-    q1 = []
-    q2 = []
-    for i in range(MainReg_num + 1):
-        q1.append(env1.Q[i])
-        q2.append(env2.Q[i])
+    q1 = env1.Q.createList(MainReg_num + 1)
+    q2 = env2.Q.createList(MainReg_num + 1)
 
     # As a preparation for D-J algorithm, we flip the ancillary qubit from |0> to |1>
     X(q1[MainReg_num])
@@ -59,7 +58,7 @@ def main():
 
     # Then apply U_f:
     # for f1 = 0, we need to do nothing on q1;
-    # for f2 = first qubit, we need to do nothing if the first qubit is 0,
+    # for f2 = first qubit, we need to do nothing if the first qubit is |0>,
     # else to flip the ancillary qubit in q2, which is exactly a CX gate
     CX(q2[0], q2[MainReg_num])
 

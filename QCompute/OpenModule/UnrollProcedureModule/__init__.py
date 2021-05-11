@@ -18,18 +18,18 @@
 """
 Composite Gate
 """
+from copy import deepcopy
+from typing import TYPE_CHECKING, Dict, List, Optional
 
-import copy
+from QCompute.OpenModule import ModuleImplement
+from QCompute.QPlatform import Error
+from QCompute.QProtobuf import PBProgram, PBCircuitLine
 
-from QCompute.QuantumPlatform import Error
-from QCompute.QuantumPlatform.QuantumOperation import FixedGate, RotationGate
-from QCompute.QuantumPlatform.QuantumOperation.Barrier import Barrier
-from QCompute.QuantumPlatform.QuantumOperation.Measure import MeasureZ
-from QCompute.QuantumProtobuf.Library.QuantumOperation_pb2 import FixedGate as FixedGateEnum, \
-    RotationGate as RotationGateEnum, Measure as PBMeasure
+if TYPE_CHECKING:
+    from QCompute.QProtobuf import PBProcedure
 
 
-class UnrollProcedure:
+class UnrollProcedureModule(ModuleImplement):
     """
     Unroll Procedure
 
@@ -37,8 +37,12 @@ class UnrollProcedure:
 
     env.module(UnrollProcedure())
     """
+    arguments = None
 
-    def __call__(self, program):
+    _procedureMap = None  # type: Dict[str, 'PBProcedure']
+    _circuitOut = None  # type: List['PBCircuitLine']
+
+    def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
         Process the Module
 
@@ -46,79 +50,57 @@ class UnrollProcedure:
         :return: unrolled procedure
         """
 
-        # list all the quantum registers
-        qRegsMap = {qReg: qReg for qReg in program.head.usingQRegs}
+        ret = deepcopy(program)
 
-        ret = copy.deepcopy(program)
-        ret.body.ClearField('circuit')
+        ret.body.procedureMap.clear()
+        del ret.body.circuit[:]
+        self._circuitOut = ret.body.circuit
+
+        # list all the quantum registers
+        qRegMap = {qReg: qReg for qReg in program.head.usingQRegList}
 
         self._procedureMap = program.body.procedureMap
-        self._circuitOut = ret.body.circuit
-        self._unrollProcedure(program.body.circuit, qRegsMap, None)
+        self._unrollProcedure(program.body.circuit, qRegMap, None)
 
-        ret.body.ClearField('procedureMap')
         return ret
 
-    def _unrollProcedure(self, circuit, qRegsMap, paramValues):
+    def _unrollProcedure(self, circuit: List['PBCircuitLine'], qRegMap: Dict[int, int],
+                         argumentValueList: Optional[List[float]]) -> None:
         # fill in the circuit
         for circuitLine in circuit:
-            if circuitLine.HasField('fixedGate'):  # fixed gate
-                fixedGateClass = getattr(FixedGate, FixedGateEnum.Name(circuitLine.fixedGate))  # get gate class
-                qRegList = []
-                for qReg in circuitLine.qRegs:  # quantum register lists
-                    qRegList.append(qRegsMap[qReg])
-                self._circuitOut.append(fixedGateClass._toPB(*qRegList))
-            elif circuitLine.HasField('rotationGate'):  # rotation gate
-                rotationGateClass = getattr(RotationGate, RotationGateEnum.Name(
-                    circuitLine.rotationGate))  # get gate class
-                qRegList = []
-                for qReg in circuitLine.qRegs:  # quantum register lists
-                    qRegList.append(qRegsMap[qReg])
-                params = []
-                if len(circuitLine.paramIds) > 0:
-                    for index, paramId in enumerate(circuitLine.paramIds):  # check procedure params
-                        if paramId == -1:
-                            params.append(circuitLine.paramValues[index])  # from angles
-                        else:
-                            params.append(paramValues[paramId])  # from procedure params
-                else:
-                    params = circuitLine.paramValues
+            op = circuitLine.WhichOneof('op')
+            if op in ['fixedGate', 'rotationGate', 'compositeGate', 'measure', 'barrier']:
+                ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                if len(ret.argumentIdList) > 0:
+                    if len(ret.argumentValueList) == 0:
+                        ret.argumentValueList[:] = [0.0] * len(ret.argumentIdList)
+                    for index, argumentId in enumerate(ret.argumentIdList):
+                        if argumentId >= 0:
+                            ret.argumentValueList[index] = argumentValueList[argumentId]
+                    del ret.argumentIdList[:]
+                for index, qReg in enumerate(ret.qRegList):
+                    if qReg not in qRegMap:
+                        raise Error.ArgumentError('QReg argument is not in procedure!')
+                    ret.qRegList[index] = qRegMap[qReg]
+                self._circuitOut.append(ret)
+            elif op == 'customizedGate':  # customized gate
+                raise Error.ArgumentError('Unsupported operation customizedGate!')
+            elif op == 'procedureName':  # procedure
+                qProcedureRegMap = {index: qRegMap[qReg] for index, qReg in enumerate(circuitLine.qRegList)}
 
-                self._circuitOut.append(rotationGateClass(*params)._toPB(*qRegList))
-            elif circuitLine.HasField('customizedGate'):  # customized gate
-                raise Error.ParamError('unsupported operation customizedGate')
-                # todo it is not implemented
-            elif circuitLine.HasField('procedureName'):  # procedure
-                qProcedureRegsMap = {index: qRegsMap[qReg] for index, qReg in enumerate(circuitLine.qRegs)}
-
-                paramIdsLen = len(circuitLine.paramIds)
-                paramValuesLen = len(circuitLine.paramValues)
-                procedureParamLen = paramIdsLen if paramIdsLen > paramValuesLen else paramValuesLen
-                procedureParamValues = [None] * procedureParamLen
-                for i in range(procedureParamLen):
-                    if i < paramIdsLen:
-                        paramId = circuitLine.paramIds[i]
-                        if paramId != -1:
-                            procedureParamValues[i] = paramValues[paramId]
+                argumentIdLen = len(circuitLine.argumentIdList)
+                argumentValueLen = len(circuitLine.argumentValueList)
+                argumentLen = argumentIdLen if argumentIdLen > argumentValueLen else argumentValueLen
+                argumentList = [0.0] * argumentLen
+                for i in range(argumentLen):
+                    if i < argumentIdLen:
+                        argumentId = circuitLine.argumentIdList[i]
+                        if argumentId != -1:
+                            argumentList[i] = argumentValueList[argumentId]
                             continue
-                    procedureParamValues[i] = circuitLine.paramValues[i]
+                    argumentList[i] = circuitLine.argumentValueList[i]
 
                 procedure = self._procedureMap[circuitLine.procedureName]
-                self._unrollProcedure(procedure.circuit, qProcedureRegsMap, procedureParamValues)
-            elif circuitLine.HasField('measure'):  # measure
-                if circuitLine.measure.type == PBMeasure.Type.Z:  # only Z measure is supported
-                    pass
-                else:  # unsupported measure types
-                    raise Error.ParamError(
-                        f'unsupported operation measure {PBMeasure.Type.Name(circuitLine.measure.type)}')
-                qRegList = []
-                for qReg in circuitLine.qRegs:  # quantum register list
-                    qRegList.append(qRegsMap[qReg])
-                self._circuitOut.append(MeasureZ._toPB(qRegList, circuitLine.measure.cRegs))
-            elif circuitLine.HasField('barrier'):  # barrier
-                qRegList = []
-                for qReg in circuitLine.qRegs:  # quantum register list
-                    qRegList.append(qRegsMap[qReg])
-                self._circuitOut.append(Barrier()._toPB(*qRegList))
+                self._unrollProcedure(procedure.circuit, qProcedureRegMap, argumentList)
             else:  # unsupported operation
-                raise Error.ParamError('unsupported operation')
+                raise Error.ArgumentError(f'Unsupported operation {op}!')

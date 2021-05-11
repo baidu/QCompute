@@ -22,6 +22,10 @@ Global Definitions
 import os
 import sys
 from enum import IntEnum, unique
+from pathlib import Path
+
+import QCompute
+from QCompute.Define import TrimFlag
 
 env = 'prod'
 
@@ -35,15 +39,13 @@ Values: 'prod', 'test'
 Used for prod or test environment.
 """
 if env == "test":
-    # service address for testing
-    quantumHubAddr = 'https://quantum-hub-test.baidu.com/api'
-    quantumBucket = 'quantum-task-test'
+    raise Error.RuntimeError('Not implemented')
 else:
     # service address for production
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
 
-sdkVersion = 'Python 1.0.3'
+sdkVersion = 'Python 1.1.0'
 """
 SDK Version
 
@@ -102,6 +104,17 @@ Values: None or Other
 Used for PyOnline.
 """
 
+taskInside = os.environ.get('TASKINSIDE', False)
+"""
+Task Inside
+
+Do not modify by user.
+
+Values: False or True
+
+Used for Inside.
+"""
+
 pollInterval = 5
 """
 Poll Interval seconds
@@ -120,7 +133,10 @@ Do not modify by user.
 Retry count for waittask in case network failed.
 """
 
-outputPath = os.path.join(os.path.abspath(os.path.curdir), 'Output')
+if hasattr(TrimFlag, 'Trim') and TrimFlag.Trim is not True:
+    outputPath = Path(Path(QCompute.__file__).parent.parent, 'Output').absolute()
+else:
+    outputPath = Path('Output').absolute()
 """
 Output Path
 
@@ -129,22 +145,22 @@ Do not modify by user.
 Will be created, when not exist.
 """
 if 'sphinx' in sys.modules:
-    outputPath = ''
+    outputPath = Path()
 else:
     os.makedirs(outputPath, mode=0o744, exist_ok=True)
 
-circuitPackageFile = os.path.join(outputPath, 'Package.pb')
+circuitPackageFile = outputPath / 'Package.pb'
 """
 Circuit Package File
 
 Do not modify by user.
 
-Circuit hdf5 target file
+Circuit package target file
 """
 if 'sphinx' in sys.modules:
-    circuitPackageFile = ''
+    circuitPackageFile = Path()
 
-statusDbFile = os.path.join(outputPath, 'Status.db')
+statusDbFile = outputPath / 'Status.db'
 """
 Status Db File
 
@@ -152,11 +168,8 @@ Do not modify by user.
 
 Used for local task status storage.
 """
-
-
-
 if 'sphinx' in sys.modules:
-    statusDbFile = ''
+    statusDbFile = Path()
 
 
 @unique

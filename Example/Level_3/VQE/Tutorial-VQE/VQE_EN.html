@@ -274,11 +274,11 @@ The core of VQE is to minimize <span class="mathjax-exps">$\langle{\phi} \lvert 
 <h3 class="mume-header" id="parameterized-quantum-circuit">Parameterized Quantum Circuit</h3>
 
 <p>To adjust a quantum state <span class="mathjax-exps">$\lvert {\phi}\rangle$</span>, we need to build a parameterized quantum circuit.</p>
-<p><img src="./pic/VQE4.png" alt="VQE4.png"></p>
+<p><img src="./PIC/VQE4.png" alt="VQE4.png"></p>
 <p>The figure above shows a 2-qubit quantum circuit controlled by 4 parameters. By adjusting the 4 parameters, we can change the output state of the circuit given a fixed input state. Certainly, you can build a more complex parameterized quantum circuit.</p>
-<p><img src="./pic/VQE12.png" alt="VQE12.png"></p>
+<p><img src="./PIC/VQE12.png" alt="VQE12.png"></p>
 <p>The figure above shows a 5-qubit quantum circuit with 12 parameters. Still, by adjusting those parameters, we can change the output state. Some readers may wonder that, given a fixed input state, whether a parameterized circuit can output an arbitrary quantum state. That depends on the structre of a parameterized circuit. For a 2-qubit system, we can build a parameterized with 15 parameters, shown in the figure below.</p>
-<p><img src="./pic/VQE15.png" alt="VQE15.png"></p>
+<p><img src="./PIC/VQE15.png" alt="VQE15.png"></p>
 <p>By adjusting those 15 parameters, we can generate an arbitrary 2-qubit state. Generally, it is not only hard, but impractical to design a parameterized quantum circuit that can generate any possible quantum state. In practice, we only need a quantum state <span class="mathjax-exps">$|\phi\rangle$</span> close enough to the ground state <span class="mathjax-exps">$|\phi_{\lambda_\text{min}}\rangle$</span> to make a good estimation of <span class="mathjax-exps">$\lambda_{min}$</span>.</p>
 <p>Now that we understand how to adjust <span class="mathjax-exps">$\lvert {\phi}\rangle$</span> with a parameterized quantum circuit, let&#x2019;s keep on and learn to use quantum circuits to compute <span class="mathjax-exps">$\langle{\phi} \lvert H\lvert {\phi}\rangle$</span>, the expectation value of <span class="mathjax-exps">$H$</span> under state <span class="mathjax-exps">$|\phi\rangle$</span>.</p>
 <h3 class="mume-header" id="pauli-measurement">Pauli Measurement</h3>
@@ -291,13 +291,13 @@ where <span class="mathjax-exps">$c_i$</span> is a complex coefficient. For each
 </p><div class="mathjax-exps">$$H_i \in \{I, \sigma_x, \sigma_y, \sigma_z\}^{\otimes n}.$$</div><br>
 where <span class="mathjax-exps">$I$</span> is the identity matrix, and <span class="mathjax-exps">$\sigma_x, \sigma_y, \sigma_z$</span> are the Pauli matrices. In theory, any Hermitian <span class="mathjax-exps">$H$</span> can be written as a linear combination of tensor products of Pauli matrices. Since to get <span class="mathjax-exps">$\langle{\phi} \lvert H\lvert {\phi}\rangle$</span> we need to compute every <span class="mathjax-exps">$\langle\phi|H_i|\phi\rangle$</span>, how do we compute <span class="mathjax-exps">$\langle\phi|H_i|\phi\rangle$</span> in practice? This computation can be done with a technique called Pauli measurement. Let&#x2019;s go through a simple example.<p></p>
 <p>To begin with, we use the following circuit to prepare a 3-qubit quantum state <span class="mathjax-exps">$\lvert {\phi}\rangle$</span>.<br>
-<img src="./pic/pauli1.png" alt="pauli1.png"></p>
+<img src="./PIC/pauli1.png" alt="pauli1.png"></p>
 <p>Suppose we want to get the value <span class="mathjax-exps">$\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$</span>, so we build a circuit like the one in the figure below and run it for several times.<br>
-<img src="./pic/pauli2-EN.png" alt="pauli2-EN.png"><br>
+<img src="./PIC/pauli2-EN.png" alt="pauli2-EN.png"><br>
 Notice that we add an ancilla qubit <span class="mathjax-exps">$q_0$</span> to our circuit. The purpose of this extra qubit is to help us compute the value of <span class="mathjax-exps">$\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$</span>. Also notice that we append a new part to the circuit which contains gates including Hadamard&#x200B; gates and a <span class="mathjax-exps">$R_z(-\pi/2)$</span> gate. This new part of circuit is another trick to get <span class="mathjax-exps">$\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$</span>. For different <span class="mathjax-exps">$H_i$</span> we need to build different circuits, which we will discuss later. We run the circuit, measure the ancilla, records the result (0 or 1), and repeat the process multiple times. By recording the <strong>frequency</strong> of 0 and 1, we can calculate the <strong>probability</strong> of getting 0 and 1:<br>
 </p><div class="mathjax-exps">$$\text{The value of }\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle \approx \\ \text{The probability of getting 0} - \text{The probability of getting 1}$$</div><br>
 The more you repeat, the more accurate your result will be. We have just learned how different <span class="mathjax-exps">$H_i$</span> have different circuits associate with them. Let me show you what the circuit look like if <span class="mathjax-exps">$H_i = \sigma_z\otimes \sigma_x\otimes I$</span>:<br>
-<img src="./pic/pauli3.png" alt="pauli3.png"><br>
+<img src="./PIC/pauli3.png" alt="pauli3.png"><br>
 See? The second part of the circuit changed and the rest remains the same. We still run the circuit multiple times, measure the ancilla each time, record the result, and repeat the same procedure to calculate the probability of getting 0 minus the probability of getting 1, which is very close to <span class="mathjax-exps">$\langle{\phi} \lvert \sigma_z\otimes \sigma_x\otimes I\lvert {\phi}\rangle$</span>. Of course, the more it repeats, the closer the result gets. There are some rules you need to follow:<p></p>
 <ul>
 <li><span class="mathjax-exps">$\sigma_x\to$</span> <span class="mathjax-exps">$Hadamard$</span> gate + <span class="mathjax-exps">$CNOT$</span> gate</li>
@@ -307,7 +307,7 @@ See? The second part of the circuit changed and the rest remains the same. We st
 </ul>
 <p>Have you seen patterns from the circuit that corresponds with <span class="mathjax-exps">$\sigma_x\otimes \sigma_y\otimes\sigma_z$</span>? We add a <span class="mathjax-exps">$Hadamard$</span> gate on <span class="mathjax-exps">$q_1$</span> and a <span class="mathjax-exps">$CNOT$</span> gate, because the first item in <span class="mathjax-exps">$\sigma_x\otimes \sigma_y\otimes\sigma_z$</span> is <span class="mathjax-exps">$\sigma_x$</span>; we add a <span class="mathjax-exps">$R_z(-\pi/2)$</span> gate, <span class="mathjax-exps">$Hadamard$</span> gate on <span class="mathjax-exps">$q_2$</span> and a <span class="mathjax-exps">$CNOT$</span> gate. That is because the second part of <span class="mathjax-exps">$\sigma_x\otimes \sigma_y\otimes\sigma_z$</span> is <span class="mathjax-exps">$\sigma_y$</span>. We only add a <span class="mathjax-exps">$CNOT$</span> gate on <span class="mathjax-exps">$q_3$</span> because the third part is <span class="mathjax-exps">$\sigma_z$</span>. Now, let&#x2019;s figure out the circuit associated with<span class="mathjax-exps">$\sigma_z\otimes \sigma_x\otimes I$</span>:</p>
 <p>Apply <span class="mathjax-exps">$CNOT$</span> gate onto <span class="mathjax-exps">$q_1$</span>, because the first part of <span class="mathjax-exps">$\sigma_z\otimes \sigma_x\otimes I$</span> is <span class="mathjax-exps">$\sigma_z$</span>; <span class="mathjax-exps">$Hadamard$</span> gate and <span class="mathjax-exps">$CNOT$</span> gate are applied onto <span class="mathjax-exps">$q_2$</span>, because the second part is <span class="mathjax-exps">$\sigma_x$</span>; add nothing on <span class="mathjax-exps">$q_3$</span>, because the third part is <span class="mathjax-exps">$I$</span>. Let&#x2019;s take a quiz, what is the circuit that measures <span class="mathjax-exps">$\langle{\phi} \lvert \sigma_y\otimes I\otimes \sigma_y\lvert {\phi}\rangle$</span> ? The answer is in the figure below:<br>
-<img src="./pic/pauli4.png" alt="pauli4.png"></p>
+<img src="./PIC/pauli4.png" alt="pauli4.png"></p>
 <p>Not surprisingly, we get all gradients to get the value <span class="mathjax-exps">$\langle{\phi} \lvert H\lvert {\phi}\rangle$</span>, where<br>
 </p><div class="mathjax-exps">$$H = 0.5*\sigma_x\otimes \sigma_y\otimes\sigma_z + 0.2*\sigma_z\otimes \sigma_x\otimes I + 0.8 * \sigma_y\otimes I\otimes \sigma_y$$</div><br>
 Just run the three circuit independently multiple times and record the measurement records on the ancilla. Calculate<span class="mathjax-exps">$\langle{\phi} \lvert H_i\lvert {\phi}\rangle$</span>, times the coefficient, add them up and we are done. I know it looks intimidating and complicated the first time you read this. Just read the previous part a few more times, and you will get it through. There is nothing incomprehensible in VQE.<p></p>
@@ -596,7 +596,7 @@ Hamiltonian <span class="token operator">=</span> random_H_generator<span class=
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">&apos;__main__&apos;</span><span class="token punctuation">:</span>
     main<span class="token punctuation">(</span><span class="token punctuation">)</span>
 </pre><p>Here is the figure that generated by one test of the whole program. Each thread is an independent process that makes 20 gradient descend iterations. Not so bad, eh?<br>
-<img src="./pic/Figure_1.png" alt="Figure_1.png"></p>
+<img src="./PIC/Figure_1.png" alt="Figure_1.png"></p>
 <hr>
 <h2 class="mume-header" id="reference">Reference</h2>
 

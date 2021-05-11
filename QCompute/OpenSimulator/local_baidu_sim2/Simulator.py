@@ -23,38 +23,36 @@ The initial state and gates are converted to tensors and gate implementation is 
 """
 
 import argparse
-import json
-import os
 from datetime import datetime
+from typing import List, TYPE_CHECKING, Union, Dict, Optional
 
 import numpy
 
 
-
-from bidict import bidict
-from google.protobuf.json_format import Parse
-
-from QCompute import outputPath
+from QCompute.Define import outputPath
 from QCompute.Define.Settings import doCompressGate
-from QCompute.OpenModule.CompositeGateModule import CompositeGate
-from QCompute.OpenModule.CompressGateModule import CompressGate
-from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuit
-from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedure
-from QCompute.OpenSimulator import QuantumResult
+from QCompute.OpenConvertor.JsonToCircuit import JsonToCircuit
+from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
+from QCompute.OpenModule.CompressGateModule import CompressGateModule
+from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
+from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+from QCompute.OpenSimulator import QResult
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType, initState_1_0
 from QCompute.OpenSimulator.local_baidu_sim2.Measure import MeasureMethod, Measurer
 from QCompute.OpenSimulator.local_baidu_sim2.Transfer import Algorithm, TransferProcessor
-from QCompute.QuantumPlatform import Error
-from QCompute.QuantumPlatform.QuantumOperation.FixedGate import CX, X, Y, Z, H
-from QCompute.QuantumPlatform.QuantumOperation.RotationGate import U
-from QCompute.QuantumPlatform.Utilities import _protobufMatrixToNumpyMatrix, _filterMeasure
-from QCompute.QuantumProtobuf.Library.PlatformStruct_pb2 import Program
-from QCompute.QuantumProtobuf.Library.QuantumOperation_pb2 import FixedGate as FixedGateEnum, \
-    RotationGate as RotationGateEnum, Measure as PBMeasure
-from QCompute.QuantumPlatform import Error
+from QCompute.QPlatform import Error
+from QCompute.QPlatform.Processor.PostProcessor import filterMeasure
+from QCompute.QPlatform.Processor.PreProcess import preProcess
+from QCompute.QPlatform.QOperation.FixedGate import CX, X, Y, Z, H
+from QCompute.QPlatform.QOperation.RotationGate import U
+from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix, normalizeNdarrayOrderForTranspose
+from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBCustomizedGate, PBMeasure
+
+if TYPE_CHECKING:
+    from QCompute.QProtobuf import PBProgram
 
 
-def runSimulator(args, program):
+def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> 'QResult':
     """
     Initialization process
     """
@@ -68,52 +66,58 @@ def runSimulator(args, program):
     parser.add_argument('-inputFile', default=None, type=str)
 
     args = parser.parse_args(args=args)
-    matrixType = args.mt.lower()
-    algorithm = args.a.lower()
-    measureMethod = args.mm.lower()
-    seed = args.s
-    shots = args.shots
-    inputFile = args.inputFile
+    matrixType = args.mt.lower()  # type: str
+    algorithm = args.a.lower()  # type: str
+    measureMethod = args.mm.lower()  # type: str
+    seed = args.s  # type: int
+    shots = args.shots  # type: int
+    inputFile = args.inputFile  # type: str
 
+    matrixTypeValue = None  # type: Optional[MatrixType]
     if matrixType == 'dense':
-        matrixType = MatrixType.Dense
+        matrixTypeValue = MatrixType.Dense
     
     else:
-        raise Error.ParamError(f'Invalid MatrixType {matrixType}')
+        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}')
 
+    algorithmValue = None  # type: Optional[Algorithm]
     if algorithm == 'matmul':
-        algorithm = Algorithm.Matmul
+        algorithmValue = Algorithm.Matmul
     elif algorithm == 'einsum':
-        algorithm = Algorithm.Einsum
+        algorithmValue = Algorithm.Einsum
     else:
-        raise Error.ParamError(f'Invalid Algorithm {algorithm}')
+        raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}')
 
+    measureMethodValue = None  # type: Optional[MeasureMethod]
     if measureMethod == 'probability':
-        measureMethod = MeasureMethod.Probability
+        measureMethodValue = MeasureMethod.Probability
+    elif measureMethod == 'output_probability':
+        measureMethodValue = MeasureMethod.OutputProbability
+    elif measureMethod == 'output_state':
+        measureMethodValue = MeasureMethod.OutputState
     elif measureMethod == 'accumulation':
-        measureMethod = MeasureMethod.Accumulation
+        measureMethodValue = MeasureMethod.Accumulation
     else:
-        raise Error.ParamError(f'Invalid MeasureMethod {measureMethod}')
+        raise Error.ArgumentError(f'Invalid MeasureMethod {measureMethodValue}')
 
     if seed is not None:
-        if isinstance(seed, int):
-            if seed < 0 or seed > 2147483647:
-                raise Error.ParamError(f'Invalid Seed {seed}')
-        else:
-            raise Error.ParamError(f'Invalid Seed {seed}')
+        if seed < 0 or seed > 2147483647:
+            raise Error.ArgumentError(f'Invalid Seed {seed}')
 
     if shots <= 0:
-        raise Error.ParamError(f'invalid shots {shots}')
+        raise Error.ArgumentError(f'Invalid shots {shots}')
 
     if inputFile is not None:
         with open(inputFile, "rt") as fObj:
             jsonStr = fObj.read()
-        program = Parse(jsonStr, Program())
+        program = JsonToCircuit().convert(jsonStr)
 
-    return core(program, matrixType, algorithm, measureMethod, shots, seed)
+    return core(program, matrixTypeValue, algorithmValue, measureMethodValue, shots, seed)
 
 
-def core(program, matrixType, algorithm, measureMethod, shots, seed):
+def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm', measureMethod: 'MeasureMethod',
+         shots: int,
+         seed: int) -> 'QResult':
     """
     Simulaton process
         Check if the argument is available. The accepted ones are:
@@ -129,26 +133,27 @@ def core(program, matrixType, algorithm, measureMethod, shots, seed):
         
     """
 
-    compositeGate = CompositeGate()
+    compositeGate = CompositeGateModule()
     program = compositeGate(program)
 
-    unrollProcedure = UnrollProcedure()
+    unrollProcedure = UnrollProcedureModule()
     program = unrollProcedure(program)
 
-    unrollCircuit = UnrollCircuit()
+    unrollCircuit = UnrollCircuitModule()
     program = unrollCircuit(program)  # must unrollProcedure before, because of paramIds to paramValues
 
     if doCompressGate:
-        compressGate = CompressGate()
+        compressGate = CompressGateModule()
         program = compressGate(program)
+
+    usedQRegSet, usedCRegSet, compactedQRegDict, compactedCRegDict = preProcess(program, True)
 
     
 
-    qRegsMap = {qReg: index for index, qReg in enumerate(program.head.usingQRegs)}
-    qRegCount = len(qRegsMap)
+    qRegMap = {qReg: index for index, qReg in enumerate(program.head.usingQRegList)}
+    qRegCount = len(qRegMap)
 
-    operationDict = {}
-    loadGates(matrixType, operationDict)
+    operationDict = loadGates(matrixType)
 
     if seed is None:
         seed = numpy.random.randint(0, 2147483647 + 1)
@@ -159,91 +164,93 @@ def core(program, matrixType, algorithm, measureMethod, shots, seed):
     measurer = Measurer(matrixType, algorithm, measureMethod)
 
     # collect the result to simulator for the subsequent invoking
-    result = QuantumResult()
-    result.startTimeUtc = datetime.utcnow().isoformat()[:-3]+'Z'
+    result = QResult()
+    result.startTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
 
     measured = False
-    counts = {}
-    measuredQRegsToCRegsBidict = bidict()
     for circuitLine in program.body.circuit:  # Traverse the circuit
-        if measured and not circuitLine.HasField('measure'):
-            raise Error.ParamError('measure must be the last operation')
+        op = circuitLine.WhichOneof('op')
 
-        qRegs = []
-        for qReg in circuitLine.qRegs:
-            qRegs.append(qRegsMap[qReg])
+        qRegList = []  # type List[int]
+        for qReg in circuitLine.qRegList:
+            qRegList.append(qRegMap[qReg])
 
-        if circuitLine.HasField('fixedGate'):  # fixed gate
-            matrix = operationDict.get(circuitLine.fixedGate)
+        if op == 'fixedGate':  # fixed gate
+            fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+            matrix = operationDict.get(fixedGate)
             if matrix is None:
-                raise Error.ParamError(f'unsupported operation {FixedGateEnum.Name(circuitLine.fixedGate)}')
-            state = transfer(state, matrix, qRegs)
-        elif circuitLine.HasField('rotationGate'):  # rotation gate
-            if circuitLine.rotationGate != RotationGateEnum.U:
-                raise Error.ParamError(
-                    f'unsupported operation {RotationGateEnum.Name(circuitLine.rotationGate)}')
-            uGate = U(*circuitLine.paramValues)
+                raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!')
+            state = transfer(state, matrix, qRegList)
+        elif op == 'rotationGate':  # rotation gate
+            rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+            if rotationGate != PBRotationGate.U:
+                raise Error.ArgumentError(
+                    f'Unsupported operation {PBRotationGate.Name(rotationGate)}!')
+            uGate = U(*circuitLine.argumentValueList)
             if matrixType == MatrixType.Dense:
-                matrix = uGate.matrix
+                matrix = uGate.getMatrix()
             else:
                 raise Error.RuntimeError('Not implemented')
-            state = transfer(state, matrix, qRegs)
-        elif circuitLine.HasField('customizedGate'):  # customized gate
+            state = transfer(state, matrix, qRegList)
+        elif op == 'customizedGate':  # customized gate
+            customizedGate = circuitLine.customizedGate  # type: PBCustomizedGate
             if matrixType == MatrixType.Dense:
-                matrix = _protobufMatrixToNumpyMatrix(circuitLine.customizedGate.matrix)
+                matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
             else:
                 raise Error.RuntimeError('Not implemented')
-            state = transfer(state, matrix, qRegs)
-        elif circuitLine.HasField('procedureName'):  # procedure
-            Error.ParamError('unsupported operation procedure, please flatten by UnrollProcedureModule')
+            state = transfer(state, matrix, qRegList)
+        elif op == 'procedureName':  # procedure
+            raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!')
             # it is not implemented, flattened by UnrollProcedureModule
-        elif circuitLine.HasField('measure'):  # measure
-            if circuitLine.measure.type != PBMeasure.Type.Z:  # only Z measure is supported
-                raise Error.ParamError(
-                    f'unsupported operation measure {PBMeasure.Type.Name(circuitLine.measure.type)}')
+        elif op == 'measure':  # measure
+            measure = circuitLine.measure  # type: PBMeasure
+            if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
+                raise Error.ArgumentError(
+                    f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!')
             if not measured:
-                counts = measurer(state, shots)
+                result.counts = measurer(state, shots)
                 measured = True
-            cRegs = []
-            for cReg in circuitLine.measure.cRegs:
-                cRegs.append(cReg)
-            for i in range(len(cRegs)):
-                if measuredQRegsToCRegsBidict.get(qRegs[i]) is not None:
-                    raise Error.ParamError('measure must be once on a QReg')
-                if measuredQRegsToCRegsBidict.inverse.get(cRegs[i]) is not None:
-                    raise Error.ParamError('measure must be once on a CReg')
-                measuredQRegsToCRegsBidict[qRegs[i]] = cRegs[i]
-        elif circuitLine.HasField('barrier'):  # barrier
+        elif op == 'barrier':  # barrier
             pass
             # unimplemented operation
         else:  # unsupported operation
-            raise Error.ParamError('unsupported operation')
-    measuredCRegsList = list(measuredQRegsToCRegsBidict.keys())
+            raise Error.ArgumentError(f'Unsupported operation {op}!')
 
-    result.endTimeUtc = datetime.utcnow().isoformat()[:-3]+'Z'
+    result.endTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
     result.shots = shots
-    result.counts = _filterMeasure(counts, measuredCRegsList)
+    result.counts = filterMeasure(result.counts, compactedCRegDict)
+    result.ancilla.usedQRegList = list(usedQRegSet)
+    result.ancilla.usedCRegList = list(usedCRegSet)
+    result.ancilla.compactedQRegDict = compactedQRegDict
+    result.ancilla.compactedCRegDict = compactedCRegDict
+    if measureMethod == MeasureMethod.OutputState:
+        if matrixType == MatrixType.Dense:
+            result.state = normalizeNdarrayOrderForTranspose(state)
+        else:
+            result.state = normalizeNdarrayOrderForTranspose(state.todense())
     result.seed = int(seed)
     return result
 
 
-def loadGates(matrixType, operationDict):
+def loadGates(matrixType: 'MatrixType') -> Dict['PBFixedGate', Union[numpy.ndarray, 'COO']]:
     """
     Load the matrix of the gate
     """
-
     if matrixType == MatrixType.Dense:
-        operationDict[FixedGateEnum.X] = X.matrix
-        operationDict[FixedGateEnum.Y] = Y.matrix
-        operationDict[FixedGateEnum.Z] = Z.matrix
-        operationDict[FixedGateEnum.H] = H.matrix
-        operationDict[FixedGateEnum.CX] = CX.matrix.reshape(2, 2, 2, 2)
+        operationDict = {
+            PBFixedGate.X: X.getMatrix(),
+            PBFixedGate.Y: Y.getMatrix(),
+            PBFixedGate.Z: Z.getMatrix(),
+            PBFixedGate.H: H.getMatrix(),
+            PBFixedGate.CX: CX.getMatrix().reshape(2, 2, 2, 2)
+        }  # type: Dict['PBFixedGate', Union[numpy.ndarray, 'COO']]
     else:
         raise Error.RuntimeError('Not implemented')
+    return operationDict
 
 
 if __name__ == '__main__':
     result = runSimulator(None, None)
-    countsFilePath = os.path.join(outputPath, 'counts.json')
+    countsFilePath = outputPath / 'counts.json'
     with open(countsFilePath, 'wt', encoding='utf-8') as file:
-        file.write(result.toJsonInside())
+        file.write(result.toJson(True))

@@ -23,6 +23,8 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # In this example we use 3 qubits in total
 qubit_num = 3
 # and set the shot number for each request
@@ -34,12 +36,12 @@ def main():
     main
     """
     # Create environment
-    env = QuantumEnvironment()
+    env = QEnv()
     # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
 
     # Initialize the three-qubit circuit
-    q = [env.Q[i] for i in range(qubit_num)]
+    q = env.Q.createList(qubit_num)
 
     # The first step of Grover's search algorithm, superposition
     H(q[0])
@@ -58,7 +60,7 @@ def main():
     H(q[1])
     H(q[2])
 
-    # The reflection gate 2|0><0|-I in the first Grover iteration, which is divided to three parts:
+    # The reflection gate 2|0><0| - I in the first Grover iteration, which is divided to three parts:
     # two layer of X gates and a decomposition for the gate CCZ between the above two
     X(q[0])
     X(q[1])
@@ -81,7 +83,7 @@ def main():
     # if the user you want to increase the number of Grover iteration,
     # please repeat the code from the comment “Enter the first Grover iteration” to here,
     # and then measure
-    MeasureZ(q, range(qubit_num))
+    MeasureZ(*env.Q.toListPair())
     # Commit the quest
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])

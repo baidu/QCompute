@@ -23,6 +23,8 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # Set the shot number for each quest
 shots = 1024
 
@@ -36,19 +38,19 @@ def main():
     main
     """
     # Create environment
-    env = QuantumEnvironment()
+    env = QEnv()
     # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
 
     # Initialize the two-qubit circuit
-    q = [env.Q[0], env.Q[1]]
+    q = env.Q.createList(2)
 
     # Alice and Bob share a Bell state (|00>+|11>) / sqrt(2),
     # where Alice holds q[0] and Bob holds q[1]
     H(q[0])
     CX(q[0], q[1])
 
-    # For different message, Alice applies different gates on q[0],
+    # For different messages, Alice applies different gates on q[0],
     # where she applies nothing to indicate the message '00'
     if message == '01':
         X(q[0])
@@ -68,7 +70,7 @@ def main():
     H(q[0])
 
     # Measure with the computational basis
-    MeasureZ(q, range(2))
+    MeasureZ(*env.Q.toListPair())
     # Commit the quest
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])

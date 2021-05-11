@@ -19,32 +19,37 @@
 Export the entire directory as a library
 """
 
+from QCompute import Define
+
 from QCompute.Define import (
     sdkVersion,
     outputPath,
 )
 
 from QCompute.Define.Settings import outputInfo
+from QCompute.Define.Utils import matchSdkVersion
 
-from QCompute.OpenModule.CompositeGateModule import CompositeGate
-from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuit
-from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedure
+from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
+from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
+from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+
 
 from QCompute.OpenSimulator import (
-    QuantumResult,
+    QResult,
 )
 
-from QCompute.QuantumPlatform import (
-    QuantumTask,
+from QCompute.QPlatform import (
+    QTask,
     BackendName,
-    Sim2Param,
+    Sim2Argument,
 )
-from QCompute.QuantumPlatform.QuantumEnvironment import QuantumEnvironment
+from QCompute.QPlatform.QEnv import QEnv
+from QCompute.QPlatform.QEnvOperation import QEnvOperation
 
-from QCompute.QuantumPlatform.QuantumOperation.Barrier import Barrier
-from QCompute.QuantumPlatform.QuantumOperation.CompositeGate import RZZ
-from QCompute.QuantumPlatform.QuantumOperation.CustomizedGate import CustomizedGate
-from QCompute.QuantumPlatform.QuantumOperation.FixedGate import (
+from QCompute.QPlatform.QOperation.Barrier import Barrier, BarrierOP
+from QCompute.QPlatform.QOperation.CompositeGate import RZZ
+from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
+from QCompute.QPlatform.QOperation.FixedGate import (
     ID,
     X,
     Y,
@@ -62,10 +67,10 @@ from QCompute.QuantumPlatform.QuantumOperation.FixedGate import (
     CCX,
     CSWAP,
 )
-from QCompute.QuantumPlatform.QuantumOperation.Measure import (
+from QCompute.QPlatform.QOperation.Measure import (
     MeasureZ
 )
-from QCompute.QuantumPlatform.QuantumOperation.RotationGate import (
+from QCompute.QPlatform.QOperation.RotationGate import (
     U,
     RX,
     RY,
@@ -75,6 +80,7 @@ from QCompute.QuantumPlatform.QuantumOperation.RotationGate import (
     CRY,
     CRZ,
 )
-import QCompute.QuantumPlatform.Utilities
+import QCompute.QPlatform.Utilities
 from QCompute.Test.PostInstall.PostInstall import testAll
+
 

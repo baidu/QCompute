@@ -20,19 +20,21 @@ This is a simple case of using Hardmard gate and CNOT gate to generate a GHZ sta
 Results will be fetched from a local simulator.
 """
 
-from pprint import pprint
 import sys
+from pprint import pprint
 
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # Create environment
-env = QuantumEnvironment()
+env = QEnv()
 # Choose backend Baidu Local Quantum Simulator-Sim2
 env.backend(BackendName.LocalBaiduSim2)
 
 # Initialize the three-qubit circuit
-q = [env.Q[0], env.Q[1], env.Q[2]]
+q = env.Q.createList(5)
 
 # Apply a Hadamard gate on the 0th qubit
 H(q[0])
@@ -42,9 +44,9 @@ CX(q[0], q[1])
 CX(q[0], q[2])
 
 # Measure with the computational basis
-MeasureZ(q, range(3))
+MeasureZ([env.Q[3], env.Q[2], env.Q[1]], [9, 1, 2])
 
-# Commit the quest with 1024 shots to the cloud
+# Commit the quest with 1024 shots
 taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

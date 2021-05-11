@@ -23,7 +23,6 @@ import multiprocessing as mp
 import pickle
 import random
 from functools import reduce
-from os import path
 
 import numpy as np
 import scipy
@@ -31,9 +30,11 @@ import scipy.linalg
 from matplotlib import pyplot as plt
 
 import sys
+
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
 
 # hyper-parameter setting
 shots = 1024
@@ -48,8 +49,8 @@ learning_rate = 0.3
 delta = np.pi / 2  # calculate analytical derivative
 SEED = 36  # This number will determine what the final Hamiltonian is. It is also
 # used to make sure Mac and Windows behave the same using multiprocessing module.
-K = 3  # k is the number of local hamiltonian in H
-N = 3 * n * L # N is the number of parameters needed for the circuit
+K = 3  # k is the number of local Hamiltonian in H
+N = 3 * n * L  # N is the number of parameters needed for the circuit
 random.seed(SEED)
 
 
@@ -63,9 +64,10 @@ def random_pauli_generator(l):
         s = s + random.choice(['i', 'x', 'y', 'z'])
     return s
 
+
 def random_H_generator(n, k):
     """
-    n is the number of qubits, k is the number of local hamiltonian in H
+    n is the number of qubits, k is the number of local Hamiltonian in H
     """
 
     H = []
@@ -74,7 +76,7 @@ def random_H_generator(n, k):
     return H
 
 
-Hamiltonian = random_H_generator(n, K)  # our hamiltonian H
+Hamiltonian = random_H_generator(n, K)  # our Hamiltonian H
 
 
 # From Paddle_quantum package
@@ -95,7 +97,7 @@ def NKron(AMatrix, BMatrix, *args):
 
 def ground_energy(Ha):
     """
-    It returns the graound energy of hamiltonian Ha,
+    It returns the ground energy of Hamiltonian Ha,
     which looks like [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']].
     """
 
@@ -149,7 +151,7 @@ def eigen_plot(eigenv_list, actual_eigenv):
 
 def prob_calc(data_dic):
     """
-    Measure the first (ancilla) qubit. Returns the value
+    Measure the first (ancilla) qubit. Return the value
     of 'the probability of getting 0' minus 'the probability of getting 1'.
     """
 
@@ -161,7 +163,9 @@ def prob_calc(data_dic):
         else:
             sum_1 += value
     return (sum_0 - sum_1) / shots
-#TODO: Add entangled layer
+
+
+# TODO: Add entangled layer
 
 def add_block(q, loc, para):
     """
@@ -175,32 +179,31 @@ def add_block(q, loc, para):
 
 def add_layer(para, q):
     """
-    add a layer, each layer has 3*n parameters. para is a 2-D numpy array
+    Add a layer, which has 3*n parameters. para is a 2-D numpy array
     """
 
     for i in range(1, n + 1):
-        add_block(q, i, para[i-1])
+        add_block(q, i, para[i - 1])
     for i in range(1, n):
-        CX(q[i], q[i+1])
+        CX(q[i], q[i + 1])
     CX(q[n], q[1])
-
 
 
 def self_defined_circuit(para, hamiltonian):
     """
     H is a list, for example, if H = 12*X*Y*I*Z + 21*Z*Z*X*Z + 10* I*I*X*Y,
-    then parameter hamiltonian is [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']](upper case or lower case are all fine).
+    then Hamiltonian is [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']](upper case or lower case are all fine).
     It returns the expectation value of H.
     """
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
-    # the first qubit is ancilla
-    q = [env.Q[i] for i in range(n + 1)]
+    # the first qubit is ancillary
+    q = env.Q.createList(n + 1)
 
     hamiltonian = [symbol.lower() for symbol in hamiltonian]
-    high_D_para = para.reshape(L, n, 3) # change 1-D numpy array to a 3-D numpy array
+    high_D_para = para.reshape(L, n, 3)  # change 1-D numpy array to a 3-D numpy array
 
     # set up our parameterized circuit
     for i in range(1, n + 1):
@@ -225,7 +228,7 @@ def self_defined_circuit(para, hamiltonian):
             CX(q[i + 1], q[0])
 
     # measurement result
-    MeasureZ([env.Q[i] for i in range(n)], range(n))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     return prob_calc(taskResult['counts'])
 
@@ -274,7 +277,7 @@ def multi_process_fun(j):
     for i in range(iteration_num):
         para_list.append(diff_fun(loss_fun, para_list[i]))
 
-    with open(path.join(outputPath, f"para{j}.pickle"), "wb") as fp:
+    with open(outputPath / f"para{j}.pickle", "wb") as fp:
         pickle.dump(para_list, fp)
 
 
@@ -289,7 +292,7 @@ def main():
 
     for _ in range(experiment_num):
         actual_loss = []
-        with open(path.join(outputPath, f"para{_}.pickle"), "rb") as fp:
+        with open(outputPath / f"para{_}.pickle", "rb") as fp:
             new_para_list = pickle.load(fp)
 
         for j in range(iteration_num):

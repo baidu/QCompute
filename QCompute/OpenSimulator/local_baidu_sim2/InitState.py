@@ -20,12 +20,13 @@ Statevector Initialization Process
 """
 
 from enum import unique, IntEnum
+from typing import Union
 
-import numpy as np
+import numpy
 
 
 
-from QCompute.QuantumPlatform import Error
+from QCompute.QPlatform import Error
 
 
 @unique
@@ -39,7 +40,7 @@ class MatrixType(IntEnum):
     
 
 
-def initState_1_0(matrixType, n):
+def initState_1_0(matrixType: MatrixType, n: int) -> Union[numpy.ndarray, 'COO']:
     """
     Generate an n-qubit state
     """
@@ -50,15 +51,16 @@ def initState_1_0(matrixType, n):
         raise Error.RuntimeError('Not implemented')
 
 
-def initStateDense_1_0(n):
+def initStateDense_1_0(n: int) -> numpy.ndarray:
     """
     Generate an n-qubit state
     :param n: number of qubits
     :return: tensor of the state
     """
 
-    state = np.zeros([2] * n, complex)
+    state = numpy.zeros([2] * n, complex)
     state.reshape(-1)[0] = 1.0
     return state
+
 
 

@@ -26,8 +26,10 @@ from pprint import pprint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # Create environment
-env = QuantumEnvironment()
+env = QEnv()
 # Choose backend Baidu Local Quantum Simulator-Sim2
 env.backend(BackendName.LocalBaiduSim2)
 
@@ -45,9 +47,9 @@ X(q[0])
 CX(q[0], q[1])
 
 # Measure with the computational basis
-MeasureZ([q[0], q[1], q[2]], range(3))  # Interval and disorder
+MeasureZ([q[1], q[4], q[3]], range(3))  # Interval and disorder
 
-# Commit the request with 1024 shots to the cloud
+# Commit the request with 1024 shots
 taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

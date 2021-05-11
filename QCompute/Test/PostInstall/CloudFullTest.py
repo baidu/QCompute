@@ -26,11 +26,11 @@ def cloudFullTest():
     Cloud Full Test
     """
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.CloudBaiduSim2, '-s 0')
 
     # procedure0 start
-    procedure0Env = QuantumEnvironment()
+    procedure0Env = QEnv()
     U(1.1, 2.2, 3.3)(procedure0Env.Q[0])
     U(1.1, 2.2)(procedure0Env.Q[0])
     U(1.1)(procedure0Env.Q[0])
@@ -65,7 +65,7 @@ def cloudFullTest():
     # procedure0 end
 
     # procedure1 start
-    procedure1Env = QuantumEnvironment()
+    procedure1Env = QEnv()
     U(1.1, 2.2, 3.3)(procedure1Env.Q[0])
     U(1.1, 2.2)(procedure1Env.Q[0])
     U(1.1)(procedure1Env.Q[0])
@@ -131,12 +131,3 @@ def cloudFullTest():
     MeasureZ(q, range(3))
 
     ret = env.commit(1024, fetchMeasure=True)
-    assert (
-            ret['counts']['100'] == 347 and
-            ret['counts']['110'] == 144 and
-            ret['counts']['011'] == 127 and
-            ret['counts']['101'] == 73 and
-            ret['counts']['010'] == 243 and
-            ret['counts']['001'] == 60 and
-            ret['counts']['111'] == 30
-    )

@@ -3,18 +3,20 @@
 //qelib1.inc can be obtained from the link:
 //https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/qasm/libs/qelib1.inc
 """
-
-import copy
+from copy import deepcopy
+from typing import List, Dict
 
 import numpy as np
 
-from QCompute.QuantumPlatform.QuantumOperation.FixedGate import X, H, S, SDG, T, TDG, CX, CCX
-from QCompute.QuantumPlatform.QuantumOperation.RotationGate import U
-from QCompute.QuantumProtobuf.Library.QuantumOperation_pb2 import FixedGate as FixedGateEnum
-from QCompute.QuantumProtobuf.Library.QuantumOperation_pb2 import RotationGate as RotationGateEnum
+from QCompute.OpenModule import ModuleImplement
+from QCompute.QPlatform import Error
+from QCompute.QPlatform.CircuitTools import gateToProtobuf
+from QCompute.QPlatform.QOperation.FixedGate import X, H, S, SDG, T, TDG, CX, CCX
+from QCompute.QPlatform.QOperation.RotationGate import U
+from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate
 
 
-class UnrollCircuit:
+class UnrollCircuitModule(ModuleImplement):
     """
     Unroll supported gates to CX, U3, barrier, measure
 
@@ -24,7 +26,7 @@ class UnrollCircuit:
 
     Composite gates are supported since they can be processed by the CompositeGateModule module in advance.
 
-    Must unrollProcedure before, because of paramIds to paramValues.
+    Must unrollProcedure before, because rotation gate must hve all rotation arguments.
 
     Example:
 
@@ -35,30 +37,31 @@ class UnrollCircuit:
     env.module(UnrollCircuit({'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}))
     """
 
-    targetGatesNames = ['CX', 'U']
-    sourceGatesNames = []
+    arguments = None  # type: Dict[str, List[str]]
+    targetGatesNames = ['CX', 'U']  # type: List[str]
+    sourceGatesNames = []  # type: List[str]
     errorOnUnsupported = True
 
-    def __init__(self, params=None):
+    def __init__(self, arguments: Dict[str, List[str]] = None):
         """
         Initialize the Module.
 
         Json serialization is allowed by the requested parameter.
 
-        :param params: {'errorOnUnsupported', True, 'targetGates': [CX, U]}.
+        :param arguments: {'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}.
         """
 
-        if params is not None:
-            if 'targetGates' in params:
-                self.targetGatesNames = params['targetGates']
+        if arguments is not None:
+            if 'targetGates' in arguments:
+                self.targetGatesNames = arguments['targetGates']
 
-            if 'sourceGates' in params:
-                self.sourceGatesNames = params['sourceGates']
+            if 'sourceGates' in arguments:
+                self.sourceGatesNames = arguments['sourceGates']
 
-            if 'errorOnUnsupported' in params:
-                self.errorOnUnsupported = params['errorOnUnsupported']
+            if 'errorOnUnsupported' in arguments:
+                self.errorOnUnsupported = arguments['errorOnUnsupported']
 
-    def __call__(self, program):
+    def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
         Process the Module
 
@@ -66,37 +69,17 @@ class UnrollCircuit:
         :return: unrolled circuit
         """
 
-        ret = copy.deepcopy(program)
-        ret.body.ClearField('circuit')
-        for id, procedure in program.body.procedureMap.items():
-            targetProcedure = ret.body.procedureMap[id]
-            targetProcedure.ClearField('circuit')
+        ret = deepcopy(program)
+
+        for name, procedure in program.body.procedureMap.items():
+            targetProcedure = ret.body.procedureMap[name]
+            del targetProcedure.circuit[:]
             self._decompose(targetProcedure.circuit, procedure.circuit)
+        del ret.body.circuit[:]
         self._decompose(ret.body.circuit, program.body.circuit)
         return ret
 
-    def _expandAnglesInUGate(self, angles):
-        """
-        Expand the angles list by following the relation among u1, u2, and u3
-        """
-
-        # normalize RepeatedScalarContainer
-        angles = list(angles)
-
-        # expand
-        nAngles = len(angles)
-        if nAngles == 3:
-            pass
-        elif nAngles == 2:
-            angles = [np.pi / 2.0] + angles
-        elif nAngles == 1:
-            angles = [0.0, 0.0] + angles
-        else:
-            raise Exception('wrong angles length. angles: ' + str(angles))
-
-        return angles
-
-    def _unrollRecursively(self, circuitLine, circuitOut):
+    def _unrollRecursively(self, circuitLine: 'PBCircuitLine', circuitOut: List['PBCircuitLine']):
         """
         Only CX U barrier measure are processed directly by circuitOut.append()
 
@@ -105,293 +88,302 @@ class UnrollCircuit:
         _expandAnglesInUGate() is used only once in process of U
         """
 
-        if circuitLine.HasField('fixedGate') or circuitLine.HasField('rotationGate'):
+        op = circuitLine.WhichOneof('op')
+        if op == 'procedureName' or op == 'measure' or op == 'barrier':
+            ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+            circuitOut.append(ret)
+            return
+        elif op == 'fixedGate' or op == 'rotationGate':
             # name the regs
-            nRegs = len(circuitLine.qRegs)
+            nRegs = len(circuitLine.qRegList)
             if nRegs == 1:
-                [a] = circuitLine.qRegs
+                [a] = circuitLine.qRegList
             elif nRegs == 2:
-                [a, b] = circuitLine.qRegs
+                [a, b] = circuitLine.qRegList
             elif nRegs == 3:
-                [a, b, c] = circuitLine.qRegs
+                [a, b, c] = circuitLine.qRegList
             else:
-                raise Exception('wrong regs length. regs: ' + str(circuitLine.qRegs))
+                raise Error.ArgumentError(f'Wrong regs count. regs: {circuitLine.qRegList}!')
 
-        # name the angles
-        if circuitLine.HasField('rotationGate'):
-            nAngles = len(circuitLine.paramValues)
-            if nAngles == 1:
-                [theta] = circuitLine.paramValues
-            elif nAngles == 2:
-                [theta, phi] = circuitLine.paramValues
-            elif nAngles == 3:
-                [theta, phi, lamda] = circuitLine.paramValues
-            else:
-                raise Exception('wrong angles length. angles: ' + str(circuitLine.paramValues))
-
-        # recognize known gates
-        if circuitLine.HasField('fixedGate'):
-            gateName = FixedGateEnum.Name(circuitLine.fixedGate)
-            if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
-                # don't need unroll: copy
-                circuitOut.append(circuitLine)
-                return
-            elif gateName in self.targetGatesNames:
-                # already supported by target machine: copy
-                circuitOut.append(circuitLine)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.ID:
-                # ID: gate id a { U(0,0,0) a; }
-                self._unrollRecursively(U(0.0, 0.0, 0.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.X:
-                # X: gate x a { u3(pi,0,pi) a; }
-                self._unrollRecursively(U(np.pi, 0.0, np.pi)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.Y:
-                # Y: gate y a { u3(pi,pi/2,pi/2) a; }
-                self._unrollRecursively(U(np.pi, np.pi / 2.0, np.pi / 2.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.Z:
-                # Z: gate z a { u1(pi) a; }
-                self._unrollRecursively(U(np.pi)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.H:
-                # H: gate h a { u2(0,pi) a; }
-                self._unrollRecursively(U(0.0, np.pi)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.S:
-                # S: gate s a { u1(pi/2) a; }
-                self._unrollRecursively(U(np.pi / 2.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.SDG:
-                # SDG: gate sdg a { u1(-pi/2) a; }
-                self._unrollRecursively(U(-np.pi / 2.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.T:
-                # T: gate t a { u1(pi/4) a; }
-                self._unrollRecursively(U(np.pi / 4.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.TDG:
-                # TDG: gate tdg a { u1(-pi/4) a; }
-                self._unrollRecursively(U(-np.pi / 4.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.CY:
-                # CY: gate cy a,b {
-                # sdg b;
-                self._unrollRecursively(SDG._toPB(b), circuitOut)
-                # cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # s b;
-                self._unrollRecursively(S._toPB(b), circuitOut)
-                # }
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.CZ:
-                # CZ: gate cz a,b {
-                # h b;
-                self._unrollRecursively(H._toPB(b), circuitOut)
-                # cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # h b;
-                self._unrollRecursively(H._toPB(b), circuitOut)
-                # }
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.CH:
-                # CH:
-                # gate ch a,b {
-                # h b;
-                self._unrollRecursively(H._toPB(b), circuitOut)
-                # sdg b;
-                self._unrollRecursively(SDG._toPB(b), circuitOut)
-                # cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # h b;
-                self._unrollRecursively(H._toPB(b), circuitOut)
-                # t b;
-                self._unrollRecursively(T._toPB(b), circuitOut)
-                # cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # t b;
-                self._unrollRecursively(T._toPB(b), circuitOut)
-                # h b;
-                self._unrollRecursively(H._toPB(b), circuitOut)
-                # s b;
-                self._unrollRecursively(S._toPB(b), circuitOut)
-                # x b;
-                self._unrollRecursively(X._toPB(b), circuitOut)
-                # s a;
-                self._unrollRecursively(S._toPB(a), circuitOut)
-                # }
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.SWAP:
-                # SWAP: gate swap a,b {
-                # cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # cx b,a;
-                self._unrollRecursively(CX._toPB(b, a), circuitOut)
-                # cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # }
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.CCX:
-                # CCX:
-                # gate ccx a,b,c
-                # {
-                #   h c;
-                self._unrollRecursively(H._toPB(c), circuitOut)
-                #   cx b,c;
-                self._unrollRecursively(CX._toPB(b, c), circuitOut)
-                #   tdg c;
-                self._unrollRecursively(TDG._toPB(c), circuitOut)
-                #   cx a,c;
-                self._unrollRecursively(CX._toPB(a, c), circuitOut)
-                #   t c;
-                self._unrollRecursively(T._toPB(c), circuitOut)
-                #   cx b,c;
-                self._unrollRecursively(CX._toPB(b, c), circuitOut)
-                #   tdg c;
-                self._unrollRecursively(TDG._toPB(c), circuitOut)
-                #   cx a,c;
-                self._unrollRecursively(CX._toPB(a, c), circuitOut)
-                #   t b;
-                self._unrollRecursively(T._toPB(b), circuitOut)
-                #   t c;
-                self._unrollRecursively(T._toPB(c), circuitOut)
-                #   h c;
-                self._unrollRecursively(H._toPB(c), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   t a;
-                self._unrollRecursively(T._toPB(a), circuitOut)
-                #   tdg b;
-                self._unrollRecursively(TDG._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # }
-                return
-            elif circuitLine.fixedGate == FixedGateEnum.CSWAP:
-                # CSWAP: gate cswap a,b,c {
-                # cx c,b;
-                self._unrollRecursively(CX._toPB(c, b), circuitOut)
-                # ccx a,b,c;
-                self._unrollRecursively(CCX._toPB(a, b, c), circuitOut)
-                # cx c,b;
-                self._unrollRecursively(CX._toPB(c, b), circuitOut)
-                # }
-                return
-        elif circuitLine.HasField('rotationGate'):
-            gateName = RotationGateEnum.Name(circuitLine.rotationGate)
-            if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
-                # don't need unroll: copy
-                circuitOut.append(circuitLine)
-                return
-            elif gateName in self.targetGatesNames:
-                # already supported by target machine: copy or expand+copy
-                if circuitLine.rotationGate == RotationGateEnum.U:
-                    # U3: gate u3(theta,phi,lamda) a { U(theta,phi,lamda) a; }
-                    # U2: gate u2(theta,phi) a { U(pi/2,theta,phi) a; }
-                    # U1: gate u1(theta) a { U(0,0,theta) a; }
-                    circuitOut.append(
-                        U(*self._expandAnglesInUGate(circuitLine.paramValues))._toPB(a))
+            if op == 'fixedGate':
+                fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                # recognize known gates
+                gateName = PBFixedGate.Name(fixedGate)
+                if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
+                    # don't need unroll: copy
+                    ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                    circuitOut.append(ret)
                     return
+                elif gateName in self.targetGatesNames:
+                    # already supported by target machine: copy
+                    ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                    circuitOut.append(ret)
+                    return
+                elif fixedGate == PBFixedGate.ID:
+                    # ID: gate id a { U(0,0,0) a; }
+                    self._unrollRecursively(gateToProtobuf(U(0.0, 0.0, 0.0), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.X:
+                    # X: gate x a { u3(pi,0,pi) a; }
+                    self._unrollRecursively(gateToProtobuf(U(np.pi, 0.0, np.pi), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.Y:
+                    # Y: gate y a { u3(pi,pi/2,pi/2) a; }
+                    self._unrollRecursively(gateToProtobuf(U(np.pi, np.pi / 2.0, np.pi / 2.0), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.Z:
+                    # Z: gate z a { u1(pi) a; }
+                    self._unrollRecursively(gateToProtobuf(U(np.pi), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.H:
+                    # H: gate h a { u2(0,pi) a; }
+                    self._unrollRecursively(gateToProtobuf(U(0.0, np.pi), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.S:
+                    # S: gate s a { u1(pi/2) a; }
+                    self._unrollRecursively(gateToProtobuf(U(np.pi / 2.0), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.SDG:
+                    # SDG: gate sdg a { u1(-pi/2) a; }
+                    self._unrollRecursively(gateToProtobuf(U(-np.pi / 2.0), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.T:
+                    # T: gate t a { u1(pi/4) a; }
+                    self._unrollRecursively(gateToProtobuf(U(np.pi / 4.0), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.TDG:
+                    # TDG: gate tdg a { u1(-pi/4) a; }
+                    self._unrollRecursively(gateToProtobuf(U(-np.pi / 4.0), [a]), circuitOut)
+                    return
+                elif fixedGate == PBFixedGate.CY:
+                    # CY: gate cy a,b {
+                    # sdg b;
+                    self._unrollRecursively(gateToProtobuf(SDG, [b]), circuitOut)
+                    # cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # s b;
+                    self._unrollRecursively(gateToProtobuf(S, [b]), circuitOut)
+                    # }
+                    return
+                elif fixedGate == PBFixedGate.CZ:
+                    # CZ: gate cz a,b {
+                    # h b;
+                    self._unrollRecursively(gateToProtobuf(H, [b]), circuitOut)
+                    # cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # h b;
+                    self._unrollRecursively(gateToProtobuf(H, [b]), circuitOut)
+                    # }
+                    return
+                elif fixedGate == PBFixedGate.CH:
+                    # CH:
+                    # gate ch a,b {
+                    # h b;
+                    self._unrollRecursively(gateToProtobuf(H, [b]), circuitOut)
+                    # sdg b;
+                    self._unrollRecursively(gateToProtobuf(SDG, [b]), circuitOut)
+                    # cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # h b;
+                    self._unrollRecursively(gateToProtobuf(H, [b]), circuitOut)
+                    # t b;
+                    self._unrollRecursively(gateToProtobuf(T, [b]), circuitOut)
+                    # cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # t b;
+                    self._unrollRecursively(gateToProtobuf(T, [b]), circuitOut)
+                    # h b;
+                    self._unrollRecursively(gateToProtobuf(H, [b]), circuitOut)
+
+                    # our modification: s b;x b -> t b;x b;tdg b;
+                    # s b;
+                    # self._unrollRecursively(gateToProtobuf(S, [b]), circuitOut)
+                    # x b;
+                    # self._unrollRecursively(gateToProtobuf(X, [b]), circuitOut)
+                    # t b
+                    self._unrollRecursively(gateToProtobuf(T, [b]), circuitOut)
+                    # x b
+                    self._unrollRecursively(gateToProtobuf(X, [b]), circuitOut)
+                    # tdg b;
+                    self._unrollRecursively(gateToProtobuf(TDG, [b]), circuitOut)
+
+                    # s a;
+                    self._unrollRecursively(gateToProtobuf(S, [a]), circuitOut)
+                    # }
+                    return
+                elif fixedGate == PBFixedGate.SWAP:
+                    # SWAP: gate swap a,b {
+                    # cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # cx b,a;
+                    self._unrollRecursively(gateToProtobuf(CX, [b, a]), circuitOut)
+                    # cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # }
+                    return
+                elif fixedGate == PBFixedGate.CCX:
+                    # CCX:
+                    # gate ccx a,b,c
+                    # {
+                    #   h c;
+                    self._unrollRecursively(gateToProtobuf(H, [c]), circuitOut)
+                    #   cx b,c;
+                    self._unrollRecursively(gateToProtobuf(CX, [b, c]), circuitOut)
+                    #   tdg c;
+                    self._unrollRecursively(gateToProtobuf(TDG, [c]), circuitOut)
+                    #   cx a,c;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, c]), circuitOut)
+                    #   t c;
+                    self._unrollRecursively(gateToProtobuf(T, [c]), circuitOut)
+                    #   cx b,c;
+                    self._unrollRecursively(gateToProtobuf(CX, [b, c]), circuitOut)
+                    #   tdg c;
+                    self._unrollRecursively(gateToProtobuf(TDG, [c]), circuitOut)
+                    #   cx a,c;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, c]), circuitOut)
+                    #   t b;
+                    self._unrollRecursively(gateToProtobuf(T, [b]), circuitOut)
+                    #   t c;
+                    self._unrollRecursively(gateToProtobuf(T, [c]), circuitOut)
+                    #   h c;
+                    self._unrollRecursively(gateToProtobuf(H, [c]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   t a;
+                    self._unrollRecursively(gateToProtobuf(T, [a]), circuitOut)
+                    #   tdg b;
+                    self._unrollRecursively(gateToProtobuf(TDG, [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # }
+                    return
+                elif fixedGate == PBFixedGate.CSWAP:
+                    # CSWAP: gate cswap a,b,c {
+                    # cx c,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [c, b]), circuitOut)
+                    # ccx a,b,c;
+                    self._unrollRecursively(gateToProtobuf(CCX, [a, b, c]), circuitOut)
+                    # cx c,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [c, b]), circuitOut)
+                    # }
+                    return
+            elif op == 'rotationGate':
+                rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+                if len(circuitLine.argumentIdList) > 0:
+                    raise Error.ArgumentError(f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!')
+                nAngles = len(circuitLine.argumentValueList)
+                if nAngles == 1:
+                    [theta] = circuitLine.argumentValueList
+                elif nAngles == 2:
+                    [theta, phi] = circuitLine.argumentValueList
+                elif nAngles == 3:
+                    [theta, phi, lamda] = circuitLine.argumentValueList
                 else:
-                    circuitOut.append(circuitLine)
+                    raise Error.ArgumentError(f'Wrong angles count. angles value: {circuitLine.argumentValueList}!')
+
+                gateName = PBRotationGate.Name(rotationGate)
+                if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
+                    # don't need unroll: copy
+                    ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                    circuitOut.append(ret)
                     return
-            elif circuitLine.rotationGate == RotationGateEnum.RX:
-                # RX: gate rx(theta) a { u3(theta, -pi/2,pi/2) a; }
-                self._unrollRecursively(U(theta, -np.pi / 2.0, np.pi / 2.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.rotationGate == RotationGateEnum.RY:
-                # RY: gate ry(theta) a { u3(theta,0,0) a; }
-                self._unrollRecursively(U(theta, 0.0, 0.0)._toPB(a), circuitOut)
-                return
-            elif circuitLine.rotationGate == RotationGateEnum.RZ:
-                # RZ: gate rz(theta) a { u1(theta) a; }
-                self._unrollRecursively(U(theta)._toPB(a), circuitOut)
-                return
-            elif circuitLine.rotationGate == RotationGateEnum.CU:
-                # CU: gate cu3(theta,phi,lamda) a, b
-                # {
-                #   u1((lamda+phi)/2) a;
-                self._unrollRecursively(U((lamda + phi) / 2.0)._toPB(a), circuitOut)
-                #   u1((lamda-phi)/2) b;
-                self._unrollRecursively(U((lamda - phi) / 2.0)._toPB(b), circuitOut)
-                #   cx a, b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   u3(-theta/2,0,-(phi+lamda)/2) b;
-                self._unrollRecursively(U(-theta / 2.0, 0.0, -(phi + lamda) / 2.0)._toPB(b), circuitOut)
-                #   cx a, b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   u3(theta/2,phi,0) b;
-                self._unrollRecursively(U(theta / 2.0, phi, 0.0)._toPB(b), circuitOut)
-                # }
-                return
-            elif circuitLine.rotationGate == RotationGateEnum.CRX:
-                # CRX:
-                # gate crx(theta) a,b
-                # {
-                #   u1(pi/2) b;
-                self._unrollRecursively(U(np.pi / 2.0)._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   u3(-theta/2,0,0) b;
-                self._unrollRecursively(U(-theta / 2.0, 0.0, 0.0)._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   u3(theta/2,-pi/2,0) b;
-                self._unrollRecursively(U(theta / 2.0, -np.pi / 2.0, 0.0)._toPB(b), circuitOut)
-                # }
-                return
-            elif circuitLine.rotationGate == RotationGateEnum.CRY:
-                # CRY:
-                # gate cry(theta) a,b
-                # {
-                #   u3(theta/2,0,0) b;
-                self._unrollRecursively(U(theta / 2.0, 0.0, 0.0)._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   u3(-theta/2,0,0) b;
-                self._unrollRecursively(U(-theta / 2.0, 0.0, 0.0)._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # }
-                return
-            elif circuitLine.rotationGate == RotationGateEnum.CRZ:
-                # CRZ:
-                # gate crz(theta) a,b
-                # {
-                #   u1(theta/2) b;
-                self._unrollRecursively(U(theta / 2.0)._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                #   u1(-theta/2) b;
-                self._unrollRecursively(U(-theta / 2.0)._toPB(b), circuitOut)
-                #   cx a,b;
-                self._unrollRecursively(CX._toPB(a, b), circuitOut)
-                # }
-                return
-        elif circuitLine.HasField('procedureName'):
-            # procedureName: copy
-            circuitOut.append(circuitLine)
-            return
-        elif circuitLine.HasField('barrier'):
-            # barrier: copy
-            circuitOut.append(circuitLine)
-            return
-        elif circuitLine.HasField('measure'):
-            # measure: copy
-            circuitOut.append(circuitLine)
-            return
+                elif gateName in self.targetGatesNames:
+                    # already supported by target machine: copy or expand+copy
+                    if rotationGate == PBRotationGate.U:
+                        # U3: gate u3(theta,phi,lamda) a { U(theta,phi,lamda) a; }
+                        # U2: gate u2(theta,phi) a { U(pi/2,theta,phi) a; }
+                        # U1: gate u1(theta) a { U(0,0,theta) a; }
+                        circuitOut.append(
+                            gateToProtobuf(U(*_expandAnglesInUGate(list(circuitLine.argumentValueList))), [a]))
+                        return
+                    else:
+                        ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                        circuitOut.append(ret)
+                        return
+                elif rotationGate == PBRotationGate.RX:
+                    # RX: gate rx(theta) a { u3(theta, -pi/2,pi/2) a; }
+                    self._unrollRecursively(gateToProtobuf(U(theta, -np.pi / 2.0, np.pi / 2.0), [a]), circuitOut)
+                    return
+                elif rotationGate == PBRotationGate.RY:
+                    # RY: gate ry(theta) a { u3(theta,0,0) a; }
+                    self._unrollRecursively(gateToProtobuf(U(theta, 0.0, 0.0), [a]), circuitOut)
+                    return
+                elif rotationGate == PBRotationGate.RZ:
+                    # RZ: gate rz(theta) a { u1(theta) a; }
+                    self._unrollRecursively(gateToProtobuf(U(theta), [a]), circuitOut)
+                    return
+                elif rotationGate == PBRotationGate.CU:
+                    # CU: gate cu3(theta,phi,lamda) a, b
+                    # {
+                    #   u1((lamda+phi)/2) a;
+                    self._unrollRecursively(gateToProtobuf(U((lamda + phi) / 2.0), [a]), circuitOut)
+                    #   u1((lamda-phi)/2) b;
+                    self._unrollRecursively(gateToProtobuf(U((lamda - phi) / 2.0), [b]), circuitOut)
+                    #   cx a, b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   u3(-theta/2,0,-(phi+lamda)/2) b;
+                    self._unrollRecursively(gateToProtobuf(U(-theta / 2.0, 0.0, -(phi + lamda) / 2.0), [b]), circuitOut)
+                    #   cx a, b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   u3(theta/2,phi,0) b;
+                    self._unrollRecursively(gateToProtobuf(U(theta / 2.0, phi, 0.0), [b]), circuitOut)
+                    # }
+                    return
+                elif rotationGate == PBRotationGate.CRX:
+                    # CRX:
+                    # gate crx(theta) a,b
+                    # {
+                    #   u1(pi/2) b;
+                    self._unrollRecursively(gateToProtobuf(U(np.pi / 2.0), [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   u3(-theta/2,0,0) b;
+                    self._unrollRecursively(gateToProtobuf(U(-theta / 2.0, 0.0, 0.0), [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   u3(theta/2,-pi/2,0) b;
+                    self._unrollRecursively(gateToProtobuf(U(theta / 2.0, -np.pi / 2.0, 0.0), [b]), circuitOut)
+                    # }
+                    return
+                elif rotationGate == PBRotationGate.CRY:
+                    # CRY:
+                    # gate cry(theta) a,b
+                    # {
+                    #   u3(theta/2,0,0) b;
+                    self._unrollRecursively(gateToProtobuf(U(theta / 2.0, 0.0, 0.0), [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   u3(-theta/2,0,0) b;
+                    self._unrollRecursively(gateToProtobuf(U(-theta / 2.0, 0.0, 0.0), [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # }
+                    return
+                elif rotationGate == PBRotationGate.CRZ:
+                    # CRZ:
+                    # gate crz(theta) a,b
+                    # {
+                    #   u1(theta/2) b;
+                    self._unrollRecursively(gateToProtobuf(U(theta / 2.0), [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    #   u1(-theta/2) b;
+                    self._unrollRecursively(gateToProtobuf(U(-theta / 2.0), [b]), circuitOut)
+                    #   cx a,b;
+                    self._unrollRecursively(gateToProtobuf(CX, [a, b]), circuitOut)
+                    # }
+                    return
 
         # unsupported gate
         if self.errorOnUnsupported:
             # error
-            raise Exception('unsupported gate:\n' + str(circuitLine))
+            raise Error.ArgumentError(f'Unsupported operation {circuitLine}!')
         else:
             # ignore
-            circuitOut.append(circuitLine)
+            ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+            circuitOut.append(ret)
 
-    def _decompose(self, circuitOut, circuitIn):
+    def _decompose(self, circuitOut: List['PBCircuitLine'], circuitIn: List['PBCircuitLine']):
         """
         Unroll the gates
 
@@ -401,3 +393,22 @@ class UnrollCircuit:
 
         for circuitLine in circuitIn:
             self._unrollRecursively(circuitLine, circuitOut)
+
+
+def _expandAnglesInUGate(angles: List[float]):
+    """
+    Expand the angles list by following the relation among u1, u2, and u3
+    """
+
+    # expand
+    nAngles = len(angles)
+    if nAngles == 3:
+        pass
+    elif nAngles == 2:
+        angles = [np.pi / 2.0] + angles
+    elif nAngles == 1:
+        angles = [0.0, 0.0] + angles
+    else:
+        raise Error.ArgumentError(f'Wrong angles count. angles: {angles}!')
+
+    return angles

@@ -18,16 +18,18 @@
 """
 Composite Gate
 """
+from copy import deepcopy
+from typing import List
 
-import copy
+from QCompute.OpenModule import ModuleImplement
+from QCompute.QPlatform.CircuitTools import gateToProtobuf
+from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
+from QCompute.QPlatform.QOperation.FixedGate import CX
+from QCompute.QPlatform.QOperation.RotationGate import U
+from QCompute.QProtobuf import PBCircuitLine, PBProgram, PBCompositeGate
 
-from QCompute.QuantumPlatform.QuantumOperation.FixedGate import CX
-from QCompute.QuantumPlatform.Utilities import _mergePBList
-from QCompute.QuantumProtobuf.Library.PlatformStruct_pb2 import CircuitLine
-from QCompute.QuantumProtobuf.Library.QuantumOperation_pb2 import CompositeGate as CompositeGateEnum, U
 
-
-class CompositeGate:
+class CompositeGateModule(ModuleImplement):
     """
     The decomposition of composite gate
 
@@ -36,22 +38,25 @@ class CompositeGate:
     env.module(CompositeGate())
 
     env.module(CompositeGate(['RZZ']))
-
-    env.module(CompositeGate([PBCompositeGate.RZZ]))
     """
+    arguments = None
 
-    def __init__(self, params=None):
+    def __init__(self, gateNameList: List[str] = None) -> None:
         """
         Initialize the Module.
 
         Json serialization is allowed by the requested parameter.
 
-        :param params: The gate list to process. Let it be None to process all.
+        :param gateNameList: The gate list to process. Let it be None to process all.
+
+        Example:
+
+        env.module(UnrollCircuit())
         """
 
-        self.params = params
+        self.gateNameList = gateNameList
 
-    def __call__(self, program):
+    def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
         Process the Module
 
@@ -59,51 +64,61 @@ class CompositeGate:
         :return: decomposed circuit
         """
 
-        ret = copy.deepcopy(program)
-        ret.body.ClearField('circuit')
-        for id, procedure in program.body.procedureMap.items():
-            targetProcedure = ret.body.procedureMap[id]
-            targetProcedure.ClearField('circuit')
-            self._decompose(targetProcedure.circuit, procedure.circuit)
-        self._decompose(ret.body.circuit, program.body.circuit)
+        ret = deepcopy(program)
+
+        for name, procedure in program.body.procedureMap.items():
+            procedureOut = ret.body.procedureMap[name]
+            del procedureOut.circuit[:]
+            self._decompose(procedure.circuit, procedureOut.circuit)
+        del ret.body.circuit[:]
+        self._decompose(program.body.circuit, ret.body.circuit)
         return ret
 
-    def _decompose(self, circuitOut, circuitIn):
+    def _decompose(self, circuitIn: List['PBCircuitLine'], circuitOut: List['PBCircuitLine']) -> None:
         """
         Decompose circuit
 
-        :param circuitOut: output circuit
-        :param circuitIn: input circuit
+        :param circuitIn: circuit line list
         """
 
-        for circuitLine in circuitIn:
+        for index, circuitLine in enumerate(circuitIn):
             if circuitLine.HasField('compositeGate') and (
-                    self.params is None or circuitLine.compositeGate in self.params):
-                # insert the decomposed circuit
-                if circuitLine.compositeGate == CompositeGateEnum.RZZ:
-                    """
-                    
-                    RZZ(xyz)(Q0, Q1)
-                    
-                    =
-                    
-                    CX(Q0, Q1)
-                    
-                    U(xyz)(Q1)
-                    
-                    CX(Q0, Q1)
-                    """
-                    circuitOut.append(CX._toPB(*circuitLine.qRegs))
-
-                    newCircuitLine = CircuitLine()
-                    newCircuitLine.rotationGate = U
-                    newCircuitLine.qRegs.append(circuitLine.qRegs[1])
-                    _mergePBList(newCircuitLine.paramValues, circuitLine.paramValues)
-                    _mergePBList(newCircuitLine.paramIds, circuitLine.paramIds)
-                    circuitOut.append(newCircuitLine)
-
-                    circuitOut.append(CX._toPB(*circuitLine.qRegs))
+                    self.gateNameList is None or compositeGate.name in self.gateNameList):
+                compositeGate = circuitLine.compositeGate  # type: 'PBCompositeGate'
+                if compositeGate == PBCompositeGate.RZZ:
+                    # insert the decomposed circuit
+                    circuitOut.extend(_RZZ(circuitLine))
                     continue
-
-            # copy the original circuit
             circuitOut.append(circuitLine)
+
+
+def _RZZ(rzzGate: PBCircuitLine) -> List[PBCircuitLine]:
+    """
+    RZZ(xyz)(Q0, Q1)
+
+    =
+
+    CX(Q0, Q1)
+
+    U(xyz)(Q1)
+
+    CX(Q0, Q1)
+    """
+    ret = []  # type: List['PBCircuitLine']
+
+    ret.append(gateToProtobuf(CX, rzzGate.qRegList))
+
+    argumentList = []
+    if len(rzzGate.argumentIdList) > 0:
+        for index, argumentId in enumerate(rzzGate.argumentIdList):
+            if argumentId >= 0:
+                argumentList.append(ProcedureParameterStorage(argumentId))
+            else:
+                argumentList.append(rzzGate.argumentValueList[index])
+    else:
+        argumentList = rzzGate.argumentValueList
+    ret.append(gateToProtobuf(U(*argumentList), [rzzGate.qRegList[1]]))
+
+    ret.append(gateToProtobuf(CX, rzzGate.qRegList))
+
+    return ret

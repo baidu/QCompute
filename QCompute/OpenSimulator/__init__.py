@@ -19,18 +19,81 @@
 Quantum executor interface definition
 """
 import json
+from typing import TYPE_CHECKING, Dict, Union, List
 
-from QCompute.Define import sdkVersion
+import numpy
+
+from QCompute import Define
+from QCompute.QPlatform.Utilities import numpyMatrixToDictMatrix, dictMatrixToNumpyMatrix
+
+if TYPE_CHECKING:
+    pass
 
 
-class QuantumResult:
+class SimulatorVersion:
     """
-    The result of experiment
+    The version of quantum simulator.
     """
 
-    sdkVersion = sdkVersion
+    gitHash = None  # type: str
+    """
+    Git Hash
+    """
+
+    gitTime = None  # type: str
+    """
+    Git Time
+    """
+
+    fileHash = None  # type: str
+    """
+    File Hash
+    """
+
+    compileTime = None  # type: str
+    """
+    Compile Time
+    """
+
+
+class Ancilla:
+    """
+    Ancilla
+    """
+    usedQRegList = None  # type: List[int]
+    """
+    used qReg list
+    """
+
+    usedCRegList = None  # type: List[int]
+    """
+    used cReg list
+    """
+
+    compactedQRegDict = None  # type: Dict[int, int]
+    """
+    computed qReg list
+    """
+
+    compactedCRegDict = None  # type: Dict[int, int]
+    """
+    measured qReg list
+    """
+
+
+class QResult:
+    """
+    The result of experiment.
+    """
+
+    sdkVersion = Define.sdkVersion
     """
     SDK Version from Define.sdkVersion
+    """
+
+    simulatorVersion = None  # type: SimulatorVersion
+    """
+    The version of quantum simulator
     """
 
     code = 0
@@ -43,12 +106,27 @@ class QuantumResult:
     output results
     """
 
+    log = ''
+    """
+    output results
+    """
+
+    ancilla = Ancilla()  # type: Ancilla
+    """
+    ancilla
+    """
+
     shots = 0
     """
     number of shots
     """
 
-    counts = None
+    counts = None  # type: Union[Dict[str, int], Dict[str, float]]
+    """
+    counts for results
+    """
+
+    state = None  # type: numpy.ndarray
     """
     counts for results
     """
@@ -68,65 +146,83 @@ class QuantumResult:
     end utc time
     """
 
-    def fromJson(self, str):
+    def fromJson(self, text: str):
         """
         fromJson
         """
-        data = json.loads(str)
+        data = json.loads(text)
         if 'sdkVersion' in data:
-            self.sdkVersion = data['sdkVersion']
-        if 'code' in data:
-            self.code = data['code']
-        if 'output' in data:
-            self.output = data['output']
-        if 'shots' in data:
-            self.shots = data['shots']
-        if 'counts' in data:
-            self.counts = data['counts']
-        if 'seed' in data:
-            self.seed = data['seed']
-        if 'startTimeUtc' in data:
-            self.startTimeUtc = data['startTimeUtc']
-        if 'endTimeUtc' in data:
-            self.endTimeUtc = data['endTimeUtc']
+            self.sdkVersion = data['sdkVersion']  # 否则在模拟器提交前写好
+        if 'simulatorVersion' in data:
+            simulatorVersion = data['simulatorVersion']
+            self.simulatorVersion.gitHash = simulatorVersion['gitHash']
+            self.simulatorVersion.gitTime = simulatorVersion['gitTime']
+            self.simulatorVersion.fileHash = simulatorVersion['fileHash']
+            self.simulatorVersion.compileTime = simulatorVersion['compileTime']
+        # self.code = data['code']
+        # self.output = data['output']
+        # self.log = data['log']
+        if 'ancilla' in data:
+            if 'usedQRegList' in data['ancilla'] and data['ancilla']['usedQRegList'] is not None:
+                self.ancilla.usedQRegList = data['usedQRegList']
+            if 'usedCRegList' in ['ancilla'] and data['ancilla']['usedCRegList'] is not None:
+                self.ancilla.usedCRegList = data['usedCRegList']
+            if 'compactedQRegDict' in data['ancilla'] and data['ancilla']['compactedQRegDict'] is not None:
+                self.ancilla.compactedQRegDict = data['compactedQRegDict']
+            if 'compactedCRegDict' in data['ancilla'] and data['ancilla']['compactedCRegDict'] is not None:
+                self.ancilla.compactedCRegDict = data['compactedCRegDict']
+        self.shots = data['shots']
+        self.counts = data['counts']
+        if 'state' in data and data['state'] is not None:
+            self.state = dictMatrixToNumpyMatrix(data['state'], complex)
+        self.seed = data['seed']
+        self.startTimeUtc = data['startTimeUtc']
+        self.endTimeUtc = data['endTimeUtc']
 
-    def toJsonInside(self):
-        """
-        toJsonInside
-        """
-        return json.dumps({
-            'sdkVersion': self.sdkVersion,
-            'code': self.code,
-            'output': self.output,
-            'shots': self.shots,
-            'counts': self.counts,
-            'seed': self.seed,
-            'startTimeUtc': self.startTimeUtc,
-            'endTimeUtc': self.endTimeUtc,
-        })
-
-    def toJson(self):
+    def toJson(self, inside: bool = None):
         """
         toJson
         """
-        return json.dumps({
+        ret = {
             'sdkVersion': self.sdkVersion,
+            'ancilla': {
+                'usedQRegList': self.ancilla.usedQRegList,
+                'usedCRegList': self.ancilla.usedCRegList,
+                'compactedQRegDict': self.ancilla.compactedQRegDict,
+                'compactedCRegDict': self.ancilla.compactedCRegDict,
+            },
             'shots': self.shots,
             'counts': self.counts,
             'seed': self.seed,
             'startTimeUtc': self.startTimeUtc,
             'endTimeUtc': self.endTimeUtc,
-        })
+        }
+        if self.state is not None:
+            ret['state'] = numpyMatrixToDictMatrix(self.state)
+        if inside is None:
+            inside = Define.taskInside
+        if inside:
+            ret['output'] = self.output
+            ret['log'] = self.log
+        if self.simulatorVersion is not None:
+            simulatorVersion = {
+                'gitHash': self.simulatorVersion.gitHash,
+                'gitTime': self.simulatorVersion.gitTime,
+                'fileHash': self.simulatorVersion.fileHash,
+                'compileTime': self.simulatorVersion.compileTime,
+            }
+            ret['simulatorVersion'] = simulatorVersion
+        return json.dumps(ret)
 
 
-class QuantumImplement:
+class QImplement:
     """
     Implement params for quantum execution.
 
     Send to the simulator when submitting a task.
     """
 
-    program = None
+    program = None  # type: 'PBProgram'
     """
     Protobuf format of the circuit
     """
@@ -136,12 +232,18 @@ class QuantumImplement:
     Number of shots
     """
 
-    backendParam = None
+    backendArgument = None
     """
-    The parameters of backend
+    The arguments of backend
     """
 
-    result = QuantumResult()
+    result = QResult()
     """
     The final result
     """
+
+    def commit(self):
+        """
+        Commit task
+        """
+        pass

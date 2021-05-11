@@ -26,13 +26,13 @@ The matmul format can often accelerate calculation.
 
 import copy
 from enum import IntEnum, unique
+from typing import List, Union
 
 import numpy
 
 
 
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType
-from QCompute.QuantumPlatform import Error
 
 
 @unique
@@ -44,12 +44,12 @@ class Algorithm(IntEnum):
 
        MATMUL uses tricks that can significantly reduce calculation time.
     """
-    
+
     Matmul = 0
     Einsum = Matmul + 1
 
 
-def calcEinsumIndex(bits, n):
+def _calcEinsumIndex(bits: List[int], n: int) -> str:
     """
     Calculate einsum index.
     """
@@ -78,18 +78,19 @@ class TransferProcessor:
     Calculate state evolution by gate implementation.
     """
 
-    def __init__(self, matrixType, algorithm):
+    def __init__(self, matrixType: MatrixType, algorithm: Algorithm) -> None:
         """
         Choose an algorithm according to the parameters.
         """
 
         if matrixType == MatrixType.Dense and algorithm == Algorithm.Matmul:
-            self.proc = self.transferStateDenseMatmul
+            self.proc = self._transferStateDenseMatmul
         elif matrixType == MatrixType.Dense and algorithm == Algorithm.Einsum:
             self.proc = self._transferStateDenseEinsum
         
 
-    def __call__(self, state, gate_matrix, bits):
+    def __call__(self, state: Union[numpy.ndarray, 'COO'], gate_matrix: Union[numpy.ndarray, 'COO'], bits: List[int]) -> \
+    Union[numpy.ndarray, 'COO']:
         """
         :param state:
         :param gate_matrix:
@@ -99,7 +100,8 @@ class TransferProcessor:
 
         return self.proc(state, gate_matrix, bits)
 
-    def transferStateDenseMatmul(self, state, gate_matrix, bits):
+    def _transferStateDenseMatmul(self, state: numpy.ndarray, gate_matrix: numpy.ndarray,
+                                  bits: List[int]) -> numpy.ndarray:
         """
         Essential transfer process.
         """
@@ -140,17 +142,18 @@ class TransferProcessor:
 
         return state
 
-    def _transferStateDenseEinsum(self, state, gate_matrix, bits):
+    def _transferStateDenseEinsum(self, state: numpy.ndarray, gate_matrix: numpy.ndarray,
+                                  bits: List[int]) -> numpy.ndarray:
         """
         Essential transfer process.
         """
 
         n = len(state.shape)
 
-        idx = calcEinsumIndex(bits, n)
+        idx = _calcEinsumIndex(bits, n)
         gate_matrix = numpy.reshape(gate_matrix, 2 * len(bits) * [2])
         state = numpy.einsum(idx, gate_matrix, state, dtype=complex, casting='no')
 
         return state
 
-
+    

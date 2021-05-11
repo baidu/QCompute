@@ -8,15 +8,15 @@ VQE 算法的核心正是通过不断调节单位向量 $\lvert {\phi}\rangle$�
 ### 参数化量子电路
 为了调节一个单位向量 $\lvert {\phi}\rangle$，我们需要建立一个参数化的量子电路。
 
-![VQE4.png](./pic/VQE4.png)
+![VQE4.png](./PIC/VQE4.png)
 
 上图展示了一个适用于2个量子比特的参数化电路，这个电路由4个参数 (旋转门角度 $x_i$) 控制，在给定一个输入量子态的情况下，通过调节这4个参数，我们可以改变电路输出的量子态。当然，我们也可以构造更复杂的参数化电路。
 
-![VQE12.png](./pic/VQE12.png)
+![VQE12.png](./PIC/VQE12.png)
 
 上图是一个适用于5个量子比特且含有12个参数的电路，同样地，通过调节这12个参数，我们可以得到不同的输出量子态。细心的读者可能会问:"在给定一个输入量子态时，一个参数化电路能生成任意的一个量子态吗？" 这取决于这个参数化电路的构造。对于只有两个量子比特的情形，我们可以构造出一个如下图所示的含15个参数的量子电路。
 
-![VQE15.png](./pic/VQE15.png)
+![VQE15.png](./PIC/VQE15.png)
 
 通过调节电路中的这15个参数， 我们可以输出两个量子比特的任意一个量子态 。对于任意多个的量子比特，构造一个泛化能力很强的参数化电路现今依旧是一个开放问题。从实践上来说， 只要求参数化电路输出的态 $|\phi\rangle$ 很接近真实的特征量子态 $|\phi_{\lambda_\text{min}}\rangle$， 我们就能近似求得 $\lambda \approx \lambda_\text{min}$。
 
@@ -38,11 +38,11 @@ $$
 其中 $I$ 是单位矩阵， $\sigma_x, \sigma_y, \sigma_z$ 则是 Pauli 矩阵。理论上， 任何一个 $2^n \times 2^n$ 的埃尔米特矩阵 $H$ 都可以被这样分解，也就是说 ，$\{I, \sigma_x, \sigma_y, \sigma_z\}^{\otimes n}$ 是一组埃尔米特矩阵基。既然得到 $\langle{\phi} \lvert H\lvert {\phi}\rangle$ 需要计算每一项 $\langle{\phi} \lvert H_i\lvert {\phi}\rangle$，那我们如何计算现在我们需要完成最后一个拼图，也就是如何计算 $\langle{\phi} \lvert H_i\lvert {\phi}\rangle$ 呢？一种被称为**泡利测量**的技术可以帮助我们解决这个问题。我们接下来看一个简单的例子。
 
 首先利用如下的参数化电路制备出3个量子比特的一个量子态 $\lvert {\phi}\rangle$。
-![pauli1](./pic/pauli1.png)
+![pauli1](./PIC/pauli1.png)
 假设我们想得到 $\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$，那么只需要搭建下图中的电路，反复进行测量。
-![pauli2.png](./pic/pauli2.png)
+![pauli2.png](./PIC/pauli2.png)
 虽然 $\lvert {\phi}\rangle$ 是3个量子比特的量子态，但我们需要一个额外的辅助量子比特 $q_0$ 帮助我们计算 $\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$。注意到新增加的第二部分电路，它含有阿达玛门 $H$ (**注意**：这里的 $H$ 指阿达玛门，而不是前面讨论的哈密顿量) 和 $R_z(-\pi/2)$ 门，这一部分电路是为 $\sigma_x\otimes \sigma_y\otimes\sigma_z$ 量身打造的。 不同的 $H_i$ 会对应不同的测量电路，我们下面会详细介绍。多次测量辅助量子比特后，统计出测量结果为0和为1的概率，用测量得到0的概率减去测量得到1的概率，得到的数值便是 $\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$ 的近似值。测量次数越多，计算的结果就越精确。我们说到不同的 $H_i$ 会对应不同的电路构造，现在来看一下当 $H_i = \sigma_z\otimes \sigma_x\otimes I$ 的时候， 测量电路会变成什么样。
-![pauli3.png](./pic/pauli3.png)
+![pauli3.png](./PIC/pauli3.png)
 注意到只有电路的第二部分变化了，电路其它的部分则保持不变。 我们仍然是让这个电路在初始态$\lvert {0000}\rangle$上跑好多好多次，统计出$q_0$测得0的概率减去测得1的概率，得到的数值便是 $\langle{\phi} \lvert \sigma_z\otimes \sigma_x\otimes I\lvert {\phi}\rangle$的近似值。其实这里有个重要的规律：
 
 * $\sigma_x$ 对应构造 阿达玛门 $H$ + $CNOT$ 测量
@@ -53,7 +53,7 @@ $$
 回顾一下 $\sigma_x\otimes \sigma_y\otimes\sigma_z$ 所对应的电路，你发现了吗？$q_1$添加的是阿达玛门 + $CNOT$, 对应的是$\sigma_x\otimes \sigma_y\otimes\sigma_z$的第一项$\sigma_x$; $q_2$添加的是 $R_z(-\pi/2)$门 + 阿达玛门 + $CNOT$， 对应的是$\sigma_x\otimes \sigma_y\otimes\sigma_z$ 的第二项 $\sigma_y$; $q_3$ 添加的是 $CNOT$, 对应的是 $\sigma_x\otimes \sigma_y\otimes\sigma_z$ 的第三项 $\sigma_z$。我猜你应该看出了些苗头，让我们再研究一下 $\sigma_z\otimes \sigma_x\otimes I$ 对应的电路。
 
 $q_1$添加的是 $CNOT$门, 对应的是$\sigma_z\otimes \sigma_x\otimes I$的第一项$\sigma_z$; $q_2$添加的是阿达玛门 + $CNOT$门， 对应的是$\sigma_z\otimes \sigma_x\otimes I$的第二项$\sigma_x$; $q_3$什么也没加, 对应的是$\sigma_z\otimes \sigma_x\otimes I$的第三项$I$。让我考考你，测量 $\langle{\phi} \lvert \sigma_y\otimes I\otimes \sigma_y\lvert {\phi}\rangle$ 的电路会长什么样？答案见下图:
-![pauli4.png](./pic/pauli4.png)
+![pauli4.png](./PIC/pauli4.png)
 
 这样的话，我们已经可以得到 $H = 0.5*\sigma_x\otimes \sigma_y\otimes\sigma_z + 0.2*\sigma_z\otimes \sigma_x\otimes I + 0.8 * \sigma_y\otimes I\otimes \sigma_y$关于$\lvert {\phi}\rangle$的期望值$\langle{\phi} \lvert H\lvert {\phi}\rangle$了，只要我们让前三个设计的电路每个都独立运行好多好多次，统计并计算每一项的结果，结合系数进行线性相加就好了。我知道，第一次看起来会很复杂。但是不用怕，前面的部分多读几遍，原理其实并不深奥。
 
@@ -383,7 +383,7 @@ if __name__ == '__main__':
 ```
 下面这张图是由上述代码跑出的实验结果， 每一根线都是一个不同的process独立进行的20次梯度下降优化，可以看到效果还不错。
 
-![Figure_1.png](./pic/Figure_1.png)
+![Figure_1.png](./PIC/Figure_1.png)
 
 
 ---

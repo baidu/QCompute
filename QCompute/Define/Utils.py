@@ -21,10 +21,12 @@ Utils Functions
 
 import re
 
+import QCompute
+
 _reaesc = re.compile(r'\x1b[^m]*m')
 
 
-def _filterConsoleOutput(text):
+def filterConsoleOutput(text: str):
     """
     Filter control characters in command output
 
@@ -43,3 +45,17 @@ def _filterConsoleOutput(text):
     """
 
     return _reaesc.sub('', text)
+
+
+def matchSdkVersion(tagretVersion: str):
+    """
+    Match sdk version.
+    """
+    if QCompute.Define.sdkVersion != tagretVersion:
+        import warnings
+
+        warnings.warn(
+            f'This example({tagretVersion}) '
+            f'does not match the correct sdk version({QCompute.Define.sdkVersion}). '
+            'Please update the sdk.',
+            FutureWarning)

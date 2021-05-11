@@ -24,6 +24,8 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 qubit_num = 4
 shots = 1000
 phase = 2 * np.pi / 5
@@ -34,12 +36,12 @@ def main():
     main
     """
     # Create environment
-    env = QuantumEnvironment()
+    env = QEnv()
     # Choose backend machine
     env.backend(BackendName.LocalBaiduSim2)
 
     # Initialize qubits
-    q = [env.Q[i] for i in range(qubit_num)]
+    q = env.Q.createList(qubit_num)
 
     # Prepare eigenstate |1> = X|0> on the ancilla qubit
     X(q[3])

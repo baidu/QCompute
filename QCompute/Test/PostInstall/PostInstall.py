@@ -23,7 +23,7 @@ import traceback
 
 from QCompute import Define
 from QCompute.Define import Settings
-from QCompute.QuantumPlatform.Error import ParamError, NetworkError
+from QCompute.QPlatform import Error
 from QCompute.Test.PostInstall.CloudFullTest import cloudFullTest
 from QCompute.Test.PostInstall.LocalGateTest import localGateTest
 
@@ -47,12 +47,12 @@ def testAll():
     except:
         [_, _, tb] = sys.exc_info()
         lastTb = traceback.extract_tb(tb)[-1]
-        if lastTb.name == '_getSTSToken':
-            raise ParamError('Get STSToken from Quantum Cloud Error.')
-        elif lastTb.name == '_uploadCircuit':
-            raise NetworkError('Create Circuit on Quantum Cloud Error.')
+        if lastTb.name == 'getSTSToken':
+            raise Error.ArgumentError('Get STSToken from Quantum Cloud Error.')
+        elif lastTb.name == 'uploadCircuit':
+            raise Error.NetworkError('Create Circuit on Quantum Cloud Error.')
         elif lastTb.name == 'send_request':
-            raise NetworkError('Upload Circuit to Baidu BOS Error.')
+            raise Error.NetworkError('Upload Circuit to Baidu BOS Error.')
         else:
             raise
     print('Cloud test successed.')

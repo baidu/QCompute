@@ -18,3 +18,15 @@
 """
 Export the entire directory as a library
 """
+
+
+class ModuleImplement:
+    """
+    ConvertorImplement
+    """
+
+    def __init__(self) -> None:
+        self.arguments = None  # any can serialize to json
+
+    def __call__(self, *args, **kwargs) -> None:
+        pass

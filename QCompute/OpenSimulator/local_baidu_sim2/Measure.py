@@ -24,14 +24,15 @@ Two measurement methods (Meas_METHOD) are provided:
 
 from collections import Counter
 from enum import IntEnum, unique
+from typing import Union, Dict, Tuple, Optional
 
 import numpy
 
 
 
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType
-from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
-from QCompute.QuantumPlatform import Error
+from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor, Algorithm
+from QCompute.QPlatform import Error
 
 
 @unique
@@ -43,10 +44,12 @@ class MeasureMethod(IntEnum):
     """
 
     Probability = 0
-    Accumulation = Probability + 1
+    OutputProbability = Probability + 1
+    OutputState = OutputProbability + 1
+    Accumulation = OutputState + 1
 
 
-def pow2(x):
+def pow2(x: float) -> float:
     """
     Pow 2
     """
@@ -54,7 +57,7 @@ def pow2(x):
     return pow(x, 2)
 
 
-def numToBinStr(num, n):
+def numToBinStr(num: int, n: int) -> str:
     """
     Oct to bin in the common order, not reversed
 
@@ -73,28 +76,41 @@ class Measurer:
     Quantum Measurer
     """
 
-    def __init__(self, matrixType, algorithm, measureMethod):
+    def __init__(self, matrixType: MatrixType, algorithm: Algorithm, measureMethod: MeasureMethod) -> None:
         """
         To choose the algorithms by the parameters.
         """
 
         if measureMethod == MeasureMethod.Probability:
             if matrixType == MatrixType.Dense:
-                self.proc = self.measureDenseByProbability
+                self.proc = self._measureDenseByProbability
             else:
                 raise Error.RuntimeError('Not implemented')
-        else:
+        elif measureMethod == MeasureMethod.OutputProbability:
+            if matrixType == MatrixType.Dense:
+                self.proc = self._measureDenseByOutputProbability
+            else:
+                raise Error.RuntimeError('Not implemented')
+        elif measureMethod == MeasureMethod.OutputState:
+            if matrixType == MatrixType.Dense:
+                self.proc = self._measureDenseByOutputState
+            else:
+                raise Error.RuntimeError('Not implemented')
+        elif measureMethod == MeasureMethod.Accumulation:
             self.Transfer = TransferProcessor(matrixType, algorithm)
-            self.proc = self.measureBySingleAccumulation
+            self.proc = self._measureBySingleAccumulation
+        else:
+            assert False
 
-    def __call__(self, state, shots):
+    def __call__(self, state: Union[numpy.ndarray, 'COO'], shots: int) -> \
+            Optional[Union[Dict[str, int], Dict[str, float]]]:
         """
         To enable the object callable
         """
 
         return self.proc(state, shots)
 
-    def measureSingle(self, state, bit):
+    def _measureSingle(self, state: numpy.ndarray, bit: int) -> Tuple[int, Union[numpy.ndarray, 'COO']]:
         """
         One-qubit measurement
         """
@@ -124,7 +140,7 @@ class Measurer:
 
         return out, state
 
-    def measureAll(self, state):
+    def _measureAll(self, state: numpy.ndarray) -> str:
         """
         Measure all by measuring qubit one by one
         """
@@ -133,25 +149,25 @@ class Measurer:
         outs = ''
         for i in range(n):
             # The collapse of bit0 after measuring bit0 affects the subsequent measurement of bit1 but does not affect the 1000 independent measurements of the previous layer
-            out, state = self.measureSingle(state, i)
+            out, state = self._measureSingle(state, i)
             outs = str(out) + outs  # Low to high
         return outs
 
-    def measureBySingleAccumulation(self, state, shots):
+    def _measureBySingleAccumulation(self, state: numpy.ndarray, shots: int) -> Dict[str, int]:
         """
         Measure by accumulation, one shot at a time
         """
 
         # print("Measure method Single Accu")
-        result = {}
+        result = {}  # type: Dict[str, int]
         for i in range(shots):
-            outs = self.measureAll(state)
+            outs = self._measureAll(state)
             if outs not in result:
                 result[outs] = 0
             result[outs] += 1
         return result
 
-    def measureDenseByProbability(self, state, shots):
+    def _measureDenseByProbability(self, state: numpy.ndarray, shots: int) -> Dict[str, int]:
         """
         Measure by probability
         """
@@ -174,9 +190,10 @@ class Measurer:
 
         samples = numpy.random.choice(len(prob_key), shots, p=prob_values)
         """
+
         samples = numpy.random.choice(range(2 ** n), shots, p=prob_array)
         count_samples = Counter(samples)
-        result = {}
+        result = {}  # type: Dict[str, int]
         for idex in count_samples:
             """
             result[prob_key[idex]] = count_samples[idex]
@@ -184,4 +201,47 @@ class Measurer:
             result[numToBinStr(idex, n)] = count_samples[idex]
         return result
 
+    
 
+    def _measureDenseByOutputProbability(self, state: numpy.ndarray, shots: int) -> Dict[str, float]:
+        """
+        Output probability
+        """
+
+        # print("Measure method Probability")
+        n = len(state.shape)
+
+        prob_array = numpy.reshape(numpy.abs(state) ** 2, [2 ** n])
+
+        """
+        prob_key = []
+        prob_values = []
+        pos_list = list(numpy.nonzero(prob_array)[0])
+        for index in pos_list:
+            string = _numToBinStr(index, n)
+            prob_key.append(string)
+            prob_values.append(prob_array[index])
+
+        # print("The sum prob is ", sum(prob_values))
+
+        samples = numpy.random.choice(len(prob_key), shots, p=prob_values)
+        """
+
+        result = {}
+        indices = numpy.nonzero(prob_array != 0)[0]
+        for idex in indices:
+            result[numToBinStr(idex, n)] = prob_array[idex]
+        return result
+
+    
+
+    def _measureDenseByOutputState(self, state: numpy.ndarray, shots: int) -> None:
+        """
+        Output state
+        """
+
+        # return {'0' * len(state.shape): ascii(state.tolist())}
+
+        return None
+
+    

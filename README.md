@@ -1,7 +1,7 @@
 # QCompute
 ![](https://release-data.cdn.bcebos.com/github-qleaf%2F%E9%87%8F%E6%98%93%E4%BC%8F%E5%9B%BE%E6%A0%87.png)
 
-[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) [![](https://img.shields.io/badge/build-passing-green)]() ![](https://img.shields.io/badge/Python-3.6--3.8-blue) ![](https://img.shields.io/badge/release-v1.0.3-blue)
+[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) [![](https://img.shields.io/badge/build-passing-green)]() ![](https://img.shields.io/badge/Python-3.6--3.8-blue) ![](https://img.shields.io/badge/release-v1.1.0-blue)
 
 Quantum Leaf (量易伏) is a Cloud-Native quantum computing platform developed by the Institute for Quantum Computing, Baidu. It is used for programming, simulating and executing quantum computers, aiming at providing the quantum programming environment for Quantum infrastructure as a Service (QaaS). 
 
@@ -28,7 +28,6 @@ Please prepare Python environment and Pip tool. Be careful about different path 
 
 ## Running the tests
 
-    cd QCompute
     python -m QCompute.Test.PostInstall.PostInstall
 
 Please test on a local simulator first, and then fill in your token of Quantum-hub to test on a cloud simulator.

@@ -9,15 +9,15 @@ The core of VQE is to minimize $\langle{\phi} \lvert H\lvert {\phi}\rangle$ by a
 ### Parameterized Quantum Circuit
 To adjust a quantum state $\lvert {\phi}\rangle$, we need to build a parameterized quantum circuit.
 
-![VQE4.png](./pic/VQE4.png)
+![VQE4.png](./PIC/VQE4.png)
 
 The figure above shows a 2-qubit quantum circuit controlled by 4 parameters. By adjusting the 4 parameters, we can change the output state of the circuit given a fixed input state. Certainly, you can build a more complex parameterized quantum circuit.
 
-![VQE12.png](./pic/VQE12.png)
+![VQE12.png](./PIC/VQE12.png)
 
 The figure above shows a 5-qubit quantum circuit with 12 parameters. Still, by adjusting those parameters, we can change the output state. Some readers may wonder that, given a fixed input state, whether a parameterized circuit can output an arbitrary quantum state. That depends on the structre of a parameterized circuit. For a 2-qubit system, we can build a parameterized with 15 parameters, shown in the figure below.
 
-![VQE15.png](./pic/VQE15.png)
+![VQE15.png](./PIC/VQE15.png)
 
 By adjusting those 15 parameters, we can generate an arbitrary 2-qubit state. Generally, it is not only hard, but impractical to design a parameterized quantum circuit that can generate any possible quantum state. In practice, we only need a quantum state $|\phi\rangle$ close enough to the ground state $|\phi_{\lambda_\text{min}}\rangle$ to make a good estimation of $\lambda_{min}$.
 
@@ -40,16 +40,16 @@ $$
 where $I$ is the identity matrix, and $\sigma_x, \sigma_y, \sigma_z$ are the Pauli matrices. In theory, any Hermitian $H$ can be written as a linear combination of tensor products of Pauli matrices. Since to get $\langle{\phi} \lvert H\lvert {\phi}\rangle$ we need to compute every $\langle\phi|H_i|\phi\rangle$, how do we compute $\langle\phi|H_i|\phi\rangle$ in practice? This computation can be done with a technique called Pauli measurement. Let's go through a simple example.
 
 To begin with, we use the following circuit to prepare a 3-qubit quantum state $\lvert {\phi}\rangle$.
-![pauli1.png](./pic/pauli1.png)
+![pauli1.png](./PIC/pauli1.png)
 
 Suppose we want to get the value $\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$, so we build a circuit like the one in the figure below and run it for several times.
-![pauli2-EN.png](./pic/pauli2-EN.png)
+![pauli2-EN.png](./PIC/pauli2-EN.png)
 Notice that we add an ancilla qubit $q_0$ to our circuit. The purpose of this extra qubit is to help us compute the value of $\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$. Also notice that we append a new part to the circuit which contains gates including Hadamard​ gates and a $R_z(-\pi/2)$ gate. This new part of circuit is another trick to get $\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle$. For different $H_i$ we need to build different circuits, which we will discuss later. We run the circuit, measure the ancilla, records the result (0 or 1), and repeat the process multiple times. By recording the **frequency** of 0 and 1, we can calculate the **probability** of getting 0 and 1:
 $$
 \text{The value of }\langle{\phi} \lvert \sigma_x\otimes \sigma_y\otimes\sigma_z\lvert {\phi}\rangle \approx \\ \text{The probability of getting 0} - \text{The probability of getting 1}
 $$
 The more you repeat, the more accurate your result will be. We have just learned how different $H_i$ have different circuits associate with them. Let me show you what the circuit look like if $H_i = \sigma_z\otimes \sigma_x\otimes I$:
-![pauli3.png](./pic/pauli3.png)
+![pauli3.png](./PIC/pauli3.png)
 See? The second part of the circuit changed and the rest remains the same. We still run the circuit multiple times, measure the ancilla each time, record the result, and repeat the same procedure to calculate the probability of getting 0 minus the probability of getting 1, which is very close to $\langle{\phi} \lvert \sigma_z\otimes \sigma_x\otimes I\lvert {\phi}\rangle$. Of course, the more it repeats, the closer the result gets. There are some rules you need to follow:
 
 * $\sigma_x\to$ $Hadamard$ gate + $CNOT$ gate
@@ -60,7 +60,7 @@ See? The second part of the circuit changed and the rest remains the same. We st
 Have you seen patterns from the circuit that corresponds with $\sigma_x\otimes \sigma_y\otimes\sigma_z$? We add a $Hadamard$ gate on $q_1$ and a $CNOT$ gate, because the first item in $\sigma_x\otimes \sigma_y\otimes\sigma_z$ is $\sigma_x$; we add a $R_z(-\pi/2)$ gate, $Hadamard$ gate on $q_2$ and a $CNOT$ gate. That is because the second part of $\sigma_x\otimes \sigma_y\otimes\sigma_z$ is $\sigma_y$. We only add a $CNOT$ gate on $q_3$ because the third part is $\sigma_z$. Now, let's figure out the circuit associated with$\sigma_z\otimes \sigma_x\otimes I$:
 
 Apply $CNOT$ gate onto $q_1$, because the first part of $\sigma_z\otimes \sigma_x\otimes I$ is $\sigma_z$; $Hadamard$ gate and $CNOT$ gate are applied onto $q_2$, because the second part is $\sigma_x$; add nothing on $q_3$, because the third part is $I$. Let's take a quiz, what is the circuit that measures $\langle{\phi} \lvert \sigma_y\otimes I\otimes \sigma_y\lvert {\phi}\rangle$ ? The answer is in the figure below:
-![pauli4.png](./pic/pauli4.png)
+![pauli4.png](./PIC/pauli4.png)
 
 Not surprisingly, we get all gradients to get the value $\langle{\phi} \lvert H\lvert {\phi}\rangle$, where
 $$H = 0.5*\sigma_x\otimes \sigma_y\otimes\sigma_z + 0.2*\sigma_z\otimes \sigma_x\otimes I + 0.8 * \sigma_y\otimes I\otimes \sigma_y$$
@@ -391,7 +391,7 @@ if __name__ == '__main__':
     main()
 ```
 Here is the figure that generated by one test of the whole program. Each thread is an independent process that makes 20 gradient descend iterations. Not so bad, eh?
-![Figure_1.png](./pic/Figure_1.png)
+![Figure_1.png](./PIC/Figure_1.png)
 
 ---
 ## Reference

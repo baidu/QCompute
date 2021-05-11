@@ -23,8 +23,11 @@ import copy
 import numpy as np
 
 import sys
+
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
+
+matchSdkVersion('Python 1.1.0')
 
 shots = 100000
 n = 2  # n-qubit
@@ -48,7 +51,7 @@ def state_prepare(q, i):
 
 def universal_cir(q, i, para):
     """
-    this function build a 15-parameterized circuit, which is
+    this function builds a 15-parameterized circuit, which is
     enough to simulate any 2-qubit Unitaries
     """
 
@@ -85,9 +88,9 @@ def my_cir(para):
     This function returns the measurement result
     """
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
-    q = [env.Q[i] for i in range(2 * n)]
+    q = env.Q.createList(2 * n)
 
     # prepare a state
     for i in range(2):
@@ -101,7 +104,7 @@ def my_cir(para):
     for i in range(2):
         CX(q[i], q[i + n])
 
-    MeasureZ(q, range(2 * n))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
 
     return taskResult['counts']
@@ -150,7 +153,7 @@ def diff_fun(f, para):
 
 def main():
     """
-    now we perform eigenvalues readout
+    Now we perform eigenvalues readout
     """
 
     para_list = [para]
@@ -160,15 +163,15 @@ def main():
         para_list.append(diff_fun(loss_fun, para_list[i]))
         loss_list.append(loss_fun(para_list[i]))
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
-    q = [env.Q[i] for i in range(n)]
+    q = env.Q.createList(n)
 
     state_prepare(q, 0)
     universal_cir(q, 0, para_list[-1])
 
-    MeasureZ(q, range(len(q)))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])
 

@@ -26,7 +26,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '1.0.3'
+SDK_VERSION = '1.1.0'
 
 with open('./README.md', 'r', encoding='utf-8') as srcfd:
     DESC = srcfd.read()
@@ -40,7 +40,7 @@ setup(
         'scipy',
         'requests',
         'bidict',
-        'bce-python-sdk-reborn',
+        'bce-python-sdk',
         'matplotlib',
     ],
     python_requires='>=3.6, <4',

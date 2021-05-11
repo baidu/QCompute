@@ -2,7 +2,21 @@
 
 ## [Unreleased]
 - Local graph drawing;
-- More examples.
+- More examples;
+- QASM Convertor.
+
+## [1.1.0] - Apr-19-2021
+### Added
+- Type hints
+- RegPool createList/toListPair;
+- New cloud simulators:
+  + cloud_baidu_sim2_wind
+  + cloud_qpu2
+### Changed
+- Time format;
+- Matrix must be C-contiguous;
+### Break Changed
+- New protobuf structs;
 
 ## [1.0.3] - Jan-15-2021
 ### Added
@@ -18,14 +32,14 @@
 - Local file/dir name;
 ### Deprecated
 - cloud_baidu_sim2;
-  + New name is cloud_baidu_sim2_water.
+  + New name is cloud_baidu_sim2_water
 
 ## [1.0.2] - Sep-14-2020
 ### Added
 - Update doc links;
 - Examples update;
-- Related update docs;
-- Update requirements.
+- Related docs update;
+- Requirements update.
 
 ## [0.0.1] - Sep-02-2020
 ### Added

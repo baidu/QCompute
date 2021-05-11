@@ -26,16 +26,18 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
+matchSdkVersion('Python 1.1.0')
+
 # Your token:
 # Define.hubToken = ''
 
 # Create environment
-env = QuantumEnvironment()
+env = QEnv()
 # Choose backend Baidu Cloud Quantum Simulator-Sim2
 env.backend(BackendName.CloudBaiduSim2Water)
 
 # Initialize the two-qubit circuit
-q = [env.Q[0], env.Q[1]]
+q = env.Q.createList(2)
 
 # We apply an X gate on the 0th qubit firstly.
 # Also, you can comment it as you like.
@@ -49,7 +51,7 @@ X(q[0])
 CX(q[0], q[1])
 
 # Measure with the computational basis
-MeasureZ(q, range(2))
+MeasureZ(*env.Q.toListPair())
 
 # Commit the request with 1024 shots to the cloud
 taskResult = env.commit(1024, fetchMeasure=True)

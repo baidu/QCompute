@@ -18,6 +18,8 @@
 """
 Configuration
 """
+
+
 from QCompute.Define import MeasureFormat
 
 outputInfo = True
@@ -67,7 +69,10 @@ Supporting local_baidu_sim2
 Values: True, False
 """
 
-linuxDirectSim2Thunder = False
+linuxDirectSim2Cpp = False
 """
-Use local sim2 thunder directly in linux.
+Use local sim2 cpp directly in linux.
 """
+
+
+
