@@ -23,7 +23,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 # In this example we use 3 qubits in total
 qubit_num = 3

@@ -26,7 +26,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '1.1.0'
+SDK_VERSION = '2.0.0'
 
 with open('./README.md', 'r', encoding='utf-8') as srcfd:
     DESC = srcfd.read()
@@ -42,6 +42,8 @@ setup(
         'bidict',
         'bce-python-sdk',
         'matplotlib',
+        'pyprimes',
+        'sympy',
     ],
     python_requires='>=3.6, <4',
     packages=find_packages(),

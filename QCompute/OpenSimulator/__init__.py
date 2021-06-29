@@ -19,7 +19,7 @@
 Quantum executor interface definition
 """
 import json
-from typing import TYPE_CHECKING, Dict, Union, List
+from typing import TYPE_CHECKING, Dict, Union, List, Any
 
 import numpy
 
@@ -55,6 +55,12 @@ class SimulatorVersion:
     Compile Time
     """
 
+    def __init__(self):
+        self.gitHash = None
+        self.gitTime = None
+        self.fileHash = None
+        self.compileTime = None
+
 
 class Ancilla:
     """
@@ -79,6 +85,12 @@ class Ancilla:
     """
     measured qReg list
     """
+
+    def __init__(self):
+        self.usedQRegList = None
+        self.usedCRegList = None
+        self.compactedQRegDict = None
+        self.compactedCRegDict = None
 
 
 class QResult:
@@ -116,6 +128,11 @@ class QResult:
     ancilla
     """
 
+    moduleList = None  # type:Dict[str,Any]
+    """
+    moduleList
+    """
+
     shots = 0
     """
     number of shots
@@ -146,6 +163,20 @@ class QResult:
     end utc time
     """
 
+    def __init__(self):
+        self.simulatorVersionq = None
+        self.code = 0
+        self.output = ''
+        self.log = ''
+        self.ancilla = Ancilla()
+        self.moduleList = None
+        self.shots = 0
+        self.counts = None
+        self.state = None
+        self.seed = 0
+        self.startTimeUtc = ''
+        self.endTimeUtc = ''
+
     def fromJson(self, text: str):
         """
         fromJson
@@ -164,13 +195,15 @@ class QResult:
         # self.log = data['log']
         if 'ancilla' in data:
             if 'usedQRegList' in data['ancilla'] and data['ancilla']['usedQRegList'] is not None:
-                self.ancilla.usedQRegList = data['usedQRegList']
+                self.ancilla.usedQRegList = data['ancilla']['usedQRegList']
             if 'usedCRegList' in ['ancilla'] and data['ancilla']['usedCRegList'] is not None:
-                self.ancilla.usedCRegList = data['usedCRegList']
+                self.ancilla.usedCRegList = data['ancilla']['usedCRegList']
             if 'compactedQRegDict' in data['ancilla'] and data['ancilla']['compactedQRegDict'] is not None:
-                self.ancilla.compactedQRegDict = data['compactedQRegDict']
+                self.ancilla.compactedQRegDict = data['ancilla']['compactedQRegDict']
             if 'compactedCRegDict' in data['ancilla'] and data['ancilla']['compactedCRegDict'] is not None:
-                self.ancilla.compactedCRegDict = data['compactedCRegDict']
+                self.ancilla.compactedCRegDict = data['ancilla']['compactedCRegDict']
+        if 'moduleList' in data:
+            self.moduleList = data['moduleList']
         self.shots = data['shots']
         self.counts = data['counts']
         if 'state' in data and data['state'] is not None:
@@ -191,6 +224,7 @@ class QResult:
                 'compactedQRegDict': self.ancilla.compactedQRegDict,
                 'compactedCRegDict': self.ancilla.compactedCRegDict,
             },
+            'moduleList': self.moduleList,
             'shots': self.shots,
             'counts': self.counts,
             'seed': self.seed,

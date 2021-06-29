@@ -16,7 +16,7 @@
 # limitations under the License.
 
 """
-This is a simple case of using Hardmard gate and CNOT gate to generate a GHZ state.
+This is a simple case of using Hadamard gate and CNOT gate to generate a GHZ state.
 Results will be fetched from a cloud program.
 """
 
@@ -26,14 +26,14 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 # Your token:
 # Define.hubToken = ''
 
 # Create environment
 env = QEnv()
-# Choose backend Baidu Cloud Quantum Simulator-Sim2
+# Choose backend Baidu Cloud Quantum Simulator-Sim2 Water
 env.backend(BackendName.CloudBaiduSim2Water)
 
 # Initialize the three-qubit circuit

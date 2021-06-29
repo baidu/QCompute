@@ -17,12 +17,12 @@
 
 """
 Deutsch-Jozsa Algorithm.
-Suppose: f1 = 0, f2 = first bit.
+Suppose: f1 = 0, f2 = first qubit.
 """
 
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 # In this example we use 10 qubits as the main register,
 # and also an ancillary qubit else

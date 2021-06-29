@@ -56,19 +56,6 @@ Supporting local_baidu_sim2
 Values: True, False
 """
 
-doCompressGate = True
-"""
-Compress gate before simulating.
-
-CompressGate can significantly increase the simulator calculating speed. 
-It can combine the neighbour single qubit gate into the nearest two-qubits gate. 
-The process can significant increase the tensor product process.   
-
-Supporting local_baidu_sim2
-
-Values: True, False
-"""
-
 linuxDirectSim2Cpp = False
 """
 Use local sim2 cpp directly in linux.

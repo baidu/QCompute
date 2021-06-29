@@ -26,6 +26,7 @@ from pathlib import Path
 
 import QCompute
 from QCompute.Define import TrimFlag
+from QCompute.QPlatform import Error
 
 env = 'prod'
 
@@ -45,7 +46,7 @@ else:
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
 
-sdkVersion = 'Python 1.1.0'
+sdkVersion = 'Python 2.0.0'
 """
 SDK Version
 
@@ -148,28 +149,6 @@ if 'sphinx' in sys.modules:
     outputPath = Path()
 else:
     os.makedirs(outputPath, mode=0o744, exist_ok=True)
-
-circuitPackageFile = outputPath / 'Package.pb'
-"""
-Circuit Package File
-
-Do not modify by user.
-
-Circuit package target file
-"""
-if 'sphinx' in sys.modules:
-    circuitPackageFile = Path()
-
-statusDbFile = outputPath / 'Status.db'
-"""
-Status Db File
-
-Do not modify by user.
-
-Used for local task status storage.
-"""
-if 'sphinx' in sys.modules:
-    statusDbFile = Path()
 
 
 @unique

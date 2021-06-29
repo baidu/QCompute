@@ -18,15 +18,15 @@
 """
 Export the entire directory as a library
 """
+from typing import Dict
 
 
 class ModuleImplement:
     """
     ConvertorImplement
     """
+    arguments = None  # Any can serialize to json
+    disable = False
 
-    def __init__(self) -> None:
-        self.arguments = None  # any can serialize to json
-
-    def __call__(self, *args, **kwargs) -> None:
+    def __call__(self, arguments: Dict) -> None:
         pass

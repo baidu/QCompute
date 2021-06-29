@@ -19,7 +19,7 @@
 Composite Gate
 """
 from copy import deepcopy
-from typing import List
+from typing import List, Optional, Union, Dict
 
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QPlatform.CircuitTools import gateToProtobuf
@@ -35,26 +35,28 @@ class CompositeGateModule(ModuleImplement):
 
     Example:
 
-    env.module(CompositeGate())
+    env.module(CompositeGateModule())
 
-    env.module(CompositeGate(['RZZ']))
+    env.module(CompositeGateModule({'disable': True}))  # Disable
+
+    env.module(CompositeGateModule({'compositeGateList': ['RZZ']}))
     """
-    arguments = None
+    arguments = None  # type: Optional[Dict[str, Union[List[str], bool]]]
+    compositeGateList = None  # type: List[str]
 
-    def __init__(self, gateNameList: List[str] = None) -> None:
+    def __init__(self, arguments: Optional[Dict[str, Union[List[str], bool]]] = None) -> None:
         """
         Initialize the Module.
 
         Json serialization is allowed by the requested parameter.
-
-        :param gateNameList: The gate list to process. Let it be None to process all.
-
-        Example:
-
-        env.module(UnrollCircuit())
         """
+        self.arguments = arguments
+        if arguments is not None and type(arguments) is dict:
+            if 'disable' in arguments:
+                self.disable = arguments['disable']
 
-        self.gateNameList = gateNameList
+            if 'compositeGateList' in arguments:
+                self.compositeGateList = arguments['compositeGateList']
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -78,15 +80,15 @@ class CompositeGateModule(ModuleImplement):
         """
         Decompose circuit
 
-        :param circuitIn: circuit line list
+        :param circuitIn: CircuitLine list
         """
 
         for index, circuitLine in enumerate(circuitIn):
+            compositeGate = circuitLine.compositeGate  # type: 'PBCompositeGate'
             if circuitLine.HasField('compositeGate') and (
-                    self.gateNameList is None or compositeGate.name in self.gateNameList):
-                compositeGate = circuitLine.compositeGate  # type: 'PBCompositeGate'
+                    self.compositeGateList is None or compositeGate.name in self.compositeGateList):
                 if compositeGate == PBCompositeGate.RZZ:
-                    # insert the decomposed circuit
+                    # Insert the decomposed circuit
                     circuitOut.extend(_RZZ(circuitLine))
                     continue
             circuitOut.append(circuitLine)

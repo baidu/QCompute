@@ -27,7 +27,7 @@ def cloudFullTest():
     """
 
     env = QEnv()
-    env.backend(BackendName.CloudBaiduSim2, '-s 0')
+    env.backend(BackendName.CloudBaiduSim2Water, '-s 0')
 
     # procedure0 start
     procedure0Env = QEnv()
@@ -130,4 +130,15 @@ def cloudFullTest():
 
     MeasureZ(q, range(3))
 
+    env.module(CompositeGateModule())
+    env.module(UnrollProcedureModule())
+    
     ret = env.commit(1024, fetchMeasure=True)
+    assert ret['counts']['001'] == 71
+    assert ret['counts']['010'] == 245
+    assert ret['counts']['011'] == 110
+    assert ret['counts']['100'] == 347
+    assert ret['counts']['101'] == 94
+    assert ret['counts']['110'] == 131
+    assert ret['counts']['111'] == 26
+

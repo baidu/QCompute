@@ -34,9 +34,9 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
-# hyper-parameter setting
+# Hyper-parameter setting
 shots = 1024
 n = 4  # n must be larger than or equal to 2; n is the size of our quantum system
 assert n >= 2
@@ -46,7 +46,7 @@ experiment_num = 4  # That's the number of parallel experiments we will run;
 # it indicates the number of processes we will use.
 # Don't stress your computer too much.
 learning_rate = 0.3
-delta = np.pi / 2  # calculate analytical derivative
+delta = np.pi / 2  # Calculate analytical derivative
 SEED = 36  # This number will determine what the final Hamiltonian is. It is also
 # used to make sure Mac and Windows behave the same using multiprocessing module.
 K = 3  # k is the number of local Hamiltonian in H
@@ -76,7 +76,7 @@ def random_H_generator(n, k):
     return H
 
 
-Hamiltonian = random_H_generator(n, K)  # our Hamiltonian H
+Hamiltonian = random_H_generator(n, K)  # Our Hamiltonian H
 
 
 # From Paddle_quantum package
@@ -199,22 +199,22 @@ def self_defined_circuit(para, hamiltonian):
     env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
-    # the first qubit is ancillary
+    # The first qubit is ancillary
     q = env.Q.createList(n + 1)
 
     hamiltonian = [symbol.lower() for symbol in hamiltonian]
-    high_D_para = para.reshape(L, n, 3)  # change 1-D numpy array to a 3-D numpy array
+    high_D_para = para.reshape(L, n, 3)  # Change 1-D numpy array to a 3-D numpy array
 
-    # set up our parameterized circuit
+    # Set up our parameterized circuit
     for i in range(1, n + 1):
         H(q[i])
 
-    # add parameterized circuit
+    # Add parameterized circuit
     for i in range(L):
         add_layer(high_D_para[i], q)
 
     for i in range(n):
-        # set up pauli measurement circuit
+        # Set up pauli measurement circuit
         if hamiltonian[i] == 'x':
             H(q[i + 1])
             CX(q[i + 1], q[0])
@@ -227,7 +227,7 @@ def self_defined_circuit(para, hamiltonian):
             H(q[i + 1])
             CX(q[i + 1], q[0])
 
-    # measurement result
+    # Measurement result
     MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     return prob_calc(taskResult['counts'])

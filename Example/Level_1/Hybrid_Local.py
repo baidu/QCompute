@@ -26,7 +26,7 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 # Create environment
 env = QEnv()
@@ -40,7 +40,7 @@ TotalNumQReg = 8
 q = env.Q.createList(TotalNumQReg)
 
 # We apply a Hadamard gate on each qubit in the register above,
-# and also other gates as you like such as a X gate.
+# and also other gates as you like such as an X gate.
 for index in range(TotalNumQReg):
     H(q[index])
     # X(q[index])

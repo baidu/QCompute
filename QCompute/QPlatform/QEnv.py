@@ -26,11 +26,13 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Set, List, Dict, TYPE_CHECKING, Union, Optional, Tuple
 
-from QCompute.Define import sdkVersion, noLocalTask, circuitPackageFile, outputPath, noWaitTask
+from QCompute import QResult
+from QCompute.Define import sdkVersion, noLocalTask, outputPath, noWaitTask
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
+from QCompute.QPlatform.Processor.ModuleFilter import filterModule
 from QCompute.QPlatform.Processor.PostProcessor import formatMeasure
 from QCompute.QPlatform.QOperation.QProcedure import QProcedure, QProcedureOP
 from QCompute.QPlatform.QRegPool import QRegPool
@@ -39,7 +41,7 @@ from QCompute.QPlatform.Utilities import destoryObject
 from QCompute.QProtobuf import PBProgram
 
 if TYPE_CHECKING:
-    from QCompute.QPlatform import BackendName
+    from QCompute.QPlatform import BackendName, ServerModule
 
 BackendArgumentType = Union[str,
                             'Sim2Argument',
@@ -75,10 +77,11 @@ class QEnv:
         self.procedureMap = {}  # type: Dict[str, 'QProcedure']
         self.program = None  # type: Optional['PBProgram']
 
-        self.backendName = None  # type: Optional['BackendName']
+        self.backendName = None  # type: Optional[str]
         self.backendArgument = None  # type: Optional[List['BackendArgumentType']]
 
         self.usedModuleList = []  # type: List['ModuleImplement']
+        self.usedServerModuleList = []  # type: List[Tuple[str, Dict]]
 
     def backend(self, backendName: 'BackendName', *backendArgument: BackendArgumentType) -> None:
         if type(backendName) is not str:
@@ -156,7 +159,7 @@ class QEnv:
             reversedProcedure.circuit[index] = newLine
         return reversedProcedure, reversedProcedureName
 
-    def publish(self, applyModule=True) -> None:
+    def publish(self, applyModule=True) -> List['ModuleImplement']:
         program = PBProgram()
         self.program = program
         program.sdkVersion = sdkVersion
@@ -164,8 +167,12 @@ class QEnv:
 
         if applyModule:
             # filter the circuit by Modules
-            for module in self.usedModuleList:
+            usedModuleList = filterModule(self.backendName, self.usedModuleList)
+            for module in usedModuleList:
                 self.program = module(self.program)
+            return usedModuleList
+        else:
+            return self.usedModuleList
 
     def commit(self, shots: int, fetchMeasure=True, downloadResult=True, debug: Optional[str] = None) -> Dict[
         str, Union[str, Dict[str, int]]]:
@@ -200,16 +207,23 @@ class QEnv:
         {status: 'failed', reason: ''}
         """
 
-        self.publish()  # circuit in Protobuf format
+        usedModuleList = self.publish()  # circuit in Protobuf format
 
         if self.backendName.startswith('local_'):
-            return self._localCommit(shots, fetchMeasure)
+            moduleList = []
+            for module in usedModuleList:
+                moduleList.append({
+                    'module': module.__class__.__name__,
+                    'arguments': module.arguments
+                })
+            ret = self._localCommit(shots, fetchMeasure, moduleList)
+            return ret
         elif self.backendName.startswith('cloud_'):
             return self._cloudCommit(shots, fetchMeasure, downloadResult, debug)
         else:
             raise Error.ArgumentError(f"Invalid backendName => {self.backendName}")
 
-    def _localCommit(self, shots: int, fetchMeasure: bool) -> Dict[str, Union[str, Dict[str, int]]]:
+    def _localCommit(self, shots: int, fetchMeasure: bool, moduleList: []) -> Dict[str, Union[str, Dict[str, int]]]:
         """
         Local commitment
 
@@ -251,6 +265,14 @@ class QEnv:
             if backend.result.counts is not None:
                 backend.result.counts = formatMeasure(backend.result.counts, cRegCount)
 
+            try:
+                ret = QResult()
+                ret.fromJson(backend.result.output)
+                ret.moduleList = moduleList
+                backend.result.output = ret.toJson()
+            except Exception as ex:
+                print(ex)
+
             originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir=outputPath)
             rsplitedFn = originFn.rsplit('.', 4)
             taskResult = {'taskId': rsplitedFn[-3], 'status': 'success'}
@@ -275,7 +297,10 @@ class QEnv:
                 logFn = Path(originFn[:-12] + '.log')
                 with open(logFn, 'wt') as file:
                     file.write(backend.result.log)
+                    file.write(backend.result.log)
                 taskResult["log"] = str(logFn)
+
+            taskResult["moduleList"] = moduleList
 
             if fetchMeasure:
                 taskResult['ancilla'] = {}
@@ -301,18 +326,21 @@ class QEnv:
 
         self.publish(False)  # circuit in Protobuf format
         programBuf = self.program.SerializeToString()  # the sequential bytes of the circuit which is already in PB
-        with open(circuitPackageFile, 'wb') as file:
+        circuitPackageFd, circuitPackageFn = tempfile.mkstemp(prefix="circuit.", suffix=".pb", dir=outputPath)
+        with os.fdopen(circuitPackageFd, "wb") as file:
             file.write(programBuf)
+        print(f'CircuitPackageFile: {circuitPackageFn}')
 
-        modules = []
+        usedModuleList = []
         for module in self.usedModuleList:
-            modules.append((module.__class__.__name__, module.arguments))
+            usedModuleList.append((module.__class__.__name__, module.arguments))
+        usedModuleList.extend(self.usedServerModuleList)
 
         # todo process the file and upload failed case
         task = QTask()
-        task.uploadCircuit(circuitPackageFile)
+        task.uploadCircuit(circuitPackageFn)
         backend = self.backendName[6:]  # omit the prefix `cloud_`
-        task.create(len(self.program.head.usingQRegList), shots, backend, None, modules, debug)
+        task.create(shots, backend, self.backendArgument, usedModuleList, debug)
 
         outputInfo = True
         if outputInfo:
@@ -345,6 +373,9 @@ class QEnv:
         """
 
         self.usedModuleList.append(moduleObj)
+
+    def serverModule(self, module: 'ServerModule', arguments: Dict):
+        self.usedServerModuleList.append((module.value, arguments))
 
 
 def _loadPythonModule(moduleName: str):

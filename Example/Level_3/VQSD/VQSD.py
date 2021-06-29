@@ -27,7 +27,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 shots = 100000
 n = 2  # n-qubit
@@ -51,7 +51,7 @@ def state_prepare(q, i):
 
 def universal_cir(q, i, para):
     """
-    this function builds a 15-parameterized circuit, which is
+    This function builds a 15-parameterized circuit, which is
     enough to simulate any 2-qubit Unitaries
     """
 
@@ -92,11 +92,11 @@ def my_cir(para):
     env.backend(BackendName.LocalBaiduSim2)
     q = env.Q.createList(2 * n)
 
-    # prepare a state
+    # Prepare a state
     for i in range(2):
         state_prepare(q, 2 * i)
 
-    # add parameterized circuit
+    # Add parameterized circuit
     for i in range(2):
         universal_cir(q, 2 * i, para)
 

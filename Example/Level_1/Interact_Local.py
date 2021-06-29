@@ -25,9 +25,9 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
-uValue = 1  # flag of intereactions
+uValue = 1  # Flag of interactions
 for _ in range(15):
 
     print('uValue is :', uValue)
@@ -37,15 +37,15 @@ for _ in range(15):
     # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
 
-    # apply gates and measurement operations to construct the circuit:
+    # Apply gates and measurement operations to construct the circuit:
     u = RX(uValue)
     u(env.Q[0])
 
     MeasureZ(*env.Q.toListPair())
 
-    taskResult = env.commit(1024, fetchMeasure=True)  # submit the circuit, execute and get results
+    taskResult = env.commit(1024, fetchMeasure=True)  # Submit the circuit, execute and get results
 
-    # interaction: change parameters of unitary in next experiment according to current result
+    # Interaction: change parameters of unitary in next experiment according to current result
     CountsDict = taskResult['counts']
     if CountsDict.get('0', 0) > 5:
         uValue = uValue * 2

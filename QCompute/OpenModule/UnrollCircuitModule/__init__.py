@@ -4,7 +4,7 @@
 //https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/qasm/libs/qelib1.inc
 """
 from copy import deepcopy
-from typing import List, Dict
+from typing import List, Dict, Optional, Union
 
 import numpy as np
 
@@ -18,40 +18,44 @@ from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotation
 
 class UnrollCircuitModule(ModuleImplement):
     """
-    Unroll supported gates to CX, U3, barrier, measure
+    UnrollCircuit supported gates are: CX, U3, barrier, measure
 
     Supported fixed gates: ID, X, Y, Z, H, S, SDG, T, TDG, CX, CY, CZ, CH, SWAP, CCX, CSWAP
 
-    Supported rotation gates: U, R, RX, RY, RZ, CU, CRX, CRY, CRZ
+    Supported rotation gates: U, RX, RY, RZ, CU, CRX, CRY, CRZ
 
     Composite gates are supported since they can be processed by the CompositeGateModule module in advance.
 
-    Must unrollProcedure before, because rotation gate must hve all rotation arguments.
+    Must unrollProcedure before, because rotation gate must have all rotation arguments.
 
     Example:
 
-    env.module(UnrollCircuit())
+    env.module(UnrollCircuitModule())
 
-    env.module(UnrollCircuit({'errorOnUnsupported': True, 'targetGates': ['CX', 'U']}))
+    env.module(UnrollCircuitModule({'disable': True}))  # Disable
 
-    env.module(UnrollCircuit({'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}))
+    env.module(UnrollCircuitModule({'errorOnUnsupported': True, 'targetGates': ['CX', 'U']}))
+
+    env.module(UnrollCircuitModule({'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}))
     """
 
-    arguments = None  # type: Dict[str, List[str]]
+    arguments = None  # type: Optional[Dict[str, Union[List[str], bool]]]
     targetGatesNames = ['CX', 'U']  # type: List[str]
     sourceGatesNames = []  # type: List[str]
     errorOnUnsupported = True
 
-    def __init__(self, arguments: Dict[str, List[str]] = None):
+    def __init__(self, arguments: Optional[Dict[str, Union[List[str], bool]]] = None):
         """
         Initialize the Module.
 
         Json serialization is allowed by the requested parameter.
-
-        :param arguments: {'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}.
         """
 
-        if arguments is not None:
+        self.arguments = arguments
+        if arguments is not None and type(arguments) is dict:
+            if 'disable' in arguments:
+                self.disable = arguments['disable']
+
             if 'targetGates' in arguments:
                 self.targetGatesNames = arguments['targetGates']
 
@@ -81,7 +85,7 @@ class UnrollCircuitModule(ModuleImplement):
 
     def _unrollRecursively(self, circuitLine: 'PBCircuitLine', circuitOut: List['PBCircuitLine']):
         """
-        Only CX U barrier measure are processed directly by circuitOut.append()
+        Only CX,U,barrier, measure are processed directly by circuitOut.append()
 
         Other gates are processed recursively
 
@@ -94,7 +98,7 @@ class UnrollCircuitModule(ModuleImplement):
             circuitOut.append(ret)
             return
         elif op == 'fixedGate' or op == 'rotationGate':
-            # name the regs
+            # Name the regs
             nRegs = len(circuitLine.qRegList)
             if nRegs == 1:
                 [a] = circuitLine.qRegList
@@ -107,15 +111,15 @@ class UnrollCircuitModule(ModuleImplement):
 
             if op == 'fixedGate':
                 fixedGate = circuitLine.fixedGate  # type: PBFixedGate
-                # recognize known gates
+                # Recognize known gates
                 gateName = PBFixedGate.Name(fixedGate)
                 if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
-                    # don't need unroll: copy
+                    # Don't need unroll: copy
                     ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
                     circuitOut.append(ret)
                     return
                 elif gateName in self.targetGatesNames:
-                    # already supported by target machine: copy
+                    # Already supported by target machine: copy
                     ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
                     circuitOut.append(ret)
                     return
@@ -283,12 +287,12 @@ class UnrollCircuitModule(ModuleImplement):
 
                 gateName = PBRotationGate.Name(rotationGate)
                 if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
-                    # don't need unroll: copy
+                    # Don't need unroll: copy
                     ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
                     circuitOut.append(ret)
                     return
                 elif gateName in self.targetGatesNames:
-                    # already supported by target machine: copy or expand+copy
+                    # Already supported by target machine: copy or expand+copy
                     if rotationGate == PBRotationGate.U:
                         # U3: gate u3(theta,phi,lamda) a { U(theta,phi,lamda) a; }
                         # U2: gate u2(theta,phi) a { U(pi/2,theta,phi) a; }
@@ -374,7 +378,7 @@ class UnrollCircuitModule(ModuleImplement):
                     # }
                     return
 
-        # unsupported gate
+        # Unsupported gate
         if self.errorOnUnsupported:
             # error
             raise Error.ArgumentError(f'Unsupported operation {circuitLine}!')
@@ -400,7 +404,7 @@ def _expandAnglesInUGate(angles: List[float]):
     Expand the angles list by following the relation among u1, u2, and u3
     """
 
-    # expand
+    # Expand
     nAngles = len(angles)
     if nAngles == 3:
         pass

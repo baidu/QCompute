@@ -16,7 +16,7 @@
 # limitations under the License.
 
 """
-This is a simple case of using Hardmard gate and CNOT gate.
+This is a simple case of using Hadamard gate and CNOT gate.
 Results will be fetched from a local program.
 """
 
@@ -26,7 +26,7 @@ from pprint import pprint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 # Create environment
 env = QEnv()

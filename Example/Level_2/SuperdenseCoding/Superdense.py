@@ -16,14 +16,14 @@
 # limitations under the License.
 
 """
-Superdense
+Superdense Coding
 """
 import sys
 
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 1.1.0')
+matchSdkVersion('Python 2.0.0')
 
 # Set the shot number for each quest
 shots = 1024

@@ -30,12 +30,7 @@ import numpy
 
 
 from QCompute.Define import outputPath
-from QCompute.Define.Settings import doCompressGate
 from QCompute.OpenConvertor.JsonToCircuit import JsonToCircuit
-from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
-from QCompute.OpenModule.CompressGateModule import CompressGateModule
-from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
-from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
 from QCompute.OpenSimulator import QResult
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType, initState_1_0
 from QCompute.OpenSimulator.local_baidu_sim2.Measure import MeasureMethod, Measurer
@@ -43,7 +38,7 @@ from QCompute.OpenSimulator.local_baidu_sim2.Transfer import Algorithm, Transfer
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.Processor.PostProcessor import filterMeasure
 from QCompute.QPlatform.Processor.PreProcess import preProcess
-from QCompute.QPlatform.QOperation.FixedGate import CX, X, Y, Z, H
+from QCompute.QPlatform.QOperation.FixedGate import CX, X, Y, Z, H, SWAP
 from QCompute.QPlatform.QOperation.RotationGate import U
 from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix, normalizeNdarrayOrderForTranspose
 from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBCustomizedGate, PBMeasure
@@ -132,19 +127,6 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
 
         
     """
-
-    compositeGate = CompositeGateModule()
-    program = compositeGate(program)
-
-    unrollProcedure = UnrollProcedureModule()
-    program = unrollProcedure(program)
-
-    unrollCircuit = UnrollCircuitModule()
-    program = unrollCircuit(program)  # must unrollProcedure before, because of paramIds to paramValues
-
-    if doCompressGate:
-        compressGate = CompressGateModule()
-        program = compressGate(program)
 
     usedQRegSet, usedCRegSet, compactedQRegDict, compactedCRegDict = preProcess(program, True)
 
@@ -242,7 +224,8 @@ def loadGates(matrixType: 'MatrixType') -> Dict['PBFixedGate', Union[numpy.ndarr
             PBFixedGate.Y: Y.getMatrix(),
             PBFixedGate.Z: Z.getMatrix(),
             PBFixedGate.H: H.getMatrix(),
-            PBFixedGate.CX: CX.getMatrix().reshape(2, 2, 2, 2)
+            PBFixedGate.CX: CX.getMatrix().reshape(2, 2, 2, 2),
+            PBFixedGate.SWAP: SWAP.getMatrix()
         }  # type: Dict['PBFixedGate', Union[numpy.ndarray, 'COO']]
     else:
         raise Error.RuntimeError('Not implemented')

@@ -144,7 +144,7 @@ class QTask:
         self.measureFile = Path()
 
     @_retryWhileNetworkError
-    def uploadCircuit(self, file: Path) -> None:
+    def uploadCircuit(self, file: str) -> None:
         """
         Upload the file
         """
@@ -152,7 +152,7 @@ class QTask:
         self.token, client, dest = _getSTSToken()
 
         client.put_object_from_file(
-            quantumBucket, f'tmp/{dest}', str(file))
+            quantumBucket, f'tmp/{dest}', file)
 
         ret = _invokeBackend(
             "circuit/createCircuit",
@@ -167,7 +167,7 @@ class QTask:
         self.circuitId = ret['circuitId']
 
     @_retryWhileNetworkError
-    def create(self, qRegCount: int, shots: int, backend: str, backendParam: Union[str, Enum] = None,
+    def create(self, shots: int, backend: str, backendParam: List[Union[str, Enum]] = None,
                modules: List[Tuple[str, Any]] = None, debug: Optional[str] = None) -> None:
         """
         Create a task from the code
@@ -178,7 +178,6 @@ class QTask:
         task = {
             "token": self.token,
             "circuitId": self.circuitId,
-            "qRegCount": qRegCount,
             "taskType": backend,
             "shots": shots,
             "sdkVersion": sdkVersion,
@@ -237,6 +236,19 @@ class QTask:
         if outputInfo:
             print(f'Download measure success {self.measureFile} size = {downSize}')
 
+    def _fetchOriginResult(self) -> Optional[Dict]:
+        """
+        Dump the measurement content of the file from taskId
+        """
+
+        localFile = outputPath / f'remote.{self.taskId}.origin.json'
+        if localFile.exists():
+            with open(localFile, "rb") as fObj:
+                data = json.loads(fObj.read())
+                return data
+        else:
+            return None
+
     def _fetchMeasureResult(self) -> Optional[Dict]:
         """
         Dump the measurement content of the file from taskId
@@ -278,6 +290,10 @@ class QTask:
                         if downloadResult:
                             self._fetchResult()
                             result["origin"] = str(self.originFile)
+
+                            originResult = self._fetchOriginResult()
+                            result["moduleList"] = originResult["moduleList"]
+
                             if fetchMeasure:
                                 result["counts"] = self._fetchMeasureResult()
                             else:

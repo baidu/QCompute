@@ -4,6 +4,21 @@
 - Local graph drawing;
 - More examples;
 - QASM Convertor.
+  
+## [2.0.0] - Jun-07-2021
+### Added
+- New QPU:
+  + IoPCAS. 10 qubits superconducting QPU from Institute of Physics (IOP), Chinese Academy of Sciences
+- New cloud simulators:
+  + cloud_baidu_sim2_lake. The simulator based on GPU
+- New module:
+  + InverseCircuit;
+- New functions for local simulator:
+  + output_probability;
+  + output_state;
+- New debug sector for all backends:
+  + Ancilla;
+  + Auto workflow for modules.
 
 ## [1.1.0] - Apr-19-2021
 ### Added

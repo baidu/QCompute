@@ -16,7 +16,7 @@
 # limitations under the License.
 
 """
-Composite Gate
+Unroll Procedure
 """
 from copy import deepcopy
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -35,12 +35,25 @@ class UnrollProcedureModule(ModuleImplement):
 
     Example:
 
-    env.module(UnrollProcedure())
+    env.module(UnrollProcedureModule())
+
+    env.module(UnrollProcedureModule({'disable': True}))  # Disable
     """
-    arguments = None
+    arguments = None  # type: Optional[Dict[str, bool]]
 
     _procedureMap = None  # type: Dict[str, 'PBProcedure']
     _circuitOut = None  # type: List['PBCircuitLine']
+
+    def __init__(self, arguments: Optional[Dict[str, bool]] = None):
+        """
+        Initialize the Module.
+
+        Json serialization is allowed by the requested parameter.
+        """
+        self.arguments = arguments
+        if arguments is not None and type(arguments) is dict:
+            if 'disable' in arguments:
+                self.disable = arguments['disable']
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -56,7 +69,7 @@ class UnrollProcedureModule(ModuleImplement):
         del ret.body.circuit[:]
         self._circuitOut = ret.body.circuit
 
-        # list all the quantum registers
+        # List all the quantum registers
         qRegMap = {qReg: qReg for qReg in program.head.usingQRegList}
 
         self._procedureMap = program.body.procedureMap
@@ -66,7 +79,7 @@ class UnrollProcedureModule(ModuleImplement):
 
     def _unrollProcedure(self, circuit: List['PBCircuitLine'], qRegMap: Dict[int, int],
                          argumentValueList: Optional[List[float]]) -> None:
-        # fill in the circuit
+        # Fill in the circuit
         for circuitLine in circuit:
             op = circuitLine.WhichOneof('op')
             if op in ['fixedGate', 'rotationGate', 'compositeGate', 'measure', 'barrier']:
@@ -83,7 +96,7 @@ class UnrollProcedureModule(ModuleImplement):
                         raise Error.ArgumentError('QReg argument is not in procedure!')
                     ret.qRegList[index] = qRegMap[qReg]
                 self._circuitOut.append(ret)
-            elif op == 'customizedGate':  # customized gate
+            elif op == 'customizedGate':  # Customized gate
                 raise Error.ArgumentError('Unsupported operation customizedGate!')
             elif op == 'procedureName':  # procedure
                 qProcedureRegMap = {index: qRegMap[qReg] for index, qReg in enumerate(circuitLine.qRegList)}
@@ -102,5 +115,5 @@ class UnrollProcedureModule(ModuleImplement):
 
                 procedure = self._procedureMap[circuitLine.procedureName]
                 self._unrollProcedure(procedure.circuit, qProcedureRegMap, argumentList)
-            else:  # unsupported operation
+            else:  # Unsupported operation
                 raise Error.ArgumentError(f'Unsupported operation {op}!')

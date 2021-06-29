@@ -19,20 +19,18 @@
 Compress Gate to Accelerate Simulator Process
 """
 from copy import deepcopy
-from typing import List
+from typing import List, Dict, Optional
 
-from QCompute.OpenConvertor.CircuitToInternalStruct import CircuitToInternalStruct
-from QCompute.OpenConvertor.InternalStructToCircuit import InternalStructToCircuit
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.QOperation import CircuitLine
-from QCompute.QPlatform.QOperation.FixedGate import X, Y, Z, H, CX, FixedGateOP
-from QCompute.QPlatform.QOperation.RotationGate import U, RotationGateOP
-from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
-from QCompute.QPlatform.QOperation.Measure import MeasureOP
 from QCompute.QPlatform.QOperation.Barrier import BarrierOP
+from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
+from QCompute.QPlatform.QOperation.FixedGate import FixedGateOP
+from QCompute.QPlatform.QOperation.Measure import MeasureOP
+from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP
 from QCompute.QPlatform.Utilities import contract1_1, contract1_2
-from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBCustomizedGate, PBCircuitLine, PBProgram
+from QCompute.QProtobuf import PBProgram
 
 
 class CompressGateModule(ModuleImplement):
@@ -41,9 +39,23 @@ class CompressGateModule(ModuleImplement):
 
     Example:
 
-    env.module(CompressGate())
+    env.module(CompressGateModule())
+
+    env.module(CompressGateModule({'disable': True}))  # Disable
     """
-    arguments = None
+    arguments = None  # type: Optional[Dict[str, bool]]
+
+    def __init__(self, arguments: Optional[Dict[str, bool]] = None):
+        """
+        Initialize the Module.
+
+        Json serialization is allowed by the requested parameter.
+        """
+
+        self.arguments = arguments
+        if arguments is not None and type(arguments) is dict:
+            if 'disable' in arguments:
+                self.disable = arguments['disable']
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -52,6 +64,8 @@ class CompressGateModule(ModuleImplement):
         :param program: the program
         :return: compressed circuit
         """
+        from QCompute.OpenConvertor.CircuitToInternalStruct import CircuitToInternalStruct
+        from QCompute.OpenConvertor.InternalStructToCircuit import InternalStructToCircuit
 
         ret = deepcopy(program)
 
@@ -77,7 +91,7 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
     n = len(qRegs)
     circuitMap = dict(zip(qRegs, n * [['Start']]))
 
-    for num, circuitLine in enumerate(circuitIn):  # separate operations in circuitIn and note them in circuitMap
+    for num, circuitLine in enumerate(circuitIn):  # Separate operations in circuitIn and note them in circuitMap
         if isinstance(circuitLine.data, (FixedGateOP, RotationGateOP)):
             if len(circuitLine.qRegList) == 1:
                 list_tmp = list(circuitMap[circuitLine.qRegList[0]])
@@ -104,9 +118,9 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
 
     circuitIn_copy = list(circuitIn)  # Storage of circuitLines. Copy from circuitIn, revise and then output.
 
-    for key, value in circuitMap.items():  # separate operations in circuitMap and deal with them
+    for key, value in circuitMap.items():  # Separate operations in circuitMap and deal with them
         for tag_num, tag in enumerate(value):
-            if isinstance(tag, int):  # This is a one-qubit gate. Check the next one. If str occurs, check backward.
+            if isinstance(tag, int):  # This is a one-qubit gate. Check the next one. If str occurs,check backward.
                 tag_next = value[tag_num + 1]
                 if isinstance(tag_next, int):  # The next one is a one-qubit gate.
                     floating = circuitIn_copy[tag].data.getMatrix()
@@ -170,7 +184,7 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
                 raise Error.ArgumentError('Wrong construction of circuitMap!')
 
     circuitOut = []  # type: List[CircuitLine]
-    for circuitLine in circuitIn_copy:  # get the compressed gates and other circuitLines
+    for circuitLine in circuitIn_copy:  # Get the compressed gates and other circuitLines
         if circuitLine is not None:
             circuitOut.append(circuitLine)
     return circuitOut

@@ -63,33 +63,6 @@ class BackendName(Enum):
 
     
 
-    CloudBaiduSim2 = 'cloud_baidu_sim2'
-    """
-    Cloud Baidu Sim2 Deprecated
-    
-    This backend name (CloudBaiduSim2) is only available >= v1.0.0
-    
-    Alias of cloud_baidu_sim2_water
-    
-    Parameter can be a Sim2Argument enum or string.
-    
-    Default is Sim2Argument.Dense_Matmul_Probability
-    
-    Example: 
-    
-    env = QEnv()
-    
-    env.backend(BackendName.CloudBaiduSim2)
-    
-    or
-    
-    env.backend(BackendName.CloudBaiduSim2, Sim2Argument.Dense_Matmul_Probability)
-    
-    or Added shots(must have space in string)
-    
-    env.backend(BackendName.CloudBaiduSim2, Sim2Argument.Dense_Matmul_Probability.value + ' -s 20210210')
-    """
-
     CloudBaiduSim2Water = 'cloud_baidu_sim2_water'
     """
     Cloud Baidu Sim2 Water
@@ -213,34 +186,27 @@ class BackendName(Enum):
     env.backend(BackendName.CloudBaiduSim2Wind, '-s 20210210')
     """
 
-    CloudQpu = 'cloud_qpu'
+    CloudBaiduSim2Lake = 'cloud_baidu_sim2_lake'
     """
-    Cloud QPU
+    Cloud Baidu Sim2 Lake
     
-    This backend name (CloudQpu) is only available >= v1.0.0
+    This backend name (CloudBaiduSim2Lake) is only available >= v2.0.0
     
-    Parameter should be 0.
+    Gpu dense simulator
+    
+    Dense_Matmul_Probability
+    
+    Parameter must be a string.
     
     Example: 
     
     env = QEnv()
     
-    env.backend(BackendName.CloudQpu, 0)
-    """
-
-    CloudQpu2 = 'cloud_qpu2'
-    """
-    Cloud QPU2
+    env.backend(BackendName.CloudBaiduSim2Lake)
     
-    This backend name (CloudQpu2) is only available >= v1.1.0
+    or
     
-    Parameter should be 0.
-    
-    Example: 
-    
-    env = QEnv()
-    
-    env.backend(BackendName.CloudQpu2, 0)
+    env.backend(BackendName.CloudBaiduSim2Lake, '-s 20210210')
     """
 
     CloudAerAtBD = 'cloud_aer_at_bd'
@@ -262,10 +228,18 @@ class BackendName(Enum):
     env.backend(BackendName.CloudAerAtBD, '-q')
     """
 
+    CloudIoPCAS = 'cloud_iopcas'
+    """
+    Cloud IoPCAS
     
-
-
-
+    This backend name (CloudIoPCAS) is only available >= v2.0.0
+    
+    Example: 
+    
+    env = QEnv()
+    
+    env.backend(BackendName.CloudIoPCAS)
+    """
 
 
 @unique
@@ -279,3 +253,13 @@ class Sim2Argument(Enum):
     Dense_Einsum_Probability = '-mt dense -a einsum -mm probability'
     Dense_Einsum_Accumulation = '-mt dense -a einsum -mm accumulation'
     
+
+
+@unique
+class ServerModule(Enum):
+    """
+    Module at server
+    """
+
+    UnrollCircuitToIoPCAS = 'UnrollCircuitToIoPCASModule'
+    Mapping = 'MappingModule'

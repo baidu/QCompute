@@ -114,9 +114,9 @@ class Backend(QImplement):
         # call the simulator
         completedProcess = subprocess.run(
             # Compatible with Python3.6, in Python3.7 and above, the more understandable alias of 'universal_newlines' is 'text'.
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, encoding='utf-8')
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf-8')
 
-        self.result.log = filterConsoleOutput(completedProcess.stdout) + filterConsoleOutput(completedProcess.stderr)
+        self.result.log = filterConsoleOutput(completedProcess.stdout)
         # collect the result to simulator for the subsequent invoking
         self.result.code = completedProcess.returncode
         if self.result.code != 0:

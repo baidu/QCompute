@@ -30,6 +30,9 @@ from QCompute.Define.Settings import outputInfo
 from QCompute.Define.Utils import matchSdkVersion
 
 from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
+from QCompute.OpenModule.CompressGateModule import CompressGateModule
+from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
+from QCompute.OpenModule.ReverseCircuitModule import ReverseCircuitModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
 from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
 
@@ -42,6 +45,7 @@ from QCompute.QPlatform import (
     QTask,
     BackendName,
     Sim2Argument,
+    ServerModule,
 )
 from QCompute.QPlatform.QEnv import QEnv
 from QCompute.QPlatform.QEnvOperation import QEnvOperation
@@ -80,7 +84,8 @@ from QCompute.QPlatform.QOperation.RotationGate import (
     CRY,
     CRZ,
 )
-import QCompute.QPlatform.Utilities
+from QCompute.QPlatform import QStatus
+from QCompute.QPlatform import Utilities
 from QCompute.Test.PostInstall.PostInstall import testAll
 
 
