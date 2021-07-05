@@ -17,7 +17,7 @@
 
 """
 An example of coding on Quantum-Leaf with classical-quantum information interacting features.
-Adjust parameter of rotation gate to eliminate '0' state.
+Adjust parameter of rotation gates to eliminate '0' state.
 """
 
 import sys
@@ -25,7 +25,7 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 uValue = 1  # Flag of interactions
 for _ in range(15):

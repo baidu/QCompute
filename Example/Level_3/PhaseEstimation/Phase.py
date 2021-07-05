@@ -24,7 +24,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 qubit_num = 4
 shots = 1000
@@ -37,13 +37,13 @@ def main():
     """
     # Create environment
     env = QEnv()
-    # Choose backend machine
+    # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
 
     # Initialize qubits
     q = env.Q.createList(qubit_num)
 
-    # Prepare eigenstate |1> = X|0> on the ancilla qubit
+    # Prepare eigenstate |1> = X|0> on the ancillary qubit
     X(q[3])
 
     # Superposition
@@ -72,7 +72,7 @@ def main():
     H(q[2])
 
     # Measurement result
-    MeasureZ([q[0], q[1], q[2]], [0, 1, 2])
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     return taskResult['counts']
 

@@ -26,25 +26,26 @@ from pprint import pprint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 # Create environment
 env = QEnv()
 # Choose backend Baidu Local Quantum Simulator-Sim2
 env.backend(BackendName.LocalBaiduSim2)
 
-# Initialize the three-qubit circuit
+# Initialize the five-qubit circuit
 q = env.Q.createList(5)
 
 # Apply a Hadamard gate on the 0th qubit
-H(q[0])
+H(q[3])
 
 # Apply some CX gates where the 0th qubit controls flipping each other qubit
-CX(q[0], q[1])
-CX(q[0], q[2])
+CX(q[3], q[1])
+CX(q[3], q[2])
 
 # Measure with the computational basis
-MeasureZ([env.Q[3], env.Q[2], env.Q[1]], [9, 1, 2])
+# You can adjust the order of QRegs to measure, and specify the CRegs you want
+MeasureZ([env.Q[3], env.Q[4], env.Q[1]], [9, 1, 2])
 
 # Commit the quest with 1024 shots
 taskResult = env.commit(1024, fetchMeasure=True)

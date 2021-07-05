@@ -23,14 +23,14 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 # Set the shot number for each quest
 shots = 1024
 
 # The message that Alice want to send to Bob.
 # The user you can modify the massage to '00', '01' or '10' as you like
-message = '11'
+message = '10'
 
 
 def main():

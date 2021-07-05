@@ -1,5 +1,7 @@
 ## Variational Quantum Eigensolver (VQE)
 
+> Based on QCompute version 2.0, we have developed QuantumAPP module to enrich and improve the VQE related functions. See [VQE_EN.md](../../../QAPP/tutorials/VQE_EN.md) for details.
+
 Consider the following question: how to find the smallest eigenvalue of a Hermitian matrix $H$? This question is important for physics and quantum chemistry. For an atomic level system, there is a Hamiltonian $H$, which is a Hermitian matrix, that describes the system's characteristics and behaviors. By finding the smallest eigenvalue of $H$ and its corresponding eigenvectors, we can find the ground energy and state of this system. VQE is a quantum technique designed to handle this task. The idea behind VQE is amazingly simple and easy to understand. Suppose $\lambda_\text{min}$ is the smallest eigenvalue of a Hamiltonian $H$. Then for every quantum state $\lvert {\phi}\rangle$,
 $$
 \langle{\phi} \lvert H\lvert {\phi}\rangle \ge \lambda_\text{min}.
@@ -104,6 +106,8 @@ import numpy as np
 import scipy
 import scipy.linalg
 from matplotlib import pyplot as plt
+import time
+import os
 
 import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
@@ -111,7 +115,7 @@ from QCompute import *
 ```
 Set up parameters and hyper parameters:
 ```python
-# hyper-parameter setting
+# Hyper-parameter setting
 shots = 1024
 n = 4  # n must be larger than or equal to 2; n is the size of our quantum system
 assert n >= 2
@@ -121,10 +125,10 @@ experiment_num = 4  # That's the number of parallel experiments we will run;
 # it indicates the number of processes we will use.
 # Don't stress your computer too much.
 learning_rate = 0.3
-delta = np.pi / 2  # calculate analytical derivative
+delta = np.pi / 2  # Calculate analytical derivative
 SEED = 36  # This number will determine what the final Hamiltonian is. It is also
 # used to make sure Mac and Windows behave the same using multiprocessing module.
-K = 3  # k is the number of local hamiltonian in H
+K = 3  # K is the number of local Hamiltonian in H
 N = 3 * n * L # N is the number of parameters needed for the circuit
 random.seed(SEED)
 ```
@@ -142,7 +146,7 @@ def random_pauli_generator(l):
 
 def random_H_generator(n, k):
     """
-    n is the number of qubits, k is the number of local hamiltonian in H
+    n is the number of qubits, k is the number of local Hamiltonian in H
     """
 
     H = []
@@ -174,7 +178,7 @@ This a function that calculates the smallest eigenvalue of a Hermitian matrix:
 ```python
 def ground_energy(Ha):
     """
-    It returns the ground energy of hamiltonian Ha,
+    It returns the ground energy of Hamiltonian Ha,
     which looks like [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']].
     """
 
@@ -211,8 +215,15 @@ def ground_energy(Ha):
     return eigen_vector[0].real
 ```
 
-This function is used to visualize our results:
+These two functions are used to visualize our results and save as figure:
 ```python
+def fig_name():
+    """
+    Generate a title of figure with time.
+    """
+    return os.path.dirname(__file__) + '/VQE' + time.strftime("%Y%m%d%H%M%S", time.localtime(time.time())) + '.png'
+
+
 def eigen_plot(eigenv_list, actual_eigenv):
     """
     This is the plot function of actual loss over iterations.
@@ -225,9 +236,10 @@ def eigen_plot(eigenv_list, actual_eigenv):
     plt.xlabel('iteration')
     plt.ylabel('loss')
     plt.title('Actual Loss Over Iteration')
-    plt.show()
+    plt.savefig(fig_name())
+    # plt.show()
 ```
-This function processes the experiment results, calculates the probability of getting 0 minus the probability of getting 0 with the ancilla qubit:
+This function processes the experiment results, calculates the probability of getting 0 minus the probability of getting 0 with the ancillary qubit:
 ```python
 def prob_calc(data_dic):
     """
@@ -257,7 +269,7 @@ def add_block(q, loc, para):
 
 def add_layer(para, q):
     """
-    add a layer, each layer has 3*n parameters. para is a 2-D numpy array
+    Add a layer, each layer has 3*n parameters. para is a 2-D numpy array
     """
 
     for i in range(1, n + 1):
@@ -271,29 +283,29 @@ Decompose $H$ into a linear summation of $H_i$, implement corresponding circuit 
 def self_defined_circuit(para, hamiltonian):
     """
     H is a list, for example, if H = 12*X*Y*I*Z + 21*Z*Z*X*Z + 10* I*I*X*Y,
-    then parameter hamiltonian is [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']](upper case or lower case are all fine).
+    then parameter Hamiltonian is [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']](upper case or lower case are all fine).
     It returns the expectation value of H.
     """
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
     # the first qubit is ancilla
-    q = [env.Q[i] for i in range(n + 1)]
+    q = env.Q.createList(n + 1)
 
     hamiltonian = [symbol.lower() for symbol in hamiltonian]
-    high_D_para = para.reshape(L, n, 3) # change 1-D numpy array to a 3-D numpy array
+    high_D_para = para.reshape(L, n, 3) # Change 1-D numpy array to a 3-D numpy array
 
-    # set up our parameterized circuit
+    # Set up our parameterized circuit
     for i in range(1, n + 1):
         H(q[i])
 
-    # add parameterized circuit
+    # Add parameterized circuit
     for i in range(L):
         add_layer(high_D_para[i], q)
 
     for i in range(n):
-        # set up pauli measurement circuit
+        # Set up Pauli measurement circuit
         if hamiltonian[i] == 'x':
             H(q[i + 1])
             CX(q[i + 1], q[0])
@@ -306,8 +318,8 @@ def self_defined_circuit(para, hamiltonian):
             H(q[i + 1])
             CX(q[i + 1], q[0])
 
-    # measurement result
-    MeasureZ([env.Q[i] for i in range(n)], range(n))
+    # Measurement result
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     return prob_calc(taskResult['counts'])
 ```

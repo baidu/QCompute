@@ -37,6 +37,7 @@ def testAll():
     print('Local test successed.')
 
     print('Please provide a token:')
+    Define.hubToken = input()
     if Define.hubToken == '':
         print('Cloud test cancelled.')
         return

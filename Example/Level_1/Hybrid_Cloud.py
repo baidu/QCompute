@@ -26,7 +26,7 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 # Your token:
 # Define.hubToken = ''
@@ -39,7 +39,7 @@ env.backend(BackendName.CloudBaiduSim2Water)
 # We set the number of qubits in our quantum register as
 TotalNumQReg = 8
 
-# Initialize an quantum register firstly
+# Initialize a quantum register firstly
 q = env.Q.createList(TotalNumQReg)
 
 # We apply a Hadamard gate on each qubit in the register above,

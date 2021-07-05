@@ -27,31 +27,39 @@ from QCompute.Define.Settings import measureFormat
 def filterMeasure(counts: Dict[str, int], measuredQRegsToCRegsDict: Dict[int, int]
                   , reverse: bool = False) -> Dict[str, int]:
     # return counts
-    cRegList = list(measuredQRegsToCRegsDict.keys())
-    cRegCount = len(measuredQRegsToCRegsDict)
-    targetList = sorted(measuredQRegsToCRegsDict.values())
-    for key in measuredQRegsToCRegsDict.keys():
-        measuredQRegsToCRegsDict[key] = targetList.index(measuredQRegsToCRegsDict[key])
 
-    sourceQRegCount = 0
     for key in counts.keys():
         sourceQRegCount = len(key)
         break
 
     assert sourceQRegCount > 0
 
-    zeroKey = '0' * cRegCount
+    neededQRegCount = max(measuredQRegsToCRegsDict.keys()) + 1
+    if neededQRegCount > sourceQRegCount:
+        neededQRegList = sorted(measuredQRegsToCRegsDict.keys())
+        newQRegsToCRegsDict = {}
+        for index, key in enumerate(neededQRegList):
+            newQRegsToCRegsDict[index] = measuredQRegsToCRegsDict[key]
+        measuredQRegsToCRegsDict = newQRegsToCRegsDict
+
+    qRegList = list(measuredQRegsToCRegsDict.keys())
+    qRegCount = len(measuredQRegsToCRegsDict)
+    targetList = sorted(measuredQRegsToCRegsDict.values())
+    for key in measuredQRegsToCRegsDict.keys():
+        measuredQRegsToCRegsDict[key] = targetList.index(measuredQRegsToCRegsDict[key])
+
+    zeroKey = '0' * qRegCount
     binRet = {}  # type: Dict[str, int]
     for k, v in counts.items():
         hit = False
-        for qReg in cRegList:
+        for qReg in qRegList:
             if k[sourceQRegCount - 1 - qReg] == '1':
                 hit = True
                 break
         if hit:
-            keyList = ['0'] * cRegCount
-            for qReg in cRegList:
-                keyList[cRegCount - 1 - measuredQRegsToCRegsDict[qReg]] = k[sourceQRegCount - 1 - qReg]
+            keyList = ['0'] * qRegCount
+            for qReg in qRegList:
+                keyList[qRegCount - 1 - measuredQRegsToCRegsDict[qReg]] = k[sourceQRegCount - 1 - qReg]
             if reverse:
                 key = ''.join(reversed(keyList))
             else:

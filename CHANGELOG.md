@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 - Local graph drawing;
-- More examples;
 - QASM Convertor.
-  
+
+## [2.0.1] - July-05-2021
+### Added
+- Examples update;
+  + QAPP, quantum computing toolbox.
+
 ## [2.0.0] - Jun-07-2021
 ### Added
 - New QPU:

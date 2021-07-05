@@ -26,7 +26,7 @@ from pprint import pprint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 # Create environment
 env = QEnv()
@@ -36,7 +36,7 @@ env.backend(BackendName.LocalBaiduSim2)
 q = [env.Q[0], env.Q[1], env.Q[2], env.Q[3], env.Q[4]]  # More then used
 
 # We apply an X gate on the 0th qubit firstly.
-# Also, you can comment it as you like.
+# Also,you can comment it as you like.
 X(q[0])
 
 # Then we apply a Hadamard gate on the 0th qubit,

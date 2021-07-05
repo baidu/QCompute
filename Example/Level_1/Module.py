@@ -40,12 +40,12 @@ env.backend(BackendName.LocalBaiduSim2)
 # case1:
 # The case below demonstrating the function of the CompositeGate Module,
 # which is used to decompose the composite gate,such as RZZ gate.
-# q = env.Q.createList(2)
-# RZZ(np.pi/2, np.pi/2, np.pi/2)(q[0], q[1])
-# CX(q[0], q[1])
-# MeasureZ(*env.Q.toListPair())
-# env.module(CompositeGateModule())
-# env.publish()
+q = env.Q.createList(2)
+RZZ(np.pi / 2, np.pi / 2, np.pi / 2)(q[0], q[1])
+CX(q[0], q[1])
+MeasureZ(*env.Q.toListPair())
+env.module(CompositeGateModule())
+env.publish()
 
 # case2:
 # The case below demonstrating the function of the Compress Module added by default.
@@ -65,7 +65,7 @@ env.backend(BackendName.LocalBaiduSim2)
 # H(q[0])
 # X(q[0])
 # Z(q[1])
-# CRX(np.pi/2)(q[1],q[2])
+# CRX(np.pi / 2)(q[1], q[2])
 # CX(q[0], q[3])
 # CSWAP(q[1], q[2], q[3])
 # MeasureZ(*env.Q.toListPair())

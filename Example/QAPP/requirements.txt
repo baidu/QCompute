@@ -1,0 +1,6 @@
+networkx==2.5.1
+tqdm==4.61.1
+noisyopt==0.2.2
+scikit_learn==0.24.2
+scikit-image==0.18.2
+pandas==1.2.5

@@ -17,12 +17,13 @@
 
 """
 Deutsch-Jozsa Algorithm.
-Suppose: f1 = 0, f2 = first qubit.
 """
+import sys
 
+sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 # In this example we use 10 qubits as the main register,
 # and also an ancillary qubit else
@@ -58,7 +59,7 @@ def main():
 
     # Then apply U_f:
     # for f1 = 0, we need to do nothing on q1;
-    # for f2 = first qubit, we need to do nothing if the first qubit is |0>,
+    # for f2 = the value of first qubit,so if f2 = 0 do nothing,
     # else to flip the ancillary qubit in q2, which is exactly a CX gate
     CX(q2[0], q2[MainReg_num])
 

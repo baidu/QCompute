@@ -1,4 +1,5 @@
 # Grover's Search Algorithm
+
 A salesman wants to promote sales of a newly designed quantum computer by travelling among $n$ cities (New York $\rightarrow$ Shanghai $\rightarrow ...$) and finally travels back to where he starts. He really needs to find the shortest possible route to save his time. This is known as the [Travelling Salesman Porblem (TSP)](https://en.wikipedia.org/wiki/Travelling_salesman_problem) and in its essence an **unstructured** searching problem. Mathematically, this type of problem can be formulated as:
 >In an unstructured search problem, given a set of $N$ elements forming a set $S = \{|0\rangle, |1\rangle, \cdots, |N-1\rangle \}$ and a function $f : S \rightarrow \{0, 1\}$, the goal is to find the **only** element $|x^*\rangle$ in $S$ such that $f(|x^∗\rangle) = 1$ and otherwise $f(|x\rangle) = 0$.
 
@@ -10,12 +11,14 @@ However, there exists a quantum searching algorithm named after *Lov Grover* in 
 ## Algorithm
 Let's take an easier example to illustrate the algorithm. Suppose we are given a list $S = \{ |0\rangle,\cdots, |6\rangle\}$, and our target is located close to the last index $|x^*\rangle = |5\rangle$. 
 
-- **Preprocessing:**
+- **Preprocessing**
 
   In order to work on a quantum computer, we first need to fill the searching space up to $2^n$ elements $S = \{ |0\rangle,\cdots, |7\rangle\}$ (it doesn't matter what garbage information one throw into the last element $|7\rangle$, as long as the oracle can recognize whether it is correct). In our case, $n=3$ and it is the qubit number we need to register. Then, we have to convert the decimal index into binary form $S = \{ |000\rangle,\cdots, |111\rangle\}$. It is very easy to initialize qubits in our simulator:
 
   ```python
+  # In this example we use 3 qubits in total
   qubit_num = 3
+  # and set the shot number for each request
   shots = 1000
   
   
@@ -24,15 +27,15 @@ Let's take an easier example to illustrate the algorithm. Suppose we are given a
       main
       """
       # Create environment
-      env = QuantumEnvironment()
-      # Choose backend
+      env = QEnv()
+      # Choose backend Baidu Local Quantum Simulator-Sim2
       env.backend(BackendName.LocalBaiduSim2)
   
-      # Initialize a 3-qubit state
-      q = [env.Q[i] for i in range(qubit_num)]
+      # Initialize the three-qubit circuit
+      q = env.Q.createList(qubit_num)
   ```
   
-- **Superposition $H$:**
+- **Superposition $H$**
 
   After setting up the problem, we apply a layer of Hadamard gates to the initialized states to prepare a uniform superposition state. The resulting superposition state $|\psi \rangle$ is:
   $$
@@ -54,13 +57,13 @@ Let's take an easier example to illustrate the algorithm. Suppose we are given a
 
   In our simulator, Hadamard gates are provided as following:
   ```python
-      # Superposition
-      H(q[0])
-      H(q[1])
-      H(q[2])
+    # The first step of Grover's search algorithm, superposition
+    H(q[0])
+    H(q[1])
+    H(q[2])
   ```
 
-- **Oracle $\hat{O}$:**
+- **Oracle $\hat{O}$**
 
   Once we get superposition, we can implement an oracle $\hat{O}$ (or a quantum black box) that marks the target state. **NOTE:** The oracle can recognize whether the state is desired or not, but this doesn't necessarily require the knowledge about what the solution is exactly. Here, we provide the phase flip oracle that inverts the state amplitude and **doesn't require any ancilla qubits**.
   $$
@@ -89,7 +92,7 @@ Let's take an easier example to illustrate the algorithm. Suppose we are given a
 
 
   ```python
-      # Oracle for |101>
+      # Enter the first Grover iteration, the oracle Uf for |101>
       X(q[1])
       H(q[2])
       CCX(q[0], q[1], q[2])
@@ -97,7 +100,7 @@ Let's take an easier example to illustrate the algorithm. Suppose we are given a
       H(q[2])
   ```
 
-- **Amplitude purification:**
+- **Amplitude purification**
 
   Next, we implement an amplification circuit that further increases the target state's amplitude while decreasing the amplitude of all other states. This circuit is often referred as the **Diffusion Operator** $\hat{D}$. This operator calculates the mean of probability amplitude $\mu$ of all states and inverts the probability amplitudes around this mean which eventually amplifies the probability amplitude of the target state. In our case, $n=3$
   $$
@@ -158,56 +161,63 @@ Let's take an easier example to illustrate the algorithm. Suppose we are given a
   Then, we reach $94.53\%$ probability for finding the target state $|x^*\rangle = |101\rangle$. The circuit model for diffusion $\hat{D}$ can be implemented as:
   ![avatar](./PIC/diffusion2.png)
 
-- **Overall:**
+- **Overall**
 The Grover's search algorithm is concluded in the following pipeline. We denote the Grover iteration with dashed box and repeat this block $\mathcal{O}(\sqrt{N})$ times.
+
 ![avatar](./PIC/pipeline.png)
-
-
 
 ---
 ## Comments on Oracle
+
 As you may realize, there is no free lunch and it is the same for Grover's algorithm. The quadratic speed-up passes on difficutly to constructing the orcale. Let's come back to the TSP and you would find there is no easy way to construct the oracle. This task itself may require $\mathcal{O}(\sqrt{N})$ queries to complete.
 
 ---
 ## Code and results
+
 We include the complete code for the 3-qubit example we discussed above.
 ```python
 import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-qubit_num = 3
-shots = 1000
+matchSdkVersion('Python 2.0.1')
 
+# In this example we use 3 qubits in total
+qubit_num = 3
+# and set the shot number for each request
+shots = 1000
 
 def main():
     """
     main
     """
     # Create environment
-    env = QuantumEnvironment()
-    # Choose backend
+    env = QEnv()
+    # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
 
-    # Initialize a 3-qubit state
-    q = [env.Q[i] for i in range(qubit_num)]
+     # Initialize the three-qubit circuit
+    q = env.Q.createList(qubit_num)
 
-    # Superposition
+    # The first step of Grover's search algorithm, superposition
     H(q[0])
     H(q[1])
     H(q[2])
 
-    # Oracle for |101>
+    # Enter the first Grover iteration, the oracle Uf for |101>
     X(q[1])
     H(q[2])
     CCX(q[0], q[1], q[2])
     X(q[1])
     H(q[2])
 
-    # Diffusion Operator
+    # The first layer of Hadamard gates in the first Grover iteration
     H(q[0])
     H(q[1])
     H(q[2])
+    
+    # The reflection gate 2|0><0| - I in the first Grover iteration, which is divided to three parts:
+    # two layer of X gates and a decomposition for the gate CCZ between the above two
     X(q[0])
     X(q[1])
     X(q[2])
@@ -219,12 +229,17 @@ def main():
     X(q[0])
     X(q[1])
     X(q[2])
+    
+    # The second layer of Hadamard gates in the first Grover iteration
     H(q[0])
     H(q[1])
     H(q[2])
 
-    # Measurement result
-    MeasureZ(q, range(qubit_num))
+    # Measure with the computational basis;
+    # if the user you want to increase the number of Grover iteration,
+    # please repeat the code from the comment “Enter the first Grover iteration” to here,
+    # and then measure
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     return taskResult['counts']
 

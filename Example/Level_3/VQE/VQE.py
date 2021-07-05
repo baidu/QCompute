@@ -28,13 +28,15 @@ import numpy as np
 import scipy
 import scipy.linalg
 from matplotlib import pyplot as plt
+import time
+import os
 
 import sys
 
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.0')
+matchSdkVersion('Python 2.0.1')
 
 # Hyper-parameter setting
 shots = 1024
@@ -134,6 +136,14 @@ def ground_energy(Ha):
     return eigen_vector[0].real
 
 
+def fig_name():
+    """
+    Generate a title of figure with time.
+    """
+
+    return os.path.dirname(__file__) + '/VQE' + time.strftime("%Y%m%d%H%M%S", time.localtime(time.time())) + '.png'
+
+
 def eigen_plot(eigenv_list, actual_eigenv):
     """
     This is the plot function of actual loss over iterations.
@@ -146,12 +156,13 @@ def eigen_plot(eigenv_list, actual_eigenv):
     plt.xlabel('iteration')
     plt.ylabel('loss')
     plt.title('Actual Loss Over Iteration')
-    plt.show()
+    plt.savefig(fig_name())
+    # plt.show()
 
 
 def prob_calc(data_dic):
     """
-    Measure the first (ancilla) qubit. Return the value
+    Measure the first (ancillary) qubit. Return the value
     of 'the probability of getting 0' minus 'the probability of getting 1'.
     """
 
@@ -214,7 +225,7 @@ def self_defined_circuit(para, hamiltonian):
         add_layer(high_D_para[i], q)
 
     for i in range(n):
-        # Set up pauli measurement circuit
+        # Set up Pauli measurement circuit
         if hamiltonian[i] == 'x':
             H(q[i + 1])
             CX(q[i + 1], q[0])

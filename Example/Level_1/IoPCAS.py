@@ -41,9 +41,9 @@ q = env.Q.createList(3)
 # UnrollCircuitToIOPCAS Module and Mapping Module added by default.
 # UnrollCircuitToIOPCAS Module decomposes H,CH into a combination of Rx, Ry, and CZ that QPU can handle,
 # then Mapping Module maps the two logical qubits in a two-qubit gate(CZ) to two coupled physical qubits.
-# H(q[0])
-# CH(q[0], q[1])
-# CH(q[0], q[2])
+H(q[0])
+CH(q[0], q[1])
+CH(q[0], q[2])
 
 # case 2:
 # The case below demonstrating what will happen when we close ServerModule.UnrollCircuitToIoPCAS Module

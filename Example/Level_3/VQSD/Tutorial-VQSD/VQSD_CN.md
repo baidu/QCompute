@@ -1,10 +1,10 @@
 ## 变分量子态对角化 (VQSD)
 
-变分量子态对角化算法是量子-经典混合算法中的一员，可以看作是VQE算法的拓展。假设给定一个量子态，怎么找到它所有的特征值？按照量子力学的密度矩阵表示，每一个量子态都可以被表示为一个有非负特征值的埃尔米特矩阵，且这些特征值之和为1。变分量子态对角化 (VQSD) 就是一个可以帮助我们找到量子态所有特征值的算法。VQSD算法的核心思想很简单，首先建造一个参数化的电路 $U(\overrightarrow\theta)$，利用梯度下降算法进行参数优化。当参数优化到足够好时，输入初始态 $\rho$ 让这个电路运行，得到的输出态 $\rho' = U(\overrightarrow\theta)\rho U^\dagger(\overrightarrow\theta)$ 的非对角元元素就变成了（更准确地说是接近）$0$。
+变分量子态对角化算法是量子-经典混合算法中的一员，可以看作是 VQE 算法的拓展。假设给定一个量子态，怎么找到它所有的特征值？按照量子力学的密度矩阵表示，每一个量子态都可以被表示为一个有非负特征值的埃尔米特矩阵，且这些特征值之和为 1。变分量子态对角化 (VQSD) 就是一个可以帮助我们找到量子态所有特征值的算法。VQSD 算法的核心思想很简单，首先建造一个参数化的电路 $U(\overrightarrow\theta)$，利用梯度下降算法进行参数优化。当参数优化到足够好时，输入初始态 $\rho$ 让这个电路运行，得到的输出态 $\rho' = U(\overrightarrow\theta)\rho U^\dagger(\overrightarrow\theta)$ 的非对角元元素就变成了（更准确地说是接近）$0$。
 
 ### 对角内积测量
 
-对角内积测量是变分量子态对角化中的重要组成部分，它其实就是一个用来计算 $\text{Tr}(Z(\sigma)Z(\tau))$ 的电路，其中函数 $Z$ 的作用是将一个矩阵的非对角元变为0,
+对角内积测量是变分量子态对角化中的重要组成部分，它其实就是一个用来计算 $\text{Tr}(Z(\sigma)Z(\tau))$ 的电路，其中函数 $Z$ 的作用是将一个矩阵的非对角元变为 0,
 $$
 Z(\begin{pmatrix}
 \tau_{11} & \cdots & \tau_{1m}\\
@@ -32,11 +32,10 @@ $$
 
 *图片来自于[[1]](https://www.nature.com/articles/s41534-019-0167-6)*
 
-
-上述的图片展示了我们应该怎么做。准备好两个一样的量子态 $\rho$， 作为初始态分别输入到两个一摸一样的参数化电路中。这两个参数化电路有一样的参数。将输出的两个量子态作用对角内积测量，计算得到 $00\cdots0$  的频率，这个频率便是 $Tr(Z(\rho')Z(\rho'))$ 的近似值。 这个数值越大，$\rho'$ 就越接近对角矩阵。如果你想知道背后的原因，可以去参考 [[1]](https://www.nature.com/articles/s41534-019-0167-6)。这就意味着我们要找到最优的参数 $\overrightarrow\theta_\text{optimal}$ 使得 $-Tr(Z(\rho')Z(\rho'))$ 最小化。注意到$-Tr(Z(\rho')Z(\rho'))$ 本身就是关于 $\overrightarrow\theta$ 一个多元函数，也就是说，我们可以利用梯度下降帮我们寻找答案。
+上述的图片展示了我们应该怎么做。准备好两个一样的量子态 $\rho$， 作为初始态分别输入到两个一摸一样的参数化电路中。这两个参数化电路有一样的参数。将输出的两个量子态作用对角内积测量，计算得到 $00\cdots0$ 的频率，这个频率便是 $Tr(Z(\rho')Z(\rho'))$ 的近似值。 这个数值越大，$\rho'$ 就越接近对角矩阵。如果你想知道背后的原因，可以去参考 [[1]](https://www.nature.com/articles/s41534-019-0167-6)。这就意味着我们要找到最优的参数 $\overrightarrow\theta_\text{optimal}$ 使得 $-Tr(Z(\rho')Z(\rho'))$ 最小化。注意到 $-Tr(Z(\rho')Z(\rho'))$ 本身就是关于 $\overrightarrow\theta$ 一个多元函数，也就是说，我们可以利用梯度下降帮我们寻找答案。
 
 ### 特征值的读出
-经过一些列梯度下降优化，我们找到了 $\overrightarrow\theta_\text{optimal}$， 将 $\rho$ 作为输入态，运行量子电路  $U(\overrightarrow\theta_\text{optimal})$， 终于得到了一个（近似）对角态 $\rho'$。我们需要做什么才能从 $\rho'$ 那里得到它的对角元（也就是特征值）？当然是做很多次测量。
+经过一些列梯度下降优化，我们找到了 $\overrightarrow\theta_\text{optimal}$， 将 $\rho$ 作为输入态，运行量子电路 $U(\overrightarrow\theta_\text{optimal})$， 终于得到了一个（近似）对角态 $\rho'$。我们需要做什么才能从 $\rho'$ 那里得到它的对角元（也就是特征值）？当然是做很多次测量。
 
 ![pic_3.png ](./PIC/pic_3.png)
 
@@ -46,7 +45,7 @@ $$
 
 ### Quantum Leaf 上的演练
 
-首先我们装载相关的包。我们的例子模拟的是一个2-qubit的纯量子态，这个纯量子态是由一个提前定义好的电路生成的
+首先我们装载相关的包。我们的例子模拟的是一个 2-qubit 的纯量子态，这个纯量子态是由一个提前定义好的电路生成的
 
 ```python
 import copy
@@ -56,6 +55,8 @@ import numpy as np
 import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
+
+matchSdkVersion('Python 2.0.1')
 ```
 设置好参数和超参数
 ```python
@@ -83,7 +84,7 @@ def state_prepare(q, i):
 
 def universal_cir(q, i, para):
     """
-    this function build a 15-parameterized circuit, which is
+    This function builds a 15-parameterized circuit, which is
     enough to simulate any 2-qubit Unitaries
     """
 
@@ -120,15 +121,15 @@ def my_cir(para):
     This function returns the measurement result
     """
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
-    q = [env.Q[i] for i in range(2 * n)]
+    q = env.Q.createList(2 * n)
 
-    # prepare a state
+    # Prepare a state
     for i in range(2):
         state_prepare(q, 2 * i)
 
-    # add parameterized circuit
+    # Add parameterized circuit
     for i in range(2):
         universal_cir(q, 2 * i, para)
 
@@ -136,7 +137,7 @@ def my_cir(para):
     for i in range(2):
         CX(q[i], q[i + n])
 
-    MeasureZ(q, range(2 * n))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
 
     return taskResult['counts']
@@ -186,7 +187,7 @@ def diff_fun(f, para):
 ```python
 def main():
     """
-    now we perform eigenvalues readout
+    Now we perform eigenvalues readout
     """
 
     para_list = [para]
@@ -196,15 +197,15 @@ def main():
         para_list.append(diff_fun(loss_fun, para_list[i]))
         loss_list.append(loss_fun(para_list[i]))
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
-    q = [env.Q[i] for i in range(n)]
+    q = env.Q.createList(2 * n)
 
     state_prepare(q, 0)
     universal_cir(q, 0, para_list[-1])
 
-    MeasureZ(q, range(len(q)))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])
 
@@ -212,9 +213,11 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
 其中一次运行的结果是
+
 ```python
 {'00': 99563, '01': 405, '10': 27, '11': 5}
 ```
-如果变成频率就是 $0.995, 0.004, 0.0027, 0.0005$, 和理论上的特征值 $1,0,0,0$ 很接近！
 
+如果变成频率就是 $0.995, 0.004, 0.0027, 0.0005$, 和理论上的特征值 $1,0,0,0$ 很接近！

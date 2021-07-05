@@ -1,9 +1,12 @@
 # Quantum Phase Estimation (QPE)
-Quantum phase estimation plays an important role as a subroutine in many quantum programs and lays the foundation for the famous Shor's algorithm. The task is usually formulated as: 
+
+Quantum phase estimation plays an important role as a subroutine in many quantum programs and lays the foundation for the famous Shor's algorithm. The task is usually formulated as:
 >Given a unitary operator $U$ and its eigenvector $|u\rangle$, find the associated eigenvalue such that $U|u\rangle = e^{2\pi i\varphi} |u\rangle$ ( phase $\varphi$ unknown ). Since $U$ is unitary, we can say that $0\leq\varphi<1$.
 
 ---
+
 ## Algorithm
+
 To illustrate how phase estimation works, consider an example. Suppose
 $$
 U = 
@@ -15,6 +18,7 @@ $$
 with eigenvector $|u\rangle = |1\rangle$. Thus, the phase we want to estimate is $\varphi = 1/5$ since $U|1\rangle = e^{2\pi i\varphi} |1\rangle$. In general, the QPE algorithm can be divided into the following 4 steps:
 
 - **Pre-processing**
+  
   The phase estimation algorithm requires two registers. The first part is called counting register and it contains an $n$-qubit state all initialized to $|0\rangle$. They will estimate the unknown phase $\varphi$ in binary form. The number of $n$ depends on the accuracy we want to achieve. The second part contains $m$ qubits and we need to initialize it to the eigenstate $|u\rangle$. In our case, $m=1$ and choose $n=3$ to begin with. We would expect bad precision with only 3 counting qubits. Thus, the overall initial state after preprocessing is:
   $$|\psi_0\rangle = |0\rangle^{\otimes n} \otimes |u\rangle =|000\rangle \otimes |1\rangle$$
   We can easily do this in our simulator:
@@ -42,6 +46,7 @@ with eigenvector $|u\rangle = |1\rangle$. Thus, the phase we want to estimate is
   ```
   
 - **Superposition $H$**
+  
   Next, we apply a layer of Hadamard gates to all zero-initialized **counting qubits** to prepare a uniform superposition state. The resulting superposition state $|\psi_1 \rangle$ is
   $$
   |\psi_1\rangle = (H|0\rangle)^{\otimes n} \otimes |u\rangle = \frac{1}{\sqrt{2^n}}(|0\rangle + |1\rangle)^{\otimes n} \otimes |u\rangle\,.
@@ -60,6 +65,7 @@ with eigenvector $|u\rangle = |1\rangle$. Thus, the phase we want to estimate is
   ```
   
 - **Oracle $\hat{O}$**
+  
   The oracle used in phase estimation algorithm is a bunch of controlled-unitaries by setting control on $j$-th counting qubit and target $U^{2^j}$ on the ancilla qubits in eigenstate $|u\rangle$. Let's see what happens if we apply $U^{2^j}$ to eigenstate $|u\rangle$. Set $j = 2$, we get
   $$
   U^{4}|u\rangle =  U^{3}U|u\rangle = e^{2\pi i\varphi} U^{3}|u\rangle = e^{2\pi i(2^1\varphi)}U^{2}|u\rangle = \cdots = e^{2\pi i (2^2\varphi)} |u\rangle
@@ -225,6 +231,7 @@ $$
     ```
 
 - **Read out and measurement**
+    
     After so many efforts, we finally reach the point where we read out the 3-qubit estimated phase $\hat{\varphi} = 0.\varphi_0\varphi_1\varphi_2$ in binary fraction.
      ![measure](./PIC/measure.png)
      Combine all the steps above, we get the following measurement results:
@@ -235,14 +242,18 @@ $$
     $$
     which is off by $25\%$ from the true value. But this is the best we can get using 3 counting qubits. If we use 5-qubits instead, the result will be much more accurate (error scales as $1/2^n$).
 
-## Code 
+## Code
+
 Here is the complete code. Please try it, change the parameters and see what happens.
+
 ```python
 import numpy as np
 
 import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
+
+matchSdkVersion('Python 2.0.1')
 
 qubit_num = 4
 shots = 1000
@@ -254,7 +265,7 @@ def main():
     main
     """
     # Create environment
-    env = QuantumEnvironment()
+    env = QEnv()
     # Choose backend machine
     env.backend(BackendName.LocalBaiduSim2)
 
@@ -290,7 +301,7 @@ def main():
     H(q[2])
 
     # Measurement result
-    MeasureZ([q[0], q[1], q[2]], [0, 1, 2])
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     return taskResult['counts']
 
@@ -300,9 +311,13 @@ if __name__ == '__main__':
 ```
 
 ---
+
 ## Discussion
+
 We can see that the algorithm itself is trying to find the eigenvalue of a given unitary. That's why it is also called **eigenvalue estimation**. Now, it's your turn to have a try. You may change the phase to $\varphi = 2\pi/3$ and generate meaningful explanations.
 
 ---
+
 ## Reference
+
 [Nielsen, Michael A. & Isaac L. Chuang (2001). Quantum computation and quantum information (Repr. ed.). Cambridge [u.a.]: Cambridge Univ. Press. ISBN 978-0521635035.]()

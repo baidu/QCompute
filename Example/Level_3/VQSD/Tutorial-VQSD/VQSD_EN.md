@@ -53,6 +53,8 @@ import numpy as np
 import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
+
+matchSdkVersion('Python 2.0.1')
 ```
 Set up hyper-parameters and parameters:
 ```python
@@ -80,7 +82,7 @@ def state_prepare(q, i):
 
 def universal_cir(q, i, para):
     """
-    this function build a 15-parameterized circuit, which is
+    This function builds a 15-parameterized circuit, which is
     enough to simulate any 2-qubit Unitaries
     """
 
@@ -117,15 +119,15 @@ def my_cir(para):
     This function returns the measurement result
     """
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
-    q = [env.Q[i] for i in range(2 * n)]
+    q = env.Q.createList(2 * n)
 
-    # prepare a state
+    # Prepare a state
     for i in range(2):
         state_prepare(q, 2 * i)
 
-    # add parameterized circuit
+    # Add parameterized circuit
     for i in range(2):
         universal_cir(q, 2 * i, para)
 
@@ -133,7 +135,7 @@ def my_cir(para):
     for i in range(2):
         CX(q[i], q[i + n])
 
-    MeasureZ(q, range(2 * n))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
 
     return taskResult['counts']
@@ -180,10 +182,11 @@ def diff_fun(f, para):
     res = new_para - learning_rate * gradient
     return res
 ```
+
 ```python
 def main():
     """
-    now we perform eigenvalues readout
+    Now we perform eigenvalues readout
     """
 
     para_list = [para]
@@ -193,15 +196,15 @@ def main():
         para_list.append(diff_fun(loss_fun, para_list[i]))
         loss_list.append(loss_fun(para_list[i]))
 
-    env = QuantumEnvironment()
+    env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
-    q = [env.Q[i] for i in range(n)]
+    q = env.Q.createList(2 * n)
 
     state_prepare(q, 0)
     universal_cir(q, 0, para_list[-1])
 
-    MeasureZ(q, range(len(q)))
+    MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])
 
@@ -209,10 +212,11 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
 One of the experiments gave me:
+
 ```python
 {'00': 99563, '01': 405, '10': 27, '11': 5}
 ```
+
 which translates to frequency $0.995, 0.004, 0.0027, 0.0005$, not far from true eigenvalues $1,0,0,0$.
-
-

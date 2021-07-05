@@ -17,18 +17,20 @@ If Alice wants to send $10$, she runs a $X$ gate in her qubit before mailing it 
 ![avatar](./PIC/message10_QH.png)
 ![avatar](./PIC/message_11_QH.png)
 
-
-
 Above is the main idea of superdense coding. Now let's implement this protocol using QCompute.
+
 ```python
 import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-# hyper-parameter
+matchSdkVersion('Python 2.0.1')
+
+# Set the shot number for each quest
 shots = 1024
 
-# The message that Alice want to send to Bob
+# The message that Alice want to send to Bob.
+# The user you can modify the massage to '00', '01' or '10' as you like
 message = '11'
 
 
@@ -36,24 +38,41 @@ def main():
     """
     main
     """
-    env = QuantumEnvironment()
+    # Create environment
+    env = QEnv()
+    # Choose backend Baidu Local Quantum Simulator-Sim2
     env.backend(BackendName.LocalBaiduSim2)
-    q = [env.Q[0], env.Q[1]]
+    
+    # Initialize the two-qubit circuit
+    q = env.Q.createList(2)
+    
+    # Alice and Bob share a Bell state (|00>+|11>) / sqrt(2),
+    # where Alice holds q[0] and Bob holds q[1]
     H(q[0])
     CX(q[0], q[1])
 
+    # For different messages, Alice applies different gates on q[0],
+    # where she applies nothing to indicate the message '00'
     if message == '01':
         Z(q[0])
     elif message == '10':
         X(q[0])
     elif message == '11':
+        # Here ZX = iY
         Z(q[0])
         X(q[0])
-
+    
+    # Alice sends her qubit q[0] to Bob,
+    # and then Bob decodes the two qubits.
+    # Bob needs to measure the two qubits with Bell basis,
+    # or transforms the state to computational basis
+    # and measures it with the computational basis
     CX(q[0], q[1])
     H(q[0])
-
-    MeasureZ(q, range(2))
+    
+    # Measure with the computational basis
+    MeasureZ(*env.Q.toListPair())
+    # Commit the quest
     taskResult = env.commit(shots, fetchMeasure=True)
     print(taskResult['counts'])
 
@@ -63,11 +82,15 @@ if __name__ == '__main__':
 ```
 
 Here is the measurement result:
+
 ```python
 {'11': 1024}
 ```
+
 **Note:** You may change the message to '01', '10', or '00' as you wish.
 
 ---
+
 ## Reference
+
 1. [Bennett, C.; Wiesner, S. (1992). "Communication via one- and two-particle operators on Einstein-Podolsky-Rosen states". Physical Review Letters. 69 (20): 2881–2884. ](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.69.2881)
