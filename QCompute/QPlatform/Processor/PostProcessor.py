@@ -28,6 +28,7 @@ def filterMeasure(counts: Dict[str, int], measuredQRegsToCRegsDict: Dict[int, in
                   , reverse: bool = False) -> Dict[str, int]:
     # return counts
 
+    sourceQRegCount = 0
     for key in counts.keys():
         sourceQRegCount = len(key)
         break

@@ -1,8 +1,14 @@
 # Changelog
 
 ## [Unreleased]
+- New Command Channel.
+
+## [2.0.2] - Nov-04-2021
+### Added
 - Local graph drawing;
-- QASM Convertor.
+- New error code assembly.
+### Changed
+- Remove RZZ example.
 
 ## [2.0.1] - July-05-2021
 ### Added

@@ -59,8 +59,6 @@ def cloudFullTest():
     CCX(procedure0Env.Q[0], procedure0Env.Q[1], procedure0Env.Q[2])
     CSWAP(procedure0Env.Q[0], procedure0Env.Q[1], procedure0Env.Q[2])
 
-    RZZ(1.1, 2.2, 3.3)(procedure0Env.Q[0], procedure0Env.Q[1])
-
     procedure0 = procedure0Env.convertToProcedure('procedure0', env)
     # procedure0 end
 
@@ -121,8 +119,6 @@ def cloudFullTest():
     CRY(1.1)(q[0], q[1])
     CRZ(1.1)(q[0], q[1])
 
-    RZZ(1.1, 2.2, 3.3)(q[0], q[1])
-
     procedure0()(q[0], q[1], q[2])
     procedure1()(q[1], q[2], q[0])
 
@@ -130,15 +126,15 @@ def cloudFullTest():
 
     MeasureZ(q, range(3))
 
-    env.module(CompositeGateModule())
     env.module(UnrollProcedureModule())
     
     ret = env.commit(1024, fetchMeasure=True)
-    assert ret['counts']['001'] == 71
-    assert ret['counts']['010'] == 245
-    assert ret['counts']['011'] == 110
-    assert ret['counts']['100'] == 347
-    assert ret['counts']['101'] == 94
-    assert ret['counts']['110'] == 131
-    assert ret['counts']['111'] == 26
+    assert ret['counts']['000'] == 157
+    assert ret['counts']['001'] == 128
+    assert ret['counts']['010'] == 137
+    assert ret['counts']['011'] == 288
+    assert ret['counts']['100'] == 202
+    assert ret['counts']['101'] == 2
+    assert ret['counts']['110'] == 97
+    assert ret['counts']['111'] == 13
 

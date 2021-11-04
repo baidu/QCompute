@@ -24,8 +24,11 @@ import traceback
 from QCompute import Define
 from QCompute.Define import Settings
 from QCompute.QPlatform import Error
+from QCompute.Test import ModuleErrorCode
 from QCompute.Test.PostInstall.CloudFullTest import cloudFullTest
 from QCompute.Test.PostInstall.LocalGateTest import localGateTest
+
+FileErrorCode = 1
 
 
 def testAll():
@@ -48,11 +51,11 @@ def testAll():
         [_, _, tb] = sys.exc_info()
         lastTb = traceback.extract_tb(tb)[-1]
         if lastTb.name == 'getSTSToken':
-            raise Error.ArgumentError('Get STSToken from Quantum Cloud Error.')
+            raise Error.ArgumentError('Get STSToken from Quantum Cloud Error.', ModuleErrorCode, FileErrorCode, 1)
         elif lastTb.name == 'uploadCircuit':
-            raise Error.NetworkError('Create Circuit on Quantum Cloud Error.')
+            raise Error.NetworkError('Create Circuit on Quantum Cloud Error.', ModuleErrorCode, FileErrorCode, 2)
         elif lastTb.name == 'send_request':
-            raise Error.NetworkError('Upload Circuit to Baidu BOS Error.')
+            raise Error.NetworkError('Upload Circuit to Baidu BOS Error.', ModuleErrorCode, FileErrorCode, 3)
         else:
             raise
     print('Cloud test successed.')

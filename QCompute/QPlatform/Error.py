@@ -25,10 +25,16 @@ class Error(Exception):
     The basic class of the user-defined exceptions
     """
 
-    code = 0
+    type = 0x00
 
-    def __init__(self, msg=None):
+    def __init__(self, msg: str, module: int = 0, file: int = 0, error: int = 0):
         self.message = msg
+        self.module = module
+        self.file = file
+        self.error = error
+
+    def __str__(self) -> str:
+        return 'QC.{}.{}.{}.{}: {}'.format(self.type, self.module, self.file, self.error, self.message)
 
 
 class ArgumentError(Error):
@@ -36,7 +42,7 @@ class ArgumentError(Error):
     Arguments related error
     """
 
-    code = 100
+    type = 0x01
 
 
 class NetworkError(Error):
@@ -44,7 +50,7 @@ class NetworkError(Error):
     Network related error
     """
 
-    code = 200
+    type = 0x02
 
 
 class RuntimeError(Error):
@@ -52,7 +58,7 @@ class RuntimeError(Error):
     Runtime related error
     """
 
-    code = 300
+    type = 0x03
 
 
 class LogicError(Error):
@@ -60,7 +66,7 @@ class LogicError(Error):
     Logical error
     """
 
-    code = 400
+    type = 0x04
 
 
 class TokenError(LogicError):
@@ -68,4 +74,4 @@ class TokenError(LogicError):
     Token related error
     """
 
-    code = 401
+    type = 0x05

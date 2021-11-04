@@ -33,6 +33,26 @@ The information also can be found from quantum-hub website.
 Values: True, False
 """
 
+drawCircuitControl = None
+"""
+Draw circuit control.
+
+Draw the circuit to console.
+
+Values: None, [], [...]
+"""
+
+drawCircuitCustomizedGateHashLength = 2
+"""
+Customized gate hash length, when draw circuit.
+
+Hex str, length * 2
+
+|Custom[xxxx]|
+
+Values: int
+"""
+
 measureFormat = MeasureFormat.Bin
 """
 Measure output format setting. 

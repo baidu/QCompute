@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-protobuf==3.17.3
-numpy==1.21.0
-scipy==1.7.0
-requests==2.25.1
-bidict==0.21.2
-bce-python-sdk==0.8.61
-matplotlib==3.4.2
-sympy==1.8
+protobuf==3.19.0
+numpy==1.21.3
+scipy==1.7.1
+requests==2.26.0
+bidict==0.21.4
+bce-python-sdk==0.8.62
+matplotlib==3.4.3
+sympy==1.9
+pyprimes==0.1
 
 

@@ -3,7 +3,9 @@ from typing import List, Optional
 from QCompute import UnrollCircuitModule, CompressGateModule
 
 from QCompute.OpenModule import ModuleImplement
-from QCompute.QPlatform import BackendName, Error
+from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
+
+FileErrorCode = 15
 
 
 def filterModule(backendName: Optional[str], moduleList: List['ModuleImplement']) \

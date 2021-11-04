@@ -18,18 +18,19 @@
 """
 Quantum Environment
 """
-import importlib
 import json
 import os
 import tempfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Set, List, Dict, TYPE_CHECKING, Union, Optional, Tuple
+from typing import Set, List, Dict, TYPE_CHECKING, Union, Optional, Tuple, Any
 
-from QCompute import QResult
-from QCompute.Define import sdkVersion, noLocalTask, outputPath, noWaitTask
+from QCompute import QResult, outputInfo
+from QCompute.Define import sdkVersion, noLocalTask, outputPath, noWaitTask, Settings
+from QCompute.Define.Utils import loadPythonModule
+from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
 from QCompute.QPlatform.Processor.ModuleFilter import filterModule
@@ -43,9 +44,7 @@ from QCompute.QProtobuf import PBProgram
 if TYPE_CHECKING:
     from QCompute.QPlatform import BackendName, ServerModule
 
-BackendArgumentType = Union[str,
-                            'Sim2Argument',
-]
+FileErrorCode = 2
 
 
 class QEnv:
@@ -78,12 +77,15 @@ class QEnv:
         self.program = None  # type: Optional['PBProgram']
 
         self.backendName = None  # type: Optional[str]
-        self.backendArgument = None  # type: Optional[List['BackendArgumentType']]
+        self.backendArgument = None  # type: Optional[List]
 
         self.usedModuleList = []  # type: List['ModuleImplement']
         self.usedServerModuleList = []  # type: List[Tuple[str, Dict]]
 
-    def backend(self, backendName: 'BackendName', *backendArgument: BackendArgumentType) -> None:
+    def backend(self, backendName: 'BackendName', *backendArgument: Any) -> None:
+        """
+        Set backend
+        """
         if type(backendName) is not str:
             backendName = backendName.value
         self.backendName = backendName
@@ -91,7 +93,7 @@ class QEnv:
 
     def convertToProcedure(self, name: str, env: 'QEnv') -> 'QProcedure':
         if name in env.procedureMap:
-            raise Error.ArgumentError(f'Duplicate procedure name: {name}!')
+            raise Error.ArgumentError(f'Duplicate procedure name: {name}!', ModuleErrorCode, FileErrorCode, 1)
         procedure = QProcedure(name, self.Q, self.Parameter, self.circuit)
         env.procedureMap[name] = procedure
         destoryObject(self)
@@ -100,7 +102,7 @@ class QEnv:
     def inverseProcedure(self, name: str) -> Tuple['QProcedure', str]:
         procedure = self.procedureMap.get(name)
         if procedure is None:
-            raise Error.ArgumentError(f"Don't have procedure name: {name}!")
+            raise Error.ArgumentError(f"Don't have procedure name: {name}!", ModuleErrorCode, FileErrorCode, 2)
         inversedProcedure = None  # type: 'QProcedure'
         inversedProcedureName = None  # type: str
         if name.endswith('__inversed'):
@@ -132,7 +134,7 @@ class QEnv:
     def reverseProcedure(self, name: str) -> Tuple['QProcedure', str]:
         procedure = self.procedureMap.get(name)
         if procedure is None:
-            raise Error.ArgumentError(f"Don't have procedure name: {name}!")
+            raise Error.ArgumentError(f"Don't have procedure name: {name}!", ModuleErrorCode, FileErrorCode, 3)
         reversedProcedure = None  # type: 'QProcedure'
         reversedProcedureName = None  # type: str
         if name.endswith('__reversed'):
@@ -160,16 +162,33 @@ class QEnv:
         return reversedProcedure, reversedProcedureName
 
     def publish(self, applyModule=True) -> List['ModuleImplement']:
+        """
+        To protobuf
+        """
         program = PBProgram()
         self.program = program
         program.sdkVersion = sdkVersion
         QEnvToProtobuf(self.program, self)
 
+        moduleStep = 0
+        circuitToDrawTerminal = CircuitToDrawConsole()
+        if outputInfo and (Settings.drawCircuitControl is None or moduleStep in Settings.drawCircuitControl):
+            asciiPic = circuitToDrawTerminal.convert(self.program)
+            print('Origin circuit:')
+            print(asciiPic)
+
         if applyModule:
             # filter the circuit by Modules
             usedModuleList = filterModule(self.backendName, self.usedModuleList)
             for module in usedModuleList:
+                moduleStep += 1
                 self.program = module(self.program)
+
+                if outputInfo and (Settings.drawCircuitControl is None or moduleStep in Settings.drawCircuitControl):
+                    asciiPic = circuitToDrawTerminal.convert(self.program)
+                    print(f'{module.__class__.__name__} pass...')
+                    print(asciiPic)
+
             return usedModuleList
         else:
             return self.usedModuleList
@@ -207,9 +226,8 @@ class QEnv:
         {status: 'failed', reason: ''}
         """
 
-        usedModuleList = self.publish()  # circuit in Protobuf format
-
         if self.backendName.startswith('local_'):
+            usedModuleList = self.publish()  # circuit in Protobuf format
             moduleList = []
             for module in usedModuleList:
                 moduleList.append({
@@ -219,9 +237,10 @@ class QEnv:
             ret = self._localCommit(shots, fetchMeasure, moduleList)
             return ret
         elif self.backendName.startswith('cloud_'):
+            self.publish(False)  # circuit in Protobuf format
             return self._cloudCommit(shots, fetchMeasure, downloadResult, debug)
         else:
-            raise Error.ArgumentError(f"Invalid backendName => {self.backendName}")
+            raise Error.ArgumentError(f"Invalid backendName => {self.backendName}", ModuleErrorCode, FileErrorCode, 4)
 
     def _localCommit(self, shots: int, fetchMeasure: bool, moduleList: []) -> Dict[str, Union[str, Dict[str, int]]]:
         """
@@ -231,16 +250,16 @@ class QEnv:
         """
 
         if noLocalTask is not None:
-            raise Error.RuntimeError('Local tasks are not allowed in the online environment!')
+            raise Error.RuntimeError('Local tasks are not allowed in the online environment!', ModuleErrorCode,
+                                     FileErrorCode, 5)
 
         # import the backend plugin according to the backend name
-        module = _loadPythonModule(
-            f'QCompute.OpenSimulator.{self.backendName}')
+        module = loadPythonModule(f'QCompute.OpenSimulator.{self.backendName}')
         if module is None:
-            module = _loadPythonModule(
-                f'QCompute.Simulator.{self.backendName}')
+            module = loadPythonModule(f'QCompute.Simulator.{self.backendName}')
         if module is None:
-            raise Error.ArgumentError(f"Invalid local backend => {self.backendName}!")
+            raise Error.ArgumentError(f"Invalid local backend => {self.backendName}!", ModuleErrorCode, FileErrorCode,
+                                      6)
         backendClass = getattr(module, 'Backend')
 
         # configure the parameters
@@ -324,12 +343,12 @@ class QEnv:
         :return: task result
         """
 
-        self.publish(False)  # circuit in Protobuf format
         programBuf = self.program.SerializeToString()  # the sequential bytes of the circuit which is already in PB
         circuitPackageFd, circuitPackageFn = tempfile.mkstemp(prefix="circuit.", suffix=".pb", dir=outputPath)
         with os.fdopen(circuitPackageFd, "wb") as file:
             file.write(programBuf)
-        print(f'CircuitPackageFile: {circuitPackageFn}')
+        if outputInfo:
+            print(f'CircuitPackageFile: {circuitPackageFn}')
 
         usedModuleList = []
         for module in self.usedModuleList:
@@ -340,9 +359,8 @@ class QEnv:
         task = QTask()
         task.uploadCircuit(circuitPackageFn)
         backend = self.backendName[6:]  # omit the prefix `cloud_`
-        task.create(shots, backend, self.backendArgument, usedModuleList, debug)
+        task.createCircuitTask(shots, backend, self.backendArgument, usedModuleList, debug)
 
-        outputInfo = True
         if outputInfo:
             print(f'Circuit upload successful, circuitId => {task.circuitId} taskId => {task.taskId}')
 
@@ -374,21 +392,5 @@ class QEnv:
 
         self.usedModuleList.append(moduleObj)
 
-    def serverModule(self, module: 'ServerModule', arguments: Dict):
+    def serverModule(self, module: 'ServerModule', arguments: Dict) -> None:
         self.usedServerModuleList.append((module.value, arguments))
-
-
-def _loadPythonModule(moduleName: str):
-    """
-    Load module from file system.
-
-    :param moduleName: Module name
-    :return: Module object
-    """
-
-    moduleSpec = importlib.util.find_spec(moduleName)
-    if moduleSpec is None:
-        return None
-    module = importlib.util.module_from_spec(moduleSpec)
-    moduleSpec.loader.exec_module(module)
-    return module

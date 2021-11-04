@@ -25,7 +25,6 @@ from enum import IntEnum, unique
 from pathlib import Path
 
 import QCompute
-from QCompute.Define import TrimFlag
 from QCompute.QPlatform import Error
 
 env = 'prod'
@@ -46,7 +45,7 @@ else:
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
 
-sdkVersion = 'Python 2.0.1'
+sdkVersion = 'Python 2.0.2'
 """
 SDK Version
 
@@ -134,10 +133,8 @@ Do not modify by user.
 Retry count for waittask in case network failed.
 """
 
-if hasattr(TrimFlag, 'Trim') and TrimFlag.Trim is not True:
-    outputPath = Path(Path(QCompute.__file__).parent.parent, 'Output').absolute()
-else:
-    outputPath = Path('Output').absolute()
+outputPath = Path('Output').absolute()
+
 """
 Output Path
 

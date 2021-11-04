@@ -21,7 +21,7 @@ Compress Gate to Accelerate Simulator Process
 from copy import deepcopy
 from typing import List, Dict, Optional
 
-from QCompute.OpenModule import ModuleImplement
+from QCompute.OpenModule import ModuleImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.QOperation.Barrier import BarrierOP
@@ -31,6 +31,8 @@ from QCompute.QPlatform.QOperation.Measure import MeasureOP
 from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP
 from QCompute.QPlatform.Utilities import contract1_1, contract1_2
 from QCompute.QProtobuf import PBProgram
+
+FileErrorCode = 1
 
 
 class CompressGateModule(ModuleImplement):
@@ -111,7 +113,7 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
         elif isinstance(circuitLine.data, BarrierOP):
             pass
         else:
-            raise Error.ArgumentError('Unsupported operation at compress!')
+            raise Error.ArgumentError('Unsupported operation at compress!', ModuleErrorCode, FileErrorCode, 1)
 
     for key, value in circuitMap.items():
         value.append("End")
@@ -174,14 +176,14 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
                         elif isinstance(tag_bef, (str, list)):
                             break
                         else:
-                            raise Error.ArgumentError('Wrong compression of gate!')
+                            raise Error.ArgumentError('Wrong compression of gate!', ModuleErrorCode, FileErrorCode, 2)
                         tag_bef_num -= 1
                 else:
-                    raise Error.ArgumentError('Wrong construction of circuitMap!')
+                    raise Error.ArgumentError('Wrong construction of circuitMap!', ModuleErrorCode, FileErrorCode, 3)
             elif isinstance(tag, (dict, str, list)):
                 pass
             else:
-                raise Error.ArgumentError('Wrong construction of circuitMap!')
+                raise Error.ArgumentError('Wrong construction of circuitMap!', ModuleErrorCode, FileErrorCode, 4)
 
     circuitOut = []  # type: List[CircuitLine]
     for circuitLine in circuitIn_copy:  # Get the compressed gates and other circuitLines

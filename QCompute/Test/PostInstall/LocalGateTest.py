@@ -21,6 +21,8 @@ Local Gate Test: test execution of various gates and modules
 from QCompute import *
 from numpy import pi as PI
 
+from QCompute.Define import Settings
+
 normal_seed = '-s 68652'
 
 
@@ -191,13 +193,6 @@ def localGateTest():
     H(q[1])
     ret = get_outcome(env, q, N)
     assert ret['counts']['00'] == ret['counts']['11']
-
-    # Test RZZ and CompositeGate
-    N = 2
-    env, q = setup_environment(N)
-    RZZ(PI / 2, PI / 2, PI / 4)(q[0], q[1])
-    ret = get_outcome(env, q, N, Module=CompositeGateModule())
-    assert ret['counts']['00'] == ret['counts']['10']
 
     # Test SWAP
     N = 2

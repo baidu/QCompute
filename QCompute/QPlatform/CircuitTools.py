@@ -20,7 +20,7 @@ Circuit tools
 """
 from typing import List, TYPE_CHECKING, Tuple, Optional
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
 from QCompute.QPlatform.QOperation.Barrier import BarrierOP
 from QCompute.QPlatform.QOperation.CompositeGate import CompositeGateOP
@@ -36,6 +36,8 @@ from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotation
 if TYPE_CHECKING:
     from QCompute.QPlatform.QEnv import QEnv
     from QCompute.QPlatform.QOperation import CircuitLine, QOperation
+
+FileErrorCode = 5
 
 
 def QEnvToProtobuf(program: PBProgram, env: 'QEnv') -> None:
@@ -91,7 +93,7 @@ def getRotationArgumentList(data: 'QOperation') -> Tuple[List[int], List[float]]
     if not (isinstance(data, RotationGateOP) or
             isinstance(data, CompositeGateOP) or
             isinstance(data, QProcedureOP)):
-        raise Error.ArgumentError('Wrong opreation type!')
+        raise Error.ArgumentError('Wrong opreation type!', ModuleErrorCode, FileErrorCode, 1)
     argumentIdList: List[int] = []
     argumentValueList: List[float] = []
     validArgumentIdList = False

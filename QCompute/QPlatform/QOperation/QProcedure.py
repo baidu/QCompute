@@ -21,13 +21,15 @@ Quantum Procedure
 from functools import reduce
 from typing import List, TYPE_CHECKING
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool, ProcedureParameterStorage
 from QCompute.QPlatform.QOperation import QOperation
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation import CircuitLine, OperationFunc, RotationArgument
     from QCompute.QPlatform.QRegPool import QRegPool, QRegStorage
+
+FileErrorCode = 13
 
 
 class QProcedure:
@@ -57,10 +59,10 @@ class QProcedure:
 
     def __call__(self, *argumentList: 'RotationArgument') -> 'OperationFunc':
         if len(argumentList) < self.parameterCount:
-            raise Error.ArgumentError('Not enough QProcedure argument!')
+            raise Error.ArgumentError('Not enough QProcedure argument!', ModuleErrorCode, FileErrorCode, 1)
         for argument in argumentList:
             if not isinstance(argument, (int, float, ProcedureParameterStorage)):
-                raise Error.ArgumentError('Wrong QProcedure argument!')
+                raise Error.ArgumentError('Wrong QProcedure argument!', ModuleErrorCode, FileErrorCode, 2)
         return QProcedureOP(self.name, self, list(argumentList))
 
 
@@ -78,4 +80,5 @@ class QProcedureOP(QOperation):
         self._op(list(qRegList))
 
     def getInverse(self) -> None:
-        raise Error.ArgumentError("QProcedureOP can't getInverse! Please use QEnv.inverseProcedure.")
+        raise Error.ArgumentError("QProcedureOP can't getInverse! Please use QEnv.inverseProcedure.", ModuleErrorCode,
+                                  FileErrorCode, 3)

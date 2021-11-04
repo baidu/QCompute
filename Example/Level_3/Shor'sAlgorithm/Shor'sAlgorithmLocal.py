@@ -37,7 +37,7 @@ from random import randint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.1')
+matchSdkVersion('Python 2.0.2')
 
 
 def CU1(q1, q2, float_theta):

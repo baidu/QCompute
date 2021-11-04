@@ -38,25 +38,15 @@ env.backend(BackendName.LocalBaiduSim2)
 # env.backend(BackendName.CloudBaiduSim2Water)
 
 # case1:
-# The case below demonstrating the function of the CompositeGate Module,
-# which is used to decompose the composite gate,such as RZZ gate.
+# The case below demonstrating the function of the Compress Module added by default.
+# CompressGate Module is used to compress one-qubit gates into two-qubit gates to accelerate the simulator process.
 q = env.Q.createList(2)
-RZZ(np.pi / 2, np.pi / 2, np.pi / 2)(q[0], q[1])
+H(q[0])
 CX(q[0], q[1])
 MeasureZ(*env.Q.toListPair())
-env.module(CompositeGateModule())
 env.publish()
 
 # case2:
-# The case below demonstrating the function of the Compress Module added by default.
-# CompressGate Module is used to compress one-qubit gates into two-qubit gates to accelerate the simulator process.
-# q = env.Q.createList(2)
-# H(q[0])
-# CX(q[0], q[1])
-# MeasureZ(*env.Q.toListPair())
-# env.publish()
-
-# case3:
 # The case below demonstrating the function of the UnrollCircuitModule Module added by default.
 # UnrollCircuit Module supported gates are CX, U3, barrier, measure,
 # supported fixed gates are ID, X, Y, Z, H, S, SDG, T, TDG, CY, CZ, CH, SWAP, CCX, CSWAP,
@@ -71,7 +61,7 @@ env.publish()
 # MeasureZ(*env.Q.toListPair())
 # env.publish()
 
-# case4:
+# case3:
 # The case below demonstrating the function of the Subprocedure Module,
 # which is used to unroll procedure.
 # q = env.Q.createList(3)
@@ -100,7 +90,7 @@ env.publish()
 # env.module(UnrollProcedureModule())
 # env.publish()
 
-# case5:
+# case4:
 # The case below demonstrating the function of the InverseCircuit Module.
 # InverseCircuit Module is used to invert the circuit by changing the order of the gates,
 # inverting the customized gate matrix, and modifying the angles of rotation gates specifically.
@@ -111,7 +101,7 @@ env.publish()
 # env.module(InverseCircuitModule())
 # env.publish()
 
-# case6:
+# case5:
 # The case below demonstrating the function of the ReverseCircuit Module.
 # ReverseCircuit Module is used to reverse the circuit by changing the order of the gates.
 # q = env.Q.createList(1)

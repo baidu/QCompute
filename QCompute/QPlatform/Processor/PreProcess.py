@@ -20,10 +20,12 @@ PreProcess
 """
 from typing import TYPE_CHECKING, Tuple, Set, Dict
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBProgram
+
+FileErrorCode = 14
 
 
 def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
@@ -44,7 +46,7 @@ def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
     for circuitLine in program.body.circuit:
         op = circuitLine.WhichOneof('op')
         if measured and op != 'measure':
-            raise Error.ArgumentError('Measure must be the last operation!')
+            raise Error.ArgumentError('Measure must be the last operation!', ModuleErrorCode, FileErrorCode, 1)
 
         qRegList = []
         for qReg in circuitLine.qRegList:
@@ -56,9 +58,9 @@ def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
             for index, cReg in enumerate(circuitLine.measure.cRegList):
                 qReg = circuitLine.qRegList[index]
                 if qReg in compactedCRegDict:
-                    raise Error.ArgumentError('Measure must be once on a QReg')
+                    raise Error.ArgumentError('Measure must be once on a QReg', ModuleErrorCode, FileErrorCode, 2)
                 if cReg in compactedCRegDict.values():
-                    raise Error.ArgumentError('Measure must be once on a CReg')
+                    raise Error.ArgumentError('Measure must be once on a CReg', ModuleErrorCode, FileErrorCode, 3)
                 compactedCRegDict[qReg] = cReg
                 circuitLine.measure.cRegList[index] = qReg
 

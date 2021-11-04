@@ -20,15 +20,16 @@ Quantum Environment Operation
 """
 from typing import TYPE_CHECKING, Optional, Callable, Union, List
 
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.QEnv import QEnv
 from QCompute.QPlatform.QOperation.Barrier import Barrier
+from QCompute.QPlatform.QOperation.CompositeGate import RZZ
 from QCompute.QPlatform.QOperation.FixedGate import ID, X, Y, Z, H, S, SDG, T, TDG, \
     CX, CY, CZ, CH, SWAP, \
     CCX, CSWAP
 from QCompute.QPlatform.QOperation.Measure import MeasureZ
 from QCompute.QPlatform.QOperation.RotationGate import U, RX, RY, RZ, \
     CU, CRX, CRY, CRZ
-from QCompute.QPlatform.QOperation.CompositeGate import RZZ
 from QCompute.QPlatform.QRegPool import QRegStorage
 
 if TYPE_CHECKING:
@@ -37,6 +38,8 @@ if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
     from QCompute.QPlatform.QOperation.CompositeGate import CompositeGateOP
     from QCompute.QPlatform.QOperation.QProcedure import QProcedure
+
+FileErrorCode = 3
 
 
 class QEnvOperation(QEnv):
@@ -171,8 +174,10 @@ class QEnvOperation(QEnv):
     # Measure
     def MeasureZ(self, qRegIndexList: Optional[List[Union[int, 'QRegStorage']]] = None,
                  cRegIndexList: Optional[Union[List[int], range]] = None) -> 'QEnvOperation':
-        if qRegIndexList is None or cRegIndexList is None:
+        if qRegIndexList is None and cRegIndexList is None:
             qRegIndexList, cRegIndexList = self.Q.toListPair()
+        elif qRegIndexList is None or cRegIndexList is None:
+            raise Error.ArgumentError('Mismatched qRegIndexList and cRegIndexList', ModuleErrorCode, FileErrorCode, 1)
         MeasureZ([self.Q(qRegIndex) if isinstance(qRegIndex, int) else qRegIndex for qRegIndex in qRegIndexList],
                  cRegIndexList)
         return self

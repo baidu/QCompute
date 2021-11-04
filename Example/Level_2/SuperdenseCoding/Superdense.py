@@ -23,7 +23,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.1')
+matchSdkVersion('Python 2.0.2')
 
 # Set the shot number for each quest
 shots = 1024

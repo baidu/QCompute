@@ -26,7 +26,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '2.0.1'
+SDK_VERSION = '2.0.2'
 
 with open('./README.md', 'r', encoding='utf-8') as srcfd:
     DESC = srcfd.read()

@@ -31,7 +31,7 @@ import numpy
 
 from QCompute.Define import outputPath
 from QCompute.OpenConvertor.JsonToCircuit import JsonToCircuit
-from QCompute.OpenSimulator import QResult
+from QCompute.OpenSimulator import QResult, ModuleErrorCode
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType, initState_1_0
 from QCompute.OpenSimulator.local_baidu_sim2.Measure import MeasureMethod, Measurer
 from QCompute.OpenSimulator.local_baidu_sim2.Transfer import Algorithm, TransferProcessor
@@ -45,6 +45,8 @@ from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBCustomizedGate, PB
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBProgram
+
+FileErrorCode = 2
 
 
 def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> 'QResult':
@@ -73,7 +75,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
         matrixTypeValue = MatrixType.Dense
     
     else:
-        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}')
+        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 1)
 
     algorithmValue = None  # type: Optional[Algorithm]
     if algorithm == 'matmul':
@@ -81,7 +83,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     elif algorithm == 'einsum':
         algorithmValue = Algorithm.Einsum
     else:
-        raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}')
+        raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 2)
 
     measureMethodValue = None  # type: Optional[MeasureMethod]
     if measureMethod == 'probability':
@@ -93,14 +95,14 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     elif measureMethod == 'accumulation':
         measureMethodValue = MeasureMethod.Accumulation
     else:
-        raise Error.ArgumentError(f'Invalid MeasureMethod {measureMethodValue}')
+        raise Error.ArgumentError(f'Invalid MeasureMethod {measureMethodValue}', ModuleErrorCode, FileErrorCode, 3)
 
     if seed is not None:
         if seed < 0 or seed > 2147483647:
-            raise Error.ArgumentError(f'Invalid Seed {seed}')
+            raise Error.ArgumentError(f'Invalid Seed {seed}', ModuleErrorCode, FileErrorCode, 4)
 
     if shots <= 0:
-        raise Error.ArgumentError(f'Invalid shots {shots}')
+        raise Error.ArgumentError(f'Invalid shots {shots}', ModuleErrorCode, FileErrorCode, 5)
 
     if inputFile is not None:
         with open(inputFile, "rt") as fObj:
@@ -161,13 +163,14 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
             fixedGate = circuitLine.fixedGate  # type: PBFixedGate
             matrix = operationDict.get(fixedGate)
             if matrix is None:
-                raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!')
+                raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
+                                          FileErrorCode, 7)
             state = transfer(state, matrix, qRegList)
         elif op == 'rotationGate':  # rotation gate
             rotationGate = circuitLine.rotationGate  # type: PBRotationGate
             if rotationGate != PBRotationGate.U:
                 raise Error.ArgumentError(
-                    f'Unsupported operation {PBRotationGate.Name(rotationGate)}!')
+                    f'Unsupported operation {PBRotationGate.Name(rotationGate)}!', ModuleErrorCode, FileErrorCode, 8)
             uGate = U(*circuitLine.argumentValueList)
             if matrixType == MatrixType.Dense:
                 matrix = uGate.getMatrix()
@@ -182,13 +185,15 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
                 raise Error.RuntimeError('Not implemented')
             state = transfer(state, matrix, qRegList)
         elif op == 'procedureName':  # procedure
-            raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!')
+            raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                                      ModuleErrorCode, FileErrorCode, 9)
             # it is not implemented, flattened by UnrollProcedureModule
         elif op == 'measure':  # measure
             measure = circuitLine.measure  # type: PBMeasure
             if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                 raise Error.ArgumentError(
-                    f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!')
+                    f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
+                    FileErrorCode, 10)
             if not measured:
                 result.counts = measurer(state, shots)
                 measured = True
@@ -196,11 +201,12 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
             pass
             # unimplemented operation
         else:  # unsupported operation
-            raise Error.ArgumentError(f'Unsupported operation {op}!')
+            raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 11)
 
     result.endTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
     result.shots = shots
-    result.counts = filterMeasure(result.counts, compactedCRegDict)
+    if measureMethod in [MeasureMethod.Probability, MeasureMethod.Accumulation]:
+        result.counts = filterMeasure(result.counts, compactedCRegDict)
     result.ancilla.usedQRegList = list(usedQRegSet)
     result.ancilla.usedCRegList = list(usedCRegSet)
     result.ancilla.compactedQRegDict = compactedQRegDict

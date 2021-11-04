@@ -18,7 +18,9 @@
 """
 Export the entire directory as a library
 """
-from typing import Dict
+from typing import Dict, Any
+
+ModuleErrorCode = 3
 
 
 class ModuleImplement:
@@ -28,5 +30,5 @@ class ModuleImplement:
     arguments = None  # Any can serialize to json
     disable = False
 
-    def __call__(self, arguments: Dict) -> None:
+    def __call__(self, arguments: Dict[str, Any]) -> None:
         pass

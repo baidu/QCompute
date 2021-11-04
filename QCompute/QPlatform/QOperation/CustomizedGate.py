@@ -22,11 +22,14 @@ from math import log2
 from typing import TYPE_CHECKING
 
 import numpy
-from QCompute.QPlatform import Error
+
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.QOperation import QOperation
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QRegPool import QRegStorage
+
+FileErrorCode = 11
 
 
 class CustomizedGateOP(QOperation):
@@ -43,7 +46,7 @@ class CustomizedGateOP(QOperation):
         bits = log2(len(matrix))
         self.bits = int(bits)
         if bits != self.bits:
-            raise Error.ArgumentError('bits must be an integer!')
+            raise Error.ArgumentError('bits must be an integer!', ModuleErrorCode, FileErrorCode, 1)
 
     def __call__(self, *qRegList: 'QRegStorage') -> None:
         self._op(list(qRegList))

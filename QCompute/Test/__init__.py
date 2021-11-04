@@ -18,3 +18,5 @@
 """
 Export the entire directory as a library
 """
+
+ModuleErrorCode = 8

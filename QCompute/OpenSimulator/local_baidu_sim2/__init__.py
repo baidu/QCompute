@@ -26,11 +26,13 @@ from typing import List
 
 from QCompute.Define import outputPath
 from QCompute.Define.Settings import outputInfo, inProcessSimulator
-from QCompute.Define.Utils import filterConsoleOutput
+from QCompute.Define.Utils import filterConsoleOutput, findUniError
 from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
-from QCompute.OpenSimulator import QImplement
+from QCompute.OpenSimulator import QImplement, ModuleErrorCode
 from QCompute.OpenSimulator.local_baidu_sim2.Simulator import runSimulator
 from QCompute.QPlatform import Error
+
+FileErrorCode = 1
 
 
 class Backend(QImplement):
@@ -71,7 +73,8 @@ class Backend(QImplement):
 
         if len(self.program.head.usingQRegList) > 32:
             raise Error.RuntimeError('The dimension of ndarray does not support more than 32 qubits! '
-                                     f'Currently, QReg in the program counts {self.program.head.usingQRegList}.')
+                                     f'Currently, QReg in the program counts {self.program.head.usingQRegList}.',
+                                     ModuleErrorCode, FileErrorCode, 1)
 
         if inProcessSimulator:
             self.runInProcess()
@@ -120,6 +123,8 @@ class Backend(QImplement):
         # collect the result to simulator for the subsequent invoking
         self.result.code = completedProcess.returncode
         if self.result.code != 0:
+            self.result.vendor = findUniError(completedProcess.stdout) or \
+                                    f'QC.3.{ModuleErrorCode}.{FileErrorCode}.2'
             return
 
         countsFilePath = outputPath / 'counts.json'

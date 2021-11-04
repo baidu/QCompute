@@ -18,24 +18,21 @@
 """
 Export the entire directory as a library
 """
-
+import copy
 from enum import Enum, unique
 
+from QCompute.QPlatform import Error
 
-@unique
+ModuleErrorCode = 1
+FileErrorCode = 1
+
+
+class _metaBackendName(type):
+    def __getattr__(cls, name):
+        raise Error.ArgumentError('Unknown backend name.', ModuleErrorCode, FileErrorCode, 1)
+
+
 class BackendName(Enum):
-    """
-    Name of Backends
-
-    Used in circuit computing tasks
-
-    Example:
-
-    env = QEnv()
-
-    env.backend(BackendName.LocalBaiduSim2)
-    """
-
     LocalBaiduSim2 = 'local_baidu_sim2'
     """
     Local Baidu Sim2
@@ -228,18 +225,10 @@ class BackendName(Enum):
     env.backend(BackendName.CloudAerAtBD, '-q')
     """
 
-    CloudIoPCAS = 'cloud_iopcas'
-    """
-    Cloud IoPCAS
     
-    This backend name (CloudIoPCAS) is only available >= v2.0.0
-    
-    Example: 
-    
-    env = QEnv()
-    
-    env.backend(BackendName.CloudIoPCAS)
-    """
+
+
+BackendName.__class__ = _metaBackendName
 
 
 @unique
@@ -261,5 +250,13 @@ class ServerModule(Enum):
     Module at server
     """
 
+    CompositeGate = 'CompositeGateModule'
+    CompressGate = 'CompressGateModule'
+    InverseCircuit = 'InverseCircuitModule'
+    ReverseCircuit = 'ReverseCircuitModule'
+    UnrollCircuit = 'UnrollCircuitModule'
+    UnrollProcedure = 'UnrollProcedureModule'
+
+    MappingToIoPCAS = 'MappingToIoPCASModule'
     UnrollCircuitToIoPCAS = 'UnrollCircuitToIoPCASModule'
-    Mapping = 'MappingModule'
+    

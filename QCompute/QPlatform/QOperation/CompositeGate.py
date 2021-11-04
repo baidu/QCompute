@@ -22,13 +22,15 @@ from typing import List, Optional, TYPE_CHECKING
 
 import numpy
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
 from QCompute.QPlatform.QOperation import QOperation
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation import RotationArgument, OperationFunc
     from QCompute.QPlatform.QRegPool import QRegStorage
+
+FileErrorCode = 12
 
 
 class CompositeGateOP(QOperation):
@@ -54,7 +56,8 @@ class CompositeGateOP(QOperation):
     def getInverse(self) -> 'CompositeGateOP':
         for argument in self.argumentList:
             if isinstance(argument, ProcedureParameterStorage):
-                raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!')
+                raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,
+                                          FileErrorCode, 1)
 
         nAngles = len(self.argumentList)
         if nAngles == 1:
@@ -64,7 +67,8 @@ class CompositeGateOP(QOperation):
         elif nAngles == 3:
             [theta, phi, lamda] = self.argumentList  # type: float
         else:
-            raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!')
+            raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
+                                      FileErrorCode, 2)
 
         if self.name == 'RZZ':
             return RZZ(theta, numpy.pi - lamda, numpy.pi - phi)

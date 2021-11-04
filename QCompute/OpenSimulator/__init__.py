@@ -26,6 +26,8 @@ import numpy
 from QCompute import Define
 from QCompute.QPlatform.Utilities import numpyMatrixToDictMatrix, dictMatrixToNumpyMatrix
 
+ModuleErrorCode = 7
+
 if TYPE_CHECKING:
     pass
 
@@ -113,6 +115,11 @@ class QResult:
     error code
     """
 
+    vendor = None
+    """
+    vendor code for universal error
+    """
+
     output = ''
     """
     output results
@@ -166,6 +173,7 @@ class QResult:
     def __init__(self):
         self.simulatorVersionq = None
         self.code = 0
+        self.vendor = None
         self.output = ''
         self.log = ''
         self.ancilla = Ancilla()

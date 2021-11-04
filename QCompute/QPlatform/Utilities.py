@@ -23,8 +23,11 @@ import functools
 from typing import Dict, Optional, Union, Type
 
 import numpy
-from QCompute.QPlatform import Error
+
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QProtobuf import PBMatrix
+
+FileErrorCode = 6
 
 
 def destoryObject(obj: object) -> None:
@@ -47,7 +50,7 @@ def numpyMatrixToProtobufMatrix(numpyMatrix: numpy.ndarray) -> PBMatrix:
     Must be C-contiguous.
     """
     if not numpyMatrix.flags['C_CONTIGUOUS']:
-        raise Error.ArgumentError('Matrix must be C-contiguous!')
+        raise Error.ArgumentError('Matrix must be C-contiguous!', ModuleErrorCode, FileErrorCode, 1)
 
     protobufMatrix = PBMatrix()
     protobufMatrix.shape[:] = numpyMatrix.shape
@@ -78,7 +81,7 @@ def numpyMatrixToDictMatrix(numpyMatrix: numpy.ndarray) -> Dict:
     """
 
     if not numpyMatrix.flags['C_CONTIGUOUS']:
-        raise Error.ArgumentError('Matrix must be C-contiguous!')
+        raise Error.ArgumentError('Matrix must be C-contiguous!', ModuleErrorCode, FileErrorCode, 2)
 
     if numpyMatrix.size == 0:
         return {}
@@ -148,9 +151,9 @@ def contract1_1(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray) -> 
     just like writing matrix vector multiplication, U{ket0}
     """
     if matrixFloating.shape != (2, 2):
-        raise Error.ArgumentError("Floating gate not a 1-qubit gate")
+        raise Error.ArgumentError("Floating gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 3)
     if matrixParking.shape != (2, 2):
-        raise Error.ArgumentError("Parking gate not a 1-qubit gate")
+        raise Error.ArgumentError("Parking gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 4)
     newArray = numpy.einsum('ab,bc->ac', matrixParking,
                             matrixFloating)  # v is a vector, A B is a matrix, we must count ABv, here we count AB
     return newArray
@@ -164,11 +167,11 @@ def contract1_2(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray, upO
     and the second half are inputs.
     """
     if matrixFloating.shape != (2, 2):
-        raise Error.ArgumentError("Floating gate not a 1-qubit gate")
+        raise Error.ArgumentError("Floating gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 5)
     if matrixParking.shape == (4, 4):
         matrixParking = numpy.reshape(matrixParking, [2, 2, 2, 2])
     elif matrixParking.shape != (2, 2, 2, 2):
-        raise Error.ArgumentError("Parking gate not a 2-qubit gate")
+        raise Error.ArgumentError("Parking gate not a 2-qubit gate", ModuleErrorCode, FileErrorCode, 6)
     newArray = None  # type: Optional[numpy.ndarray]
     if leftOrRight == 0:
         if upOrDown == 0:

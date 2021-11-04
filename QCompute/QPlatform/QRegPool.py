@@ -20,11 +20,13 @@ Quantum Register Poll
 """
 from typing import Dict, Union, TYPE_CHECKING, List, Tuple
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QEnv import QEnv
     from QCompute.QPlatform.QOperation.QProcedure import QProcedure
+
+FileErrorCode = 4
 
 
 class QRegStorage:
@@ -98,7 +100,8 @@ class QRegPool:
         Only can called when self.registerMap is empty.
         """
         if len(self.registerMap) > 0:
-            raise Error.ArgumentError('createList is called when self.registerMap is not empty!')
+            raise Error.ArgumentError('createList is called when self.registerMap is not empty!', ModuleErrorCode,
+                                      FileErrorCode, 1)
         for i in range(num):
             self._get(i)
         return list(self.registerMap.values())

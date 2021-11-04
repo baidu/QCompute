@@ -18,12 +18,15 @@
 """
 Utils Functions
 """
-
+import importlib
 import re
+from typing import List, Union
 
 import QCompute
 
 _reaesc = re.compile(r'\x1b[^m]*m')
+
+_unierror = re.compile(r'((SV|SL)((\.\d+)+))')
 
 
 def filterConsoleOutput(text: str):
@@ -45,6 +48,38 @@ def filterConsoleOutput(text: str):
     """
 
     return _reaesc.sub('', text)
+
+
+def findUniError(*texts: List[str]) -> Union[str, None]:
+    """
+    Find Any UniError Code from Inputs
+
+    :param *texts: String array to be find
+    :return: The founded code string or None
+    """
+
+    for text in texts:
+        ret =  _unierror.findall(text)
+        if ret:
+            return ret[0][0]    # Only the first result would return
+    else:
+        return None
+
+
+def loadPythonModule(moduleName: str):
+    """
+    Load module from file system.
+
+    :param moduleName: Module name
+    :return: Module object
+    """
+
+    moduleSpec = importlib.util.find_spec(moduleName)
+    if moduleSpec is None:
+        return None
+    module = importlib.util.module_from_spec(moduleSpec)
+    moduleSpec.loader.exec_module(module)
+    return module
 
 
 def matchSdkVersion(tagretVersion: str):

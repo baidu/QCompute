@@ -23,13 +23,15 @@ from typing import List, Optional, TYPE_CHECKING
 
 import numpy
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
 from QCompute.QPlatform.QOperation import QOperation
 from QCompute.QPlatform.QRegPool import QRegStorage
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation import RotationArgument, OperationFunc
+
+FileErrorCode = 10
 
 
 class RotationGateOP(QOperation):
@@ -131,7 +133,8 @@ class RotationGateOP(QOperation):
     def getInverse(self) -> 'RotationGateOP':
         for argument in self.argumentList:
             if isinstance(argument, ProcedureParameterStorage):
-                raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!')
+                raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,
+                                          FileErrorCode, 1)
 
         nAngles = len(self.argumentList)
         if nAngles == 1:
@@ -141,7 +144,8 @@ class RotationGateOP(QOperation):
         elif nAngles == 3:
             [theta, phi, lamda] = self.argumentList  # type: float
         else:
-            raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!')
+            raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
+                                      FileErrorCode, 2)
 
         if self.name == 'RX':
             return RX(-theta)
@@ -163,7 +167,8 @@ class RotationGateOP(QOperation):
             elif nAngles == 3:
                 angles = [self.argumentList[0], numpy.pi - self.argumentList[2], numpy.pi - self.argumentList[1]]
             else:
-                raise Error.ArgumentError(f'Wrong angles count. angles: {self.argumentList}!')
+                raise Error.ArgumentError(f'Wrong angles count. angles: {self.argumentList}!', ModuleErrorCode,
+                                          FileErrorCode, 3)
             return U(*angles)
         elif self.name == 'CU':
             return CU(theta, numpy.pi - lamda, numpy.pi - phi)

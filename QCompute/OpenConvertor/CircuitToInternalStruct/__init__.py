@@ -21,7 +21,7 @@ Convert the circuit to internal struct
 from typing import List, TYPE_CHECKING
 
 from QCompute import CustomizedGateOP, BarrierOP
-from QCompute.OpenConvertor import ConvertorImplement
+from QCompute.OpenConvertor import ConvertorImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.QOperation.FixedGate import getFixedGateInstance
@@ -32,6 +32,8 @@ from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBMeasure
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBCircuitLine, PBCustomizedGate
+
+FileErrorCode = 1
 
 
 class CircuitToInternalStruct(ConvertorImplement):
@@ -75,7 +77,7 @@ class CircuitToInternalStruct(ConvertorImplement):
             elif op == 'barrier':
                 circuitLine.data = BarrierOP()
             else:
-                raise Error.ArgumentError('Unsupported operation at InternalStruct!')
+                raise Error.ArgumentError('Unsupported operation at InternalStruct!', ModuleErrorCode, FileErrorCode, 1)
             circuitLine.qRegList = list(pbCircuitLine.qRegList)
             ret.append(circuitLine)
 

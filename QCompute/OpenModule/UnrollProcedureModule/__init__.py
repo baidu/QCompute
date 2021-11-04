@@ -21,12 +21,14 @@ Unroll Procedure
 from copy import deepcopy
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from QCompute.OpenModule import ModuleImplement
+from QCompute.OpenModule import ModuleImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QProtobuf import PBProgram, PBCircuitLine
 
 if TYPE_CHECKING:
-    from QCompute.QProtobuf import PBProcedure
+    pass
+
+FileErrorCode = 2
 
 
 class UnrollProcedureModule(ModuleImplement):
@@ -93,11 +95,12 @@ class UnrollProcedureModule(ModuleImplement):
                     del ret.argumentIdList[:]
                 for index, qReg in enumerate(ret.qRegList):
                     if qReg not in qRegMap:
-                        raise Error.ArgumentError('QReg argument is not in procedure!')
+                        raise Error.ArgumentError('QReg argument is not in procedure!', ModuleErrorCode, FileErrorCode,
+                                                  1)
                     ret.qRegList[index] = qRegMap[qReg]
                 self._circuitOut.append(ret)
             elif op == 'customizedGate':  # Customized gate
-                raise Error.ArgumentError('Unsupported operation customizedGate!')
+                raise Error.ArgumentError('Unsupported operation customizedGate!', ModuleErrorCode, FileErrorCode, 2)
             elif op == 'procedureName':  # procedure
                 qProcedureRegMap = {index: qRegMap[qReg] for index, qReg in enumerate(circuitLine.qRegList)}
 
@@ -116,4 +119,4 @@ class UnrollProcedureModule(ModuleImplement):
                 procedure = self._procedureMap[circuitLine.procedureName]
                 self._unrollProcedure(procedure.circuit, qProcedureRegMap, argumentList)
             else:  # Unsupported operation
-                raise Error.ArgumentError(f'Unsupported operation {op}!')
+                raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 3)

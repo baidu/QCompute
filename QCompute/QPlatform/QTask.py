@@ -21,7 +21,7 @@ Quantum Task
 import json
 import time
 import traceback
-from enum import Enum
+from enum import Enum, IntEnum, unique
 from pathlib import Path
 from typing import Callable, Tuple, Dict, Union, Any, List, Optional
 
@@ -41,7 +41,9 @@ from QCompute.Define import waitTaskRetrys
 # Sign the files by cloud service. Then upload files to the cloud storage,
 # submit the file id to cloud service, and finally get the results.
 from QCompute.Define.Settings import outputInfo
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, ModuleErrorCode
+
+FileErrorCode = 7
 
 
 def _invokeBackend(target: str, params: object) -> Dict:
@@ -53,15 +55,15 @@ def _invokeBackend(target: str, params: object) -> Dict:
         ret = requests.post(
             f"{quantumHubAddr}/{target}", json=params).json()
     except Exception:
-        raise Error.NetworkError(traceback.format_exc())
+        raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 1)
 
     if ret["error"] > 0:
         errCode = ret["error"]
         errMsg = ret["message"]
         if errCode == 401:
-            raise Error.TokenError(errMsg)
+            raise Error.TokenError(errMsg, ModuleErrorCode, FileErrorCode, 2)
         else:
-            raise Error.LogicError(errMsg)
+            raise Error.LogicError(errMsg, ModuleErrorCode, FileErrorCode, 3)
 
     return ret["data"]
 
@@ -96,7 +98,7 @@ def _getSTSToken() -> Tuple[str, BosClient, str]:
     """
 
     if not Define.hubToken:
-        raise Error.ArgumentError('Please provide a valid token')
+        raise Error.ArgumentError('Please provide a valid token', ModuleErrorCode, FileErrorCode, 4)
 
     config = _invokeBackend("circuit/genSTS", {"token": Define.hubToken})
 
@@ -167,8 +169,8 @@ class QTask:
         self.circuitId = ret['circuitId']
 
     @_retryWhileNetworkError
-    def create(self, shots: int, backend: str, backendParam: List[Union[str, Enum]] = None,
-               modules: List[Tuple[str, Any]] = None, debug: Optional[str] = None) -> None:
+    def createCircuitTask(self, shots: int, backend: str, backendParam: List[Union[str, Enum]] = None,
+                          modules: List[Tuple[str, Any]] = None, debug: Optional[str] = None) -> None:
         """
         Create a task from the code
 
@@ -191,10 +193,10 @@ class QTask:
         if backendParam:
             paramList = []
             for param in backendParam:
-                if isinstance(param, Enum):
-                    paramList.append(param.value)
-                else:
+                if type(param) is str:
                     paramList.append(param)
+                else:
+                    paramList.append(param.value)
             task['backendParam'] = paramList
 
         ret = _invokeBackend(
@@ -204,25 +206,23 @@ class QTask:
 
         self.taskId = ret['taskId']
 
+    
+
     @_retryWhileNetworkError
     def _fetchResult(self) -> None:
         """
         Fetch the result files from the taskId
         """
 
-        params = {"token": self.token, "taskId": self.taskId}
-
-        ret = _invokeBackend("task/getTaskInfo", params)
-
+        ret = _invokeBackend("task/getTaskInfo", {"token": self.token, "taskId": self.taskId})
         result = ret["result"]
-
         originUrl = result["originUrl"]
         # originSize = result["originSize"]
         try:
             self.originFile, downSize = _downloadToFile(originUrl, outputPath / f"remote.{self.taskId}.origin.json")
         except Exception:
             # TODO split the disk write error
-            raise Error.NetworkError(traceback.format_exc())
+            raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 5)
         if outputInfo:
             print(f'Download origin success {self.originFile} size = {downSize}')
 
@@ -232,7 +232,7 @@ class QTask:
             self.measureFile, downSize = _downloadToFile(measureUrl, outputPath / f"remote.{self.taskId}.measure.json")
         except Exception:
             # TODO split the disk write error
-            raise Error.NetworkError(traceback.format_exc())
+            raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 6)
         if outputInfo:
             print(f'Download measure success {self.measureFile} size = {downSize}')
 
@@ -275,18 +275,20 @@ class QTask:
             "taskId": self.taskId
         }
 
-        stepStatus = "waiting"
+        stepStatus = _Status.waiting
         while True:
             try:
                 time.sleep(pollInterval)
                 ret = _invokeBackend('task/checkTask', task)
-                if ret['status'] in ('success', 'failed', 'manual_term'):
+                newStatus = _Status[ret["status"]]
+                stepStatusName = _Status(stepStatus).name
+                if newStatus > 0:
                     if outputInfo:
-                        print(f'status changed {stepStatus} => {ret["status"]}')
-                    stepStatus = ret["status"]
+                        print(f'status changed {stepStatusName} => {ret["status"]}')
+                    stepStatus = newStatus
                     result = {"taskId": self.taskId, "status": ret["status"]}
 
-                    if ret["status"] == "success" and "originUrl" in ret.get("result", {}):
+                    if newStatus == _Status.success and "originUrl" in ret.get("result", {}):
                         if downloadResult:
                             self._fetchResult()
                             result["origin"] = str(self.originFile)
@@ -299,26 +301,35 @@ class QTask:
                             else:
                                 result["measure"] = str(self.measureFile)
                         break
-                    elif ret["status"] == "failed":
+                    elif newStatus == _Status.failed:
                         result = ret["reason"]
                         break
-                    elif ret["status"] == "manual_term":
+                    elif newStatus == _Status.manual_terminate:
                         break
                     else:
                         # go on loop
                         pass
                 else:
-                    if ret["status"] == stepStatus:
+                    if newStatus == stepStatus:
                         continue
 
                     if outputInfo:
-                        print(f'status changed {stepStatus} => {ret["status"]}')
-                    stepStatus = ret["status"]
+                        print(f'status changed {stepStatusName} => {ret["status"]}')
+                    stepStatus = newStatus
 
             except Error.Error as err:
                 raise err
 
             except Exception:
-                raise Error.RuntimeError(traceback.format_exc())
+                raise Error.RuntimeError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 7)
 
         return result
+
+
+@unique
+class _Status(IntEnum):
+    waiting = 0
+    executing = 1
+    success = 2
+    failed = 3
+    manual_terminate = 4
