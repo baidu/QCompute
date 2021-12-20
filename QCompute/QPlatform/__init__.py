@@ -58,8 +58,6 @@ class BackendName(Enum):
     env.backend(BackendName.LocalBaiduSim2, Sim2Argument.Dense_Matmul_Probability.value + ' -s 20210210')
     """
 
-    
-
     CloudBaiduSim2Water = 'cloud_baidu_sim2_water'
     """
     Cloud Baidu Sim2 Water
@@ -225,7 +223,18 @@ class BackendName(Enum):
     env.backend(BackendName.CloudAerAtBD, '-q')
     """
 
+    CloudIoPCAS = 'cloud_iopcas'
+    """
+    Cloud IoPCAS
     
+    This backend name (CloudIoPCAS) is only available >= v2.0.0
+    
+    Example: 
+    
+    env = QEnv()
+    
+    env.backend(BackendName.CloudIoPCAS)
+    """
 
 
 BackendName.__class__ = _metaBackendName
@@ -241,7 +250,6 @@ class Sim2Argument(Enum):
     Dense_Matmul_Accumulation = '-mt dense -a matmul -mm accumulation'
     Dense_Einsum_Probability = '-mt dense -a einsum -mm probability'
     Dense_Einsum_Accumulation = '-mt dense -a einsum -mm accumulation'
-    
 
 
 @unique
@@ -259,4 +267,3 @@ class ServerModule(Enum):
 
     MappingToIoPCAS = 'MappingToIoPCASModule'
     UnrollCircuitToIoPCAS = 'UnrollCircuitToIoPCASModule'
-    

@@ -3,6 +3,10 @@
 ## [Unreleased]
 - New Command Channel.
 
+## [2.0.3] - Dec-20-2021
+### Changed
+- Repair IoPCAS backend.
+
 ## [2.0.2] - Nov-04-2021
 ### Added
 - Local graph drawing;

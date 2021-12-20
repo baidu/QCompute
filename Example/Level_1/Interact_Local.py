@@ -25,7 +25,7 @@ import sys
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.2')
+matchSdkVersion('Python 2.0.3')
 
 uValue = 1  # Flag of interactions
 for _ in range(15):

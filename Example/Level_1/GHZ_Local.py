@@ -26,7 +26,7 @@ from pprint import pprint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.2')
+matchSdkVersion('Python 2.0.3')
 
 # Create environment
 env = QEnv()
