@@ -163,3 +163,28 @@ class CircuitLine:
     data: None  # type: Operation
     qRegList: None  # type: List[int]
     cRegList: None  # type: List[int]
+
+    def __init__(self, data: Operation = None, qRegList: List[int] = None, cRegList: List[int] = None):
+        """
+        Initialize a quantum gate instance.
+
+        :param data: a Quanlse.QOperation.Operation instance,
+                    the quantum gate to be applied
+        :param qRegList: a list of qubit indices.
+                    If `gate` is a single-qubit
+                    gate, then `qubits` still be a List of the form `[i]`
+        :param cRegList: a list of classical bit indices
+        """
+        self.data = data
+        self.qRegList = qRegList
+        self.cRegList = cRegList
+
+    def inverse(self) -> 'CircuitLine':
+        """
+        Return a `CircuitLine` instance whose `QOperation` data is the inverse of the origin one.
+
+        :return: a `CircuitLine` instance whose `QOperation` data is the inverse of the origin one
+        """
+        self.data = self.data.getInverse()
+        return self
+

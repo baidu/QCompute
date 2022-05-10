@@ -45,7 +45,7 @@ else:
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
 
-sdkVersion = 'Python 2.0.3'
+sdkVersion = 'Python 2.0.4'
 """
 SDK Version
 
@@ -142,6 +142,19 @@ Do not modify by user.
 
 Will be created, when not exist.
 """
+
+calibrationPath = Path('Calibration').absolute()
+# Trim start
+calibrationPath = Path(Path(QCompute.__file__).parent.parent, 'Calibration').absolute()
+# Trim end
+"""
+Calibration Path
+
+Do not modify by user.
+
+Will be created, when not exist.
+"""
+
 if 'sphinx' in sys.modules:
     outputPath = Path()
 else:

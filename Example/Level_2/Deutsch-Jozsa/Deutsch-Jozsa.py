@@ -23,7 +23,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.3')
+matchSdkVersion('Python 2.0.4')
 
 # In this example we use 10 qubits as the main register,
 # and also an ancillary qubit else

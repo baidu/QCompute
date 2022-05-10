@@ -263,7 +263,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.3')
+matchSdkVersion('Python 2.0.4')
 
 qubit_num = 4
 shots = 1000

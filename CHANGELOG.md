@@ -1,7 +1,8 @@
 # Changelog
 
-## [Unreleased]
-- New Command Channel.
+## [2.0.4] - May-05-2022
+### Added
+- Support for the QEP plugin.
 
 ## [2.0.3] - Dec-20-2021
 ### Changed

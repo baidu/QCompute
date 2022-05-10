@@ -33,6 +33,10 @@ class BarrierOP(QOperation):
     Barrier does nothing for implementing circuits on simulator but does STOP optimization between two barriers
     """
 
+    def __init__(self):
+        # For quantum leaf
+        super().__init__('Barrier', None, None)
+
     def __call__(self, *qRegList: 'QRegStorage') -> None:
         self._op(list(qRegList))
 
