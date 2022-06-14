@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,9 +49,10 @@ from QCompute.QPlatform import (
 )
 from QCompute.QPlatform.QEnv import QEnv
 from QCompute.QPlatform.QEnvOperation import QEnvOperation
+from QCompute.QPlatform.InteractiveModule import InteractiveModule
 
 from QCompute.QPlatform.QOperation.Barrier import Barrier, BarrierOP
-from QCompute.QPlatform.QOperation.CompositeGate import RZZ
+from QCompute.QPlatform.QOperation.CompositeGate import MS, CK
 from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
 from QCompute.QPlatform.QOperation.FixedGate import (
     ID,
@@ -83,6 +84,30 @@ from QCompute.QPlatform.QOperation.RotationGate import (
     CRX,
     CRY,
     CRZ,
+)
+from QCompute.OpenConvertor.CircuitToDrawConsole import (
+    CircuitToDrawConsole
+)
+from QCompute.OpenConvertor.CircuitToJson import (
+    CircuitToJson
+)
+from QCompute.OpenConvertor.JsonToCircuit import (
+    JsonToCircuit
+)
+from QCompute.OpenConvertor.CircuitToQasm import (
+    CircuitToQasm
+)
+from QCompute.OpenConvertor.QasmToCircuit import (
+    QasmToCircuit
+)
+from QCompute.OpenConvertor.CircuitToIonQ import (
+    CircuitToIonQ
+)
+from QCompute.OpenConvertor.IonQToCircuit import (
+    IonQToCircuit
+)
+from QCompute.OpenConvertor.CircuitToXanaduSF import (
+    CircuitToXanaduSF, TwoQubitsGate
 )
 from QCompute.QPlatform import QStatus
 from QCompute.QPlatform import Utilities

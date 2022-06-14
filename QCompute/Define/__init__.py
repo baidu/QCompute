@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ from enum import IntEnum, unique
 from pathlib import Path
 
 import QCompute
-from QCompute.QPlatform import Error
 
 env = 'prod'
 
@@ -44,8 +43,9 @@ else:
     # service address for production
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
+    blindCompAddr = 'wss://blindcomp.baidu.com'
 
-sdkVersion = 'Python 2.0.4'
+sdkVersion = 'Python 2.0.6'
 """
 SDK Version
 
@@ -144,9 +144,7 @@ Will be created, when not exist.
 """
 
 calibrationPath = Path('Calibration').absolute()
-# Trim start
-calibrationPath = Path(Path(QCompute.__file__).parent.parent, 'Calibration').absolute()
-# Trim end
+
 """
 Calibration Path
 
@@ -160,6 +158,9 @@ if 'sphinx' in sys.modules:
 else:
     os.makedirs(outputPath, mode=0o744, exist_ok=True)
 
+maxSeed = 2147483647
+maxShots = 100000
+
 
 @unique
 class MeasureFormat(IntEnum):
@@ -168,3 +169,4 @@ class MeasureFormat(IntEnum):
     """
     Bin = 0
     Hex = Bin + 1
+    Dec = Hex + 1  # formatReverseMeasure only

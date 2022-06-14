@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 """
 Quantum Task
 """
+import sys
 import json
 import time
 import traceback
@@ -40,7 +41,7 @@ from QCompute.Define import waitTaskRetrys
 # todo carefully demonstrate the upload logic
 # Sign the files by cloud service. Then upload files to the cloud storage,
 # submit the file id to cloud service, and finally get the results.
-from QCompute.Define.Settings import outputInfo
+from QCompute.Define import Settings
 from QCompute.QPlatform import Error, ModuleErrorCode
 
 FileErrorCode = 7
@@ -57,13 +58,15 @@ def _invokeBackend(target: str, params: object) -> Dict:
     except Exception:
         raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 1)
 
-    if ret["error"] > 0:
-        errCode = ret["error"]
-        errMsg = ret["message"]
+    if ret['error'] > 0:
+        errCode = ret['error']
+        errMsg = ret.get('message', '')
+        vendor = ret.get('vendor', '')
         if errCode == 401:
             raise Error.TokenError(errMsg, ModuleErrorCode, FileErrorCode, 2)
         else:
-            raise Error.LogicError(errMsg, ModuleErrorCode, FileErrorCode, 3)
+            raise Error.LogicError(f'errCode: {errCode}; errMsg: {errMsg}; vendor: {vendor}', ModuleErrorCode,
+                                   FileErrorCode, 3)
 
     return ret["data"]
 
@@ -139,7 +142,7 @@ class QTask:
     """
 
     def __init__(self):
-        self.token = ''
+        self.token = Define.hubToken
         self.circuitId = -1
         self.taskId = -1
         self.originFile = Path()
@@ -206,6 +209,68 @@ class QTask:
 
         self.taskId = ret['taskId']
 
+    @_retryWhileNetworkError
+    def createBlindTask(self, backend: str, params) -> None:
+        """
+        Create a blind task
+        """
+
+        task = {
+            "token": self.token,
+            "service": backend,
+            "params": params,
+            "sdkVersion": sdkVersion,
+            "source": taskSource,
+        }
+
+        ret = _invokeBackend(
+            "task/createBlind",
+            task
+        )
+
+        self.taskId = ret['taskId']
+        self.taskToken = ret['taskToken']
+
+    @_retryWhileNetworkError
+    def waitBlindTask(self, checkInterval) -> Union[Tuple[str, str], None]:
+        """
+        Wait for a task from the taskId
+        """
+
+        task = {
+            "token": self.token,
+            "taskId": self.taskId
+        }
+
+        stepStatus = _Status.waiting
+        while True:
+            try:
+                time.sleep(checkInterval)
+                ret = _invokeBackend('task/checkTask', task)
+                newStatus = _Status[ret["status"]]
+                stepStatusName = _Status(stepStatus).name
+
+                if newStatus > 0:
+                    if newStatus in (
+                            _Status.success,
+                            _Status.failed,
+                            _Status.manual_terminate):
+                        # 如果任务状态已经是最终状态了 那说明有问题 直接返回
+                        print(f'resource unavailable\nDEBUG info: {self.taskId}, {ret}', file=sys.stderr)
+                        return
+                    else:
+                        # 剩下来的就是 executing 状态的 可以返回了
+                        # 任务id刻意被str化是为了将来修改跳转地址做准备 目前用任务id作为跳转地址
+                        return str(self.taskId), self.taskToken
+                else:
+                    continue
+
+            except Error.Error as err:
+                raise err
+
+            except Exception:
+                raise Error.RuntimeError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 7)
+
     
 
     @_retryWhileNetworkError
@@ -223,7 +288,7 @@ class QTask:
         except Exception:
             # TODO split the disk write error
             raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 5)
-        if outputInfo:
+        if Settings.outputInfo:
             print(f'Download origin success {self.originFile} size = {downSize}')
 
         measureUrl = result["measureUrl"]
@@ -233,7 +298,7 @@ class QTask:
         except Exception:
             # TODO split the disk write error
             raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 6)
-        if outputInfo:
+        if Settings.outputInfo:
             print(f'Download measure success {self.measureFile} size = {downSize}')
 
     def _fetchOriginResult(self) -> Optional[Dict]:
@@ -243,9 +308,8 @@ class QTask:
 
         localFile = outputPath / f'remote.{self.taskId}.origin.json'
         if localFile.exists():
-            with open(localFile, "rb") as fObj:
-                data = json.loads(fObj.read())
-                return data
+            text = localFile.read_text(encoding='utf-8')
+            return json.loads(text)
         else:
             return None
 
@@ -256,9 +320,8 @@ class QTask:
 
         localFile = outputPath / f'remote.{self.taskId}.measure.json'
         if localFile.exists():
-            with open(localFile, "rb") as fObj:
-                data = json.loads(fObj.read())
-                return data
+            text = localFile.read_text(encoding='utf-8')
+            return json.loads(text)
         else:
             return None
 
@@ -267,7 +330,7 @@ class QTask:
         """
         Wait for a task from the taskId
         """
-        if outputInfo:
+        if Settings.outputInfo:
             print(f'Task {self.taskId} is running, please wait...')
 
         task = {
@@ -283,7 +346,7 @@ class QTask:
                 newStatus = _Status[ret["status"]]
                 stepStatusName = _Status(stepStatus).name
                 if newStatus > 0:
-                    if outputInfo:
+                    if Settings.outputInfo:
                         print(f'status changed {stepStatusName} => {ret["status"]}')
                     stepStatus = newStatus
                     result = {"taskId": self.taskId, "status": ret["status"]}
@@ -313,7 +376,7 @@ class QTask:
                     if newStatus == stepStatus:
                         continue
 
-                    if outputInfo:
+                    if Settings.outputInfo:
                         print(f'status changed {stepStatusName} => {ret["status"]}')
                     stepStatus = newStatus
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python3CircuitLine
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,3 +26,5 @@ from QCompute.QProtobuf.Library.QOperation_pb2 import FixedGate as PBFixedGate, 
 from QCompute.QProtobuf.Library.Complex_pb2 import Matrix as PBMatrix
 from QCompute.QProtobuf.Library.QObj_pb2 import QObject as PBQObject, Experiment as PBExperiment, \
     Instruction as PBInstruction
+from QCompute.QProtobuf.Library.UniversalBlindQuantumComputing_pb2 import InitState as PBUbpcInitState, \
+    EncryptedMeasureReq as PBEncryptedMeasureReq, EncryptedMeasureRes as PBEncryptedMeasureRes

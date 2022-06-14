@@ -1,6 +1,6 @@
 # Quantum Kernel Method
 
-<em> Copyright (c) 2021 Institute for Quantum Computing, Baidu Inc. All Rights Reserved. </em>
+<em> Copyright (c) 2022 Institute for Quantum Computing, Baidu Inc. All Rights Reserved. </em>
 
 > If you run this tutorial with cloud computing power, you will consume about 500 Quantum-hub points.
 

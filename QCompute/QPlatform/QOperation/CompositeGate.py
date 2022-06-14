@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 """
 Composite Gate Operation
 """
+import importlib
+import math
 from typing import List, Optional, TYPE_CHECKING
-
-import numpy
 
 from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
@@ -41,7 +41,7 @@ class CompositeGateOP(QOperation):
 
     The real implementation of Composite Gate can be given in the file OpenModule/CompositeGateModule/__init__.py
 
-    An example "RZZ" has been given in this class.
+    An example "MS" has been given in this class.
     """
 
     argumentList = None  # type: List['RotationArgument']
@@ -60,34 +60,97 @@ class CompositeGateOP(QOperation):
                                           FileErrorCode, 1)
 
         nAngles = len(self.argumentList)
-        if nAngles == 1:
-            [theta] = self.argumentList  # type: float
+        if nAngles == 0:
+            pass
+        elif nAngles == 1:
+            [theta] = self.argumentList  # type: List[float]
         elif nAngles == 2:
-            [theta, phi] = self.argumentList  # type: float
+            [theta, phi] = self.argumentList  # type: List[float]
         elif nAngles == 3:
-            [theta, phi, lamda] = self.argumentList  # type: float
+            [theta, phi, lamda] = self.argumentList  # type: List[float]
         else:
             raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
                                       FileErrorCode, 2)
 
-        if self.name == 'RZZ':
-            return RZZ(theta, numpy.pi - lamda, numpy.pi - phi)
+        if self.name == 'MS':
+            if nAngles == 0:
+                return CompositeGateOP('MS', 2, [-math.pi / 2])
+            else:
+                return CompositeGateOP('MS', 2, [-theta])
+        elif self.name == 'CK':
+            return CompositeGateOP('CK', 2, [-theta])
+        else:
+            raise Error.ArgumentError(f'Unsupported inverse {self.name}!', ModuleErrorCode,
+                                      FileErrorCode, 3)
 
 
-def RZZ(theta: 'RotationArgument',
-        phi: Optional['RotationArgument'] = None,
-        lamda: Optional['RotationArgument'] = None) -> 'OperationFunc':
+_MSNotified = False
+
+
+def MS(theta: Optional['RotationArgument'] = None) -> 'OperationFunc':
     """
-    RZZ(xyz)(Q0, Q1)
-
-    =
-
-    CX(Q0, Q1)
-
-    U(xyz)(Q1)
-
-    CX(Q0, Q1)
+    MS()(Q0, Q1)
+    MS(theta)(Q0, Q1)
     """
-    angleList = [value for value in [theta, phi, lamda] if value is not None]
-    gate = CompositeGateOP('RZZ', 2, angleList)
+    global _MSNotified
+    if not _MSNotified:
+        _MSNotified = True
+        print('**Attention** MS gate is a two qubit gate used in trapped ion quantum computing.\n'
+              'We support MS as a native gate only when the target device type is an ion trap.\n'
+              'In other cases, MS is a composite gate on platform.\n')
+
+    angleList = [value for value in [theta] if value is not None]
+    gate = CompositeGateOP('MS', 2, angleList)
     return gate
+
+
+_CKNotified = False
+
+
+def CK(kappa: 'RotationArgument') -> 'OperationFunc':
+    """
+    CK(kappa)(Q0, Q1)
+    """
+    global _CKNotified
+    if not _CKNotified:
+        _CKNotified = True
+        print('**Attention** CK gate is a two qubit gate used in optical quantum computing.\n'
+              'We support CK as a native gate only when the target device type is optical.\n'
+              'In other cases, CK is a composite gate on platform.\n')
+
+    gate = CompositeGateOP('CK', 2, [kappa])
+    return gate
+
+
+def createCompositeGateInstance(name: str, *angles: 'RotationArgument') -> 'OperationFunc':
+    """
+    Create a new gate according to name and angles
+
+    :param name : rotation gate name
+    :param angles: angle param list
+    :return: new gate
+    """
+
+    currentModule = importlib.import_module(__name__)
+    gateClass = getattr(currentModule, name)
+    gate = gateClass(*angles)
+    return gate
+
+# removed. only example
+# def RZZ(theta: 'RotationArgument',
+#         phi: Optional['RotationArgument'] = None,
+#         lamda: Optional['RotationArgument'] = None) -> 'OperationFunc':
+#     """
+#     RZZ(xyz)(Q0, Q1)
+#
+#     =
+#
+#     CX(Q0, Q1)
+#
+#     U(xyz)(Q1)
+#
+#     CX(Q0, Q1)
+#     """
+#     angleList = [value for value in [theta, phi, lamda] if value is not None]
+#     gate = CompositeGateOP('RZZ', 2, angleList)
+#     return gate

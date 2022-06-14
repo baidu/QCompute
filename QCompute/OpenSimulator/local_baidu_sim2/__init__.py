@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from sys import executable
 from typing import List
 
 from QCompute.Define import outputPath
-from QCompute.Define.Settings import outputInfo, inProcessSimulator
+from QCompute.Define import Settings
 from QCompute.Define.Utils import filterConsoleOutput, findUniError
 from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
 from QCompute.OpenSimulator import QImplement, ModuleErrorCode
@@ -76,7 +76,7 @@ class Backend(QImplement):
                                      f'Currently, QReg in the program counts {self.program.head.usingQRegList}.',
                                      ModuleErrorCode, FileErrorCode, 1)
 
-        if inProcessSimulator:
+        if Settings.inProcessSimulator:
             self.runInProcess()
         else:
             self.runOutProcess()
@@ -89,7 +89,7 @@ class Backend(QImplement):
         self.result = runSimulator(self._makeArguments(), self.program)
         self.result.output = self.result.toJson()
 
-        if outputInfo:
+        if Settings.outputInfo:
             print('Shots', self.result.shots)
             print('Counts', self.result.counts)
             print('State', self.result.state)
@@ -104,14 +104,13 @@ class Backend(QImplement):
 
         # write the circuit to a temporary json file
         programFilePath = outputPath / 'program.json'
-        if outputInfo:
+        if Settings.outputInfo:
             print('Program file:', programFilePath)  # print the output filename
-        with open(programFilePath, 'wt', encoding='utf-8') as file:
-            file.write(jsonStr)
+        programFilePath.write_text(jsonStr, encoding='utf-8')
 
         cmd = (executable,) + (str(Path(__file__).parent / 'Simulator.py'),) + tuple(self._makeArguments()) + (
             '-inputFile', programFilePath)
-        if outputInfo:
+        if Settings.outputInfo:
             print(f'{cmd}')
 
         # call the simulator
@@ -124,19 +123,18 @@ class Backend(QImplement):
         self.result.code = completedProcess.returncode
         if self.result.code != 0:
             self.result.vendor = findUniError(completedProcess.stdout) or \
-                                    f'QC.3.{ModuleErrorCode}.{FileErrorCode}.2'
+                                 f'QC.3.{ModuleErrorCode}.{FileErrorCode}.2'
             return
 
         countsFilePath = outputPath / 'counts.json'
-        if outputInfo:
+        if Settings.outputInfo:
             print('Counts file:', countsFilePath)  # print the input filename
-        with open(countsFilePath, 'rt', encoding='utf-8') as file:
-            text = file.read()
+        text = countsFilePath.read_text(encoding='utf-8')
 
         self.result.fromJson(text)
         self.result.output = self.result.toJson()
 
-        if outputInfo:
+        if Settings.outputInfo:
             print('UsedQRegList', self.result.ancilla.usedQRegList)
             print('UsedCRegList', self.result.ancilla.usedCRegList)
             print('CompactedQRegDict', self.result.ancilla.compactedQRegDict)

@@ -2,7 +2,7 @@ English | [简体中文](README_CN.md)
 
 # QCompute-QAPP User's Guide
 
-<em> Copyright (c) 2021 Institute for Quantum Computing, Baidu Inc. All Rights Reserved. </em>
+<em> Copyright (c) 2022 Institute for Quantum Computing, Baidu Inc. All Rights Reserved. </em>
 
 ## QAPP Introduction
 

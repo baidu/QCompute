@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional, Callable, Union, List
 from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.QEnv import QEnv
 from QCompute.QPlatform.QOperation.Barrier import Barrier
-from QCompute.QPlatform.QOperation.CompositeGate import RZZ
+from QCompute.QPlatform.QOperation.CompositeGate import MS, CK
 from QCompute.QPlatform.QOperation.FixedGate import ID, X, Y, Z, H, S, SDG, T, TDG, \
     CX, CY, CZ, CH, SWAP, \
     CCX, CSWAP
@@ -154,10 +154,12 @@ class QEnvOperation(QEnv):
         return self.gateWrap(gate)
 
     # Composite Gate
-    def RZZ(self, theta: 'RotationArgument',
-            phi: Optional['RotationArgument'] = None,
-            lamda: Optional['RotationArgument'] = None) -> 'gateWrapFunc':
-        gate = RZZ(theta, phi, lamda)
+    def MS(self, theta: Optional['RotationArgument'] = None) -> 'gateWrapFunc':
+        gate = MS(theta)
+        return self.gateWrap(gate)
+
+    def CK(self, kappa: Optional['RotationArgument'] = None) -> 'gateWrapFunc':
+        gate = CK(kappa)
         return self.gateWrap(gate)
 
     # QProcedure

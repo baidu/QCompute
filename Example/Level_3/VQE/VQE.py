@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 2.0.4')
+matchSdkVersion('Python 2.0.6')
 
 # Hyper-parameter setting
 shots = 1024
@@ -288,7 +288,7 @@ def multi_process_fun(j):
     for i in range(iteration_num):
         para_list.append(diff_fun(loss_fun, para_list[i]))
 
-    with open(outputPath / f"para{j}.pickle", "wb") as fp:
+    with (outputPath / f"para{j}.pickle").open(mode='wb') as fp:
         pickle.dump(para_list, fp)
 
 
@@ -303,7 +303,7 @@ def main():
 
     for _ in range(experiment_num):
         actual_loss = []
-        with open(outputPath / f"para{_}.pickle", "rb") as fp:
+        with (outputPath / f"para{_}.pickle").open(mode='rb') as fp:
             new_para_list = pickle.load(fp)
 
         for j in range(iteration_num):

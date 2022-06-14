@@ -40,7 +40,7 @@ Deutsch-Jozsa Algorithm.
 
 from QCompute import *
 
-matchSdkVersion('Python 2.0.4')
+matchSdkVersion('Python 2.0.6')
 
 # In this example we use 10 qubits as the main register,
 # and also an ancillary qubit else

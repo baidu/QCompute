@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,12 @@ The initial state and gates are converted to tensors and gate implementation is 
 
 import argparse
 from datetime import datetime
+from pathlib import Path
 from typing import List, TYPE_CHECKING, Union, Dict, Optional
 
 import numpy
 
-
+from QCompute import Define
 from QCompute.Define import outputPath
 from QCompute.OpenConvertor.JsonToCircuit import JsonToCircuit
 from QCompute.OpenSimulator import QResult, ModuleErrorCode
@@ -70,12 +71,20 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     shots = args.shots  # type: int
     inputFile = args.inputFile  # type: str
 
+    if shots < 1 or shots > Define.maxShots:
+        raise Error.ArgumentError(f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode,
+                                  FileErrorCode, 1)
+    if seed is not None:
+        if seed < 0 or seed > Define.maxSeed:
+            raise Error.ArgumentError(f'Invalid seed {seed}, should in [0, {Define.maxSeed}]', ModuleErrorCode,
+                                      FileErrorCode, 2)
+
     matrixTypeValue = None  # type: Optional[MatrixType]
     if matrixType == 'dense':
         matrixTypeValue = MatrixType.Dense
     
     else:
-        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 1)
+        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 2)
 
     algorithmValue = None  # type: Optional[Algorithm]
     if algorithm == 'matmul':
@@ -83,7 +92,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     elif algorithm == 'einsum':
         algorithmValue = Algorithm.Einsum
     else:
-        raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 2)
+        raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 4)
 
     measureMethodValue = None  # type: Optional[MeasureMethod]
     if measureMethod == 'probability':
@@ -95,18 +104,10 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     elif measureMethod == 'accumulation':
         measureMethodValue = MeasureMethod.Accumulation
     else:
-        raise Error.ArgumentError(f'Invalid MeasureMethod {measureMethodValue}', ModuleErrorCode, FileErrorCode, 3)
-
-    if seed is not None:
-        if seed < 0 or seed > 2147483647:
-            raise Error.ArgumentError(f'Invalid Seed {seed}', ModuleErrorCode, FileErrorCode, 4)
-
-    if shots <= 0:
-        raise Error.ArgumentError(f'Invalid shots {shots}', ModuleErrorCode, FileErrorCode, 5)
+        raise Error.ArgumentError(f'Invalid MeasureMethod {measureMethodValue}', ModuleErrorCode, FileErrorCode, 5)
 
     if inputFile is not None:
-        with open(inputFile, "rt") as fObj:
-            jsonStr = fObj.read()
+        jsonStr = Path(inputFile).read_text()
         program = JsonToCircuit().convert(jsonStr)
 
     return core(program, matrixTypeValue, algorithmValue, measureMethodValue, shots, seed)
@@ -241,5 +242,4 @@ def loadGates(matrixType: 'MatrixType') -> Dict['PBFixedGate', Union[numpy.ndarr
 if __name__ == '__main__':
     result = runSimulator(None, None)
     countsFilePath = outputPath / 'counts.json'
-    with open(countsFilePath, 'wt', encoding='utf-8') as file:
-        file.write(result.toJson(True))
+    countsFilePath.write_text(result.toJson(True), encoding='utf-8')

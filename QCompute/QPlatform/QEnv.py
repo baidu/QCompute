@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 """
 Quantum Environment
 """
+import argparse
 import json
 import os
 import tempfile
@@ -25,15 +26,16 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Set, List, Dict, TYPE_CHECKING, Union, Optional, Tuple, Any
 
-from QCompute import QResult, outputInfo
 from QCompute.Define import sdkVersion, noLocalTask, outputPath, noWaitTask, Settings
 from QCompute.Define.Utils import loadPythonModule
 from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
+from QCompute.OpenSimulator import QResult
 from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
+from QCompute.QPlatform.InteractiveModule import InteractiveModule
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
-from QCompute.QPlatform.Processor.ModuleFilter import filterModule
+from QCompute.QPlatform.Processor.ModuleFilter import filterModule, printModuleListDescription
 from QCompute.QPlatform.Processor.PostProcessor import formatMeasure
 from QCompute.QPlatform.QOperation.QProcedure import QProcedure, QProcedureOP
 from QCompute.QPlatform.QRegPool import QRegPool
@@ -76,19 +78,21 @@ class QEnv:
         self.procedureMap = {}  # type: Dict[str, 'QProcedure']
         self.program = None  # type: Optional['PBProgram']
 
-        self.backendName = None  # type: Optional[str]
+        self.backendName = None  # type: Optional[BackendName]
         self.backendArgument = None  # type: Optional[List]
+        self.shots = 0  # type: int
 
-        self.usedModuleList = []  # type: List['ModuleImplement']
+        self.usingModuleList = []  # type: List['ModuleImplement']
         self.usedServerModuleList = []  # type: List[Tuple[str, Dict]]
 
     def backend(self, backendName: 'BackendName', *backendArgument: Any) -> None:
         """
         Set backend
         """
-        if type(backendName) is not str:
-            backendName = backendName.value
-        self.backendName = backendName
+        if type(backendName) is str:
+            self.backendName = BackendName(backendName)
+        else:
+            self.backendName = backendName
         self.backendArgument = list(backendArgument)
 
     def convertToProcedure(self, name: str, env: 'QEnv') -> 'QProcedure':
@@ -172,28 +176,32 @@ class QEnv:
 
         moduleStep = 0
         circuitToDrawTerminal = CircuitToDrawConsole()
-        if outputInfo and (Settings.drawCircuitControl is None or moduleStep in Settings.drawCircuitControl):
+        if Settings.outputInfo and (
+                Settings.drawCircuitControl is None or moduleStep in Settings.drawCircuitControl):
             asciiPic = circuitToDrawTerminal.convert(self.program)
             print('Origin circuit:')
             print(asciiPic)
 
         if applyModule:
             # filter the circuit by Modules
-            usedModuleList = filterModule(self.backendName, self.usedModuleList)
+            usedModuleList = filterModule(self.backendName, self.usingModuleList)
             for module in usedModuleList:
                 moduleStep += 1
                 self.program = module(self.program)
 
-                if outputInfo and (Settings.drawCircuitControl is None or moduleStep in Settings.drawCircuitControl):
+                if Settings.outputInfo and (
+                        Settings.drawCircuitControl is None or moduleStep in Settings.drawCircuitControl):
                     asciiPic = circuitToDrawTerminal.convert(self.program)
                     print(f'{module.__class__.__name__} pass...')
                     print(asciiPic)
 
             return usedModuleList
         else:
-            return self.usedModuleList
+            return self.usingModuleList
 
-    def commit(self, shots: int, fetchMeasure=True, downloadResult=True, debug: Optional[str] = None) -> Dict[
+    def commit(self, shots: int, fetchMeasure=True, downloadResult=True
+               
+               ) -> Dict[
         str, Union[str, Dict[str, int]]]:
         """
         Switch local/cloud commitment by prefix of backend name
@@ -207,15 +215,15 @@ class QEnv:
         env.commit(1024, downloadResult=False)
 
         :param shots: experiment counts
-        :param fetchMeasure: named param, default is False, means 'Extract data from measurement results', downloadResult must be True
+        :param fetchMeasure: named param, default is True, means 'Extract data from measurement results', downloadResult must be True
         :param downloadResult: named param, default is True, means 'Download experiment results from the server'
         :return: local or cloud commit result
 
         Successful:
 
-        {status: 'success', origin: resultFilePath, measure: measureDict}  # fetchMeasure=True
+        {status: 'success', origin: resultFilePath, counts: measureDict}  # fetchMeasure=True
 
-        {status: 'success', origin: resultFilePath, counts: 1024}  # fetchMeasure=False
+        {status: 'success', origin: resultFilePath, measure: measurePath}  # fetchMeasure=False
 
         {status: 'success'}  # downloadResult=False
 
@@ -226,7 +234,10 @@ class QEnv:
         {status: 'failed', reason: ''}
         """
 
-        if self.backendName.startswith('local_'):
+        self.shots = shots
+
+        ret = None  # type: Dict[str, Union[str, Dict[str, int]]]
+        if self.backendName.value.startswith('local_'):
             usedModuleList = self.publish()  # circuit in Protobuf format
             moduleList = []
             for module in usedModuleList:
@@ -234,15 +245,35 @@ class QEnv:
                     'module': module.__class__.__name__,
                     'arguments': module.arguments
                 })
-            ret = self._localCommit(shots, fetchMeasure, moduleList)
-            return ret
-        elif self.backendName.startswith('cloud_'):
+            ret = self._localCommit(fetchMeasure, moduleList)
+        elif self.backendName.value.startswith('cloud_'):
             self.publish(False)  # circuit in Protobuf format
-            return self._cloudCommit(shots, fetchMeasure, downloadResult, debug)
+            ret = self._cloudCommit(fetchMeasure, downloadResult
+                                    
+                                    )
+        elif self.backendName.value.startswith('service_'):
+            usedModuleList = self.publish()  # circuit in Protobuf format
+            moduleList = []
+            for module in usedModuleList:
+                moduleList.append({
+                    'module': module.__class__.__name__,
+                    'arguments': module.arguments
+                })
+            ret = self._serviceCommit(fetchMeasure, moduleList)
         else:
-            raise Error.ArgumentError(f"Invalid backendName => {self.backendName}", ModuleErrorCode, FileErrorCode, 4)
+            raise Error.ArgumentError(f"Invalid backendName => {self.backendName.value}", ModuleErrorCode,
+                                      FileErrorCode, 4)
+        if Settings.outputInfo and 'moduleList' in ret:
+            moduleList = []  # type: List[str]
+            for moduleSetting in ret['moduleList']:
+                moduleList.append(moduleSetting['module'])
+            interactiveModule = InteractiveModule(self)
+            print('Modules called sequentially')
+            interactiveModule.printModuleList(moduleList)
+            printModuleListDescription(moduleList)
+        return ret
 
-    def _localCommit(self, shots: int, fetchMeasure: bool, moduleList: []) -> Dict[str, Union[str, Dict[str, int]]]:
+    def _localCommit(self, fetchMeasure: bool, moduleList: []) -> Dict[str, Union[str, Dict[str, int]]]:
         """
         Local commitment
 
@@ -254,18 +285,19 @@ class QEnv:
                                      FileErrorCode, 5)
 
         # import the backend plugin according to the backend name
-        module = loadPythonModule(f'QCompute.OpenSimulator.{self.backendName}')
+        module = loadPythonModule(f'QCompute.OpenSimulator.{self.backendName.value}')
         if module is None:
-            module = loadPythonModule(f'QCompute.Simulator.{self.backendName}')
+            module = loadPythonModule(f'QCompute.Simulator.{self.backendName.value}')
         if module is None:
-            raise Error.ArgumentError(f"Invalid local backend => {self.backendName}!", ModuleErrorCode, FileErrorCode,
+            raise Error.ArgumentError(f"Invalid local backend => {self.backendName.value}!", ModuleErrorCode,
+                                      FileErrorCode,
                                       6)
         backendClass = getattr(module, 'Backend')
 
         # configure the parameters
         backend = backendClass()  # type: 'QImplement'
         backend.program = self.program
-        backend.shots = shots
+        backend.shots = self.shots
         backend.backendArgument = self.backendArgument
         # execution
         backend.commit()
@@ -304,19 +336,15 @@ class QEnv:
 
             if backend.result.counts is not None:
                 measureFn = Path(originFn[:-12] + '.measure.json')
-                with open(measureFn, 'wt') as file:
-                    file.write(json.dumps(backend.result.counts))
+                measureFn.write_text(json.dumps(backend.result.counts), encoding='utf-8')
             elif backend.result.state is not None:
                 measureFn = Path(originFn[:-12] + '.measure.txt')
-                with open(measureFn, 'wt') as file:
-                    file.write(str(backend.result.state))
+                measureFn.write_text(str(backend.result.state), encoding='utf-8')
             taskResult["measure"] = str(measureFn)
 
             if backend.result.log != '':
                 logFn = Path(originFn[:-12] + '.log')
-                with open(logFn, 'wt') as file:
-                    file.write(backend.result.log)
-                    file.write(backend.result.log)
+                logFn.write_text(backend.result.log, encoding='utf-8')
                 taskResult["log"] = str(logFn)
 
             taskResult["moduleList"] = moduleList
@@ -335,7 +363,9 @@ class QEnv:
 
         return {"status": "failed", "reason": backend.result.log}
 
-    def _cloudCommit(self, shots: int, fetchMeasure: bool, downloadResult: bool, debug: Optional[str]) -> Dict[
+    def _cloudCommit(self, fetchMeasure: bool, downloadResult: bool
+                     
+                     ) -> Dict[
         str, Union[str, Dict[str, int]]]:
         """
         Cloud Commitment
@@ -347,21 +377,23 @@ class QEnv:
         circuitPackageFd, circuitPackageFn = tempfile.mkstemp(prefix="circuit.", suffix=".pb", dir=outputPath)
         with os.fdopen(circuitPackageFd, "wb") as file:
             file.write(programBuf)
-        if outputInfo:
+        if Settings.outputInfo:
             print(f'CircuitPackageFile: {circuitPackageFn}')
 
         usedModuleList = []
-        for module in self.usedModuleList:
+        for module in self.usingModuleList:
             usedModuleList.append((module.__class__.__name__, module.arguments))
         usedModuleList.extend(self.usedServerModuleList)
 
         # todo process the file and upload failed case
         task = QTask()
         task.uploadCircuit(circuitPackageFn)
-        backend = self.backendName[6:]  # omit the prefix `cloud_`
-        task.createCircuitTask(shots, backend, self.backendArgument, usedModuleList, debug)
+        backend = self.backendName.value[6:]  # omit the prefix `cloud_`
+        task.createCircuitTask(self.shots, backend, self.backendArgument, usedModuleList
+                               
+                               )
 
-        if outputInfo:
+        if Settings.outputInfo:
             print(f'Circuit upload successful, circuitId => {task.circuitId} taskId => {task.taskId}')
 
         # skip waiting when the relevant variable exists
@@ -377,6 +409,36 @@ class QEnv:
 
         return taskResult
 
+    def _serviceCommit(self, fetchMeasure: bool, moduleList: []) -> Dict[str, Union[str, Dict[str, int]]]:
+        """
+        Service commitment
+
+        :return: task result
+        """
+
+        # import the service plugin according to the backend name
+        module = loadPythonModule(f'QCompute.OpenService.{self.backendName.value}')
+        # if module is None:
+        #     module = loadPythonModule(f'QCompute.Service.{self.backendName.value}')
+        if module is None:
+            raise Error.ArgumentError(f"Invalid service backend => {self.backendName.value}!", ModuleErrorCode,
+                                      FileErrorCode,
+                                      7)
+        backendClass = getattr(module, 'Backend')
+
+        # configure the parameters
+        backend = backendClass()  # type: 'QImplement'
+        backend.program = self.program
+        backend.shots = self.shots
+        backend.backendArgument = self.backendArgument
+        # execution
+        backend.commit()
+
+        taskResult = {'status': 'success'}
+        taskResult['shots'] = backend.result.shots
+        taskResult['counts'] = backend.result.counts
+        return taskResult
+
     def module(self, moduleObj: 'ModuleImplement') -> None:
         """
         Add processing Modules, register module object and params
@@ -390,7 +452,7 @@ class QEnv:
         :param moduleObj: module object
         """
 
-        self.usedModuleList.append(moduleObj)
+        self.usingModuleList.append(moduleObj)
 
     def serverModule(self, module: 'ServerModule', arguments: Dict) -> None:
         self.usedServerModuleList.append((module.value, arguments))

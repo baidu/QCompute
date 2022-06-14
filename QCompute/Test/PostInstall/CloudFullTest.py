@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -125,8 +125,6 @@ def cloudFullTest():
     Barrier(q[0], q[1], q[2])
 
     MeasureZ(q, range(3))
-
-    env.module(UnrollProcedureModule())
     
     ret = env.commit(1024, fetchMeasure=True)
     assert ret['counts']['000'] == 157

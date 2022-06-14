@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 """
 PostProcess
 """
-from typing import Dict
+from typing import Dict, Union
 
 from QCompute.Define import MeasureFormat
-from QCompute.Define.Settings import measureFormat
+from QCompute.Define import Settings
 
 
 def filterMeasure(counts: Dict[str, int], measuredQRegsToCRegsDict: Dict[int, int]
@@ -74,7 +74,8 @@ def filterMeasure(counts: Dict[str, int], measuredQRegsToCRegsDict: Dict[int, in
     return binRet
 
 
-def formatMeasure(counts: Dict[str, int], cRegCount: int, mFormat: MeasureFormat = measureFormat) -> Dict[str, int]:
+def formatMeasure(counts: Dict[str, int], cRegCount: int, mFormat: MeasureFormat = Settings.measureFormat) -> Dict[
+    str, int]:
     ret = {}  # type: Dict[str, int]
     for (k, v) in counts.items():
         if mFormat == MeasureFormat.Bin and k.startswith('0x'):
@@ -85,4 +86,28 @@ def formatMeasure(counts: Dict[str, int], cRegCount: int, mFormat: MeasureFormat
             ret[hex(num)] = v
         else:
             ret[k] = v
+    return ret
+
+
+def formatReverseMeasure(counts: Dict[str, int], cRegCount: int, reverse: bool,
+                         mFormat: MeasureFormat = Settings.measureFormat) -> Dict[Union[str, int], int]:
+    ret = {}  # type: Dict[Union[str, int], int]
+    for (k, v) in counts.items():
+        if k.startswith('0x'):
+            numKey = int(k, 16)
+            binKey = bin(numKey)[2:].zfill(cRegCount)
+        else:
+            numKey = int(k, 2)
+            binKey = bin(numKey)[2:].zfill(cRegCount)
+        if reverse:
+            binKey = binKey[::-1]
+        if mFormat == MeasureFormat.Bin:
+            ret[binKey] = v
+        elif mFormat == MeasureFormat.Hex:
+            numKey = int(binKey, 2)
+            hexKey = hex(numKey)
+            ret[hexKey] = v
+        elif mFormat == MeasureFormat.Dec:
+            numKey = int(binKey, 2)
+            ret[numKey] = v
     return ret

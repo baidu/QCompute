@@ -365,7 +365,7 @@ $$
 from QCompute import *
 from numpy import pi
 
-matchSdkVersion('Python 2.0.4')
+matchSdkVersion('Python 2.0.6')
 
 
 def func_order_finding_2_mod_63():

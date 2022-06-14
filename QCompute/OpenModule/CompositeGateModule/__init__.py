@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ Composite Gate
 from copy import deepcopy
 from typing import List, Optional, Union, Dict
 
-from QCompute.OpenModule import ModuleImplement
+from QCompute.OpenModule import ModuleImplement, ModuleErrorCode
+from QCompute.QPlatform import Error
 from QCompute.QPlatform.CircuitTools import gateToProtobuf
-from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
-from QCompute.QPlatform.QOperation.FixedGate import CX
-from QCompute.QPlatform.QOperation.RotationGate import U
+from QCompute.QPlatform.QOperation.FixedGate import H, CZ, S
+from QCompute.QPlatform.QOperation.RotationGate import CRX, RX, CU
 from QCompute.QProtobuf import PBCircuitLine, PBProgram, PBCompositeGate
+
+FileErrorCode = 5
 
 
 class CompositeGateModule(ModuleImplement):
@@ -39,7 +41,7 @@ class CompositeGateModule(ModuleImplement):
 
     env.module(CompositeGateModule({'disable': True}))  # Disable
 
-    env.module(CompositeGateModule({'compositeGateList': ['RZZ']}))
+    env.module(CompositeGateModule({'compositeGateList': ['MS']}))
     """
     arguments = None  # type: Optional[Dict[str, Union[List[str], bool]]]
     compositeGateList = None  # type: List[str]
@@ -86,41 +88,85 @@ class CompositeGateModule(ModuleImplement):
         for index, circuitLine in enumerate(circuitIn):
             compositeGate = circuitLine.compositeGate  # type: 'PBCompositeGate'
             if circuitLine.HasField('compositeGate') and (
-                    self.compositeGateList is None or compositeGate.name in self.compositeGateList):
-                if compositeGate == PBCompositeGate.RZZ:
+                    self.compositeGateList is None or PBCompositeGate.Name(compositeGate) in self.compositeGateList):
+                if compositeGate == PBCompositeGate.MS:
                     # Insert the decomposed circuit
-                    circuitOut.extend(_RZZ(circuitLine))
+                    circuitOut.extend(_MS(circuitLine))
                     continue
+                elif compositeGate == PBCompositeGate.CK:
+                    # Insert the decomposed circuit
+                    circuitOut.append(_CK(circuitLine))
+                    continue
+                else:
+                    raise Error.ArgumentError(f'Unsupported composite gate {compositeGate.name}!', ModuleErrorCode,
+                                              FileErrorCode, 1)
+
             circuitOut.append(circuitLine)
 
 
-def _RZZ(rzzGate: PBCircuitLine) -> List[PBCircuitLine]:
+def _MS(msGate: PBCircuitLine) -> List[PBCircuitLine]:
     """
-    RZZ(xyz)(Q0, Q1)
-
-    =
-
-    CX(Q0, Q1)
-
-    U(xyz)(Q1)
-
-    CX(Q0, Q1)
+    MS()(Q0, Q1)
+    MS(theta)(Q0, Q1)
     """
+    if len(msGate.argumentIdList) > 0:
+        raise Error.ArgumentError('MS gate in procedure, must unroll procedure first!', ModuleErrorCode,
+                                  FileErrorCode, 2)
     ret = []  # type: List['PBCircuitLine']
-
-    ret.append(gateToProtobuf(CX, rzzGate.qRegList))
-
-    argumentList = []
-    if len(rzzGate.argumentIdList) > 0:
-        for index, argumentId in enumerate(rzzGate.argumentIdList):
-            if argumentId >= 0:
-                argumentList.append(ProcedureParameterStorage(argumentId))
-            else:
-                argumentList.append(rzzGate.argumentValueList[index])
+    if len(msGate.argumentValueList) > 0:
+        # CRX
+        theta = msGate.argumentValueList[0]  # type: 'RotationArgument'
+        ret.append(gateToProtobuf(H, [msGate.qRegList[0]]))
+        ret.append(gateToProtobuf(CRX(-2 * theta), msGate.qRegList))
+        ret.append(gateToProtobuf(H, [msGate.qRegList[0]]))
+        ret.append(gateToProtobuf(RX(theta), [msGate.qRegList[1]]))
     else:
-        argumentList = rzzGate.argumentValueList
-    ret.append(gateToProtobuf(U(*argumentList), [rzzGate.qRegList[1]]))
-
-    ret.append(gateToProtobuf(CX, rzzGate.qRegList))
-
+        # CZ
+        ret.append(gateToProtobuf(H, [msGate.qRegList[0]]))
+        ret.append(gateToProtobuf(H, [msGate.qRegList[1]]))
+        ret.append(gateToProtobuf(CZ, msGate.qRegList))
+        ret.append(gateToProtobuf(S, [msGate.qRegList[0]]))
+        ret.append(gateToProtobuf(S, [msGate.qRegList[1]]))
+        ret.append(gateToProtobuf(H, [msGate.qRegList[0]]))
+        ret.append(gateToProtobuf(H, [msGate.qRegList[1]]))
     return ret
+
+
+def _CK(ckGate: PBCircuitLine) -> PBCircuitLine:
+    """
+    CK(kappa)(Q0, Q1)
+    """
+    kappa = ckGate.argumentValueList[0]  # type: 'RotationArgument'
+    return gateToProtobuf(CU(0, kappa, 0), ckGate.qRegList)
+
+# removed. only example
+# def _RZZ(rzzGate: PBCircuitLine) -> List[PBCircuitLine]:
+#     """
+#     RZZ(xyz)(Q0, Q1)
+#
+#     =
+#
+#     CX(Q0, Q1)
+#
+#     U(xyz)(Q1)
+#
+#     CX(Q0, Q1)
+#     """
+#     ret = []  # type: List['PBCircuitLine']
+#
+#     ret.append(gateToProtobuf(CX, rzzGate.qRegList))
+#
+#     if len(rzzGate.argumentIdList) > 0:
+#         argumentList = []  # type: List['RotationArgument']
+#         for index, argumentId in enumerate(rzzGate.argumentIdList):
+#             if argumentId >= 0:
+#                 argumentList.append(ProcedureParameterStorage(argumentId))
+#             else:
+#                 argumentList.append(rzzGate.argumentValueList[index])
+#     else:
+#         argumentList = rzzGate.argumentValueList  # type: List['RotationArgument']
+#     ret.append(gateToProtobuf(U(*argumentList), [rzzGate.qRegList[1]]))
+#
+#     ret.append(gateToProtobuf(CX, rzzGate.qRegList))
+#
+#     return ret

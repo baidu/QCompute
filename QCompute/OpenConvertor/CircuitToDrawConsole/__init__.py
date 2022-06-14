@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 # limitations under the License.
 
 """
-Convert the circuit to internal struct
+Convert the circuit to draw console
 """
 from hashlib import blake2b
 from io import StringIO
 from typing import List
 
-from QCompute.Define.Settings import drawCircuitCustomizedGateHashLength
+from QCompute.Define import Settings
 from QCompute.OpenConvertor import ConvertorImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
-from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBMeasure
+from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, PBMeasure
 
 FileErrorCode = 2
 
@@ -38,7 +38,7 @@ numPos = gapLen + 1
 
 class CircuitToDrawConsole(ConvertorImplement):
     """
-    Circuit to draw terminal
+    Circuit to draw console
     """
 
     def __init__(self):
@@ -106,10 +106,24 @@ class CircuitToDrawConsole(ConvertorImplement):
                     for argument in pbCircuitLine.argumentValueList:
                         argumentList.append(f'{argument}')
                 self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
+            elif op == 'compositeGate':
+                compositeGate = pbCircuitLine.compositeGate  # type: PBCompositeGate
+                gateName = PBCompositeGate.Name(compositeGate)
+                argumentList = []
+                if pbCircuitLine.argumentIdList:
+                    for index, argumentId in enumerate(pbCircuitLine.argumentIdList):
+                        if argumentId == -1:
+                            argumentList.append(f'{pbCircuitLine.argumentValueList[index]}')
+                        else:
+                            argumentList.append(f'P{argumentId}')
+                else:
+                    for argument in pbCircuitLine.argumentValueList:
+                        argumentList.append(f'{argument}')
+                self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'customizedGate':
                 customizedGate = pbCircuitLine.customizedGate  # type: PBCustomizedGate
                 matrixBytes = protobufMatrixToNumpyMatrix(customizedGate.matrix).tobytes()
-                hash = blake2b(matrixBytes, digest_size=drawCircuitCustomizedGateHashLength)
+                hash = blake2b(matrixBytes, digest_size=Settings.drawCircuitCustomizedGateHashLength)
                 self._draw(qRegCount, f'|Custom[{hash.hexdigest()}]|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'procedureName':
                 gateName = pbCircuitLine.procedureName

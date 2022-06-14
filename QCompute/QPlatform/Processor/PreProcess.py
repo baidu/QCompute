@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,6 +63,10 @@ def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
                     raise Error.ArgumentError('Measure must be once on a CReg', ModuleErrorCode, FileErrorCode, 3)
                 compactedCRegDict[qReg] = cReg
                 circuitLine.measure.cRegList[index] = qReg
+
+    if measured is False:
+        raise Error.ArgumentError('At least one measurement operation is required in a quantum circuit.',
+                                  ModuleErrorCode, FileErrorCode, 4)
 
     program.head.usingQRegList[:] = sorted(compactedQRegDict.values())
     if strictUsingCReg:

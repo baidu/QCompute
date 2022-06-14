@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 """
 Export the entire directory as a library
 """
-import copy
 from enum import Enum, unique
 
 from QCompute.QPlatform import Error
@@ -58,17 +57,19 @@ class BackendName(Enum):
     env.backend(BackendName.LocalBaiduSim2, Sim2Argument.Dense_Matmul_Probability.value + ' -s 20210210')
     """
 
+    
+
     CloudBaiduSim2Water = 'cloud_baidu_sim2_water'
     """
     Cloud Baidu Sim2 Water
     
     This backend name (CloudBaiduSim2Water) is only available >= v1.0.3
     
-    Python simulator
+    Cpp dense simulator
     
-    Parameter can be a Sim2Argument enum or string.
+    Dense_Matmul_Probability
     
-    Default is Sim2Argument.Dense_Matmul_Probability
+    Parameter must be a string.
     
     Example: 
     
@@ -78,11 +79,11 @@ class BackendName(Enum):
     
     or
     
-    env.backend(BackendName.CloudBaiduSim2Water, Sim2Argument.Dense_Matmul_Probability)
+    env.backend(BackendName.CloudBaiduSim2Water)
     
     or Added shots(must have space in string)
     
-    env.backend(BackendName.CloudBaiduSim2Water, Sim2Argument.Dense_Matmul_Probability.value + ' -s 20210210')
+    env.backend(BackendName.CloudBaiduSim2Water, '-s 20210210')
     """
 
     CloudBaiduSim2Earth = 'cloud_baidu_sim2_earth'
@@ -236,6 +237,21 @@ class BackendName(Enum):
     env.backend(BackendName.CloudIoPCAS)
     """
 
+    ServiceUbqc = 'service_ubqc'
+    """
+    Service Ubqc
+    
+    This backend name (ServiceUbqc) is only available >= v2.0.4
+    
+    Example: 
+    
+    env = QEnv()
+    
+    env.backend(BackendName.ServiceUbqc)
+    """
+
+    
+
 
 BackendName.__class__ = _metaBackendName
 
@@ -250,6 +266,7 @@ class Sim2Argument(Enum):
     Dense_Matmul_Accumulation = '-mt dense -a matmul -mm accumulation'
     Dense_Einsum_Probability = '-mt dense -a einsum -mm probability'
     Dense_Einsum_Accumulation = '-mt dense -a einsum -mm accumulation'
+    
 
 
 @unique
@@ -265,5 +282,4 @@ class ServerModule(Enum):
     UnrollCircuit = 'UnrollCircuitModule'
     UnrollProcedure = 'UnrollProcedureModule'
 
-    MappingToIoPCAS = 'MappingToIoPCASModule'
-    UnrollCircuitToIoPCAS = 'UnrollCircuitToIoPCASModule'
+    

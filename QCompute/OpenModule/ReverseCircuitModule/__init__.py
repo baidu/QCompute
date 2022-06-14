@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2020 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,15 +19,7 @@ from copy import deepcopy
 from typing import List, Dict, Optional
 
 from QCompute.OpenModule import ModuleImplement
-from QCompute.QPlatform import Error
-from QCompute.QPlatform.CircuitTools import gateToProtobuf
-from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
-from QCompute.QPlatform.QOperation.FixedGate import ID, X, Y, Z, H, S, SDG, T, TDG, CX, CY, CZ, CH, SWAP, CCX, CSWAP, \
-    getFixedGateInstance
-from QCompute.QPlatform.QOperation.RotationGate import U, RX, RY, RZ, CRX, CRY, CRZ, CU, createRotationGateInstance
-from QCompute.QPlatform.QOperation.CompositeGate import RZZ
-from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
-from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate
+from QCompute.QProtobuf import PBProgram, PBCircuitLine
 
 
 class ReverseCircuitModule(ModuleImplement):

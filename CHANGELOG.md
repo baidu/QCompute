@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.0.6] - June-11-2022
+### Changed
+- Repair some range-restriction issues;
+- Update requirements.
+
+## [2.0.5] - June-01-2022
+### Added
+- Support for the UBQC(Universal blind quantum computing) plugin;
+- More convertors
+  + Qasm Convertor;
+  + XanaduSF Convertor;
+  + IonQ Convertor;
+- Calibration functions;
+- InteractiveModule.
+### Changed
+- CompositeGate:
+  + CK Gate;
+  + MS Gate.
+### Removed
+- RZZ Gate.
+
 ## [2.0.4] - May-05-2022
 ### Added
 - Support for the QEP plugin.
