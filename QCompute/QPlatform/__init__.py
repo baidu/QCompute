@@ -18,6 +18,7 @@
 """
 Export the entire directory as a library
 """
+import sys
 from enum import Enum, unique
 
 from QCompute.QPlatform import Error
@@ -26,9 +27,11 @@ ModuleErrorCode = 1
 FileErrorCode = 1
 
 
-class _metaBackendName(type):
-    def __getattr__(cls, name):
-        raise Error.ArgumentError('Unknown backend name.', ModuleErrorCode, FileErrorCode, 1)
+def getBackendFromName(name: str):
+    for value in BackendName.__members__.values():
+        if value.name == name or value.value == name:
+            return value
+    raise Error.ArgumentError('Unknown backend name.', ModuleErrorCode, FileErrorCode, 1)
 
 
 class BackendName(Enum):
@@ -224,6 +227,19 @@ class BackendName(Enum):
     env.backend(BackendName.CloudAerAtBD, '-q')
     """
 
+    CloudBaiduQPUQian = 'cloud_baidu_qpu_qian'
+    """
+    Cloud Baidu QPU Qian
+
+    This backend name (CloudBaiduQPUQian) is only available >= v3.0.0
+
+    Example: 
+
+    env = QEnv()
+
+    env.backend(BackendName.CloudBaiduQPUQian)
+    """
+
     CloudIoPCAS = 'cloud_iopcas'
     """
     Cloud IoPCAS
@@ -235,6 +251,19 @@ class BackendName(Enum):
     env = QEnv()
     
     env.backend(BackendName.CloudIoPCAS)
+    """
+
+    CloudIonAPM = 'cloud_ionapm'
+    """
+    Cloud IonAPM
+    
+    This backend name (IonAPM) is only available >= v3.0.0
+    
+    Example: 
+    
+    env = QEnv()
+    
+    env.backend(BackendName.CloudIonAPM)
     """
 
     ServiceUbqc = 'service_ubqc'
@@ -251,9 +280,6 @@ class BackendName(Enum):
     """
 
     
-
-
-BackendName.__class__ = _metaBackendName
 
 
 @unique
@@ -281,5 +307,10 @@ class ServerModule(Enum):
     ReverseCircuit = 'ReverseCircuitModule'
     UnrollCircuit = 'UnrollCircuitModule'
     UnrollProcedure = 'UnrollProcedureModule'
+    MappingToBaiduQPUQian = 'MappingToBaiduQPUQianModule'
+    UnrollCircuitToBaiduQPUQian = 'UnrollCircuitToBaiduQPUQianModule'
+    MappingToIoPCAS = 'MappingToIoPCASModule'
+    UnrollCircuitToIoPCAS = 'UnrollCircuitToIoPCASModule'
+    UnrollCircuitToIonAPM = 'UnrollCircuitToIonAPMModule'
 
     

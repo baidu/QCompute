@@ -38,14 +38,14 @@ Values: 'prod', 'test'
 Used for prod or test environment.
 """
 if env == "test":
-    raise Error.RuntimeError('Not implemented')
+    from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 else:
     # service address for production
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
     blindCompAddr = 'wss://blindcomp.baidu.com'
 
-sdkVersion = 'Python 2.0.6'
+sdkVersion = 'Python 3.0.0'
 """
 SDK Version
 
@@ -124,42 +124,71 @@ Do not modify by user.
 Used for task check.
 """
 
-waitTaskRetrys = 10
+waitTaskRetryTimes = 10
 """
-Wait Task Retrys
+Wait Task Retry Times
 
 Do not modify by user.
 
 Retry count for waittask in case network failed.
 """
 
-outputPath = Path('Output').absolute()
+waitTaskRetryDelaySeconds = 5
+"""
+Wait Task Retry Delay Seconds
+
+Do not modify by user.
+
+Retry delay for waittask in case network failed.
+"""
+
+outputDirPath = Path('Output').absolute()
 
 """
-Output Path
+Output Dir Path
 
 Do not modify by user.
 
 Will be created, when not exist.
 """
 
-calibrationPath = Path('Calibration').absolute()
+calibrationDirPath = Path('Calibration').absolute()
 
 """
-Calibration Path
+Calibration Dir Path
 
 Do not modify by user.
 
 Will be created, when not exist.
 """
+
+
 
 if 'sphinx' in sys.modules:
-    outputPath = Path()
+    outputDirPath = Path()
 else:
-    os.makedirs(outputPath, mode=0o744, exist_ok=True)
+    os.makedirs(outputDirPath, mode=0o744, exist_ok=True)
 
 maxSeed = 2147483647
+"""
+Seed [0, 2147483647]
+
+Do not modify by user.
+"""
+
 maxShots = 100000
+"""
+Shots [1, 100000]
+
+Do not modify by user.
+"""
+
+maxNotesLen = 160
+"""
+NotesLen [1, 160]
+
+Do not modify by user.
+"""
 
 
 @unique

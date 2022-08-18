@@ -34,8 +34,6 @@ class ReverseCircuitModule(ModuleImplement):
     env.module(ReverseCircuitModule({'disable': True}))  # Disable
     """
 
-    arguments = None  # type: Optional[Dict[str, bool]]
-
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
         """
         Initialize the Module.

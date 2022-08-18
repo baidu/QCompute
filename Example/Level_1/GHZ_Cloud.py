@@ -20,23 +20,20 @@ This is a simple case of using Hadamard gate and CNOT gate to generate a GHZ sta
 Results will be fetched from a cloud program.
 """
 
-from pprint import pprint
 import sys
+from pprint import pprint
 
-sys.path.append('../..')  # "from QCompute import *" requires this
+sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 2.0.6')
-
-from QCompute.Define import Settings
-Settings.outputInfo = False
+matchSdkVersion('Python 3.0.0')
 
 # Your token:
-# Define.hubToken = ''
+Define.hubToken = ''
 
 # Create environment
 env = QEnv()
-# Choose backend Baidu Cloud Quantum Simulator-Sim2 Water
+# Choose backend Baidu cloud simulator Water
 env.backend(BackendName.CloudBaiduSim2Water)
 
 # Initialize the three-qubit circuit
@@ -52,7 +49,7 @@ CX(q[0], q[2])
 # Measure with the computational basis
 MeasureZ(*env.Q.toListPair())
 
-# Commit the quest with 1024 shots to the cloud
+# Commit the task with 1024 shots
 taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

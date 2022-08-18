@@ -16,37 +16,39 @@
 # limitations under the License.
 
 """
-An example of coding on Quantum-Leaf with classical-quantum information interacting features.
+An example of coding on Quantum Leaf with classical-quantum information interacting features.
 Adjust parameter of rotation gates to eliminate '0' state.
 """
 
 import sys
 
-sys.path.append('../..')  # "from QCompute import *" requires this
+sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 2.0.6')
+matchSdkVersion('Python 3.0.0')
 
 # Your token:
-# Define.hubToken = ''
+Define.hubToken = ''
 
-uValue = 1  # Flag of interactions
+# Flag of interactions
+uValue = 1
 for _ in range(15):
 
     print('uValue is :', uValue)
 
     # Create environment
     env = QEnv()
-    # Choose backend Baidu Cloud Quantum Simulator-Sim2 Water
+    # Choose backend Baidu cloud simulator Water
     env.backend(BackendName.CloudBaiduSim2Water)
 
-    # Apply gates and measurement operations to construct the circuit:
+    # Apply gates and measurement operations to construct the circuit
     u = RX(uValue)
     u(env.Q[0])
 
     MeasureZ(*env.Q.toListPair())
 
-    taskResult = env.commit(1024, fetchMeasure=True)  # Submit the circuit, execute and get results
+    # Commit the quest with 1024 shots
+    taskResult = env.commit(1024, fetchMeasure=True)
 
     # Interaction: change parameters of unitary in next experiment according to current result
     CountsDict = taskResult['counts']

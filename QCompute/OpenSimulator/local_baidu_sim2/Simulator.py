@@ -30,7 +30,6 @@ from typing import List, TYPE_CHECKING, Union, Dict, Optional
 import numpy
 
 from QCompute import Define
-from QCompute.Define import outputPath
 from QCompute.OpenConvertor.JsonToCircuit import JsonToCircuit
 from QCompute.OpenSimulator import QResult, ModuleErrorCode
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType, initState_1_0
@@ -131,7 +130,7 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
         
     """
 
-    usedQRegSet, usedCRegSet, compactedQRegDict, compactedCRegDict = preProcess(program, True)
+    usedQRegSet, usedCRegSet, compactedQRegDict, compactedCRegDict = preProcess(program, True, True)
 
     
 
@@ -156,9 +155,7 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
     for circuitLine in program.body.circuit:  # Traverse the circuit
         op = circuitLine.WhichOneof('op')
 
-        qRegList = []  # type List[int]
-        for qReg in circuitLine.qRegList:
-            qRegList.append(qRegMap[qReg])
+        qRegList = [qRegMap[qReg] for qReg in circuitLine.qRegList]  # type List[int]
 
         if op == 'fixedGate':  # fixed gate
             fixedGate = circuitLine.fixedGate  # type: PBFixedGate
@@ -176,14 +173,14 @@ def core(program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm',
             if matrixType == MatrixType.Dense:
                 matrix = uGate.getMatrix()
             else:
-                raise Error.RuntimeError('Not implemented')
+                from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
             state = transfer(state, matrix, qRegList)
         elif op == 'customizedGate':  # customized gate
             customizedGate = circuitLine.customizedGate  # type: PBCustomizedGate
             if matrixType == MatrixType.Dense:
                 matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
             else:
-                raise Error.RuntimeError('Not implemented')
+                from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
             state = transfer(state, matrix, qRegList)
         elif op == 'procedureName':  # procedure
             raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
@@ -235,11 +232,11 @@ def loadGates(matrixType: 'MatrixType') -> Dict['PBFixedGate', Union[numpy.ndarr
             PBFixedGate.SWAP: SWAP.getMatrix()
         }  # type: Dict['PBFixedGate', Union[numpy.ndarray, 'COO']]
     else:
-        raise Error.RuntimeError('Not implemented')
+        from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
     return operationDict
 
 
 if __name__ == '__main__':
     result = runSimulator(None, None)
-    countsFilePath = outputPath / 'counts.json'
+    countsFilePath = Define.outputDirPath / 'counts.json'
     countsFilePath.write_text(result.toJson(True), encoding='utf-8')

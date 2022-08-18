@@ -46,8 +46,13 @@ class CompositeGateOP(QOperation):
 
     argumentList = None  # type: List['RotationArgument']
 
-    def __init__(self, gate: str, bits: int, angleList: List['RotationArgument']) -> None:
+    def __init__(self, gate: str, bits: int, allowArgumentCounts: List[int],
+                 angleList: List['RotationArgument']) -> None:
         super().__init__(gate, bits)
+        if len(angleList) not in allowArgumentCounts:
+            raise Error.ArgumentError(f'allowArgumentCounts is not len(angleList)!',
+                                      ModuleErrorCode, FileErrorCode, 1)
+        self.allowArgumentCounts = allowArgumentCounts
         self.argumentList = angleList
 
     def __call__(self, *qRegList: 'QRegStorage') -> None:
@@ -57,7 +62,7 @@ class CompositeGateOP(QOperation):
         for argument in self.argumentList:
             if isinstance(argument, ProcedureParameterStorage):
                 raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,
-                                          FileErrorCode, 1)
+                                          FileErrorCode, 2)
 
         nAngles = len(self.argumentList)
         if nAngles == 0:
@@ -70,26 +75,45 @@ class CompositeGateOP(QOperation):
             [theta, phi, lamda] = self.argumentList  # type: List[float]
         else:
             raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
-                                      FileErrorCode, 2)
+                                      FileErrorCode, 3)
 
         if self.name == 'MS':
             if nAngles == 0:
-                return CompositeGateOP('MS', 2, [-math.pi / 2])
+                return CompositeGateOP('MS', 2, MSOpAllowArgumentCounts, [-math.pi / 2])
             else:
-                return CompositeGateOP('MS', 2, [-theta])
+                return CompositeGateOP('MS', 2, MSOpAllowArgumentCounts, [-theta])
         elif self.name == 'CK':
-            return CompositeGateOP('CK', 2, [-theta])
+            return CompositeGateOP('CK', 2, CKOpAllowArgumentCounts, [-theta])
         else:
             raise Error.ArgumentError(f'Unsupported inverse {self.name}!', ModuleErrorCode,
-                                      FileErrorCode, 3)
+                                      FileErrorCode, 4)
 
+
+MSOpAllowArgumentCounts = [0, 1]
+CKOpAllowArgumentCounts = [1]
 
 _MSNotified = False
 
 
 def MS(theta: Optional['RotationArgument'] = None) -> 'OperationFunc':
-    """
-    MS()(Q0, Q1)
+    r"""
+    Native two-qubit gate in trapped ion quantum computing, and can create maximum entangle state
+    by one step. For example:
+
+    :math: `MS|00>\rangle = \frac{1}{\sqrt 2}(|00\rangle - i|11\rangle)`
+
+    Matrix form:
+
+    :math:`MS = \frac{1}{\sqrt 2} \begin{bmatrix} 1 & 0  &0 & -i \\ 0 & 1  & -i& 0 \\ 0 & -i  & 1& 0 \\ -i & 0  & 0& 1 \end{bmatrix}`
+
+    Sometimes, the MS gate can hold a rotating parameter which depend on laser devices property
+    
+    :param theta: the two qubits rotating angle
+
+    Matrix form:
+    
+    :math:`MS = \begin{bmatrix} \cos\theta & 0  &0 & -i\sin\theta \\ 0 & \cos\theta  & -i\sin\theta & 0 \\ 0 & -i\sin\theta  & \cos\theta& 0 \\ -i\sin\theta & 0  & 0& \cos\theta \end{bmatrix}`
+
     MS(theta)(Q0, Q1)
     """
     global _MSNotified
@@ -100,15 +124,27 @@ def MS(theta: Optional['RotationArgument'] = None) -> 'OperationFunc':
               'In other cases, MS is a composite gate on platform.\n')
 
     angleList = [value for value in [theta] if value is not None]
-    gate = CompositeGateOP('MS', 2, angleList)
+    gate = CompositeGateOP('MS', 2, MSOpAllowArgumentCounts, angleList)
     return gate
 
+
+MS.type = 'CompositeGateOP'
+MS.allowArgumentCounts = MSOpAllowArgumentCounts
 
 _CKNotified = False
 
 
 def CK(kappa: 'RotationArgument') -> 'OperationFunc':
-    """
+    r"""
+    The cross-Kerr (CK) is a nonlinear crystal that can act on two incident photons.
+    If two channels $i$ and $j$ have incident photons, then the emergent photons will change a phase
+
+    :param kappa: the nonlinear crystal strength
+
+    Matrix form:
+
+    :math:`CK|n_in_j\rangle = \exp(i\kappa n_i\times n_j)|n_in_j\rangle`
+
     CK(kappa)(Q0, Q1)
     """
     global _CKNotified
@@ -118,8 +154,12 @@ def CK(kappa: 'RotationArgument') -> 'OperationFunc':
               'We support CK as a native gate only when the target device type is optical.\n'
               'In other cases, CK is a composite gate on platform.\n')
 
-    gate = CompositeGateOP('CK', 2, [kappa])
+    gate = CompositeGateOP('CK', 2, CKOpAllowArgumentCounts, [kappa])
     return gate
+
+
+CK.type = 'CompositeGateOP'
+CK.allowArgumentCounts = CKOpAllowArgumentCounts
 
 
 def createCompositeGateInstance(name: str, *angles: 'RotationArgument') -> 'OperationFunc':

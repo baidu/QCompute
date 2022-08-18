@@ -20,35 +20,33 @@ This is a simple case of using Hybrid language.
 Results will be fetched from a local program.
 """
 
-from pprint import pprint
 import sys
+from pprint import pprint
 
-sys.path.append('../..')  # "from QCompute import *" requires this
+sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 2.0.6')
+matchSdkVersion('Python 3.0.0')
 
 # Create environment
 env = QEnv()
-# Choose backend Baidu Local Quantum Simulator-Sim2
+# Choose backend Baidu local simulator
 env.backend(BackendName.LocalBaiduSim2)
 
-# We set the number of qubits in our quantum register as
+# Set the number of qubits
 TotalNumQReg = 8
 
 # Initialize a quantum register firstly
 q = env.Q.createList(TotalNumQReg)
 
-# We apply a Hadamard gate on each qubit in the register above,
-# and also other gates as you like such as an X gate.
+# Apply a Hadamard gate on each qubit in the register.
 for index in range(TotalNumQReg):
     H(q[index])
-    # X(q[index])
 
 # Measure with the computational basis
 MeasureZ(*env.Q.toListPair())
 
-# Commit the quest with 1000 shots
-taskResult = env.commit(1000, fetchMeasure=True)
-pprint(taskResult)
+# Commit the quest with 1024 shots
+taskResult = env.commit(1024, fetchMeasure=True)
 
+pprint(taskResult)

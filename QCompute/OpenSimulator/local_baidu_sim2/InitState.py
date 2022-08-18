@@ -48,7 +48,7 @@ def initState_1_0(matrixType: MatrixType, n: int) -> Union[numpy.ndarray, 'COO']
     if matrixType == MatrixType.Dense:
         return initStateDense_1_0(n)
     else:
-        raise Error.RuntimeError('Not implemented')
+        from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 
 
 def initStateDense_1_0(n: int) -> numpy.ndarray:

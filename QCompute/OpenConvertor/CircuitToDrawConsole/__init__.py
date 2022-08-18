@@ -147,7 +147,7 @@ class CircuitToDrawConsole(ConvertorImplement):
                 for qReg in pbCircuitLine.qRegList:
                     self._draw(qRegCount, '|', [qReg], circuitArray)
             else:
-                raise Error.ArgumentError('Unsupported operation at DrawConsole!', ModuleErrorCode, FileErrorCode, 1)
+                raise Error.ArgumentError(f'DrawConsole Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 1)
 
         for array in circuitArray:
             for text in array:

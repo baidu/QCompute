@@ -48,7 +48,7 @@ Customized gate hash length, when draw circuit.
 
 Hex str, length * 2
 
-|Custom[xxxx]|
+Custom[xxxx]
 
 Values: int
 """
@@ -72,6 +72,20 @@ The 'inProcessSimulator' option can significantly accelerate the calculation of 
 the outProcessSimulator can enhance the stability of simulator.  
 
 Supporting local_baidu_sim2
+
+Values: True, False
+"""
+
+autoClearOutputDirAfterFetchMeasure = False
+"""
+Auto clear output dir after fetch measure.
+
+Values: True, False
+"""
+
+cloudTaskDoNotWriteFile = False
+"""
+Cloud task don't write file.
 
 Values: True, False
 """

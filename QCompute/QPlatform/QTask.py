@@ -18,10 +18,13 @@
 """
 Quantum Task
 """
-import sys
+import base64
+import hashlib
 import json
+import sys
 import time
 import traceback
+from datetime import datetime
 from enum import Enum, IntEnum, unique
 from pathlib import Path
 from typing import Callable, Tuple, Dict, Union, Any, List, Optional
@@ -29,13 +32,12 @@ from typing import Callable, Tuple, Dict, Union, Any, List, Optional
 import requests
 from baidubce.auth.bce_credentials import BceCredentials
 from baidubce.bce_client_configuration import BceClientConfiguration
+from baidubce.http import bce_http_client
 from baidubce.services.bos.bos_client import BosClient
 
 # Configuration of token
 # This could be read from configure file or environment variable
 from QCompute import Define
-from QCompute.Define import quantumHubAddr, quantumBucket, pollInterval, sdkVersion, taskSource, outputPath
-from QCompute.Define import waitTaskRetrys
 # the url for cloud service
 # SERVICE = "https://8yamgsew2cs2f.cfc-execute.gz.baidubce.com/"
 # todo carefully demonstrate the upload logic
@@ -46,6 +48,51 @@ from QCompute.QPlatform import Error, ModuleErrorCode
 
 FileErrorCode = 7
 
+_bosClient = None  # type: BceClientConfiguration
+
+
+def _retryWhileNetworkError(func: Callable) -> Callable:
+    """
+    The decorator for retrying function when network failed
+    """
+
+    def _func(*args, **kwargs):
+        retryCount = 0
+        ret = None
+        
+        lastError = None  # type: Exception
+        while retryCount < Define.waitTaskRetryTimes:
+            try:
+                ret = func(*args, **kwargs)
+                lastError = None
+                break
+
+            except (Error.NetworkError, requests.RequestException) as e:
+                # retry if that's a network related error
+                # other errors will be raised
+                retryCount += 1
+                print(f'Network error for {func.__name__}, {retryCount} retrying to connect...')
+                lastError = e
+                time.sleep(Define.waitTaskRetryDelaySeconds)
+            except bce_http_client.BceHttpClientError as e:
+                retryCount += _bosClient.config.retry_policy.max_error_retry
+                print(f'Network error for putObject, {retryCount} retrying to connect...')
+                lastError = e
+                time.sleep(Define.waitTaskRetryDelaySeconds)
+        # else:
+        #     ret = func(*args, **kwargs)
+
+        if retryCount > 0:
+            
+
+            if lastError is None:
+                print(f'Successfully reconnect to {func.__name__}')
+            else:
+                raise lastError
+        return ret
+
+    return _func
+
 
 def _invokeBackend(target: str, params: object) -> Dict:
     """
@@ -54,7 +101,7 @@ def _invokeBackend(target: str, params: object) -> Dict:
 
     try:
         ret = requests.post(
-            f"{quantumHubAddr}/{target}", json=params).json()
+            f"{Define.quantumHubAddr}/{target}", json=params).json()
     except Exception:
         raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 1)
 
@@ -71,54 +118,7 @@ def _invokeBackend(target: str, params: object) -> Dict:
     return ret["data"]
 
 
-def _retryWhileNetworkError(func: Callable) -> Callable:
-    """
-    The decorator for retrying function when network failed
-    """
-
-    def _func(*args, **kwargs):
-        retryCount = 0
-        while retryCount < waitTaskRetrys:
-            try:
-                return func(*args, **kwargs)
-            except Error.NetworkError:
-                # retry if that's a network related error
-                # other errors will be raised
-                print(f'Network error for {func.__name__}, retrying, {retryCount}')
-                retryCount += 1
-        else:
-            return func(*args, **kwargs)
-
-    return _func
-
-
 @_retryWhileNetworkError
-def _getSTSToken() -> Tuple[str, BosClient, str]:
-    """
-    Get the token to upload the file
-
-    :return:
-    """
-
-    if not Define.hubToken:
-        raise Error.ArgumentError('Please provide a valid token', ModuleErrorCode, FileErrorCode, 4)
-
-    config = _invokeBackend("circuit/genSTS", {"token": Define.hubToken})
-
-    bosClient = BosClient(
-        BceClientConfiguration(
-            credentials=BceCredentials(
-                str(
-                    config['accessKeyId']),
-                str(
-                    config['secretAccessKey'])),
-            endpoint='http://bd.bcebos.com',
-            security_token=str(
-                config['sessionToken'])))
-
-    return Define.hubToken, bosClient, config['dest']
-
-
 def _downloadToFile(url: str, localFile: Path) -> Tuple[Path, int]:
     """
     Download from a url to a local file
@@ -136,60 +136,115 @@ def _downloadToFile(url: str, localFile: Path) -> Tuple[Path, int]:
     return localFile, total
 
 
+@_retryWhileNetworkError
+def _downloadToJson(url: str) -> Tuple[Dict[str, any], int]:
+    """
+    Download from a url to a local file
+    """
+    with requests.get(url, stream=True) as req:
+        req.raise_for_status()
+        return req.json(), len(req.content)
+
+
 class QTask:
     """
     Quantum Task
     """
 
     def __init__(self):
-        self.token = Define.hubToken
+        if not Define.hubToken:
+            raise Error.ArgumentError('Please provide a valid token', ModuleErrorCode, FileErrorCode, 4)
+
         self.circuitId = -1
         self.taskId = -1
         self.originFile = Path()
         self.measureFile = Path()
 
-    @_retryWhileNetworkError
-    def uploadCircuit(self, file: str) -> None:
+    def uploadCircuit(self, buf: bytes) -> None:
         """
         Upload the file
         """
+        md5hash = hashlib.md5(buf)
+        md5Buf = md5hash.digest()
+        md5B64 = base64.b64encode(md5Buf)
 
-        self.token, client, dest = _getSTSToken()
-
-        client.put_object_from_file(
-            quantumBucket, f'tmp/{dest}', file)
-
-        ret = _invokeBackend(
-            "circuit/createCircuit",
-            {
-                "token": self.token,
-                "dest": dest,
-                "sdkVersion": sdkVersion,
-                "source": taskSource
-            }
-        )
+        client, dest = self._getSTSToken()
+        self._putObject(client, dest, buf, md5B64)
+        ret = self._createCircuit(dest)
 
         self.circuitId = ret['circuitId']
 
     @_retryWhileNetworkError
-    def createCircuitTask(self, shots: int, backend: str, backendParam: List[Union[str, Enum]] = None,
-                          modules: List[Tuple[str, Any]] = None, debug: Optional[str] = None) -> None:
+    def _getSTSToken(self) -> Tuple[BosClient, str]:
+        """
+        Get the token to upload the file
+
+        :return:
+        """
+        config = _invokeBackend("circuit/genSTS", {"token": Define.hubToken})
+
+        global _bosClient
+        _bosClient = BosClient(
+            BceClientConfiguration(
+                credentials=BceCredentials(
+                    str(
+                        config['accessKeyId']),
+                    str(
+                        config['secretAccessKey'])),
+                endpoint='http://bd.bcebos.com',
+                security_token=str(
+                    config['sessionToken'])))
+
+        return _bosClient, config['dest']
+
+    @_retryWhileNetworkError
+    def _putObject(self, client: BosClient, dest: str, buf: bytes, md5B64: str):
+        client.put_object(
+            Define.quantumBucket, f'tmp/{dest}', buf, len(buf), md5B64)
+
+    @_retryWhileNetworkError
+    def _createCircuit(self, dest: str):
+        ret = _invokeBackend(
+            "circuit/createCircuit",
+            {
+                "token": Define.hubToken,
+                "dest": dest,
+                "sdkVersion": Define.sdkVersion,
+                "source": Define.taskSource
+            }
+        )
+        return ret
+
+    @_retryWhileNetworkError
+    def createCircuitTask(self, shots: int, backend: str, qbits: int, backendParam: List[Union[str, Enum]] = None,
+                          modules: List[Tuple[str, Any]] = None, notes: str = None,
+                          debug: Optional[str] = None) -> None:
         """
         Create a task from the code
 
         debug: None/'shell'/'dump'
         """
 
+        if notes is not None:
+            if len(notes) <= 1:
+                notes = None
+            elif len(notes) > Define.maxNotesLen:
+                print(f'Notes len warning, {len(notes)}/{Define.maxNotesLen}(current/max).')
+                notes = notes[:Define.maxNotesLen]
+
         task = {
-            "token": self.token,
+            "token": Define.hubToken,
             "circuitId": self.circuitId,
             "taskType": backend,
             "shots": shots,
-            "sdkVersion": sdkVersion,
-            "source": taskSource,
+            "sdkVersion": Define.sdkVersion,
+            "source": Define.taskSource,
             "modules": modules,
+            "qbits": qbits,
         }
 
+        if notes is not None:
+            task['notes'] = notes
         if debug:
             task['debug'] = debug
 
@@ -216,11 +271,11 @@ class QTask:
         """
 
         task = {
-            "token": self.token,
+            "token": Define.hubToken,
             "service": backend,
             "params": params,
-            "sdkVersion": sdkVersion,
-            "source": taskSource,
+            "sdkVersion": Define.sdkVersion,
+            "source": Define.taskSource,
         }
 
         ret = _invokeBackend(
@@ -231,60 +286,23 @@ class QTask:
         self.taskId = ret['taskId']
         self.taskToken = ret['taskToken']
 
-    @_retryWhileNetworkError
-    def waitBlindTask(self, checkInterval) -> Union[Tuple[str, str], None]:
-        """
-        Wait for a task from the taskId
-        """
-
-        task = {
-            "token": self.token,
-            "taskId": self.taskId
-        }
-
-        stepStatus = _Status.waiting
-        while True:
-            try:
-                time.sleep(checkInterval)
-                ret = _invokeBackend('task/checkTask', task)
-                newStatus = _Status[ret["status"]]
-                stepStatusName = _Status(stepStatus).name
-
-                if newStatus > 0:
-                    if newStatus in (
-                            _Status.success,
-                            _Status.failed,
-                            _Status.manual_terminate):
-                        # 如果任务状态已经是最终状态了 那说明有问题 直接返回
-                        print(f'resource unavailable\nDEBUG info: {self.taskId}, {ret}', file=sys.stderr)
-                        return
-                    else:
-                        # 剩下来的就是 executing 状态的 可以返回了
-                        # 任务id刻意被str化是为了将来修改跳转地址做准备 目前用任务id作为跳转地址
-                        return str(self.taskId), self.taskToken
-                else:
-                    continue
-
-            except Error.Error as err:
-                raise err
-
-            except Exception:
-                raise Error.RuntimeError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 7)
-
     
 
-    @_retryWhileNetworkError
     def _fetchResult(self) -> None:
         """
         Fetch the result files from the taskId
         """
 
-        ret = _invokeBackend("task/getTaskInfo", {"token": self.token, "taskId": self.taskId})
+        ret = _invokeBackend("task/getTaskInfo", {"token": Define.hubToken, "taskId": self.taskId})
         result = ret["result"]
         originUrl = result["originUrl"]
         # originSize = result["originSize"]
         try:
-            self.originFile, downSize = _downloadToFile(originUrl, outputPath / f"remote.{self.taskId}.origin.json")
+            if not Settings.cloudTaskDoNotWriteFile:
+                self.originFile, downSize = _downloadToFile(originUrl,
+                                                            Define.outputDirPath / f"remote.{self.taskId}.origin.json")
+            else:
+                self.originJson, downSize = _downloadToJson(originUrl)
         except Exception:
             # TODO split the disk write error
             raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 5)
@@ -294,7 +312,11 @@ class QTask:
         measureUrl = result["measureUrl"]
         # measureSize = result["measureSize"]
         try:
-            self.measureFile, downSize = _downloadToFile(measureUrl, outputPath / f"remote.{self.taskId}.measure.json")
+            if not Settings.cloudTaskDoNotWriteFile:
+                self.measureFile, downSize = _downloadToFile(measureUrl,
+                                                             Define.outputDirPath / f"remote.{self.taskId}.measure.json")
+            else:
+                self.measureJson, downSize = _downloadToJson(measureUrl)
         except Exception:
             # TODO split the disk write error
             raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 6)
@@ -306,7 +328,7 @@ class QTask:
         Dump the measurement content of the file from taskId
         """
 
-        localFile = outputPath / f'remote.{self.taskId}.origin.json'
+        localFile = Define.outputDirPath / f'remote.{self.taskId}.origin.json'
         if localFile.exists():
             text = localFile.read_text(encoding='utf-8')
             return json.loads(text)
@@ -318,7 +340,7 @@ class QTask:
         Dump the measurement content of the file from taskId
         """
 
-        localFile = outputPath / f'remote.{self.taskId}.measure.json'
+        localFile = Define.outputDirPath / f'remote.{self.taskId}.measure.json'
         if localFile.exists():
             text = localFile.read_text(encoding='utf-8')
             return json.loads(text)
@@ -326,7 +348,7 @@ class QTask:
             return None
 
     @_retryWhileNetworkError
-    def wait(self, fetchMeasure: bool = False, downloadResult: bool = True) -> Dict:
+    def waitCircuitTask(self, fetchMeasure: bool = False, downloadResult: bool = True) -> Dict:
         """
         Wait for a task from the taskId
         """
@@ -334,14 +356,14 @@ class QTask:
             print(f'Task {self.taskId} is running, please wait...')
 
         task = {
-            "token": self.token,
+            "token": Define.hubToken,
             "taskId": self.taskId
         }
 
         stepStatus = _Status.waiting
         while True:
             try:
-                time.sleep(pollInterval)
+                time.sleep(Define.pollInterval)
                 ret = _invokeBackend('task/checkTask', task)
                 newStatus = _Status[ret["status"]]
                 stepStatusName = _Status(stepStatus).name
@@ -354,14 +376,20 @@ class QTask:
                     if newStatus == _Status.success and "originUrl" in ret.get("result", {}):
                         if downloadResult:
                             self._fetchResult()
-                            result["origin"] = str(self.originFile)
+                            if not Settings.cloudTaskDoNotWriteFile:
+                                result["origin"] = str(self.originFile)
+                                originResult = self._fetchOriginResult()
+                            else:
+                                originResult = self.originJson
 
-                            originResult = self._fetchOriginResult()
                             result["moduleList"] = originResult["moduleList"]
 
                             if fetchMeasure:
-                                result["counts"] = self._fetchMeasureResult()
-                            else:
+                                if not Settings.cloudTaskDoNotWriteFile:
+                                    result["counts"] = self._fetchMeasureResult()
+                                else:
+                                    result["counts"] = self.measureJson
+                            elif not Settings.cloudTaskDoNotWriteFile:
                                 result["measure"] = str(self.measureFile)
                         break
                     elif newStatus == _Status.failed:
@@ -387,6 +415,45 @@ class QTask:
                 raise Error.RuntimeError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 7)
 
         return result
+
+    @_retryWhileNetworkError
+    def waitBlindTask(self, checkInterval) -> Union[Tuple[str, str], None]:
+        """
+        Wait for a task from the taskId
+        """
+
+        task = {
+            "token": Define.hubToken,
+            "taskId": self.taskId
+        }
+
+        stepStatus = _Status.waiting
+        while True:
+            try:
+                time.sleep(checkInterval)
+                ret = _invokeBackend('task/checkTask', task)
+                newStatus = _Status[ret["status"]]
+                stepStatusName = _Status(stepStatus).name
+
+                if newStatus > 0:
+                    if newStatus in (
+                            _Status.success,
+                            _Status.failed,
+                            _Status.manual_terminate):
+                        
+                        print(f'resource unavailable\nDEBUG info: {self.taskId}, {ret}', file=sys.stderr)
+                        return
+                    else:
+                        
+                        return str(self.taskId), self.taskToken
+                else:
+                    continue
+
+            except Error.Error as err:
+                raise err
+
+            except Exception:
+                raise Error.RuntimeError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 7)
 
 
 @unique

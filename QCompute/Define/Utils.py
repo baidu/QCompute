@@ -19,10 +19,14 @@
 Utils Functions
 """
 import importlib
+import os
 import re
+import shutil
+from pathlib import Path
 from typing import List, Union
 
 import QCompute
+from QCompute import Define
 
 _reaesc = re.compile(r'\x1b[^m]*m')
 
@@ -59,9 +63,9 @@ def findUniError(*texts: List[str]) -> Union[str, None]:
     """
 
     for text in texts:
-        ret =  _unierror.findall(text)
+        ret = _unierror.findall(text)
         if ret:
-            return ret[0][0]    # Only the first result would return
+            return ret[0][0]  # Only the first result would return
     else:
         return None
 
@@ -94,3 +98,17 @@ def matchSdkVersion(tagretVersion: str):
             f'does not match the correct sdk version({QCompute.Define.sdkVersion}). '
             'Please update the sdk.',
             FutureWarning)
+
+
+def clearOutputDir():
+    """
+    Clear output dir.
+    """
+    if Define.outputDirPath.is_dir():
+        fileList = os.listdir(Define.outputDirPath)
+        for path in fileList:
+            path = Define.outputDirPath / path
+            if path.is_dir():
+                shutil.rmtree(path)
+            elif path.is_file():
+                os.remove(path)

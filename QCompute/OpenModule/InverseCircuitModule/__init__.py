@@ -44,9 +44,8 @@ class InverseCircuitModule(ModuleImplement):
 
     env.module(InverseCircuitModule({'errorOnUnsupported': True}))
     """
-
-    arguments = None  # type: Optional[Dict[str, bool]]
     errorOnUnsupported = True
+
 
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
         """

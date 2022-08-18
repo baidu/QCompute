@@ -32,7 +32,7 @@ FileErrorCode = 6
 
 def destoryObject(obj: object) -> None:
     """
-    destoryObject
+    Destory Object
     """
     from itertools import chain
     for attrName in chain(dir(obj.__class__), dir(obj)):
@@ -47,7 +47,7 @@ def destoryObject(obj: object) -> None:
 
 def numpyMatrixToProtobufMatrix(numpyMatrix: numpy.ndarray) -> PBMatrix:
     """
-    Must be C-contiguous.
+    Convert the matrix from numpy format to protobuf format. Must be C-contiguous.
     """
     if not numpyMatrix.flags['C_CONTIGUOUS']:
         raise Error.ArgumentError('Matrix must be C-contiguous!', ModuleErrorCode, FileErrorCode, 1)
@@ -67,7 +67,7 @@ def numpyMatrixToProtobufMatrix(numpyMatrix: numpy.ndarray) -> PBMatrix:
 
 def protobufMatrixToNumpyMatrix(protobufMatrix: PBMatrix) -> numpy.ndarray:
     """
-    Must be C-contiguous.
+    Convert the matrix from protobuf format to numpy format. Must be C-contiguous.
     """
     complexArray = [
         complex(complexValue.real, complexValue.imag) if complexValue.HasField('imag') else complexValue.real for
@@ -77,7 +77,7 @@ def protobufMatrixToNumpyMatrix(protobufMatrix: PBMatrix) -> numpy.ndarray:
 
 def numpyMatrixToDictMatrix(numpyMatrix: numpy.ndarray) -> Dict:
     """
-    Must be C-contiguous.
+    Convert the matrix from numpy format to dict format. Must be C-contiguous.
     """
 
     if not numpyMatrix.flags['C_CONTIGUOUS']:
@@ -108,7 +108,7 @@ def numpyMatrixToDictMatrix(numpyMatrix: numpy.ndarray) -> Dict:
 
 def dictMatrixToNumpyMatrix(dictMatrix: Dict, valueType: Union[Type[complex], Type[float]]) -> numpy.ndarray:
     """
-    Must be C-contiguous.
+    Convert the matrix from dict format to numpy format. Must be C-contiguous.
     """
 
     if len(dictMatrix) == 0:

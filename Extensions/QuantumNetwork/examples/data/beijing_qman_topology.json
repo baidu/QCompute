@@ -1,0 +1,438 @@
+{
+  "nodes": [
+    {
+      "name": "Beijing_Backbone",
+      "type": "BackboneNode",
+      "latitude": 39.93194444,
+      "longitude": 116.1680556
+    },
+    {
+      "name": "TR1",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.93055556,
+      "longitude": 116.2130556
+    },
+    {
+      "name": "TR2",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.99027778,
+      "longitude": 116.2255556
+    },
+    {
+      "name": "TR3",
+      "type": "TrustedRepeaterNode",
+      "latitude": 40.00944444,
+      "longitude": 116.2702778
+    },
+    {
+      "name": "TR4",
+      "type": "TrustedRepeaterNode",
+      "latitude": 40.025,
+      "longitude": 116.3536111
+    },
+    {
+      "name": "TR5",
+      "type": "TrustedRepeaterNode",
+      "latitude": 40.02361111,
+      "longitude": 116.4822222
+    },
+    {
+      "name": "TR6",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.97916667,
+      "longitude": 116.5211111
+    },
+    {
+      "name": "TR7",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.93111111,
+      "longitude": 116.5413889
+    },
+    {
+      "name": "TR8",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.84472222,
+      "longitude": 116.5375
+    },
+    {
+      "name": "TR9",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.81416667,
+      "longitude": 116.4797222
+    },
+    {
+      "name": "TR10",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.81388889,
+      "longitude": 116.3577778
+    },
+    {
+      "name": "TR11",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.81944444,
+      "longitude": 116.2572222
+    },
+    {
+      "name": "TR12",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.8825,
+      "longitude": 116.2075
+    },
+    {
+      "name": "TR13",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.98527778,
+      "longitude": 116.5447222
+    },
+    {
+      "name": "TR14",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.92,
+      "longitude": 116.5983333
+    },
+    {
+      "name": "TR15",
+      "type": "TrustedRepeaterNode",
+      "latitude": 39.93722222,
+      "longitude": 116.3488889
+    },
+    {
+      "name": "TR16",
+      "type": "TrustedRepeaterNode",
+      "latitude": 40.06,
+      "longitude": 116.2661111
+    },
+    {
+      "name": "EN1",
+      "type": "EndNode",
+      "latitude": 39.80083333,
+      "longitude": 116.2263889
+    },
+    {
+      "name": "EN2",
+      "type": "EndNode",
+      "latitude": 39.93,
+      "longitude": 116.2294444
+    },
+    {
+      "name": "EN3",
+      "type": "EndNode",
+      "latitude": 39.94861111,
+      "longitude": 116.3113889
+    },
+    {
+      "name": "EN4",
+      "type": "EndNode",
+      "latitude": 39.91388889,
+      "longitude": 116.32
+    },
+    {
+      "name": "EN5",
+      "type": "EndNode",
+      "latitude": 39.90444444,
+      "longitude": 116.3447222
+    },
+    {
+      "name": "EN6",
+      "type": "EndNode",
+      "latitude": 39.93222222,
+      "longitude": 116.3586111
+    },
+    {
+      "name": "EN7",
+      "type": "EndNode",
+      "latitude": 39.89972222,
+      "longitude": 116.3044444
+    },
+    {
+      "name": "EN8",
+      "type": "EndNode",
+      "latitude": 39.84555556,
+      "longitude": 116.3125
+    },
+    {
+      "name": "EN9",
+      "type": "EndNode",
+      "latitude": 40.07611111,
+      "longitude": 116.2380556
+    },
+    {
+      "name": "EN10",
+      "type": "EndNode",
+      "latitude": 40.05138889,
+      "longitude": 116.2541667
+    },
+    {
+      "name": "EN11",
+      "type": "EndNode",
+      "latitude": 40.07555556,
+      "longitude": 116.2891667
+    },
+    {
+      "name": "EN12",
+      "type": "EndNode",
+      "latitude": 40.0975,
+      "longitude": 116.3319444
+    },
+    {
+      "name": "EN13",
+      "type": "EndNode",
+      "latitude": 40.14388889,
+      "longitude": 116.5925
+    },
+    {
+      "name": "EN14",
+      "type": "EndNode",
+      "latitude": 40.13805556,
+      "longitude": 116.7111111
+    },
+    {
+      "name": "EN15",
+      "type": "EndNode",
+      "latitude": 39.71027778,
+      "longitude": 116.515
+    },
+    {
+      "name": "EN16",
+      "type": "EndNode",
+      "latitude": 39.76194444,
+      "longitude": 116.3538889
+    },
+    {
+      "name": "EN17",
+      "type": "EndNode",
+      "latitude": 40.01111111,
+      "longitude": 116.3516667
+    },
+    {
+      "name": "EN18",
+      "type": "EndNode",
+      "latitude": 40.01555556,
+      "longitude": 116.3786111
+    }
+  ],
+  "links": [
+    {
+      "node1": "Beijing_Backbone",
+      "node2": "TR1",
+      "cchannel": {"distance":  3080},
+      "qchannel": {"distance":  3080}
+    },
+    {
+      "node1": "TR1",
+      "node2": "TR2",
+      "cchannel": {"distance":  6706},
+      "qchannel": {"distance":  6706}
+    },
+    {
+      "node1": "TR2",
+      "node2": "TR3",
+      "cchannel": {"distance":  3946},
+      "qchannel": {"distance":  3946}
+    },
+    {
+      "node1": "TR3",
+      "node2": "TR4",
+      "cchannel": {"distance":  6538},
+      "qchannel": {"distance":  6538}
+    },
+    {
+      "node1": "TR4",
+      "node2": "TR5",
+      "cchannel": {"distance":  9806},
+      "qchannel": {"distance":  9806}
+    },
+    {
+      "node1": "TR5",
+      "node2": "TR6",
+      "cchannel": {"distance":  5729},
+      "qchannel": {"distance":  5729}
+    },
+    {
+      "node1": "TR6",
+      "node2": "TR7",
+      "cchannel": {"distance":  5536},
+      "qchannel": {"distance":  5536}
+    },
+    {
+      "node1": "TR7",
+      "node2": "TR8",
+      "cchannel": {"distance":  9620},
+      "qchannel": {"distance":  9620}
+    },
+    {
+      "node1": "TR8",
+      "node2": "TR9",
+      "cchannel": {"distance":  4818},
+      "qchannel": {"distance":  4818}
+    },
+    {
+      "node1": "TR9",
+      "node2": "TR10",
+      "cchannel": {"distance":  7027},
+      "qchannel": {"distance":  7027}
+    },
+    {
+      "node1": "TR10",
+      "node2": "TR11",
+      "cchannel": {"distance":  5852},
+      "qchannel": {"distance":  5852}
+    },
+    {
+      "node1": "TR11",
+      "node2": "TR12",
+      "cchannel": {"distance":  7646},
+      "qchannel": {"distance":  7646}
+    },
+    {
+      "node1": "TR1",
+      "node2": "TR12",
+      "cchannel": {"distance":  5362},
+      "qchannel": {"distance":  5362}
+    },
+    {
+      "node1": "TR1",
+      "node2": "EN2",
+      "cchannel": {"distance":  1120},
+      "qchannel": {"distance":  1120}
+    },
+    {
+      "node1": "EN2",
+      "node2": "EN3",
+      "cchannel": {"distance":  6026},
+      "qchannel": {"distance":  6026}
+    },
+    {
+      "node1": "TR15",
+      "node2": "EN2",
+      "cchannel": {"distance":  8230},
+      "qchannel": {"distance":  8230}
+    },
+    {
+      "node1": "EN2",
+      "node2": "EN4",
+      "cchannel": {"distance":  6373},
+      "qchannel": {"distance":  6373}
+    },
+    {
+      "node1": "EN4",
+      "node2": "EN5",
+      "cchannel": {"distance":  1949},
+      "qchannel": {"distance":  1949}
+    },
+    {
+      "node1": "TR15",
+      "node2": "EN5",
+      "cchannel": {"distance":  3659},
+      "qchannel": {"distance":  3659}
+    },
+    {
+      "node1": "TR15",
+      "node2": "EN6",
+      "cchannel": {"distance":  869},
+      "qchannel": {"distance":  869}
+    },
+    {
+      "node1": "TR10",
+      "node2": "TR15",
+      "cchannel": {"distance":  13740},
+      "qchannel": {"distance":  13740}
+    },
+    {
+      "node1": "TR15",
+      "node2": "EN8",
+      "cchannel": {"distance":  10471},
+      "qchannel": {"distance":  10471}
+    },
+    {
+      "node1": "TR15",
+      "node2": "EN7",
+      "cchannel": {"distance":  5133},
+      "qchannel": {"distance":  5133}
+    },
+    {
+      "node1": "TR11",
+      "node2": "EN1",
+      "cchannel": {"distance":  2721},
+      "qchannel": {"distance":  2721}
+    },
+    {
+      "node1": "TR10",
+      "node2": "EN16",
+      "cchannel": {"distance":  5786},
+      "qchannel": {"distance":  5786}
+    },
+    {
+      "node1": "TR9",
+      "node2": "EN15",
+      "cchannel": {"distance":  11711},
+      "qchannel": {"distance":  11711}
+    },
+    {
+      "node1": "TR7",
+      "node2": "TR14",
+      "cchannel": {"distance":  4057},
+      "qchannel": {"distance":  4057}
+    },
+    {
+      "node1": "TR6",
+      "node2": "TR13",
+      "cchannel": {"distance":  1847},
+      "qchannel": {"distance":  1847}
+    },
+    {
+      "node1": "TR13",
+      "node2": "EN13",
+      "cchannel": {"distance":  18054},
+      "qchannel": {"distance":  18054}
+    },
+    {
+      "node1": "TR13",
+      "node2": "EN14",
+      "cchannel": {"distance":  21470},
+      "qchannel": {"distance":  21470}
+    },
+    {
+      "node1": "TR15",
+      "node2": "TR16",
+      "cchannel": {"distance":  14971},
+      "qchannel": {"distance":  14971}
+    },
+    {
+      "node1": "TR16",
+      "node2": "EN9",
+      "cchannel": {"distance":  2866},
+      "qchannel": {"distance":  2866}
+    },
+    {
+      "node1": "TR16",
+      "node2": "EN10",
+      "cchannel": {"distance":  1342},
+      "qchannel": {"distance":  1342}
+    },
+    {
+      "node1": "TR16",
+      "node2": "EN11",
+      "cchannel": {"distance":  2524},
+      "qchannel": {"distance":  2524}
+    },
+    {
+      "node1": "TR4",
+      "node2": "EN17",
+      "cchannel": {"distance":  1553},
+      "qchannel": {"distance":  1553}
+    },
+    {
+      "node1": "TR15",
+      "node2": "EN18",
+      "cchannel": {"distance":  8979},
+      "qchannel": {"distance":  8979}
+    },
+    {
+      "node1": "TR4",
+      "node2": "EN12",
+      "cchannel": {"distance":  8250},
+      "qchannel": {"distance":  8250}
+    }
+  ]
+}

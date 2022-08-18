@@ -577,7 +577,7 @@ class UbqcClient(threading.Thread):
             vec_buf = numpyMatrixToProtobufMatrix(vec)
             _init_.vector.append(vec_buf)
 
-        init_stateBuf = _init_.SerializeToString()
+        init_stateBuf = _init_.SerializeToString()  # type: bytes
 
         self.send_back(
             'remote',
@@ -620,7 +620,7 @@ class UbqcClient(threading.Thread):
             req.angles.append(angle)
 
         # Encode the message by serialization
-        reqBuf = req.SerializeToString()
+        reqBuf = req.SerializeToString()  # type: bytes
 
         self.send_back(
             'remote',

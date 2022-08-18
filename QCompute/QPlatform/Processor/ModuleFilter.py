@@ -37,6 +37,13 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
     if backendName in [
         BackendName.LocalBaiduSim2,
         
+        BackendName.CloudBaiduSim2Water,
+        BackendName.CloudBaiduSim2Earth,
+        BackendName.CloudBaiduSim2Thunder,
+        BackendName.CloudBaiduSim2Heaven,
+        BackendName.CloudBaiduSim2Wind,
+        BackendName.CloudBaiduSim2Lake,
+        BackendName.CloudAerAtBD,
     ]:
         return _filterSimulator(backendName, moduleList)
     
@@ -101,17 +108,21 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
 
 
 
-def printModuleListDescription(moduleList: str):
+def printModuleListDescription(moduleList: List[str]):
     for moduleName in moduleList:
         if moduleName in [
+            'MappingToBaiduQPUQianModule',
             'MappingToIoPCASModule',
+            'MappingToIonAPMModule',
             
         ]:
             print(
                 f'- {moduleName}: The qubit mapping module reconstructs the mapping from quantum gates to quantum registers, \n  and adds SWAP gates if necessary to ensure the two-qubit gates in the circuit can be run on hardware devices.'
             )
         elif moduleName in [
+            'UnrollCircuitToBaiduQPUQianModule',
             'UnrollCircuitToIoPCASModule',
+            'UnrollCircuitToIonAPMModule',
             
         ]:
             print(

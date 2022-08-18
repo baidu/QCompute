@@ -40,15 +40,17 @@ class RotationGateOP(QOperation):
 
     Use rotation parameters to create the quantum operators
     """
-    argumentList = None  # type: List['RotationArgument']
-    uGateArgumentList = None  # type: List['RotationArgument']
 
-    def __init__(self, gate: str, bits: int,
+    def __init__(self, gate: str, bits: int, allowArgumentCounts: List[int],
                  angleList: List['RotationArgument'],
                  uGateArgumentList: List['RotationArgument']) -> None:
         super().__init__(gate, bits)
-        self.argumentList = angleList
-        self.uGateArgumentList = uGateArgumentList
+        if len(angleList) not in allowArgumentCounts:
+            raise Error.ArgumentError(f'allowArgumentCounts is not len(angleList)!',
+                                      ModuleErrorCode, FileErrorCode, 1)
+        self.allowArgumentCounts = allowArgumentCounts
+        self.argumentList = angleList  # type: List['RotationArgument']
+        self.uGateArgumentList = uGateArgumentList  # type: List['RotationArgument']
 
     def __call__(self, *qRegList: QRegStorage) -> None:
         self._op(list(qRegList))
@@ -66,10 +68,10 @@ class RotationGateOP(QOperation):
         :return: U3 matrix
         """
 
-        self._matrix = numpy.array([[numpy.cos(theta / 2.0), -numpy.exp(1j * lamda) * numpy.sin(theta / 2.0)],
-                                    [numpy.exp(1j * phi) * numpy.sin(theta / 2.0),
+        self.matrix = numpy.array([[numpy.cos(theta / 2.0), -numpy.exp(1j * lamda) * numpy.sin(theta / 2.0)],
+                                   [numpy.exp(1j * phi) * numpy.sin(theta / 2.0),
                                      numpy.exp(1j * lamda + 1j * phi) * numpy.cos(theta / 2.0)]])
-        return self._matrix
+        return self.matrix
 
     def _u2Matrix(self, phi: float, lamda: float) -> numpy.ndarray:
         """
@@ -80,9 +82,9 @@ class RotationGateOP(QOperation):
         :return: U2 matrix
         """
 
-        self._matrix = (1 / numpy.sqrt(2)) * numpy.array([[1, -numpy.exp(1j * lamda)],
-                                                          [numpy.exp(1j * phi), numpy.exp(1j * (phi + lamda))]])
-        return self._matrix
+        self.matrix = (1 / numpy.sqrt(2)) * numpy.array([[1, -numpy.exp(1j * lamda)],
+                                                         [numpy.exp(1j * phi), numpy.exp(1j * (phi + lamda))]])
+        return self.matrix
 
     def _u1Matrix(self, lamda: float) -> numpy.ndarray:
         """
@@ -92,49 +94,49 @@ class RotationGateOP(QOperation):
         :return: U1 matrix
         """
 
-        self._matrix = numpy.array([[1, 0],
-                                    [0, numpy.exp(1j * lamda)]])
-        return self._matrix
+        self.matrix = numpy.array([[1, 0],
+                                   [0, numpy.exp(1j * lamda)]])
+        return self.matrix
 
     def _cu3Matrix(self, theta: float, phi: float, lamda: float) -> numpy.ndarray:
-        self._matrix = numpy.kron(numpy.eye(2),
-                                  numpy.array([[1, 0],
+        self.matrix = numpy.kron(numpy.eye(2),
+                                 numpy.array([[1, 0],
                                                [0, 0]])
-                                  ) + \
-                       numpy.kron(self._u3Matrix(theta, phi, lamda),
+                                 ) + \
+                      numpy.kron(self._u3Matrix(theta, phi, lamda),
                                   numpy.array([[0, 0],
                                                [0, 1]])
                                   )
-        return self._matrix
+        return self.matrix
 
-    def _generateUMatrix(self) -> None:
+    def _generateUMatrix(self) -> numpy.ndarray:
         uGateArgumentCount = len(
             [value for value in self.uGateArgumentList if isinstance(value, (float, int))])
         if uGateArgumentCount != len(self.uGateArgumentList):
             pass  # has parameter
         elif uGateArgumentCount == 3:
-            self._u3Matrix(*self.uGateArgumentList)
+            return self._u3Matrix(*self.uGateArgumentList)
         elif uGateArgumentCount == 2:
-            self._u2Matrix(*self.uGateArgumentList)
+            return self._u2Matrix(*self.uGateArgumentList)
         elif uGateArgumentCount == 1:
-            self._u1Matrix(*self.uGateArgumentList)
+            return self._u1Matrix(*self.uGateArgumentList)
 
-    def _generateCUMatrix(self) -> None:
+    def _generateCUMatrix(self) -> numpy.ndarray:
         uGateArgumentCount = len([value for value in self.uGateArgumentList if isinstance(value, (float, int))])
         if uGateArgumentCount != len(self.uGateArgumentList):
             pass  # has parameter
         elif uGateArgumentCount == 3:
-            self._cu3Matrix(*self.uGateArgumentList)
+            return self._cu3Matrix(*self.uGateArgumentList)
         # elif uGateArgumentCount == 2:
-        #     self._cu2Matrix(*self.uGateArgumentList)
+        #     return self._cu2Matrix(*self.uGateArgumentList)
         # elif uGateArgumentCount == 1:
-        #     self._cu1Matrix(*self.uGateArgumentList)
+        #     return self._cu1Matrix(*self.uGateArgumentList)
 
     def getInverse(self) -> 'RotationGateOP':
         for argument in self.argumentList:
             if isinstance(argument, ProcedureParameterStorage):
                 raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,
-                                          FileErrorCode, 1)
+                                          FileErrorCode, 2)
 
         nAngles = len(self.argumentList)
         if nAngles == 1:
@@ -145,7 +147,7 @@ class RotationGateOP(QOperation):
             [theta, phi, lamda] = self.argumentList  # type: float
         else:
             raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
-                                      FileErrorCode, 2)
+                                      FileErrorCode, 3)
 
         if self.name == 'RX':
             return RX(-theta)
@@ -168,10 +170,20 @@ class RotationGateOP(QOperation):
                 angles = [self.argumentList[0], numpy.pi - self.argumentList[2], numpy.pi - self.argumentList[1]]
             else:
                 raise Error.ArgumentError(f'Wrong angles count. angles: {self.argumentList}!', ModuleErrorCode,
-                                          FileErrorCode, 3)
+                                          FileErrorCode, 4)
             return U(*angles)
         elif self.name == 'CU':
             return CU(theta, numpy.pi - lamda, numpy.pi - phi)
+
+
+UOpAllowArgumentCounts = [1, 2, 3]
+RXOpAllowArgumentCounts = [1]
+RYOpAllowArgumentCounts = [1]
+RZOpAllowArgumentCounts = [1]
+CUOpAllowArgumentCounts = [3]
+CRXOpAllowArgumentCounts = [1]
+CRYOpAllowArgumentCounts = [1]
+CRZOpAllowArgumentCounts = [1]
 
 
 def U(theta: 'RotationArgument',
@@ -185,9 +197,13 @@ def U(theta: 'RotationArgument',
     The reason is any single-qubit operator can be fully identified with three angles.
     """
     uGateArgumentList = angleList = [value for value in [theta, phi, lamda] if value is not None]
-    gate = RotationGateOP('U', 1, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateUMatrix()
+    gate = RotationGateOP('U', 1, UOpAllowArgumentCounts, angleList, uGateArgumentList)
+    gate.generateMatrix = gate._generateUMatrix
     return gate
+
+
+U.type = 'RotationGateOP'
+U.allowArgumentCounts = UOpAllowArgumentCounts
 
 
 def RX(theta: 'RotationArgument') -> 'OperationFunc':
@@ -200,9 +216,13 @@ def RX(theta: 'RotationArgument') -> 'OperationFunc':
     """
     angleList = [theta]
     uGateArgumentList = [theta, -numpy.math.pi / 2, numpy.math.pi / 2]
-    gate = RotationGateOP('RX', 1, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateUMatrix()
+    gate = RotationGateOP('RX', 1, RXOpAllowArgumentCounts, angleList, uGateArgumentList)
+    gate.generateMatrix = gate._generateUMatrix
     return gate
+
+
+RX.type = 'RotationGateOP'
+RX.allowArgumentCounts = RXOpAllowArgumentCounts
 
 
 def RY(theta: 'RotationArgument') -> 'OperationFunc':
@@ -215,9 +235,13 @@ def RY(theta: 'RotationArgument') -> 'OperationFunc':
     """
     angleList = [theta]
     uGateArgumentList = [theta, 0, 0]
-    gate = RotationGateOP('RY', 1, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateUMatrix()
+    gate = RotationGateOP('RY', 1, RYOpAllowArgumentCounts, angleList, uGateArgumentList)
+    gate.generateMatrix = gate._generateUMatrix
     return gate
+
+
+RY.type = 'RotationGateOP'
+RY.allowArgumentCounts = RYOpAllowArgumentCounts
 
 
 def RZ(lamda: 'RotationArgument') -> 'OperationFunc':
@@ -230,9 +254,13 @@ def RZ(lamda: 'RotationArgument') -> 'OperationFunc':
     """
     angleList = [lamda]
     uGateArgumentList = [0, 0, lamda]
-    gate = RotationGateOP('RZ', 1, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateUMatrix()
+    gate = RotationGateOP('RZ', 1, RZOpAllowArgumentCounts, angleList, uGateArgumentList)
+    gate.generateMatrix = gate._generateUMatrix
     return gate
+
+
+RZ.type = 'RotationGateOP'
+RZ.allowArgumentCounts = RZOpAllowArgumentCounts
 
 
 def CU(theta: 'RotationArgument',
@@ -246,9 +274,13 @@ def CU(theta: 'RotationArgument',
     The rotation gate is performed on the target qubit only when the control qubit is taking effect.
     """
     uGateArgumentList = angleList = [theta, phi, lamda]
-    gate = RotationGateOP('CU', 2, angleList, uGateArgumentList)
+    gate = RotationGateOP('CU', 2, CUOpAllowArgumentCounts, angleList, uGateArgumentList)
     gate.generateMatrix = gate._generateCUMatrix()
     return gate
+
+
+CU.type = 'RotationGateOP'
+CU.allowArgumentCounts = CUOpAllowArgumentCounts
 
 
 def CRX(theta: 'RotationArgument') -> 'OperationFunc':
@@ -257,9 +289,13 @@ def CRX(theta: 'RotationArgument') -> 'OperationFunc':
     """
     angleList = [theta]
     uGateArgumentList = [theta, -numpy.math.pi / 2, numpy.math.pi / 2]
-    gate = RotationGateOP('CRX', 2, angleList, uGateArgumentList)
+    gate = RotationGateOP('CRX', 2, CRXOpAllowArgumentCounts, angleList, uGateArgumentList)
     gate.generateMatrix = gate._generateCUMatrix()
     return gate
+
+
+CRX.type = 'RotationGateOP'
+CRX.allowArgumentCounts = CRXOpAllowArgumentCounts
 
 
 def CRY(theta: 'RotationArgument') -> 'OperationFunc':
@@ -268,9 +304,13 @@ def CRY(theta: 'RotationArgument') -> 'OperationFunc':
     """
     angleList = [theta]
     uGateArgumentList = [theta, 0, 0]
-    gate = RotationGateOP('CRY', 2, angleList, uGateArgumentList)
+    gate = RotationGateOP('CRY', 2, CRYOpAllowArgumentCounts, angleList, uGateArgumentList)
     gate.generateMatrix = gate._generateCUMatrix()
     return gate
+
+
+CRY.type = 'RotationGateOP'
+CRY.allowArgumentCounts = CRYOpAllowArgumentCounts
 
 
 def CRZ(lamda: 'RotationArgument') -> 'OperationFunc':
@@ -279,9 +319,13 @@ def CRZ(lamda: 'RotationArgument') -> 'OperationFunc':
     """
     angleList = [lamda]
     uGateArgumentList = [0, 0, lamda]
-    gate = RotationGateOP('CRZ', 2, angleList, uGateArgumentList)
+    gate = RotationGateOP('CRZ', 2, CRZOpAllowArgumentCounts, angleList, uGateArgumentList)
     gate.generateMatrix = gate._generateCUMatrix()
     return gate
+
+
+CRZ.type = 'RotationGateOP'
+CRZ.allowArgumentCounts = CRZOpAllowArgumentCounts
 
 
 def createRotationGateInstance(name: str, *angles: 'RotationArgument') -> 'OperationFunc':

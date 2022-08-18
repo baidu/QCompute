@@ -28,9 +28,9 @@ from QCompute.QPlatform import Error, ModuleErrorCode
 FileErrorCode = 8
 
 
-def getIoPCASStatus():
+def getDeviceStatus(device: str):
     try:
         return requests.post(
-            f"{Define.quantumHubAddr}/iopcas/status").json()
+            f"{Define.quantumHubAddr}/{device}/status").json()
     except Exception:
         raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 1)

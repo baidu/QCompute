@@ -41,7 +41,7 @@ class Backend(QImplement):
 
     def commit(self) -> None:
         """
-        Universal blind quantum computation backend
+        Commit the circuit to universal blind quantum computation backend
 
         .. code-block:: python
 

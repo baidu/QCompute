@@ -23,10 +23,9 @@ from QCompute import Define
 
 from QCompute.Define import (
     sdkVersion,
-    outputPath,
+    outputDirPath,
 )
 
-from QCompute.Define.Settings import outputInfo
 from QCompute.Define.Utils import matchSdkVersion
 
 from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
@@ -94,6 +93,12 @@ from QCompute.OpenConvertor.CircuitToJson import (
 from QCompute.OpenConvertor.JsonToCircuit import (
     JsonToCircuit
 )
+from QCompute.OpenConvertor.CircuitToInternalStruct import (
+    CircuitToInternalStruct
+)
+from QCompute.OpenConvertor.InternalStructToCircuit import (
+    InternalStructToCircuit
+)
 from QCompute.OpenConvertor.CircuitToQasm import (
     CircuitToQasm
 )
@@ -106,11 +111,14 @@ from QCompute.OpenConvertor.CircuitToIonQ import (
 from QCompute.OpenConvertor.IonQToCircuit import (
     IonQToCircuit
 )
+from QCompute.OpenConvertor.CircuitToQobj import (
+    CircuitToQobj
+)
 from QCompute.OpenConvertor.CircuitToXanaduSF import (
     CircuitToXanaduSF, TwoQubitsGate
 )
 from QCompute.QPlatform import QStatus
 from QCompute.QPlatform import Utilities
-from QCompute.Test.PostInstall.PostInstall import testAll
+from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 
 

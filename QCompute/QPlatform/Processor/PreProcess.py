@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 FileErrorCode = 14
 
 
-def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
+def preProcess(program: 'PBProgram', rerangeQReg: bool, strictUsingCReg: bool) -> \
         Tuple[Set[int], Set[int], Dict[int, int], Dict[int, int]]:
     usedQRegSet = set(program.head.usingQRegList)
     usedCRegSet = set(program.head.usingCRegList)
@@ -40,7 +40,10 @@ def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
         for qReg in circuitLine.qRegList:
             qRegSet.add(qReg)
     for index, qReg in enumerate(sorted(list(qRegSet))):
-        compactedQRegDict[qReg] = index
+        if rerangeQReg:
+            compactedQRegDict[qReg] = index
+        else:
+            compactedQRegDict[qReg] = qReg
 
     measured = False
     for circuitLine in program.body.circuit:
@@ -48,10 +51,7 @@ def preProcess(program: 'PBProgram', strictUsingCReg: bool) -> \
         if measured and op != 'measure':
             raise Error.ArgumentError('Measure must be the last operation!', ModuleErrorCode, FileErrorCode, 1)
 
-        qRegList = []
-        for qReg in circuitLine.qRegList:
-            qRegList.append(compactedQRegDict[qReg])
-        circuitLine.qRegList[:] = qRegList
+        circuitLine.qRegList[:] = [compactedQRegDict[qReg] for qReg in circuitLine.qRegList]
 
         if op == 'measure':
             measured = True

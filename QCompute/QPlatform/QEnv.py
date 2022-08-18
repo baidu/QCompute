@@ -18,7 +18,6 @@
 """
 Quantum Environment
 """
-import argparse
 import json
 import os
 import tempfile
@@ -26,12 +25,13 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Set, List, Dict, TYPE_CHECKING, Union, Optional, Tuple, Any
 
-from QCompute.Define import sdkVersion, noLocalTask, outputPath, noWaitTask, Settings
-from QCompute.Define.Utils import loadPythonModule
+from QCompute import Define
+from QCompute.Define import Settings
+from QCompute.Define.Utils import loadPythonModule, clearOutputDir
 from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
 from QCompute.OpenSimulator import QResult
-from QCompute.QPlatform import Error, ModuleErrorCode
+from QCompute.QPlatform import Error, ModuleErrorCode, BackendName, getBackendFromName
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.InteractiveModule import InteractiveModule
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
@@ -44,7 +44,7 @@ from QCompute.QPlatform.Utilities import destoryObject
 from QCompute.QProtobuf import PBProgram
 
 if TYPE_CHECKING:
-    from QCompute.QPlatform import BackendName, ServerModule
+    from QCompute.QPlatform import ServerModule
 
 FileErrorCode = 2
 
@@ -90,7 +90,7 @@ class QEnv:
         Set backend
         """
         if type(backendName) is str:
-            self.backendName = BackendName(backendName)
+            self.backendName = getBackendFromName(backendName)
         else:
             self.backendName = backendName
         self.backendArgument = list(backendArgument)
@@ -171,7 +171,7 @@ class QEnv:
         """
         program = PBProgram()
         self.program = program
-        program.sdkVersion = sdkVersion
+        program.sdkVersion = Define.sdkVersion
         QEnvToProtobuf(self.program, self)
 
         moduleStep = 0
@@ -199,7 +199,7 @@ class QEnv:
         else:
             return self.usingModuleList
 
-    def commit(self, shots: int, fetchMeasure=True, downloadResult=True
+    def commit(self, shots: int, fetchMeasure=True, downloadResult=True, notes=None
                
                ) -> Dict[
         str, Union[str, Dict[str, int]]]:
@@ -213,6 +213,8 @@ class QEnv:
         env.commit(1024, fetchMeasure=True)
 
         env.commit(1024, downloadResult=False)
+
+        env.commit(1024, fetchMeasure=True, notes='Task 001')
 
         :param shots: experiment counts
         :param fetchMeasure: named param, default is True, means 'Extract data from measurement results', downloadResult must be True
@@ -239,38 +241,36 @@ class QEnv:
         ret = None  # type: Dict[str, Union[str, Dict[str, int]]]
         if self.backendName.value.startswith('local_'):
             usedModuleList = self.publish()  # circuit in Protobuf format
-            moduleList = []
-            for module in usedModuleList:
-                moduleList.append({
-                    'module': module.__class__.__name__,
-                    'arguments': module.arguments
-                })
+            moduleList = [{
+                'module': module.__class__.__name__,
+                'arguments': module.arguments
+            } for module in usedModuleList]
             ret = self._localCommit(fetchMeasure, moduleList)
         elif self.backendName.value.startswith('cloud_'):
             self.publish(False)  # circuit in Protobuf format
-            ret = self._cloudCommit(fetchMeasure, downloadResult
+            ret = self._cloudCommit(fetchMeasure, downloadResult, notes
                                     
                                     )
         elif self.backendName.value.startswith('service_'):
             usedModuleList = self.publish()  # circuit in Protobuf format
-            moduleList = []
-            for module in usedModuleList:
-                moduleList.append({
-                    'module': module.__class__.__name__,
-                    'arguments': module.arguments
-                })
+            moduleList = [{
+                'module': module.__class__.__name__,
+                'arguments': module.arguments
+            } for module in usedModuleList]
             ret = self._serviceCommit(fetchMeasure, moduleList)
         else:
             raise Error.ArgumentError(f"Invalid backendName => {self.backendName.value}", ModuleErrorCode,
                                       FileErrorCode, 4)
         if Settings.outputInfo and 'moduleList' in ret:
-            moduleList = []  # type: List[str]
-            for moduleSetting in ret['moduleList']:
-                moduleList.append(moduleSetting['module'])
+            moduleList = [moduleSetting['module'] for moduleSetting in ret['moduleList']]  # type: List[str]
             interactiveModule = InteractiveModule(self)
             print('Modules called sequentially')
             interactiveModule.printModuleList(moduleList)
             printModuleListDescription(moduleList)
+
+        if Settings.autoClearOutputDirAfterFetchMeasure:
+            clearOutputDir()
+
         return ret
 
     def _localCommit(self, fetchMeasure: bool, moduleList: []) -> Dict[str, Union[str, Dict[str, int]]]:
@@ -280,7 +280,7 @@ class QEnv:
         :return: task result
         """
 
-        if noLocalTask is not None:
+        if Define.noLocalTask is not None:
             raise Error.RuntimeError('Local tasks are not allowed in the online environment!', ModuleErrorCode,
                                      FileErrorCode, 5)
 
@@ -305,7 +305,7 @@ class QEnv:
         # wrap taskResult
         if backend.result.code != 0:
             if backend.result.log != '':
-                logFd, logFn = tempfile.mkstemp(prefix="local.", suffix=".log", dir=outputPath)
+                logFd, logFn = tempfile.mkstemp(prefix="local.", suffix=".log", dir=Define.outputDirPath)
                 with os.fdopen(logFd, "wt") as file:
                     file.write(backend.result.log)
             return {"status": "error", "reason": backend.result.log}
@@ -324,7 +324,7 @@ class QEnv:
             except Exception as ex:
                 print(ex)
 
-            originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir=outputPath)
+            originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir=Define.outputDirPath)
             rsplitedFn = originFn.rsplit('.', 4)
             taskResult = {'taskId': rsplitedFn[-3], 'status': 'success'}
             if backend.result.output != '':
@@ -363,7 +363,7 @@ class QEnv:
 
         return {"status": "failed", "reason": backend.result.log}
 
-    def _cloudCommit(self, fetchMeasure: bool, downloadResult: bool
+    def _cloudCommit(self, fetchMeasure: bool, downloadResult: bool, notes: str
                      
                      ) -> Dict[
         str, Union[str, Dict[str, int]]]:
@@ -373,23 +373,26 @@ class QEnv:
         :return: task result
         """
 
-        programBuf = self.program.SerializeToString()  # the sequential bytes of the circuit which is already in PB
-        circuitPackageFd, circuitPackageFn = tempfile.mkstemp(prefix="circuit.", suffix=".pb", dir=outputPath)
-        with os.fdopen(circuitPackageFd, "wb") as file:
-            file.write(programBuf)
-        if Settings.outputInfo:
-            print(f'CircuitPackageFile: {circuitPackageFn}')
+        # the sequential bytes of the circuit which is already in PB
+        programBuf = self.program.SerializeToString()  # type: bytes
 
-        usedModuleList = []
-        for module in self.usingModuleList:
-            usedModuleList.append((module.__class__.__name__, module.arguments))
+        if not Settings.cloudTaskDoNotWriteFile:
+            circuitPackageFd, circuitPackageFn = tempfile.mkstemp(prefix="circuit.", suffix=".pb",
+                                                                  dir=Define.outputDirPath)
+            with os.fdopen(circuitPackageFd, "wb") as file:
+                file.write(programBuf)
+            if Settings.outputInfo:
+                print(f'CircuitPackageFile: {circuitPackageFn}')
+
+        usedModuleList = [(module.__class__.__name__, module.arguments) for module in self.usingModuleList]
         usedModuleList.extend(self.usedServerModuleList)
 
         # todo process the file and upload failed case
         task = QTask()
-        task.uploadCircuit(circuitPackageFn)
+        task.uploadCircuit(programBuf)
         backend = self.backendName.value[6:]  # omit the prefix `cloud_`
-        task.createCircuitTask(self.shots, backend, self.backendArgument, usedModuleList
+        task.createCircuitTask(self.shots, backend, len(self.program.head.usingQRegList), self.backendArgument,
+                               usedModuleList, notes
                                
                                )
 
@@ -397,10 +400,10 @@ class QEnv:
             print(f'Circuit upload successful, circuitId => {task.circuitId} taskId => {task.taskId}')
 
         # skip waiting when the relevant variable exists
-        if noWaitTask is not None:
+        if Define.noWaitTask is not None:
             return {"taskId": task.taskId}
 
-        taskResult = task.wait(fetchMeasure=fetchMeasure, downloadResult=downloadResult)
+        taskResult = task.waitCircuitTask(fetchMeasure=fetchMeasure, downloadResult=downloadResult)
         if type(taskResult) == str:
             print(taskResult)
         elif taskResult.get('counts') is not None:

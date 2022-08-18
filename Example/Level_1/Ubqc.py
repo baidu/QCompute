@@ -16,27 +16,28 @@
 # limitations under the License.
 
 """
-Universal blind quantum computation (UBQC) test: two-qubits Grover algorithm
+This is a simple case of two-qubits Grover algorithm.
+Results will be fetched from universal blind quantum computation (UBQC) backend.
 """
 
-# Import packages
 import sys
-sys.path.append('../..')  # "from QCompute import *" requires this line
+
+sys.path.append('../..')
 from QCompute import *
-# Set the interpreter
-matchSdkVersion('Python 2.0.6')
 
-# Set you Token here
-# Define.hubToken = 'your Token'
-# Define.hubToken = ''
+matchSdkVersion('Python 3.0.0')
 
-# Build the environment for quantum programming
+# Your token:
+Define.hubToken = ''
+
+# Create environment
 env = QEnv()
-# Choose the ``ServiceUbqc`` backend
+# Choose backend ServiceUbqc
 env.backend(BackendName.ServiceUbqc)
 
-# Initialize two qubits
+# Initialize the two-qubit circuit
 q = env.Q.createList(2)
+
 # Input the Grover circuit
 H(q[0])
 H(q[1])
@@ -48,9 +49,11 @@ Z(q[1])
 CZ(q[0], q[1])
 H(q[0])
 H(q[1])
-# Measure all qubits in the Z basis
+
+# Measure with the computational basis
 MeasureZ(*env.Q.toListPair())
 
-# Submit the task to the server, sample 16 shots and obtain the counts
+# Commit the task to with 16 shots and obtain the counts
 taskResult = env.commit(16, fetchMeasure=True)
+
 print("The sample counts are:", taskResult['counts'])

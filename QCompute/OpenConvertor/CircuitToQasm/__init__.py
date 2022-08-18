@@ -34,16 +34,24 @@ class CircuitToQasm(ConvertorImplement):
     """
 
     def __init__(self):
-        self.containMeasure = False
-        # 子程序代码排序，分析调用关系使用
+        self.containMeasure = False  
+        # Sort the order of procedures to analyze procedure calling.
         self.procedureNameList = []
         self.proceduresCode = {}
         self.proceduresDepends = {}
 
-    # 进行形参、实参的分析处理，组合使用
+    
     def getArgumentList(self, params: List[str], paramIds: List[int]) -> List:
+        """
+        Load called params according to arguments.
+
+        :param params: type: List[str]. List of params.
+        :param paramIds: type: List[int]. List of param indices.
+
+        :return: type: List. List of called params.
+        """
         paramCall = []
-        # 查看paramIds的值，是否有-1的情况，如果有需要寻找对应的paramValues内容
+        
         checkParams = params and len(params)
         checkParamIds = paramIds and len(paramIds)
 
@@ -51,22 +59,22 @@ class CircuitToQasm(ConvertorImplement):
             for i in range(len(paramIds)):
                 paramId = paramIds[i]
                 if paramId != -1:
-                    # 形参
+                    # paramId
                     paramItem = f'param{paramId}'
                     paramCall.append(paramItem)
                 else:
-                    # 实参，使用实际数值参数
+                    # paramValue
                     paramItem = params[i]
                     paramCall.append(paramItem)
         else:
-            # 只有单一参数有效，或者同时为空
-            # 全部使用形参，param0 -> paramx
+            # Only checkParamIds or checkParams is available.
+            # param0 -> paramx
             if checkParamIds:
                 for i in range(len(paramIds)):
                     paramId = paramIds[i]
                     paramItem = f'param{paramId}'
                     paramCall.append(paramItem)
-            # 全部使用实参
+            
             if checkParams:
                 paramCall = params
 
@@ -74,158 +82,247 @@ class CircuitToQasm(ConvertorImplement):
 
     continueZeroRe = re.compile('0+$')
 
-    # 小数点修饰
+    
     def getFixedFloatNumber(self, realNum: float) -> str:
+        """
+        Format floating point number.
+
+        :param realNum: type: float. The input floating point number.
+
+        :return: type: str. The string of formatted floated point number.
+        """
         paramFixed = format(realNum, '.7f')
-        # 剔除连续的0，不能从.开始判断，因为可能有0.010000这种情况
+        # Remove 0s.
         paramFixed = self.continueZeroRe.sub('', paramFixed)
-        # 判断最后的字符，如果是.，则需要补一个0，符合阅读习惯
+
+        # Insert a 0 after decimal point.
         charCheck = paramFixed[-1]
         if charCheck == '.':
             paramFixed += '0'
         return paramFixed
 
     def getFixedArgumentList(self, argumentValueList: List[float]) -> List[str]:
-        # 查看是否有参数
         params = []
         for param in argumentValueList:
             paramFixed = self.getFixedFloatNumber(param)
             params.append(paramFixed)
         return params
 
+
     def getTrimmedArgumentList(self, argumentValueList: List[float]) -> List[str]:
-        # 先进行转换，空值转换为0,其它有效值不动
+        """ 
+        Convert float point number into string. Value None is converted to 0.
+
+        :param argumentValueList: type: List[float]. List of argument values. 
+
+        :return: type: List[str]. List of converted argument values.
+        """
         convertedParams = [self.getFixedFloatNumber(p) for p in argumentValueList]
         return convertedParams
 
-    # 测量指令，这里要使用传统寄存器
+    
     def getMeasureCommandCode(self, measure, qRegs: List[int], regName: str) -> str:
+        """
+        Convert measure code to command code.
+
+        :param measure: type: object. Measure code.
+        :param qRegs: type: List[int]. List of quantum registers.
+        :param regName: type: str. Name of register.
+
+        :return: type: str. Command of measure code.
+        """
         command = ''
-        # 转换使用的寄存器
-        # 要支持多参数紧凑测量，measure.cRegList size为准
+        # Convert from quantum registers to conventional registers.
         for i in range(len(measure.cRegList)):
-            # 第一个是量子寄存器，第二个是传统寄存器
-            cr = measure.cRegList[i]
-            qr = qRegs[i]
+            cr = measure.cRegList[i] # conventional register
+            qr = qRegs[i] # quantum register
             command += f'measure {regName}[{qr}] -> c[{cr}];\n'
         return command
 
-    # usingIndex的含义 - 子程序中不能使用索引，所以命令要去掉索引的表示[]
-    # 分解circuit内门的记录，转换成命令文本
-    # 固定门
+    
     def getFixedCommandCode(self, fixedGate: int, regs: List[int], regName: str, usingIndex: bool = True) -> str:
-        # 寻找映射的名称
+        """
+        Convert Fixed Gate to command code. 
+
+        :param fixedGate: type: int. Index of fixed gate.
+        :param regs: type: List[int]. List of registers.
+        :param regName: type: str. Name of register.
+        :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
+        
+        :return: type: str. Command code of fixed gate.
+        """
+
+        # Get name of gate.
         gateName = PBFixedGate.Name(fixedGate)
-        # 转换使用的寄存器
+        # Convert registers.
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
+        
+        # Index can not be used in the procedure. 
+        # Set usingIndex=False to remove braket [].
         else:
             regOp = [f'{regName}{r}' for r in regs]
-            # 子程序调用，命令加缩进
+            # Indent = 2
             command = '  '
         command += f'{gateName} {", ".join(regOp)};\n'
         return command
 
-    # usingIndex的含义 - 子程序中不能使用索引，所以命令要去掉索引的表示[]
-    # 旋转门, 注意， paramValues/paramIds可能为空
+    
     def getRotationCommandCode(self, rotationGate: int, regs: List[int], regName: str, usingIndex: bool = True,
                                paramValues: Optional[List[float]] = None, paramIds: Optional = None) -> str:
-        # 寻找映射的名称
+        """
+        Convert Rotation Gate to command code. 
+
+        :param rotationGate: type: int. Index of fixed gate.
+        :param regs: type: List[int]. List of registers.
+        :param regName: type: str. Name of register.
+        :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
+        :param paramValues: type: List[float], optional. List of param values.
+        :param paramIds: type: List[int], optional. List of param indices.
+        # NOTE: paramValues/paramIds may be None.
+
+        :return: type: str. Command code of rotation gate.
+        """
+
+        # Get name of gate.
         gateName = PBRotationGate.Name(rotationGate)
 
-        # 需要区分情况处理
-        # 查看是否有参数
+        # Check if optional arguments paramValues and paramIds are None.
         params = self.getFixedArgumentList(paramValues)
-        # 参数分析转换
+        # Convert params.
         paramCall = self.getArgumentList(params, paramIds)
 
-        # 转换使用的寄存器
+        # Convert registers
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
+        
+        # Index can not be used in the procedure. 
+        # Set usingIndex=False to remove braket [].
         else:
             regOp = [f'{regName}{r}' for r in regs]
-            # 子程序调用，命令加缩进
+            # Indent=2.
             command = '  '
 
         command += f'{gateName} ({", ".join(paramCall)}) {", ".join(regOp)};\n'
 
         return command
 
-    # 拦截器指令
+    
     def getBarrierCommandCode(self, regs: List[int], regName: str, usingIndex: bool = True) -> str:
-        # 转换使用的寄存器
+        """
+        Convert barrier code to command code.
+
+        :param regs: type: List[int]. List of registers.
+        :param regName: type: str. Name of register.
+        :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
+
+        :return: type: str. Command of barrier code.
+        """
+        # Convert registers.
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
         else:
             regOp = [f'{regName}{r}' for r in regs]
-            # 子程序调用，命令加缩进
+            # Indent=2.
             command = '  '
         command += f'barrier {", ".join(regOp)};\n'
         return command
 
-    # 转换子程序的调用指令， 参数说明：
-    # procedureName - 调用的子程序名字； regs - 引用的寄存器列表，
-    # regName - 输出使用的基础名字，典型值是q，但是解析子程序的时候，会用到其它的名字
-    # usingIndex - 是否使用寄存器的索引，子程序内指令不能使用索引
-    # paramValues - 调用子程序的参数值
     def getProcCommandCode(self, procedureName: str, regs: List[int], regName: str, usingIndex: bool = True,
                            paramValues: Optional[List[float]] = None, paramIds: Optional = None) -> str:
-        # 先进行转换，空值转换为0,其它有效值不动
+        """
+        Convert procedure to command code. 
+
+        :param procedureName: type: str. Name of called procedure.
+        :param regs: type: List[int]. List of registers.
+        :param regName: type: str. Name of quantum register. Default: 'q'.
+        :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
+        :param paramValues: type: List[float], optional. List of param values.
+        :param paramIds: type: List[int], optional. List of param indices.
+        
+        :return: type: str. Command code of procedure.
+        """
+        
+        # Convert None argument to 0.
         convertedParams = self.getTrimmedArgumentList(paramValues)
-        # 参数分析转换
+        # Convert params.
         paramCall = self.getArgumentList(convertedParams, paramIds)
-        # 连接
+        
         if len(paramCall) > 0:
             params = f'({", ".join(paramCall)})'
         else:
             params = ''
-        # 调用格式例子： cu1(pi/2) q[0],q[1];
+
+        # Example of command: cu1(pi/2) q[0],q[1];
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
+        
+        # Call procedure.
         else:
             regOp = [f'{regName}{r}' for r in regs]
-            # 子程序调用，命令加缩进
             command = '  '
         command += f'{procedureName}{params} {", ".join(regOp)};\n'
         return command
 
-    # 组合门的处理
+    
     def getCompositeCommandCode(self, compositeGate: int, regs: List[int], regName: str, usingIndex: bool = True,
                                 paramValues: Optional[List[float]] = None, paramIds: Optional = None) -> str:
-        # 寻找映射的名称
+        """
+        Convert Composite Gate to command code. 
+
+        :param compositeGate: type: int. Index of composite gate.
+        :param regs: type: List[int]. List of registers.
+        :param regName: type: str. Name of register.
+        :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
+        :param paramValues: type: List[float], optional. List of param values.
+        :param paramIds: type: List[int], optional. List of param indices.
+
+        :return: type: str. Command code of composite gate.
+        """
+        
+        # Get name of gate.
         gateName = PBCompositeGate.Name(compositeGate)
-        # 查看是否有参数
+        # Check params.
         params = self.getFixedArgumentList(paramValues)
-        # 参数分析转换
+        # Convert params.
         paramCall = self.getArgumentList(params, paramIds)
 
-        # 转换使用的寄存器
+        # Convert registers.
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
         else:
             regOp = [f'{regName}{r}' for r in regs]
-            # 子程序调用，命令加缩进
             command = '  '
         command += f'{gateName} ({", ".join(paramCall)}) {", ".join(regOp)};\n'
         return command
 
-    # 处理电路映射，circuit作为对象，如何在ts标记？
-    # regName - 使用的寄存器名称，因为子程序使用的寄存器名字与外部程序需要分开
+    
     def getCircuitsCode(self, circuit: List, regName: str, usingIndex: bool = True) -> Tuple[str, Set[str]]:
-        # 循环处理电路标记
-        # 需要标记，是否有测量指令，此外，测量指令自动放在后面
-        # 查找记录依赖项
+        """
+        Convert Circuits to qasm code. 
+
+        :param circuit: type: List. List of gate operations.
+        :param regName: type: str. Name of register. The name of register \
+            used in the procedure is different from that in external program.
+        :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
+
+        :return qasmCode: type: str. Qasm code of circuit.
+        :return depends: type: str. Dependencies of called procedures.
+        """
+        
+        # Process circuits recurrently.
         qasmCode = ''
+        # If op == 'measure', adds measure code to the end of command code. 
         measureCode = ''
+        # Dependency of procedures.
         depends = set()  # type: Set[str]
         for gate in circuit:
-            # 判定操作类型，目前支持的几类，后续要支持子程序
-            # 不同的操作, 需要反向查询具体类型信息
+            # Type of gate operation.
             op = gate.WhichOneof('op')
             if op == 'fixedGate':
                 qasmCode += self.getFixedCommandCode(gate.fixedGate, gate.qRegList, regName, usingIndex)
@@ -233,20 +330,17 @@ class CircuitToQasm(ConvertorImplement):
                 qasmCode += self.getRotationCommandCode(gate.rotationGate, gate.qRegList, regName, usingIndex,
                                                         gate.argumentValueList, gate.argumentIdList)
             elif op == 'compositeGate':
-                # 组合门
                 qasmCode += self.getCompositeCommandCode(gate.compositeGate, gate.qRegList, regName, usingIndex,
                                                          gate.argumentValueList, gate.argumentIdList)
             elif op == 'procedureName':
-                # 子程序
                 qasmCode += self.getProcCommandCode(gate.procedureName, gate.qRegList, regName, usingIndex,
                                                     gate.argumentValueList, gate.argumentIdList)
-                # 记录依赖的子程序名称
+                # Store names of dependent procedures
                 if gate.procedureName in depends:
                     depends.add(gate.procedureName)
             elif op == 'barrier':
                 qasmCode += self.getBarrierCommandCode(gate.qRegList, regName, usingIndex)
             elif op == 'measure':
-                # 测量指令单独处理
                 measureCode += self.getMeasureCommandCode(gate.measure, gate.qRegList, regName)
             else:
                 raise Error.ArgumentError(f'Invalid gate operation: {gate}', ModuleErrorCode, FileErrorCode, 1)
@@ -257,124 +351,145 @@ class CircuitToQasm(ConvertorImplement):
 
         return qasmCode, depends
 
-    # 处理子程序的定义，子程序的结构定义，可以参考测试用例，比较全面
-    # 格式说明：
-    # "nG1": {
-    #         "paramCount": 2,
-    #         "usingQRegs": [
-    #         ],
-    #         "circuit": [
-    #           {
-    #             "fixedGate": 5,
-    #             "qRegs": []
-    #           },
-    #         ]
-    #       }
+    
     def getProcedureCode(self, procedureMaps: Dict[str, Any]) -> str:
+        """
+        Process procedure code
+
+        :param procedureMaps: type: Dict[str, Any]. Map of procedures.
+        
+        :return: type: str. Procedure code.
+
+        
+        Example:
+        "nG1": {
+            "paramCount": 2,
+            "usingQRegs": [
+            ],
+            "circuit": [
+                {
+                    "fixedGate": 5,
+                    "qRegs": []
+                },
+            ]
+        }
+        """
         procCode = ''
         for name, content in procedureMaps.items():
-            # key 是子程序的名字
-            # val 是子程序的设定内容对象
+            # key: name of procedure
+            # val: object of procedure content
             gateDefine = self.getProcDefineCode(name, content)
-            # 需要对子程序的声明顺序做标记，确保声明在前，使用在后
+            
+            # Make sure definition of procedure is in front of procedure code.
             self.procedureNameList.append(name)
             self.proceduresCode[name] = gateDefine
-        # 根据依赖信息表，重排设定子程序的代码声明顺序，确保正确
-        # 算法使用过的子程序信息
+        
+        # Reorder definitions of procedures according to procedureMaps.
         usedProcedure = []  # List[str]
-        # 处理代码依赖
         for name in self.procedureNameList:
-            # 循环检测依赖信息
+            # detect dependencies.
             depends = self.proceduresDepends.get(name)
-            # 如果有依赖，先使用依赖的代码
+            # Process the dependent procedure first.
             if depends is not None and len(depends) > 0:
                 for item in depends:
-                    # 查看是否已经使用过
                     if item in usedProcedure:
-                        # 已经使用过
+                        # Procedure has been used.
                         continue
                     depCode = self.proceduresCode.get(item)
                     if depCode is not None:
-                        # 依赖代码放在最前面
+                        # Dependent code is at the front.
                         depCode += procCode
-                        # 重设
+                        # Reset 
                         procCode = depCode
-                        # 设置使用标志，避免循环依赖、死循环
+                        # Flag of used procedure to skip loop.
                         usedProcedure.append(item)
                     else:
-                        # 依赖代码没有找到，报告错误
+                        # Dependent code not found.
                         raise Error.ArgumentError(f'Invalid procedure name: {item}', ModuleErrorCode, FileErrorCode, 2)
-            # 查看是否已经使用过
+            
             if name in usedProcedure:
-                # 已经使用过
+                # Procedure has been used.
                 continue
-            # 代码计入
+            
+            # Assemble procedure code.
             procCode += self.proceduresCode.get(name)
             usedProcedure.append(name)
 
         return procCode
 
-    # 获取单个子程序的定义代码
+    
     def getProcDefineCode(self, name: str, content) -> str:
-        # {parameterCount, usingQRegList, circuit} = content
+        """
+        Get definition code of procedure.
 
-        # 分解三个参数；parameterCount 是定义了几个参数，1-3个，一般对应是：theta,phi,lambda，
-        # 但是我们这里先用param0 -> paramX 这样的命名
-        # 更多的使用其它的参数名字
-        # usingQRegList是使用了几个Qubit，用qb0-qbn表达
-        # circuit 是具体的操作指令
+        :param name: type: str. Name of procedure.
+        :param content: type: object. Content includes {parameterCount, usingQRegList, circuit}. \
+            parameterCount: type: int. Number of defined params ranges from 1 to 3, corresponding to theta, phi, and lambda. 
+            usingQRegList: type: List[int]. List of quantum registers. Example: qb0-qbn.
+            circuit: type: List. List of gate operations.
+ 
+        :return: type: str. Definition code of procedure.
+        
+        Example:
+            gate cu1(lambda) a,b
+            {
+                U(0,0,theta/2) a
+                CX a,b
+                U(0,0,-theta/2) b
+                CX a,b
+                U(0,0,theta/2) b
+            }
+        """
+        
         if content.parameterCount > 0:
             paramsArray = [f'param{i}' for i in range(content.parameterCount)]
             paramsDef = f'({", ".join(paramsArray)})'
         else:
             paramsDef = ''
 
-        # 寄存器
+        # Quantum registers.
         qRegList = [f'qb{r}' for r in content.usingQRegList]
         qRegs = ', '.join(qRegList)
 
-        # 循环处理内部定义的电路指令 - 分解
-        # 判定操作类型，不支持测量指令
+        
+        # Get type of gate operation. Measure code is excluded.
         if content.circuit is not None:
             circuitCode, depends = self.getCircuitsCode(content.circuit, 'qb', False)
-            # 构建依赖信息表
+            # Construct map of dependencies. 
             self.proceduresDepends[name] = depends
         else:
             circuitCode = ''
-        # gate cu1(lambda) a,b
-        # {
-        # U(0,0,theta/2) a
-        # CX a,b
-        # U(0,0,-theta/2) b
-        # CX a,b
-        # U(0,0,theta/2) b
-        # }
 
-        # 输出声明
         gateDefine = f'gate {name}{paramsDef} {qRegs}\n{{\n{circuitCode}}}\n'
 
         return gateDefine
 
-    # 循环转换处理
+
     def convert(self, program: PBProgram) -> str:
+        """
+        Convert PBProgram to qasmCode. 
+
+        :param program: type: object. PBProgram.
+
+        :return: type: str. qasm code.
+        """
         qasmCode = 'OPENQASM 2.0;\ninclude "qelib1.inc";\n'
 
-        # 如果已经有了source，则直接返回
         if program.source.qasm != '':
             return program.source.qasm
-        # usingQRegList, usingCRegList 是数组，最大值是使用的索引值，因为从0开始，需要+1
+        
+        # Size is maximum+1, since index starts from 0.
         maxQregSize = max(program.head.usingQRegList) + 1
         maxCregSize = max(program.head.usingCRegList) + 1
 
         qasmCode += f'qreg q[{maxQregSize}];\n'
         qasmCode += f'creg c[{maxCregSize}];\n'
 
-        # 处理子程序声明部分，需要处理额外的子程序调用关系，确保先声明，后调用
+        # Make sure procedure is defined before it is called.
         if program.body.procedureMap:
             procedureCode = self.getProcedureCode(program.body.procedureMap)
             qasmCode += procedureCode
-
-        # 循环处理电路标记
+ 
         circuitCode, depends = self.getCircuitsCode(program.body.circuit, 'q')
         qasmCode += circuitCode
 

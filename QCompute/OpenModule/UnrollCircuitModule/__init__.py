@@ -40,8 +40,6 @@ class UnrollCircuitModule(ModuleImplement):
 
     env.module(UnrollCircuitModule({'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}))
     """
-
-    arguments = None  # type: Optional[Dict[str, Union[List[str], bool]]]
     targetGatesNames = ['CX', 'U']  # type: List[str]
     sourceGatesNames = []  # type: List[str]
     errorOnUnsupported = True
@@ -52,7 +50,6 @@ class UnrollCircuitModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-
         self.arguments = arguments
         if arguments is not None and type(arguments) is dict:
             if 'disable' in arguments:

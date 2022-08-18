@@ -23,7 +23,9 @@ import json
 import sys
 from typing import List, Dict, Type
 
-from QCompute import sdkVersion
+from QCompute import Define
+
+
 
 from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
@@ -43,6 +45,10 @@ _SimulatorModuleList = [
     [InverseCircuitModule, ReverseCircuitModule]
 ]
 _HardwareOptionalModuleList = [UnrollProcedureModule, CompositeGateModule, InverseCircuitModule, ReverseCircuitModule]
+_AerSimulatorModuleList = [
+    [UnrollProcedureModule, CompositeGateModule, UnrollCircuitModule],
+    [InverseCircuitModule, ReverseCircuitModule]
+]
 
 BackendModuleDict = {
     BackendName.LocalBaiduSim2: _SimulatorModuleList,
@@ -53,7 +59,15 @@ BackendModuleDict = {
     BackendName.CloudBaiduSim2Heaven: _SimulatorModuleList,
     BackendName.CloudBaiduSim2Wind: _SimulatorModuleList,
     BackendName.CloudBaiduSim2Lake: _SimulatorModuleList,
-    BackendName.CloudAerAtBD: _SimulatorModuleList,
+    BackendName.CloudAerAtBD: _AerSimulatorModuleList,
+
+    
+}
+
+BackendModuleNameDict = {
+    BackendName.CloudBaiduQPUQian: ['MappingToBaiduQPUQianModule', 'UnrollCircuitToBaiduQPUQianModule'],
+    BackendName.CloudIoPCAS: ['MappingToIoPCASModule', 'UnrollCircuitToIoPCASModule'],
+    BackendName.CloudIonAPM: ['UnrollCircuitToIonAPMModule'],
     
 }
 
@@ -67,42 +81,49 @@ class InteractiveModule:
         self.env = env
         self.circuitToDrawTerminal = CircuitToDrawConsole()
         self.originProgram = PBProgram()
-        self.originProgram.sdkVersion = sdkVersion
+        self.originProgram.sdkVersion = Define.sdkVersion
         QEnvToProtobuf(self.originProgram, env)
         self.backendName = env.backendName  # type: BackendName
-        self.moduleSetting = BackendModuleDict[self.backendName]
-        self.moduleDict = {}  # type: Dict[str, Type[ModuleImplement]]
-        self.usingModuleList = []  # type: List[ModuleImplement]
-        self.necessaryModuleList = self.moduleSetting[0]
-        self.optionalModuleList = self.moduleSetting[1]
-        self.necessaryModuleNameList = []  # type: List[str]
-        self.optionalModuleNameList = []  # type: List[str]
-        for module in self.necessaryModuleList:
-            self.necessaryModuleNameList.append(module.__name__)
-            self.moduleDict[module.__name__] = module
-        for module in self.optionalModuleList:
-            self.optionalModuleNameList.append(module.__name__)
-            self.moduleDict[module.__name__] = module
+        self.moduleSetting = BackendModuleDict.get(self.backendName)
+        if self.moduleSetting:
+            self.moduleDict = {}  # type: Dict[str, Type[ModuleImplement]]
+            self.usingModuleList = []  # type: List[ModuleImplement]
+            self.necessaryModuleList = self.moduleSetting[0]
+            self.optionalModuleList = self.moduleSetting[1]
+            self.necessaryModuleNameList = []  # type: List[str]
+            self.optionalModuleNameList = []  # type: List[str]
+            for module in self.necessaryModuleList:
+                self.necessaryModuleNameList.append(module.__name__)
+                self.moduleDict[module.__name__] = module
+            for module in self.optionalModuleList:
+                self.optionalModuleNameList.append(module.__name__)
+                self.moduleDict[module.__name__] = module
+        else:
+            self.necessaryModuleNameList = BackendModuleNameDict[self.backendName]
 
     def interactive(self):
-        print(f'Interactive module [With backend: {self.backendName.value}]')
+        if not self.moduleSetting:
+            print(f'Interactive module [Unsupport backend: {self.backendName.name}]')
+            exit(0)
+
+        print(f'Interactive module [With backend: {self.backendName.name}]')
         print('(*): Module required\n')
 
         asciiPic = self.circuitToDrawTerminal.convert(self.originProgram)
         print('Origin circuit:')
         print(asciiPic)
-        self._refurbishStatus()
+        self.refurbishStatus()
         while True:
             try:
                 cmd = input('(add, remove, move, draw, commit, exit) $')
                 cmdList = cmd.split()
                 verb = cmdList[0] if len(cmdList) >= 1 else None
                 arguments = cmdList[1:] if len(cmdList) >= 2 else None
-                self._do(verb, arguments)
+                self.do(verb, arguments)
             except Exception as ex:
                 print(ex)
 
-    def _refurbishStatus(self):
+    def refurbishStatus(self):
         usingModuleList = filterModule(self.backendName, self.usingModuleList)
         usingModuleNameList = []  # type: List[str]
         reorderUsingModuleList = []  # type: List[ModuleImplement]
@@ -132,7 +153,7 @@ class InteractiveModule:
                 nameList.append(moduleName)
         return json.dumps(nameList).replace('"', '')
 
-    def _do(self, verb: str, arguments: List[str]):
+    def do(self, verb: str, arguments: List[str]):
         if verb == 'add':
             self._add(arguments)
         elif verb == 'remove':
@@ -147,7 +168,7 @@ class InteractiveModule:
             self._exit()
         else:
             return
-        self._refurbishStatus()
+        self.refurbishStatus()
 
     def _add(self, arguments: List[str]):
         if arguments is None:
@@ -224,7 +245,7 @@ class InteractiveModule:
     def _exit(self):
         sys.exit()
 
-    def printModuleList(self, moduleList: List[str]) -> str:
+    def printModuleList(self, moduleList: List[str]) -> None:
         nameList = []  # type: List[str]
         for moduleName in moduleList:
             if moduleName in self.necessaryModuleNameList:

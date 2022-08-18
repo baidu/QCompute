@@ -65,7 +65,7 @@ class CircuitToIonQ(ConvertorImplement):
             elif op == 'measure':
                 continue
             else:
-                raise Error.ArgumentError('Unsupported operation at IonQ!', ModuleErrorCode, FileErrorCode, 1)
+                raise Error.ArgumentError(f'IonQ Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 1)
             circuit.append(circuitLine)
 
         return json.dumps(ret)
@@ -148,7 +148,7 @@ supportedRotationGate = {
 
 def fixedGateMapping(gateName: str, qRegList: List[int]) -> Dict:
     if gateName not in supportedFixedGate:
-        raise Error.ArgumentError(f'Unsupported fixedGate {gateName} at IonQ!', ModuleErrorCode, FileErrorCode, 2)
+        raise Error.ArgumentError(f'IonQ Unsupported fixedGate {gateName}!', ModuleErrorCode, FileErrorCode, 2)
     ionOp = supportedFixedGate[gateName]
     ret = {
         'gate': ionOp.gate
@@ -159,7 +159,7 @@ def fixedGateMapping(gateName: str, qRegList: List[int]) -> Dict:
 
 def rotationGateMapping(gateName: str, argumentValueList: List[float], qRegList: List[int]) -> Dict:
     if gateName not in supportedRotationGate:
-        raise Error.ArgumentError(f'Unsupported rotationGate {gateName} at IonQ!', ModuleErrorCode, FileErrorCode, 3)
+        raise Error.ArgumentError(f'IonQ Unsupported rotationGate {gateName}!', ModuleErrorCode, FileErrorCode, 3)
     ionOp = supportedRotationGate[gateName]
     return {
         'gate': ionOp.gate,

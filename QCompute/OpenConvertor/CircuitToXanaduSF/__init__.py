@@ -89,7 +89,8 @@ def quarterConvert(pbProgram: 'PBProgram', ret: StringIO):
         elif op == 'measure':
             continue
         else:
-            raise Error.ArgumentError('Unsupported operation at XanaduSF quarter!', ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(f'Unsupported operation {op} at XanaduSF quarter!', ModuleErrorCode,
+                                      FileErrorCode, 1)
 
 
 def quarterFixedGateMapping(pbFixedGate: PBFixedGate, qRegList: List[int], qRegMap: Dict[int, int], ret: StringIO):
@@ -163,12 +164,12 @@ def quarterFixedGateMapping(pbFixedGate: PBFixedGate, qRegList: List[int], qRegM
 
         ancillaQRegIndex += 2
     else:
-        kerrFixedGateMapping(pbFixedGate, qRegList, qRegMap, ret)
+        kerrFixedGateMapping(TwoQubitsGate.quarter, pbFixedGate, qRegList, qRegMap, ret)
 
 
 def quarterRotationGateMapping(pbRotationGate: PBRotationGate, argumentValueList: List[float], qRegList: List[int],
                                qRegMap: Dict[int, int], ret: StringIO):
-    kerrRotationGateMapping(pbRotationGate, argumentValueList, qRegList, qRegMap, ret)
+    kerrRotationGateMapping(TwoQubitsGate.quarter, pbRotationGate, argumentValueList, qRegList, qRegMap, ret)
 
 
 twoQubitsSet = set()
@@ -197,7 +198,8 @@ def thirdConvert(pbProgram: 'PBProgram', ret: StringIO):
         elif op == 'measure':
             continue
         else:
-            raise Error.ArgumentError('Unsupported operation at XanaduSF third!', ModuleErrorCode, FileErrorCode, 2)
+            raise Error.ArgumentError(f'Unsupported operation {op} at XanaduSF third!', ModuleErrorCode, FileErrorCode,
+                                      2)
 
 
 def thirdFixedGateMapping(pbFixedGate: PBFixedGate, qRegList: List[int], qRegMap: Dict[int, int], ret: StringIO):
@@ -250,12 +252,12 @@ def thirdFixedGateMapping(pbFixedGate: PBFixedGate, qRegList: List[int], qRegMap
 
         ancillaQRegIndex += 1
     else:
-        kerrFixedGateMapping(pbFixedGate, qRegList, qRegMap, ret)
+        kerrFixedGateMapping(TwoQubitsGate.third, pbFixedGate, qRegList, qRegMap, ret)
 
 
 def thirdRotationGateMapping(pbRotationGate: PBRotationGate, argumentValueList: List[float], qRegList: List[int],
                              qRegMap: Dict[int, int], ret: StringIO):
-    kerrRotationGateMapping(pbRotationGate, argumentValueList, qRegList, qRegMap, ret)
+    kerrRotationGateMapping(TwoQubitsGate.third, pbRotationGate, argumentValueList, qRegList, qRegMap, ret)
 
 
 def kerrConvert(pbProgram: 'PBProgram', ret: StringIO):
@@ -270,17 +272,20 @@ def kerrConvert(pbProgram: 'PBProgram', ret: StringIO):
         op = pbCircuitLine.WhichOneof('op')
         if op == 'fixedGate':
             fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
-            kerrFixedGateMapping(fixedGate, pbCircuitLine.qRegList, qRegMap, ret)
+            kerrFixedGateMapping(TwoQubitsGate.kerr, fixedGate, pbCircuitLine.qRegList, qRegMap, ret)
         elif op == 'rotationGate':
             rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
-            kerrRotationGateMapping(rotationGate, pbCircuitLine.argumentValueList, pbCircuitLine.qRegList, qRegMap, ret)
+            kerrRotationGateMapping(TwoQubitsGate.kerr, rotationGate, pbCircuitLine.argumentValueList,
+                                    pbCircuitLine.qRegList, qRegMap, ret)
         elif op == 'measure':
             continue
         else:
-            raise Error.ArgumentError('Unsupported operation at XanaduSF kerr!', ModuleErrorCode, FileErrorCode, 5)
+            raise Error.ArgumentError(f'Unsupported operation {op} at XanaduSF kerr!', ModuleErrorCode, FileErrorCode,
+                                      5)
 
 
-def kerrFixedGateMapping(pbFixedGate: PBFixedGate, qRegList: List[int], qRegMap: Dict[int, int], ret: StringIO):
+def kerrFixedGateMapping(type: TwoQubitsGate, pbFixedGate: PBFixedGate, qRegList: List[int], qRegMap: Dict[int, int],
+                         ret: StringIO):
     if pbFixedGate == PBFixedGate.X:
         ret.write(
             f'BSgate({math.pi / 2}, {-math.pi / 2}) | [{2 * qRegMap[qRegList[0]]}, {2 * qRegMap[qRegList[0]] + 1}]\n')
@@ -302,11 +307,12 @@ def kerrFixedGateMapping(pbFixedGate: PBFixedGate, qRegList: List[int], qRegMap:
         ret.write(f'Rgate({math.pi}) | {2 * qRegMap[qRegList[1]]}\n')
         ret.write(f'Rgate({math.pi}) | {2 * qRegMap[qRegList[1]] + 1}\n')
     else:
-        raise Error.ArgumentError(f'Unsupported fixedGate {PBFixedGate.Name(pbFixedGate)} at XanaduSF kerr!',
+        raise Error.ArgumentError(f'Unsupported fixedGate {PBFixedGate.Name(pbFixedGate)} at XanaduSF {type.value}!',
                                   ModuleErrorCode, FileErrorCode, 6)
 
 
-def kerrRotationGateMapping(pbRotationGate: PBRotationGate, argumentValueList: List[float], qRegList: List[int],
+def kerrRotationGateMapping(type: TwoQubitsGate, pbRotationGate: PBRotationGate, argumentValueList: List[float],
+                            qRegList: List[int],
                             qRegMap: Dict[int, int], ret: StringIO):
     if pbRotationGate == PBRotationGate.RX:
         ret.write(
@@ -315,5 +321,6 @@ def kerrRotationGateMapping(pbRotationGate: PBRotationGate, argumentValueList: L
         ret.write(
             f'BSgate({argumentValueList[0] / 2}, 0) | [{2 * qRegMap[qRegList[0]]}, {2 * qRegMap[qRegList[0]] + 1}]\n')
     else:
-        raise Error.ArgumentError(f'Unsupported rotationGate {PBRotationGate.Name(pbRotationGate)} at XanaduSF kerr!',
-                                  ModuleErrorCode, FileErrorCode, 7)
+        raise Error.ArgumentError(
+            f'Unsupported rotationGate {PBRotationGate.Name(pbRotationGate)} at XanaduSF {type.value}!',
+            ModuleErrorCode, FileErrorCode, 7)

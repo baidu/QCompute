@@ -50,17 +50,17 @@ class QOperation:
                  matrix: Optional[numpy.ndarray] = None) -> None:
         self.name = name
         self.bits = bits
-        self._matrix = matrix
+        self.matrix = matrix
 
     def getMatrix(self) -> numpy.ndarray:
         if self.__class__.__name__ == 'FixedGateOP':
-            return self._matrix
+            return self.matrix
         elif self.__class__.__name__ == 'RotationGateOP':
-            if self._matrix is None:
-                self._matrix = self.generateMatrix()
-            return self._matrix
+            if self.matrix is None:
+                self.generateMatrix()
+            return self.matrix
         elif self.__class__.__name__ == 'CustomizedGateOP':
-            return self._matrix
+            return self.matrix
         else:
             raise Error.ArgumentError(f'{self.__class__.__name__} do not have matrix!', ModuleErrorCode, FileErrorCode,
                                       1)
@@ -160,9 +160,6 @@ class CircuitLine:
     """
     Circuit Line
     """
-    data: None  # type: Operation
-    qRegList: None  # type: List[int]
-    cRegList: None  # type: List[int]
 
     def __init__(self, data: Operation = None, qRegList: List[int] = None, cRegList: List[int] = None):
         """
@@ -175,9 +172,9 @@ class CircuitLine:
                     gate, then `qubits` still be a List of the form `[i]`
         :param cRegList: a list of classical bit indices
         """
-        self.data = data
-        self.qRegList = qRegList
-        self.cRegList = cRegList
+        self.data = data  # type: Operation
+        self.qRegList = qRegList  # type: Operation
+        self.cRegList = cRegList  # type: List[int]
 
     def inverse(self) -> 'CircuitLine':
         """

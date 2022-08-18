@@ -24,7 +24,7 @@ from pathlib import Path
 from sys import executable
 from typing import List
 
-from QCompute.Define import outputPath
+from QCompute import Define
 from QCompute.Define import Settings
 from QCompute.Define.Utils import filterConsoleOutput, findUniError
 from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
@@ -103,7 +103,7 @@ class Backend(QImplement):
         jsonStr = CircuitToJson().convert(self.program)
 
         # write the circuit to a temporary json file
-        programFilePath = outputPath / 'program.json'
+        programFilePath = Define.outputDirPath / 'program.json'
         if Settings.outputInfo:
             print('Program file:', programFilePath)  # print the output filename
         programFilePath.write_text(jsonStr, encoding='utf-8')
@@ -126,7 +126,7 @@ class Backend(QImplement):
                                  f'QC.3.{ModuleErrorCode}.{FileErrorCode}.2'
             return
 
-        countsFilePath = outputPath / 'counts.json'
+        countsFilePath = Define.outputDirPath / 'counts.json'
         if Settings.outputInfo:
             print('Counts file:', countsFilePath)  # print the input filename
         text = countsFilePath.read_text(encoding='utf-8')

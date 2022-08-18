@@ -45,7 +45,6 @@ class CompressGateModule(ModuleImplement):
 
     env.module(CompressGateModule({'disable': True}))  # Disable
     """
-    arguments = None  # type: Optional[Dict[str, bool]]
 
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
         """
@@ -113,7 +112,7 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
         elif isinstance(circuitLine.data, BarrierOP):
             pass
         else:
-            raise Error.ArgumentError('Unsupported operation at compress!', ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(f'Unsupported operation {circuitLine} at compress!', ModuleErrorCode, FileErrorCode, 1)
 
     for key, value in circuitMap.items():
         value.append("End")

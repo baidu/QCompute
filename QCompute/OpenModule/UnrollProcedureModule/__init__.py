@@ -41,8 +41,6 @@ class UnrollProcedureModule(ModuleImplement):
 
     env.module(UnrollProcedureModule({'disable': True}))  # Disable
     """
-    arguments = None  # type: Optional[Dict[str, bool]]
-
     _procedureMap = None  # type: Dict[str, 'PBProcedure']
     _circuitOut = None  # type: List['PBCircuitLine']
 

@@ -17,8 +17,9 @@
 Convert Pauli terms to a matrix
 """
 
-from typing import List
 from functools import reduce
+from typing import List
+
 import numpy as np
 
 
@@ -33,9 +34,7 @@ def pauli_terms_to_matrix(pauli_terms: List) -> np.ndarray:
 
     matrices = []
     for coeff, op_str in pauli_terms:
-        sub_matrices = []
-        for op in op_str.lower():
-            sub_matrices.append(pauli_dict[op])
+        sub_matrices = [pauli_dict[op] for op in op_str.lower()]
         if len(op_str) == 1:
             matrices.append(coeff * sub_matrices[0])
         else:

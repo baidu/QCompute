@@ -20,40 +20,35 @@ This is a simple case of using Hadamard gate and CNOT gate.
 Results will be fetched from a cloud program.
 """
 
-from pprint import pprint
 import sys
+from pprint import pprint
 
-sys.path.append('../..')  # "from QCompute import *" requires this
+sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 2.0.6')
+matchSdkVersion('Python 3.0.0')
 
 # Your token:
-# Define.hubToken = ''
+Define.hubToken = ''
 
 # Create environment
 env = QEnv()
-# Choose backend Baidu Cloud Quantum Simulator-Sim2 Water
+# Choose backend Baidu cloud simulator Water
 env.backend(BackendName.CloudBaiduSim2Water)
 
 # Initialize the two-qubit circuit
 q = env.Q.createList(2)
 
-# We apply an X gate on the 0th qubit firstly.
-# Also, you can comment it as you like.
-X(q[0])
+# Apply an Hadamard gate on the 0th qubit firstly.
+H(q[0])
 
-# Then we apply a Hadamard gate on the 0th qubit,
-# where we comment the gate in order to hint the user you to try yourself.
-# H(q[0])
-
-# We need a CX gate to generate an entangle quantum state
+# Apply a CX gate to generate an entangle quantum state
 CX(q[0], q[1])
 
 # Measure with the computational basis
 MeasureZ(*env.Q.toListPair())
 
-# Commit the request with 1024 shots to the cloud
+# Commit the task with 1024 shots
 taskResult = env.commit(1024, fetchMeasure=True)
 
 pprint(taskResult)

@@ -32,7 +32,6 @@ from baidubce.bce_client_configuration import BceClientConfiguration
 from baidubce.services.bos.bos_client import BosClient
 
 from QCompute import Define
-from QCompute.Define import calibrationPath, quantumHubAddr
 from QCompute.QPlatform import Error
 
 ModuleErrorCode = 10
@@ -46,7 +45,7 @@ def CalibrationUpdate(device: str):
 
     # verify permissions, get key list and temporary signature needed for download
     re_sess = requests.session()
-    res = re_sess.post(f'{quantumHubAddr}/{device}/calibration/genDownloadSTS', json={'token': Define.hubToken})
+    res = re_sess.post(f'{Define.quantumHubAddr}/{device}/calibration/genDownloadSTS', json={'token': Define.hubToken})
 
     # exception handling
     content = res.json()
@@ -60,17 +59,17 @@ def CalibrationUpdate(device: str):
     bucket_name = config['resource']['bucket']
 
     # check the storage directory
-    localCalibrationPath = calibrationPath / device
-    localKeysFilePath = localCalibrationPath / 'keys.json'
-    localDataPath = localCalibrationPath / 'Data'
-    if not localCalibrationPath.is_dir():
-        os.makedirs(localCalibrationPath)
-    if not localDataPath.is_dir():
+    localCalibrationDirPath = Define.calibrationDirPath / device
+    localKeysFilePath = localCalibrationDirPath / 'keys.json'
+    localDataPath = localCalibrationDirPath / 'Data'
+    if not localCalibrationDirPath.exists():
+        os.makedirs(localCalibrationDirPath)
+    if not localDataPath.exists():
         os.makedirs(localDataPath)
 
     # load key list from keys.json
     localKeys = None
-    if localKeysFilePath.is_file():
+    if localKeysFilePath.exists():
         localKeysStr = localKeysFilePath.read_text('utf-8')
         localKeys = json.loads(localKeysStr)
 
@@ -91,7 +90,7 @@ def CalibrationUpdate(device: str):
     for localFile in localKeysSet:
         if localFile not in onlineKeysDict:
             filePath = localDataPath / localFile
-            if (filePath.is_file()):
+            if (filePath.exists()):
                 filePath.unlink()
 
     # create BosClient
@@ -148,12 +147,12 @@ def CalibrationReadData(device: str) -> List[CalibrationData]:
     """
 
     # get path
-    localCalibrationPath = calibrationPath / device
-    localKeysFilePath = localCalibrationPath / 'keys.json'
-    localDataPath = localCalibrationPath / 'Data'
+    localCalibrationDirPath = Define.calibrationDirPath / device
+    localKeysFilePath = localCalibrationDirPath / 'keys.json'
+    localDataPath = localCalibrationDirPath / 'Data'
 
     # check keys.json exists
-    if not localKeysFilePath.is_file():
+    if not localKeysFilePath.exists():
         raise Error.RuntimeError(f'Local keys file {str(localKeysFilePath)} not exists!', ModuleErrorCode,
                                  FileErrorCode, 2)
 

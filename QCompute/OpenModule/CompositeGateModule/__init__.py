@@ -43,7 +43,6 @@ class CompositeGateModule(ModuleImplement):
 
     env.module(CompositeGateModule({'compositeGateList': ['MS']}))
     """
-    arguments = None  # type: Optional[Dict[str, Union[List[str], bool]]]
     compositeGateList = None  # type: List[str]
 
     def __init__(self, arguments: Optional[Dict[str, Union[List[str], bool]]] = None) -> None:

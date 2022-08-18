@@ -85,17 +85,17 @@ class Measurer:
             if matrixType == MatrixType.Dense:
                 self.proc = self._measureDenseByProbability
             else:
-                raise Error.RuntimeError('Not implemented')
+                from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
         elif measureMethod == MeasureMethod.OutputProbability:
             if matrixType == MatrixType.Dense:
                 self.proc = self._measureDenseByOutputProbability
             else:
-                raise Error.RuntimeError('Not implemented')
+                from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
         elif measureMethod == MeasureMethod.OutputState:
             if matrixType == MatrixType.Dense:
                 self.proc = self._measureDenseByOutputState
             else:
-                raise Error.RuntimeError('Not implemented')
+                from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
         elif measureMethod == MeasureMethod.Accumulation:
             self.Transfer = TransferProcessor(matrixType, algorithm)
             self.proc = self._measureBySingleAccumulation

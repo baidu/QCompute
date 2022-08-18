@@ -77,7 +77,7 @@ class CircuitToInternalStruct(ConvertorImplement):
             elif op == 'barrier':
                 circuitLine.data = BarrierOP()
             else:
-                raise Error.ArgumentError('Unsupported operation at InternalStruct!', ModuleErrorCode, FileErrorCode, 1)
+                raise Error.ArgumentError(f'InternalStruct Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 1)
             circuitLine.qRegList = list(pbCircuitLine.qRegList)
             ret.append(circuitLine)
 
