@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Disable mapping and enable unrolling when calling quantum hardware.
+- Disable mapping and enable unrolling when calling quantum hardware in the QuantumErrorProcessing extension.
 
 ## [3.0.0] - June-31-2022
 
