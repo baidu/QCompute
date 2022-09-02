@@ -25,26 +25,24 @@ from qiskit.providers.fake_provider import FakeSantiago, FakeParis
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 import qcompute_qep.benchmarking.unitarityrb as unitarityrb
 import qcompute_qep.utils.types as types
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).
 #         The QuantumComputer can be a simulator or a hardware interface.
 ##########################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-# qc = QCompute.BackendName.LocalBaiduSim2
-# QCompute.Define.Settings.drawCircuitControl = []
-# QCompute.Define.Settings.outputInfo = False
+qc = BackendName.LocalBaiduSim2
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeParis
-qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
+# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
 
 # You can also use Qiskit's AerSimulator to customize noise
 # noise_model = NoiseModel()
@@ -58,12 +56,12 @@ qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
 # Step 2. Perform the randomized benchmarking protocol.
 ##########################################################################################
 
-# Initialize a RandomizedBenchmarking instance
+# Initialize a UnitarityRB instance
 urb = unitarityrb.UnitarityRB()
 urb.benchmark(qc=qc,
               qubits=[0],
-              seq_lengths=[1, 10, 25, 50, 75, 100, 150],
-              repeats=10, )
+              seq_lengths=[1, 5, 10, 15, 20],
+              repeats=5)
 # Plot the randomized benchmarking results
 fname = "UnitarityRB-{}.png".format(types.get_qc_name(qc))
 urb.plot_results(show=True, fname=fname)

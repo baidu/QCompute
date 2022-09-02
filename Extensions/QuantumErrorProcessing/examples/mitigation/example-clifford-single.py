@@ -34,7 +34,6 @@ import numpy as np
 import sys
 sys.path.append('../..')
 
-import QCompute
 from QCompute import *
 from qcompute_qep.utils import expval_from_counts, decompose_yzy
 from qcompute_qep.quantum import clifford
@@ -70,8 +69,8 @@ zne_linear = ZNEMitigator(folder="circuit", extrapolator='linear')
 zne_richard = ZNEMitigator(folder="circuit", extrapolator='richardson')
 
 # Set the ideal quantum computer to `LocalBaiduSim2` and the noisy quantum computer to `CloudBaiduQPUQian`
-qc_ideal = QCompute.BackendName.LocalBaiduSim2
-# qc_noisy = QCompute.BackendName.CloudBaiduQPUQian
+qc_ideal = BackendName.LocalBaiduSim2
+# qc_noisy = BackendName.CloudBaiduQPUQian
 # For numeric test on the noisy simulator, change qc_noisy to Qiskit's FakeSantiago
 qc_noisy = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
 

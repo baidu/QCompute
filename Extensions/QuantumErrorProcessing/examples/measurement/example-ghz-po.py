@@ -35,23 +35,23 @@ from matplotlib import rc, pylab
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 from QCompute.QPlatform.QOperation import RotationGate
 from qcompute_qep.exceptions.QEPError import ArgumentError
 from qcompute_qep.measurement import InverseCorrector, LeastSquareCorrector, IBUCorrector, NeumannCorrector
 from qcompute_qep.measurement.correction import vector2dict, dict2vector
 from qcompute_qep.measurement.utils import plot_histograms
 from qcompute_qep.utils import expval_z_from_counts
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits, get_qc_name
 from qcompute_qep.utils.circuit import execute, circuit_to_state
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 # Set the default number of shots
-NUMBER_OF_SHOTS = 8192
+NUMBER_OF_SHOTS = 4096
 
 
-def calculator(qp: QCompute.QEnv = None, qc: QCompute.BackendName = None) -> Tuple[float, dict]:
+def calculator(qp: QEnv = None, qc: BackendName = None) -> Tuple[float, dict]:
     """
     Run the quantum program on the quantum computer and estimate the expectation value.
     This function must be specified by the user.
@@ -66,8 +66,8 @@ def calculator(qp: QCompute.QEnv = None, qc: QCompute.BackendName = None) -> Tup
     return expval_z_from_counts(counts), counts
 
 
-def corrected_calculator(qp: QCompute.QEnv = None,
-                         qc: QCompute.BackendName = None,
+def corrected_calculator(qp: QEnv = None,
+                         qc: BackendName = None,
                          method: str = 'least square') -> Tuple[float, dict]:
     """
     Run the quantum program on the quantum computer and estimate the expectation value.
@@ -127,19 +127,19 @@ def setup_po_circuit(n: int, phi: float) -> QProgram:
     :param phi: float, the parity oscillation angle
     :return: QProgram, the quantum program that creates the GHZ state
     """
-    qp = QCompute.QEnv()
+    qp = QEnv()
     qp.Q.createList(n)
     # Set up the GHZ state generating quantum circuit
-    QCompute.H(qp.Q[0])
+    H(qp.Q[0])
     for i in range(0, n - 1):
-        QCompute.CX(qp.Q[i], qp.Q[i + 1])
+        CX(qp.Q[i], qp.Q[i + 1])
 
     # Add the rotation gates layer
-    QCompute.U = rotation_gate(phi)
+    U = rotation_gate(phi)
     for i in range(0, n):
-        QCompute.U(qp.Q[i])
+        U(qp.Q[i])
 
-    QCompute.MeasureZ(*qp.Q.toListPair())
+    MeasureZ(*qp.Q.toListPair())
 
     return qp
 
@@ -176,7 +176,7 @@ def theo_parity_oscillation(n: int, phi: float) -> Tuple[float, dict]:
     return po, counts
 
 
-def parity_oscillation(n: int, phi: float, qc: QComputer = QCompute.BackendName.LocalBaiduSim2) -> Tuple[float, dict]:
+def parity_oscillation(n: int, phi: float, qc: QComputer = BackendName.LocalBaiduSim2) -> Tuple[float, dict]:
     """
     Given the number of qubits of the GHZ state and the rotation angle,
     estimate its parity oscillation on the given quantum computer.
@@ -193,7 +193,7 @@ def parity_oscillation(n: int, phi: float, qc: QComputer = QCompute.BackendName.
 
 def corrected_parity_oscillation(n: int,
                                  phi: float,
-                                 qc: QComputer = QCompute.BackendName.CloudBaiduQPUQian,
+                                 qc: QComputer = BackendName.CloudBaiduQPUQian,
                                  method: str = 'least square') -> Tuple[float, dict]:
     """
     Given the number of qubits of the GHZ state and the rotation angle,
@@ -246,13 +246,15 @@ if __name__ == '__main__':
     # Set the quantum hardware for estimating the parity oscillation.
     #######################################################################################################################
     # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-    qc = QCompute.BackendName.LocalBaiduSim2
+    qc = BackendName.LocalBaiduSim2
 
     # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-    # qc = QCompute.BackendName.CloudBaiduQPUQian
+    # qc = BackendName.CloudBaiduQPUQian
 
     # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
     # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+
+    qc_name = get_qc_name(qc)
 
     for phi in phi_list:
         theo_val, theo_counts = theo_parity_oscillation(n, phi)
@@ -325,7 +327,7 @@ if __name__ == '__main__':
                     color=colors['hardware'],
                     edgecolors='none',
                     alpha=0.75,
-                    label="Santiago",
+                    label="{}".format(qc_name),
                     s=16,
                     zorder=2)
 
@@ -335,7 +337,7 @@ if __name__ == '__main__':
                     color=colors['inverse'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Inverse",
+                    label="{} Inverse".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -345,7 +347,7 @@ if __name__ == '__main__':
                     color=colors['least square'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago LS",
+                    label="{} LS".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -355,7 +357,7 @@ if __name__ == '__main__':
                     color=colors['ibu'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago IBU",
+                    label="{} IBU".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -365,7 +367,7 @@ if __name__ == '__main__':
                     color=colors['neu'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Neumann",
+                    label="{} Neumann".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -422,15 +424,15 @@ if __name__ == '__main__':
         }
 
         x_range = range(1, len(phi_list)+1)
-        # Plot the IBM Santiago quantum computer result
 
+        # Plot the noisy quantum computer result
         indices = np.argsort(noisy_val_diff_list)
         plt.scatter(x_range, [noisy_euc_list[i] for i in indices],
                     marker=markers['hardware'],
                     color=colors['hardware'],
                     edgecolors='none',
                     alpha=0.75,
-                    label="Santiago Euc",
+                    label="{} Euc".format(qc_name),
                     s=16,
                     zorder=2)
 
@@ -439,7 +441,7 @@ if __name__ == '__main__':
                     color=cm(1. * 5 / NUM_COLORS),
                     edgecolors='none',
                     alpha=0.75,
-                    label="Santiago Diff",
+                    label="{} Diff".format(qc_name),
                     s=16,
                     zorder=2)
 
@@ -450,7 +452,7 @@ if __name__ == '__main__':
                     color=colors['inverse'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Inverse Euc",
+                    label="{} Inverse Euc".format(qc_name),
                     s=18,
                     zorder=2)
         plt.scatter(x_range, [inv_val_diff_list[i] for i in indices],
@@ -458,7 +460,7 @@ if __name__ == '__main__':
                     color=cm(1. * 6 / NUM_COLORS),
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Inverse Diff",
+                    label="{} Inverse Diff".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -469,7 +471,7 @@ if __name__ == '__main__':
                     color=colors['least square'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago LS Euc",
+                    label="{} LS Euc".format(qc_name),
                     s=18,
                     zorder=2)
         plt.scatter(x_range, [ls_val_diff_list[i] for i in indices],
@@ -477,7 +479,7 @@ if __name__ == '__main__':
                     color=cm(1. * 7 / NUM_COLORS),
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago LS Diff",
+                    label="{} LS Diff".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -488,7 +490,7 @@ if __name__ == '__main__':
                     color=colors['ibu'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago IBU Euc",
+                    label="{} IBU Euc".format(qc_name),
                     s=18,
                     zorder=2)
         plt.scatter(x_range, [ibu_val_diff_list[i] for i in indices],
@@ -496,7 +498,7 @@ if __name__ == '__main__':
                     color=cm(1. * 8 / NUM_COLORS),
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago IBU Diff",
+                    label="{} IBU Diff".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -507,7 +509,7 @@ if __name__ == '__main__':
                     color=colors['neu'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Neumann Euc",
+                    label="{} Neumann Euc".format(qc_name),
                     s=18,
                     zorder=2)
         plt.scatter(x_range, [neu_val_diff_list[i] for i in indices],
@@ -515,7 +517,7 @@ if __name__ == '__main__':
                     color=cm(1. * 9 / NUM_COLORS),
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Neumann Diff",
+                    label="{} Neumann Diff".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -549,7 +551,7 @@ if __name__ == '__main__':
         plot_histograms(counts=vals_diff,
                         legends=['Theo - Noisy', 'Theo - INV', 'Theo - LSC', 'Theo - IBU', 'Theo - Neumann'],
                         binary_labels=False,
-                        fig_name="GHZ_PO_FakeSantiago_MEM2_N={}.png".format(n))
+                        fig_name="GHZ_PO_{}_MEM2_N={}.png".format(qc_name, n))
 
         print("Euclidean distance between theoretical and noisy values: {}".format(np.linalg.norm(vals_diff[0, :])))
         print("Euclidean distance between theoretical and inverse values: {}".format(np.linalg.norm(vals_diff[1, :])))

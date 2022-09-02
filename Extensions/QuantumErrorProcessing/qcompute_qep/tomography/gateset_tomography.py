@@ -293,7 +293,7 @@ class GateSetTomography(Tomography):
 
         Optional keywords list are:
 
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `qubits`: default to None, the index of target qubit(s) we want to tomography
 
         :param qc: QComputer, the quantum computer
@@ -303,7 +303,7 @@ class GateSetTomography(Tomography):
         super().__init__(qc=qc, **kwargs)
         self._qc: QComputer = qc
         self._gate_set = gate_set
-        self._shots: int = kwargs.get('shots', 8192)
+        self._shots: int = kwargs.get('shots', 4096)
         self._qubits: List[int] = kwargs.get('qubits', None)
 
         # Store the gate set tomography results. Initialize to an empty dictionary
@@ -320,7 +320,7 @@ class GateSetTomography(Tomography):
 
         Optional keywords list are:
 
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `qubits`: default to None, the index of target qubit(s) we want to tomography
 
         :param qc: QComputer, the quantum computer

@@ -23,7 +23,7 @@ import json
 import sys
 sys.path.append('../..')
 
-from QCompute import Define
+from QCompute import *
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 
 # Set the token. You must set your VIP token in order to access the hardware.

@@ -31,14 +31,13 @@ import numpy as np
 import qiskit
 from qiskit.providers.aer.noise import NoiseModel
 from scipy.stats import unitary_group
-from collections import Counter
 
 import QCompute
 from QCompute.QPlatform import QOperation
 from QCompute.QPlatform.QOperation import CircuitLine, RotationGate, FixedGate
 from qcompute_qep.interface import conversion
-from qcompute_qep.utils.types import QProgram, QComputer, number_of_qubits
-from qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis, vec_to_operator
+from qcompute_qep.utils.types import QProgram, QComputer
+from qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
 from qcompute_qep.utils.utils import limit_angle, decompose_yzy
 from qcompute_qep.exceptions.QEPError import ArgumentError
 
@@ -834,20 +833,23 @@ def execute(qp: QProgram, qc: QComputer, **kwargs) -> Dict[str, int]:
     if isinstance(qp, QCompute.QEnv) and isinstance(qc, QCompute.BackendName):
         # Set the backend
         qp.backend(qc)
-        # Remove barrier gates and forbid mapping and unroll
+        # Remove barrier gates, forbid mapping and enable unroll
         remove_barrier(qp)
         if qc == QCompute.BackendName.CloudIoPCAS:
-            qp.module(QCompute.MappingToIoPCASModule({'disable': True}))
+            qp.serverModule(QCompute.ServerModule.MappingToIoPCAS, {'disable': True})
+            qp.serverModule(QCompute.ServerModule.UnrollCircuitToIoPCAS, {'disable': False})
         elif qc == QCompute.BackendName.CloudBaiduQPUQian:
-            qp.module(QCompute.MappingToBaiduQPUQianModule({'disable': True}))
+            qp.serverModule(QCompute.ServerModule.MappingToBaiduQPUQian, {'disable': True})
+            qp.serverModule(QCompute.ServerModule.UnrollCircuitToBaiduQPUQian, {'disable': False})
         elif qc == QCompute.BackendName.CloudIonAPM:
-            qp.module(QCompute.MappingToIonAPMModule({'disable': True}))
+            qp.serverModule(QCompute.ServerModule.UnrollCircuitToIonAPM, {'disable': False})
         else:
             pass
 
         # Commit the computation task and fetch the results
         result = qp.commit(shots=shots)
         # Obtain the 'counts' information for the computation result
+        print(result)
         counts = result["counts"]
     # Case 2. quantum program is QCompute.QEnv and quantum computer is qiskit.providers.Backend
     elif isinstance(qp, QCompute.QEnv) and isinstance(qc, qiskit.providers.Backend):

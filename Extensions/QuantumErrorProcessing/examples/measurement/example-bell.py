@@ -32,7 +32,7 @@ from qcompute_qep.utils import execute
 # Set the token. You must set your VIP token in order to access the hardware.
 Define.hubToken = "Token"
 # Set the default number of shots
-NUMBER_OF_SHOTS = 8192
+NUMBER_OF_SHOTS = 4096
 # Set the default number of qubits
 NUMBER_OF_QUBITS = 2
 
@@ -50,13 +50,13 @@ MeasureZ(*qp.Q.toListPair())
 # Set the quantum hardware for running the Bell circuit.
 ##########################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-# qc = BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
 # qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
 
 ##########################################################################################
 # Execute the quantum program on the quantum computer and mitigate the results.

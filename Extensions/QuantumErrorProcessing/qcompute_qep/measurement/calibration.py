@@ -38,7 +38,7 @@ and performs a noisy measurement of each qubit, keeping the record of the measur
     >>> from qcompute_qep.utils.circuit import print_circuit
     >>>
     >>> # Set the default maximal number of measurement shots
-    >>> MAX_SHOTS = 8192
+    >>> MAX_SHOTS = 4096
     >>> qc_ideal = BackendName.LocalBaiduSim2
     >>> qc_noisy = BackendName.CloudBaiduQPUQian
     >>> qubits = [1, 2]

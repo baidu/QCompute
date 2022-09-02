@@ -41,7 +41,7 @@ from qcompute_qep.measurement.correction import dict2vector
 # Set the token. You must set your VIP token in order to access the hardware.
 Define.hubToken = "Token"
 # Set the default number of shots
-NUMBER_OF_SHOTS = 8192
+NUMBER_OF_SHOTS = 4096
 
 
 def calculator(qp: QProgram = None, qc: QComputer = None):
@@ -125,13 +125,13 @@ if __name__ == '__main__':
     # Set the quantum hardware for running the Bell circuit.
     ##########################################################################################
     # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-    # qc = BackendName.LocalBaiduSim2
+    qc = BackendName.LocalBaiduSim2
 
     # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
     # qc = BackendName.CloudBaiduQPUQian
 
     # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-    qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
 
     ##########################################################################################
     # Compute the ideal and noisy expectation values.
@@ -166,8 +166,8 @@ if __name__ == '__main__':
     count_list = [new_val_ideal, new_val_noisy, new_val_corr_lsc, new_val_corr_lsc_tensor,
                   new_val_corr_inv, new_val_corr_inv_tensor, new_val_corr_ibu, new_val_corr_ibu_tensor,
                   new_val_corr_neu, new_val_corr_neu_tensor]
-    legend = ['val ideal IBM simulator', 'val noisy IBM', 'val corr ibmq quito LSC',
-              'val corr ibmq quito LSC tensor', 'val corr ibmq quito INV', 'val corr ibmq quito INV tensor',
-              'val corr ibmq quito IBU', 'val corr ibmq quito IBU tensor', 'val corr ibmq quito Neumann',
-              'val corr ibmq quito Neumann tensor']
+    legend = ['val ideal simulator', 'val noisy', 'val corr noisy LSC',
+              'val corr noisy LSC tensor', 'val corr noisy INV', 'val corr noisy INV tensor',
+              'val corr noisy IBU', 'val corr noisy IBU tensor', 'val corr noisy Neumann',
+              'val corr noisy Neumann tensor']
     plot_histograms(count_list, legend)

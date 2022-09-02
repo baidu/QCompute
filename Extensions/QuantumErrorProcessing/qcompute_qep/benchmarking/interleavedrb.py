@@ -61,7 +61,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         + ``target_gate``: class Clifford, the target clifford gate that we want to benchmark.
         + ``seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, a list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
-        + ``shots``: int, default to :math:`8192`, the number of shots each measurement carries out to estimate value
+        + ``shots``: int, default to :math:`4096`, the number of shots each measurement carries out to estimate value
         + ``prep_circuit``: default to `default_prep_circuit`, prepares the initial quantum state
                                 :math:`\vert 0\cdots 0\rangle`
         + ``meas_circuit``: default to `default_meas_circuit`, add the Z basis measurement to the end of
@@ -82,7 +82,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         self._qubits = qubits
         self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100])
         self._repeats = kwargs.get('repeats', 6)
-        self._shots = kwargs.get('shots', 8192)
+        self._shots = kwargs.get('shots', 4096)
         self._prep_circuit = kwargs.get('prep_circuit', rb.default_prep_circuit)
         self._meas_circuit = kwargs.get('meas_circuit', rb.default_meas_circuit)
 
@@ -186,7 +186,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         + ``target_gate``: class Clifford, the target clifford gate that we want to benchmark.
         + ``seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, the list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
-        + ``shots``: int, default to :math:`8192`, the number of shots each measurement should carry out
+        + ``shots``: int, default to :math:`4096`, the number of shots each measurement should carry out
         + ``prep_circuit``: default to `default_prep_circuit`, prepares the initial quantum state
                                 :math:`\vert 0\cdots 0 \rangle`
         + ``meas_circuit``: default to `default_meas_circuit`, add the Z basis measurement

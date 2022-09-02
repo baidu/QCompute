@@ -25,37 +25,34 @@ import numpy as np
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 import qcompute_qep.tomography as tomography
-import qcompute_qep.quantum.pauli as pauli
-import qcompute_qep.utils.circuit
 import qcompute_qep.utils.types as types
-import qcompute_qep.quantum.metrics as metrics
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 
 ##########################################################################################
 # Step 1. Setup the quantum program for the CNOT gate.
 ##########################################################################################
 
-qp = QCompute.QEnv()  # qp is short for "quantum program", instance of QProgram
-qp.Q.createList(3)
+qp = QEnv()  # qp is short for "quantum program", instance of QProgram
+qp.Q.createList(2)
 
 # Manually decompose the CNOT gate using the CZ gate, where CNOT: q2 -> q1
-QCompute.H(qp.Q[1])
-QCompute.CZ(qp.Q[2], qp.Q[1])
-QCompute.H(qp.Q[1])
+H(qp.Q[0])
+CZ(qp.Q[1], qp.Q[0])
+H(qp.Q[0])
 
 ##########################################################################################
 # Step 2. Set the quantum computer (instance of QComputer).
 #         The QuantumComputer can be a simulator or a hardware interface.
 ##########################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-qc = QCompute.BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
 # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
@@ -70,7 +67,7 @@ qc_name = types.get_qc_name(qc)
 st = tomography.ProcessTomography()
 # Call the tomography procedure and obtain the noisy CZ gate
 noisy_ptm = st.fit(qp, qc, qubits=[1, 2], prep_basis='Pauli', meas_basis='Pauli',
-                   method='inverse', shots=8192, ptm=True).data
+                   method='inverse', shots=4096, ptm=True).data
 
 # Compute numerically the ideal CNOT for reference
 ideal_ptm = st.ideal_ptm

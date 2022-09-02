@@ -108,7 +108,7 @@ class ZNEMitigator(Mitigator):
 
                 def calculator(qp: QProgram, qc: QComputer) -> float:
                     # Obtain the output raw counts
-                    counts = execute(qp, qc, shots='8192')
+                    counts = execute(qp, qc, shots='4096')
                     # Estimate the expectation value of the Pauli z observable
                     return expval_z_from_counts(counts)
 

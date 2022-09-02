@@ -35,23 +35,23 @@ import numpy as np
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 import qcompute_qep.tomography as tomography
 import qcompute_qep.quantum.pauli as pauli
 import qcompute_qep.utils.circuit
 
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 
 #######################################################################################################################
 # Set the quantum hardware for Spectral Quantum Tomography.
 #######################################################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-qc = QCompute.BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
 # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
@@ -60,9 +60,9 @@ qc = QCompute.BackendName.LocalBaiduSim2
 # Set the quantum program for the CNOT gate in Spectral Quantum Tomography.
 ##########################################################################################
 # Apply Ry gate in qubit [1]
-qp = QCompute.QEnv()  # qp is short for "quantum program", instance of QProgram
+qp = QEnv()  # qp is short for "quantum program", instance of QProgram
 qp.Q.createList(2)
-QCompute.RX(np.math.pi / 4)(qp.Q[1])
+RX(np.math.pi / 4)(qp.Q[1])
 
 # Compute numerically the ideal CNOT for reference
 ideal_cnot = qcompute_qep.utils.circuit.circuit_to_unitary(qp)

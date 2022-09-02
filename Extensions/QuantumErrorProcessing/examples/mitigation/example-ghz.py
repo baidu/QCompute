@@ -38,7 +38,7 @@ from qcompute_qep.utils.circuit import execute
 # Set the token. You must set your VIP token in order to access the hardware.
 Define.hubToken = "Token"
 # Set the default number of shots
-NUMBER_OF_SHOTS = 8192
+NUMBER_OF_SHOTS = 4096
 
 
 def calculator(qp: QProgram = None, qc: QComputer = None) -> float:

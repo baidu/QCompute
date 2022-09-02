@@ -136,7 +136,7 @@ def calculator(qp: QProgram, qc: QComputer) -> float:
     :param qc: QComputer, the quantum computer
     :return: float, the estimated expectation value
     """
-    counts = execute(qp, qc, shots=8192)
+    counts = execute(qp, qc, shots=4096)
     return expval_z_from_counts(counts)
 
 

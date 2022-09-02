@@ -35,14 +35,14 @@ import numpy as np
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 import qcompute_qep.tomography as tomography
 import qcompute_qep.utils.circuit as circuit
 import qcompute_qep.utils.types as types
 import qcompute_qep.exceptions as exceptions
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 
 
 def process_tomography(qp: types.QProgram, qc: types.QComputer, gate_name: str):
@@ -58,7 +58,7 @@ def process_tomography(qp: types.QProgram, qc: types.QComputer, gate_name: str):
     # Step 1. Perform quantum process tomography
     st = tomography.ProcessTomography()
     # Call the tomography procedure and obtain the noisy gate
-    noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=8192, ptm=True).data
+    noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=4096, ptm=True).data
 
     # Step 2. Compute numerically the ideal quantum gate for reference
     ideal_ptm = st.ideal_ptm
@@ -104,9 +104,9 @@ def cnot(qp: types.QProgram, indices: typing.List[int]):
     c = indices[0]
     t = indices[1]
     # Decompose CNOT via Hadamard and CZ
-    QCompute.H(qp.Q[t])
-    QCompute.CZ(qp.Q[c], qp.Q[t])
-    QCompute.H(qp.Q[t])
+    H(qp.Q[t])
+    CZ(qp.Q[c], qp.Q[t])
+    H(qp.Q[t])
 
 
 def toffoli(qp: types.QProgram, indices: typing.List[int]):
@@ -143,44 +143,44 @@ def toffoli(qp: types.QProgram, indices: typing.List[int]):
     c_1 = indices[1]
     t = indices[2]
 
-    QCompute.H(qp.Q[t])
+    H(qp.Q[t])
     # CNOT c_1 -> t
     cnot(qp, [c_1, t])
 
-    QCompute.TDG(qp.Q[t])
+    TDG(qp.Q[t])
     # CNOT c_0 -> t
     cnot(qp, [c_0, t])
 
-    QCompute.T(qp.Q[t])
+    T(qp.Q[t])
     # CNOT c_1 -> t
     cnot(qp, [c_1, t])
 
-    QCompute.TDG(qp.Q[t])
+    TDG(qp.Q[t])
     # CNOT c_0 -> t
     cnot(qp, [c_0, t])
 
-    QCompute.TDG(qp.Q[c_1])
+    TDG(qp.Q[c_1])
     # CNOT c_0 -> c_1
     cnot(qp, [c_0, c_1])
 
-    QCompute.TDG(qp.Q[c_1])
+    TDG(qp.Q[c_1])
     # CNOT c_0 -> c_1
     cnot(qp, [c_0, c_1])
 
-    QCompute.T(qp.Q[c_0])
-    QCompute.S(qp.Q[c_1])
-    QCompute.T(qp.Q[t])
-    QCompute.H(qp.Q[t])
+    T(qp.Q[c_0])
+    S(qp.Q[c_1])
+    T(qp.Q[t])
+    H(qp.Q[t])
 
 
 #######################################################################################################################
 # Set the quantum hardware in process tomography
 #######################################################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-qc = QCompute.BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
 # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
@@ -190,9 +190,9 @@ qc = QCompute.BackendName.LocalBaiduSim2
 #######################################################################################################################
 
 # Calibrating the native single-qubit Z gate
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(1)
-QCompute.Z(qp.Q[0])
+Z(qp.Q[0])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='Z')
@@ -202,9 +202,9 @@ process_tomography(qp, qc, gate_name='Z')
 #######################################################################################################################
 
 # Calibrating the native single-qubit H gate
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(1)
-QCompute.H(qp.Q[0])
+H(qp.Q[0])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='H')
@@ -215,9 +215,9 @@ process_tomography(qp, qc, gate_name='H')
 
 # Calibrating the native CZ gate `q0 -> q1`.
 # CZ has no controlled direction, thus `CZ: q0 -> q1` and `CZ: q1 -> q2` have the same matrix representation.
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(2)
-QCompute.CZ(qp.Q[0], qp.Q[1])
+CZ(qp.Q[0], qp.Q[1])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='CZ')
@@ -228,22 +228,26 @@ process_tomography(qp, qc, gate_name='CZ')
 
 # Calibrate the CNOT gate `q1 -> q0`. Notice that CNOT gate is not native in PCAS,
 # thus we have to manually decompose it using the native CZ and H gates.
-qp = QCompute.QEnv()
+# qp = QEnv()
+# qp.Q.createList(2)
+# cnot(qp, [1, 0])
+qp = QEnv()
 qp.Q.createList(2)
-cnot(qp, [1, 0])
+CX(qp.Q[0], qp.Q[1])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='CNOT')
 
+exit()
 #######################################################################################################################
 # Example 5. Calibrating the CNOT gate without manually decomposing it
 #######################################################################################################################
 
 # Calibrate the CNOT gate `q1 -> q0`. Notice that the CNOT gate originally supported in Quantum Leaf.
 # In this case, we can compare the efficiency of different implementations.
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(2)
-QCompute.CX(qp.Q[1], qp.Q[0])
+CX(qp.Q[1], qp.Q[0])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='CNOT-Mapping')
@@ -255,7 +259,7 @@ process_tomography(qp, qc, gate_name='CNOT-Mapping')
 # Calibrate the Toffoli gate `(q2, q1) -> q0`. Notice that Toffoli gate is not native in PCAS,
 # thus we have to manually decompose it using Hadamard, phase, \pi/8 and CZ gates.
 # Based on the quantum circuit decomposition in Figure 4.9 of Nielsen's book.
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(3)
 toffoli(qp, [2, 1, 0])
 
@@ -269,9 +273,9 @@ process_tomography(qp, qc, gate_name='Toffoli')
 # Calibrate the Toffoli gate `(q2, q1) -> q0`.
 # Notice that the Toffoli gate originally supported in Quantum Leaf, we do not decompose it manually as above.
 # In this case, we can compare the efficiency of different implementations.
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(3)
-QCompute.CCX(qp.Q[2], qp.Q[1], qp.Q[0])
+CCX(qp.Q[2], qp.Q[1], qp.Q[0])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='Toffoli-Mapping')
@@ -286,7 +290,7 @@ process_tomography(qp, qc, gate_name='Toffoli-Mapping')
 #                  |          <===>                |   |   |
 #         q[0]: ---@---                   q[0]: ---X---@---X---
 
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(2)
 cnot(qp, [1, 0])
 cnot(qp, [0, 1])
@@ -302,9 +306,9 @@ process_tomography(qp, qc, gate_name='SWAP')
 # Calibrate the SWAP gate `q0 <-> q1`.
 # Notice that the SWAP gate originally supported in Quantum Leaf, we do not decompose it manually as above.
 # In this case, we can compare the efficiency of different implementations.
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(2)
-QCompute.SWAP(qp.Q[0], qp.Q[1])
+SWAP(qp.Q[0], qp.Q[1])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='SWAP-Mapping')
@@ -323,7 +327,7 @@ process_tomography(qp, qc, gate_name='SWAP-Mapping')
 #                  |                               |   |   |
 #         q[0]: ---X---                   q[0]: ---@---X---@---
 
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(3)
 # CNOT q0 -> q1
 cnot(qp, [0, 1])
@@ -343,9 +347,9 @@ process_tomography(qp, qc, gate_name='CSWAP')
 # Calibrate the CSWAP gate `q2 -> (q1, q0)`.
 # Notice that the CSWAP gate originally supported in Quantum Leaf, we do not decompose it manually as above.
 # In this case, we can compare the efficiency of different implementations.
-qp = QCompute.QEnv()
+qp = QEnv()
 qp.Q.createList(3)
-QCompute.CSWAP(qp.Q[2], qp.Q[1], qp.Q[0])
+CSWAP(qp.Q[2], qp.Q[1], qp.Q[0])
 
 # Quantum process tomography
 process_tomography(qp, qc, gate_name='CSWAP-Mapping')
@@ -360,16 +364,16 @@ def test_decomposition():
     ##############################################################################
     print("Testing the decomposition of the CNOT gate now...")
     # Decompose the CNOT gate `q1 -> q0`
-    qp1 = QCompute.QEnv()
+    qp1 = QEnv()
     qp1.Q.createList(2)
     cnot(qp1, [1, 0])
 
     ideal_u1 = circuit.circuit_to_unitary(qp1)
 
     # Native CNOT gate in Quantum Leaf
-    qp2 = QCompute.QEnv()
+    qp2 = QEnv()
     qp2.Q.createList(2)
-    QCompute.CX(qp2.Q[1], qp2.Q[0])
+    CX(qp2.Q[1], qp2.Q[0])
 
     ideal_u2 = circuit.circuit_to_unitary(qp2)
 
@@ -383,16 +387,16 @@ def test_decomposition():
     ##############################################################################
     print("Testing the decomposition of the Toffoli gate now...")
     # Decompose the Toffoli gate `(q2, q1) -> q0`
-    qp1 = QCompute.QEnv()
+    qp1 = QEnv()
     qp1.Q.createList(3)
     toffoli(qp1, [2, 1, 0])
 
     ideal_u1 = circuit.circuit_to_unitary(qp1)
 
     # Native Toffoli gate in Quantum Leaf
-    qp2 = QCompute.QEnv()
+    qp2 = QEnv()
     qp2.Q.createList(3)
-    QCompute.CCX(qp2.Q[2], qp2.Q[1], qp2.Q[0])
+    CCX(qp2.Q[2], qp2.Q[1], qp2.Q[0])
 
     ideal_u2 = circuit.circuit_to_unitary(qp2)
 
@@ -406,7 +410,7 @@ def test_decomposition():
     ##############################################################################
     print("Testing the decomposition of the SWAP gate now...")
     # Decompose the SWAP gate `q0 <-> q1`
-    qp1 = QCompute.QEnv()
+    qp1 = QEnv()
     qp1.Q.createList(2)
     cnot(qp1, [1, 0])
     cnot(qp1, [0, 1])
@@ -415,9 +419,9 @@ def test_decomposition():
     ideal_u1 = circuit.circuit_to_unitary(qp1)
 
     # Native SWAP gate in Quantum Leaf
-    qp2 = QCompute.QEnv()
+    qp2 = QEnv()
     qp2.Q.createList(2)
-    QCompute.SWAP(qp2.Q[0], qp2.Q[1])
+    SWAP(qp2.Q[0], qp2.Q[1])
 
     ideal_u2 = circuit.circuit_to_unitary(qp2)
 
@@ -431,7 +435,7 @@ def test_decomposition():
     ##############################################################################
     print("Testing the decomposition of the CSWAP gate now...")
     # Decompose the CSWAP gate `q2 -> (q1, q0)`
-    qp1 = QCompute.QEnv()
+    qp1 = QEnv()
     qp1.Q.createList(3)
     # CNOT q0 -> q1
     cnot(qp1, [0, 1])
@@ -443,9 +447,9 @@ def test_decomposition():
     ideal_u1 = circuit.circuit_to_unitary(qp1)
 
     # Native CSWAP gate in Quantum Leaf
-    qp2 = QCompute.QEnv()
+    qp2 = QEnv()
     qp2.Q.createList(3)
-    QCompute.CSWAP(qp2.Q[2], qp2.Q[1], qp2.Q[0])
+    CSWAP(qp2.Q[2], qp2.Q[1], qp2.Q[0])
 
     ideal_u2 = circuit.circuit_to_unitary(qp2)
 

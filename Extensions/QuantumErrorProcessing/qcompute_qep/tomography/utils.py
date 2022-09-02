@@ -66,7 +66,7 @@ def plot_process_ptm(ptm: np.ndarray,
         >>> QCompute.CZ(qp.Q[1], qp.Q[0])
         >>> qc = QCompute.BackendName.LocalBaiduSim2
         >>> st = tomography.ProcessTomography()
-        >>> noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=8192, ptm=True)
+        >>> noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=4096, ptm=True)
         >>> tomography.plot_process_ptm(ptm=noisy_ptm.data, show_labels=True, title='LocalBaiduSim2')
 
     """
@@ -145,7 +145,7 @@ def compare_process_ptm(ptms: List[np.ndarray],
         >>> qc = QCompute.BackendName.LocalBaiduSim2
         >>> qc_name = typing.get_qc_name(qc)
         >>> st = tomography.ProcessTomography()
-        >>> noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=8192, ptm=True)
+        >>> noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=4096, ptm=True)
         >>> diff_ptm = ideal_ptm - noisy_ptm.data
         >>> tomography.compare_process_ptm(ptms=[ideal_ptm, noisy_ptm.data, diff_ptm])
 

@@ -58,15 +58,15 @@ qc = BackendName.LocalBaiduSim2
 # Initialize a DetectorTomography instance
 detec = detector_tomography.DetectorTomography()
 # Alternatively, you may initialize the StateTomography instance as follows:
-# detec = DetectorTomography(qp, qc, method='inverse', shots=8192)
+# detec = DetectorTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-meas = detec.fit(qp, qc, method='mle', shots=8192, ptm=False, tol=1e-5, qubits=[1, 2])
+meas = detec.fit(qp, qc, method='mle', shots=4096, ptm=False, tol=1e-5, qubits=[1, 2])
 
 # Compute the fidelity
 print('Measurement fidelity: F = {:.5f}'.format(detec.fidelity))
 
-# meas1 = detec.fit(qp, qc, method='mle', shots=8192, ptm=False, tol=1e-5)
+# meas1 = detec.fit(qp, qc, method='mle', shots=4096, ptm=False, tol=1e-5)
 # print('Fidelity between the ideal and noisy measurement is: F = {:.5f}'.format(detec.fidelity))
 # The main difference lies in that the former specifies the list of target qubits while the latter
 # will tomography the full list of qubits (which are three qubits in total).

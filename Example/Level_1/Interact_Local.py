@@ -25,7 +25,7 @@ import sys
 sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 3.0.0')
+matchSdkVersion('Python 3.0.1')
 
 # Flag of interactions
 uValue = 1

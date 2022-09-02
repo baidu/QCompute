@@ -36,7 +36,7 @@ from qcompute_qep.utils import expval_from_counts, execute, circuit, str_to_stat
 from qcompute_qep.quantum import clifford
 import qcompute_qep.exceptions.QEPError as QEPError
 import qcompute_qep.benchmarking as rb
-from qcompute_qep.utils.types import QComputer, get_qc_name, QProgram
+from qcompute_qep.utils.types import QComputer, get_qc_name, QProgram, number_of_qubits
 from QCompute import *
 from QCompute.QPlatform.QOperation import CircuitLine
 from qcompute_qep.exceptions.QEPError import ArgumentError
@@ -54,8 +54,7 @@ except ImportError:
 class UnitarityRB(rb.RandomizedBenchmarking):
     """The Unitarity Randomized Benchmarking class.
 
-    Aim to benchmark the coherence(unitarity) noise of a complete set of
-    Cliffords.
+    Aim to benchmark the coherence(unitarity) noise of a complete set of Cliffords.
     """
 
     def __init__(self, qc: QComputer = None, qubits: List[int] = None, **kwargs):
@@ -64,10 +63,10 @@ class UnitarityRB(rb.RandomizedBenchmarking):
         Optional keywords list are:
 
         + ``qubits2``: List[int], default to None. For example, if using `method=1`, qubits1=[0, 1],
-                default setting for qubits2 will be [2, 3]. Otherwise qubits2 should be given.
+                default setting for qubits2 will be [2, 3]. Otherwise, qubits2 should be given.
         + ``seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, a list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
-        + ``shots``: int, default to :math:`8192`, the number of shots each measurement carries out to estimate value
+        + ``shots``: int, default to :math:`4096`, the number of shots each measurement carries out to estimate value
         + ``prep_circuit``: default to `default_prep_circuit`, prepares the initial
                     quantum state :math:`\vert 0\cdots 0 \rangle`
         + ``meas_circuit``: default to `default_meas_circuit`, add the Z basis measurement to
@@ -81,10 +80,10 @@ class UnitarityRB(rb.RandomizedBenchmarking):
         super().__init__(**kwargs)
         self._qc = qc
         self._qubits = qubits
-        self._qubits2 = kwargs.get('qhbits2', None)
+        self._qubits2 = kwargs.get('qubits2', None)
         self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100])
         self._repeats = kwargs.get('repeats', 6)
-        self._shots = kwargs.get('shots', 8192)
+        self._shots = kwargs.get('shots', 4096)
         self._prep_circuit = kwargs.get('prep_circuit', rb.default_prep_circuit)
         self._meas_circuit = kwargs.get('meas_circuit', rb.default_meas_circuit)
 
@@ -153,10 +152,10 @@ class UnitarityRB(rb.RandomizedBenchmarking):
         Optional keywords list are
 
         + ``qubits2``: List[int], default to None. For example, if using `method=1`, qubits1=[0, 1],
-                default setting for qubits2 will be [2, 3]. Otherwise qubits2 should be given.
+                default setting for qubits2 will be [2, 3]. Otherwise, qubits2 should be given.
         + ``seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, the list of sequence lengths.
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length.
-        + ``shots``: int, default to :math:`8192`, the number of shots each measurement should carry out.
+        + ``shots``: int, default to :math:`4096`, the number of shots each measurement should carry out.
         + ``prep_circuit``: default to `default_prep_circuit`, prepares the initial quantum state
                 :math:`\vert 0\cdots 0\rangle`.
         + ``meas_circuit``: default to `default_meas_circuit`, add the Z basis measurement and
@@ -541,7 +540,7 @@ def _prep_circuit(ch, qp, qubits) -> QProgram:
     qcompute_qep.tomography.basis.PauliPrepBasis.
     """
     if isinstance(qp, QCompute.QEnv):
-        n = circuit.number_of_qubits(qp)
+        n = number_of_qubits(qp)
         prep_qp = deepcopy(qp)
         for i in range(len(ch)):
             idx = n - i - 1

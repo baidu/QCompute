@@ -45,7 +45,7 @@ else:
     quantumBucket = 'quantum-task'
     blindCompAddr = 'wss://blindcomp.baidu.com'
 
-sdkVersion = 'Python 3.0.0'
+sdkVersion = 'Python 3.0.1'
 """
 SDK Version
 

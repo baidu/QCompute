@@ -38,9 +38,9 @@ Define.hubToken = "Token"
 
 # Create Bell state in qubit [1, 2]
 qp = QEnv()  # qp is short for "quantum program", instance of QProgram
-qp.Q.createList(3)
-H(qp.Q[1])
-CX(qp.Q[1], qp.Q[2])
+qp.Q.createList(2)
+H(qp.Q[0])
+CX(qp.Q[0], qp.Q[1])
 
 ##########################################################################################
 # Step 2. Set the quantum computer (instance of QComputer).
@@ -62,15 +62,15 @@ qc = BackendName.LocalBaiduSim2
 # Initialize a StateTomography instance
 st = tomography.StateTomography()
 # Alternatively, you may initialize the StateTomography instance as follows:
-# st = StateTomography(qp, qc, method='inverse', shots=8192)
+# st = StateTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-noisy_state = st.fit(qp, qc, qubits=[1, 2], method='lstsq', shots=8192, ptm=False)
+noisy_state = st.fit(qp, qc, qubits=[0, 1], method='lstsq', shots=4096, ptm=False)
 # Compute the fidelity
 print('Fidelity between the ideal and noisy states is: F = {:.5f}'.format(st.fidelity))
 
 # Please note the difference between the above tomography and the following:
-# noisy_state_2 = st.fit(qp, qc, method='lstsq', shots=8192, ptm=False)
+# noisy_state_2 = st.fit(qp, qc, method='lstsq', shots=4096, ptm=False)
 # print('Fidelity between the ideal and noisy states is: F = {:.5f}'.format(st.fidelity))
 # The main difference lies in that the former specifies the list of target qubits while the latter
 # will tomography the full list of qubits (which are three qubits in total).

@@ -43,10 +43,10 @@ Define.hubToken = "Token"
 qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeParis
-qc = AerSimulator.from_backend(FakeParis())
+# qc = AerSimulator.from_backend(FakeParis())
 
 # You can also use Qiskit's AerSimulator to customize noise
 # noise_model = NoiseModel.from_backend(FakeSantiago())

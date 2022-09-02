@@ -43,7 +43,7 @@ class SpectralTomography(Tomography):
 
         The init function of the Quantum Spectral Tomography class. Optional keywords list are:
 
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `k`: default to None, number of channel reuse
             + `l`: default to None, pencil parameter, determine the shape of matrix :math:`Y`
             + `N`: default to None, the number of eigenvalues
@@ -57,7 +57,7 @@ class SpectralTomography(Tomography):
         self._qp: QProgram = qp
         self._qc: QComputer = qc
         # self._method: str = kwargs.get('method', 'inverse')
-        self._shots: int = kwargs.get('shots', 8192)
+        self._shots: int = kwargs.get('shots', 4096)
         self._K: int = kwargs.get('k', None)
         self._L: int = kwargs.get('l', None)
         self._N: int = kwargs.get('N', None)
@@ -88,7 +88,7 @@ class SpectralTomography(Tomography):
 
         Optional keywords list are:
 
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `k`: default to :math:`2 N-2`, number of channel reuse
             + `l`: default to :math:`K/2`, pencil parameter, determine the shape of matrix :math:`Y`
             + `N`: default to :math:`4^n - 1`, a variable to fit the signal (consider degenerate)

@@ -37,13 +37,13 @@ Define.hubToken = "Token"
 #         The QuantumComputer can be a simulator or a hardware interface.
 ##########################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-# qc = BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeParis
-qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
+# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
 
 # You can also use Qiskit's AerSimulator to customize noise
 # noise_model = NoiseModel.from_backend(FakeSantiago())
@@ -60,9 +60,9 @@ qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
 # Initialize a RandomizedBenchmarking instance
 srb = rb.StandardRB()
 srb.benchmark(qc=qc,
-              qubits=[0, 1],
-              seq_lengths=[1, 3, 5, 7, 10, 15, 20],
-              repeats=10)
+              qubits=[1, 2],
+              seq_lengths=[1, 3, 5, 7, 10],
+              repeats=5)
 
 # Plot the randomized benchmarking results
 fname = "StandardRB-{}.png".format(types.get_qc_name(qc))

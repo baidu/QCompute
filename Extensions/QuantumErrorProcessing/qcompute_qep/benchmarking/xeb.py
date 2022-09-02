@@ -54,7 +54,7 @@ class XEB(rb.RandomizedBenchmarking):
 
         + ``seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, a list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
-        + ``shots``: int, default to :math:`8192`, the number of shots each measurement carries out to estimate value
+        + ``shots``: int, default to :math:`4096`, the number of shots each measurement carries out to estimate value
         + ``entropy_type``: default to `linear`, the entropy type of XEB `linear` or `log`.
         + ``prep_circuit``: default to `default_prep_circuit`, prepares the initial
                             quantum state :math:`\vert 0\cdots 0 \rangle`
@@ -74,7 +74,7 @@ class XEB(rb.RandomizedBenchmarking):
         self._qubits = qubits if qubits is not None else list(range(2))
         self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100, 125, 150, 175, 200])
         self._repeats = kwargs.get('repeats', 6)
-        self._shots = kwargs.get('shots', 8192)
+        self._shots = kwargs.get('shots', 4096)
         self._entropy_type = kwargs.get('entropy_type', 'linear')
 
         # Store the cross entropy benchmarking results. Initialize to an empty dictionary
@@ -169,7 +169,7 @@ class XEB(rb.RandomizedBenchmarking):
 
         + ``_seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, the list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
-        + ``shots``: int, default to :math:`8192`, the number of shots each measurement should carry out
+        + ``shots``: int, default to :math:`4096`, the number of shots each measurement should carry out
         + ``single_gates``: List[str], default to None, while construct the random circuit by using `U3` gates
                             for single-qubit gates.
         + ``multi_gates``: List[str], default to None, while construct the random circuit by using `CNOT` gates
@@ -261,7 +261,7 @@ class XEB(rb.RandomizedBenchmarking):
             if dy > 0:
                 alpha_guess += -np.log(dy) / dx
                 count += 1
-        if count>0:
+        if count > 0:
             alpha_guess /= count
         if 0 < alpha_guess <= 1.0:
             p0[0] = alpha_guess
@@ -271,7 +271,7 @@ class XEB(rb.RandomizedBenchmarking):
         for j in range(len(ydata)):
             tmp += (ydata[j] / np.exp(-p0[0] * xdata[j]))
             count += 1
-        if count>0:
+        if count > 0:
             tmp /= count
         if 0 < tmp < 1.0:
             p0[1] = tmp

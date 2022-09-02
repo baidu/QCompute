@@ -19,9 +19,9 @@ import numpy as np
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 import qcompute_qep.tomography as tomography
-import QCompute.QPlatform.QOperation as QOperation
+import QPlatform.QOperation as QOperation
 import qcompute_qep.utils.types as types
 
 
@@ -53,10 +53,10 @@ def gateset_tomography(qc: types.QComputer, gate_set: tomography.GateSet):
 # Set the quantum hardware in process tomography
 #######################################################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-qc = QCompute.BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
 # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
@@ -68,8 +68,8 @@ qc = QCompute.BackendName.LocalBaiduSim2
 prep_circuit = []
 meas_circuit = []
 
-rx_90 = QOperation.CircuitLine(QCompute.RX(np.pi / 2), [0])
-ry_90 = QOperation.CircuitLine(QCompute.RY(np.pi / 2), [0])
+rx_90 = QOperation.CircuitLine(RX(np.pi / 2), [0])
+ry_90 = QOperation.CircuitLine(RY(np.pi / 2), [0])
 
 gate_set = tomography.GateSet(prep_circuit, meas_circuit,
                               gates={'rx_90_ex0': rx_90, 'ry_90_ex0': ry_90},
@@ -82,12 +82,12 @@ gateset_tomography(qc, gate_set)
 # Example 2.
 #######################################################################################################################
 prep_circuit = []
-meas_circuit = [QOperation.CircuitLine(QCompute.X, [0])]
+meas_circuit = [QOperation.CircuitLine(X, [0])]
 
 
-rx_90 = QOperation.CircuitLine(QCompute.RX(np.pi / 2), [0])
-ry_90 = QOperation.CircuitLine(QCompute.RY(np.pi / 2), [0])
-rx_180 = QOperation.CircuitLine(QCompute.RX(np.pi), [0])
+rx_90 = QOperation.CircuitLine(RX(np.pi / 2), [0])
+ry_90 = QOperation.CircuitLine(RY(np.pi / 2), [0])
+rx_180 = QOperation.CircuitLine(RX(np.pi), [0])
 
 gate_set = tomography.GateSet(prep_circuit, meas_circuit,
                               gates={'rx_90_ex1': rx_90, 'ry_90_ex1': ry_90, 'rx_180_ex1': rx_180},
@@ -101,9 +101,9 @@ gateset_tomography(qc, gate_set)
 prep_circuit = []
 meas_circuit = []
 
-rx_90 = QOperation.CircuitLine(QCompute.RX(np.pi / 2), [0])
-ry_90 = QOperation.CircuitLine(QCompute.RY(np.pi / 2), [0])
-i = QOperation.CircuitLine(QCompute.ID, [0])
+rx_90 = QOperation.CircuitLine(RX(np.pi / 2), [0])
+ry_90 = QOperation.CircuitLine(RY(np.pi / 2), [0])
+i = QOperation.CircuitLine(ID, [0])
 
 gate_set = tomography.GateSet(prep_circuit, meas_circuit,
                               gates={'rx_90_ex2': rx_90, 'ry_90_ex2': ry_90, 'i_ex2': i},
@@ -125,11 +125,11 @@ gateset_tomography(qc, gate_set)
 prep_circuit = []
 meas_circuit = []
 
-Gix = QOperation.CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0])
-Gxi = QOperation.CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1])
-Giy = QOperation.CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0])
-Gyi = QOperation.CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1])
-Gcnot = QOperation.CircuitLine(data=QCompute.CX, qRegList=[0, 1])
+Gix = QOperation.CircuitLine(data=RX(np.pi / 2), qRegList=[0])
+Gxi = QOperation.CircuitLine(data=RX(np.pi / 2), qRegList=[1])
+Giy = QOperation.CircuitLine(data=RY(np.pi / 2), qRegList=[0])
+Gyi = QOperation.CircuitLine(data=RY(np.pi / 2), qRegList=[1])
+Gcnot = QOperation.CircuitLine(data=CX, qRegList=[0, 1])
 
 prep_gates = [['Gix'], ['Giy'], ['Gix', 'Gix'], ['Gxi'], ['Gxi', 'Gix'], ['Gxi', 'Giy'], ['Gxi', 'Gix', 'Gix'],
               ['Gyi'], ['Gyi', 'Gix'], ['Gyi', 'Giy'], ['Gyi', 'Gix', 'Gix'],

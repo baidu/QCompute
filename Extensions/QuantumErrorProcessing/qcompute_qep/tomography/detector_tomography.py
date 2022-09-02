@@ -69,7 +69,7 @@ class DetectorTomography(Tomography):
         Optional keywords list are:
 
             + `method`: default to ``inverse``, specify the detector tomography method
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `tol`: default to :math:`10^{-5}`, the precision
             + `ptm`: default to ``False``, if the measurement should be returned to the Pauli transfer matrix form
 
@@ -83,7 +83,7 @@ class DetectorTomography(Tomography):
         self._qp: QProgram = qp
         self._qc: QComputer = qc
         self._method: str = kwargs.get('method', 'inverse')
-        self._shots: int = kwargs.get('shots', 8192)
+        self._shots: int = kwargs.get('shots', 4096)
         self._tol: float = kwargs.get('tol', 1e-5)
         self._ptm: bool = kwargs.get('ptm', False)
 
@@ -98,7 +98,7 @@ class DetectorTomography(Tomography):
                 + ``lstsq``: the least square method;
                 + ``mle``: the maximum likelihood estimation method.
 
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
 
             + `tol`: default to :math:`10^{-5}`, the precision
 
@@ -116,8 +116,8 @@ class DetectorTomography(Tomography):
 
             meas = DetectorTomography.fit(qp=qp, qc=qc)
             meas = DetectorTomography.fit(qp=qp, qc=qc, method='inverse')
-            meas = DetectorTomography.fit(qp=qp, qc=qc, method='lstsq', shots=8192)
-            meas = DetectorTomography.fit(qp=qp, qc=qc, method='mle', shots=8192, tol=1e-5)
+            meas = DetectorTomography.fit(qp=qp, qc=qc, method='lstsq', shots=4096)
+            meas = DetectorTomography.fit(qp=qp, qc=qc, method='mle', shots=4096, tol=1e-5)
 
         **Examples**
 
@@ -127,7 +127,7 @@ class DetectorTomography(Tomography):
             >>> qp.Q.createList(2)
             >>> qc = QCompute.BackendName.LocalBaiduSim2
             >>> detec = DetectorTomography()
-            >>> meas = detec.fit(qp, qc, method='inverse', shots=8192)
+            >>> meas = detec.fit(qp, qc, method='inverse', shots=4096)
             >>> fid = detec.fidelity
             >>> print('Measurement fidelity: F = {:.5f}'.format(fid))
             Fidelity between the ideal and noisy states: F = 1.00000

@@ -47,7 +47,7 @@ class Tomography(abc.ABC):
         Optional keywords list are:
 
             + `method`: default to ``inverse``, specify the tomography method
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `ptm`: default to ``False``, if the quantum object should be in the Pauli transfer matrix form
 
         """
@@ -73,7 +73,7 @@ class Tomography(abc.ABC):
         Optional keywords list are:
 
             + `method`: default to ``inverse``, specify the tomography method
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `ptm`: default to ``False``, if the quantum object should be in the Pauli transfer matrix form
 
         """

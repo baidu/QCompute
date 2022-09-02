@@ -1,12 +1,16 @@
 *Copyright (c) 2022 Institute for Quantum Computing, Baidu Inc. All Rights Reserved.*
 
-[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) [![](https://img.shields.io/badge/build-passing-green)]() ![](https://img.shields.io/badge/Python-3.8--3.9-blue) ![](https://img.shields.io/badge/release-v1.0.0-red)
+![](https://img.shields.io/badge/release-v1.0.0-blue)
+[![](https://img.shields.io/badge/docs-API-blue)](https://quantum-hub.baidu.com/docs/qep/)
+[![](https://img.shields.io/badge/Python-3.8+-green)](https://www.python.org/)
+![](https://img.shields.io/badge/OS-MacOS%20|%20Windows%20|%20Linux-green)
+[![](https://img.shields.io/badge/license-Apache%202.0-orange)](https://github.com/baidu/QCompute/blob/master/LICENSE)
 
 ## About QEP
 
 **QEP** is a **Q**uantum **E**rror **P**rocessing toolkit developed by the [Institute for Quantum Computing](https://quantum.baidu.com) at [Baidu Research](http://research.baidu.com). It aims to deal with quantum errors inherent in quantum devices using software solutions. Currently, it offers three powerful quantum error processing functions: randomized benchmarking, quantum error characterization, and quantum error mitigation:
 
-+ **Randomized benchmarking** is used for assessing the capabilities and extendibilities of quantum computing hardware platforms, through estimating the average error rates that are measured with long sequences of random quantum circuits. It provides standard randomized benchmarking, interleaved randomized benchmarking, cross-entropy benchmarking, the unitarity randomized benchmarking.
++ **Randomized benchmarking** is used for assessing the capabilities and extendibilities of quantum computing hardware platforms, through estimating the average error rates that are measured with long sequences of random quantum circuits. It provides standard randomized benchmarking, interleaved randomized benchmarking, cross-entropy benchmarking, and unitarity randomized benchmarking.
 
 + **Quantum error characterization** is used for reconstructing the comprehensive information in quantum computing hardware platforms, through many partial and limited experimental results. It provides quantum state tomography, quantum process tomography, quantum detector tomography, quantum gateset tomography, and spectral quantum tomography.
 
@@ -16,6 +20,8 @@ QEP is based on [QCompute](https://quantum-hub.baidu.com/opensource), a Python-b
 
 ## Installation
 
+### Install QEP
+
 The package QEP is compatible with 64-bit Python 3.8 and 3.9, on Linux, MacOS (10.14 or later) and Windows. We highly recommend the users to install QEP via `pip`. Open the Terminal and run
 
 ```bash
@@ -24,11 +30,40 @@ pip install qcompute-qep
 
 This will install the QEP binaries as well as the QEP package. For those using an older version of QEP, keep up to date by installing with the `--upgrade` flag for additional features and bug fixes.
 
-After installing QEP, you can download the source file of QEP from [GitHub](https://github.com/baidu/QCompute/Extensions/QuantumErrorProcessing/) and run the example within the `examples` folder to check out whether the installation was successful
+### Run Examples
 
-```bash
-python example-qcompute-qep.py
+After installation, you can try the following simple program to check whether QEP has been successfully installed.
+
+```python
+from QCompute import *
+import qcompute_qep.tomography as tomography
+
+# Set the token. You must set your VIP token in order to access the hardware
+Define.hubToken = "Token"
+
+# Step 1. Initialize a quantum program for preparing the Bell state
+qp = QEnv()  # qp is short for "quantum program", instance of QProgram
+qp.Q.createList(2)
+H(qp.Q[0])
+CX(qp.Q[0], qp.Q[1])
+
+# Step 2. Set the quantum computer (instance of QComputer).
+# For debugging on ideal simulator, change qc to BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
+# For test on real quantum hardware, change qc to BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
+
+# Step 3. Perform Quantum State Tomography, check how well the Bell state is prepared.
+st = tomography.StateTomography()
+# Call the tomography procedure and obtain the noisy quantum state
+st.fit(qp, qc, method='inverse', shots=4096)
+
+print('Fidelity between the ideal and noisy Bell states is: F = {:.5f}'.format(st.fidelity))
 ```
+
+More examples can be found in [QEP Tutorials](https://quantum-hub.baidu.com/qep/)
+and the source file of QEP hosted in [GitHub](https://github.com/baidu/QCompute/tree/master/Extensions/QuantumErrorProcessing/).
+You can get started from there.
 
 ## Tutorials
 
@@ -55,6 +90,26 @@ QEP provides detailed and comprehensive tutorials for randomized benchmarking, q
   + [Measurement Error Mitigation](https://quantum-hub.baidu.com/qep/tutorial-mem)
   + [Applications of Measurement Error Mitigation](https://quantum-hub.baidu.com/qep/tutorial-mem-applications)
 
-## Contribution Guidelines
+## API Documentation
 
-Comments, suggestions, and code contributions are warmly welcome. Please contact us via Email: quantum@baidu.com .
+For those who are looking for explanation on the python classes and functions in QEP, please refer to our [API documentation](https://quantum-hub.baidu.com/docs/qep/).
+
+## Feedbacks
+
+Users are encouraged to contact us via email quantum@baidu.com with general questions, unfixed bugs, and potential improvements. We hope to make QEP better together with the community!
+
+## Research based on QEP
+
+We encourage researchers and developers to use QEP to explore quantum error processing. If your work uses QEP, please feel free to send us a notice via quantum@baidu.com and cite us with the following BibTeX:
+
+```BibTex
+@misc{QEP,
+      title = {{Quantum Error Processing in Baidu Quantum Platform}},
+      year = {2022},
+      url = {https://quantum-hub.baidu.com/qep/}
+}
+```
+
+## Copyright and License
+
+QEP uses [Apache-2.0 license](https://github.com/baidu/QCompute/blob/master/LICENSE).

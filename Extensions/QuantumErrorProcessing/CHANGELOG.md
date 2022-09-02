@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.1] - August-2022
+
+``Fixed`` Disable mapping and enable unrolling when calling quantum hardware.
+
 ## [1.0.0] - July-2022
 
 ``ADDED`` Interleaved randomized benchmarking, quantum detector tomography,

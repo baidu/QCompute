@@ -49,7 +49,7 @@ class ProcessTomography(Tomography):
         Optional keywords list are:
 
             + `method`: default to ``inverse``, specify the process tomography method
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `ptm`: default to ``True``, if the quantum process should be returned to the Pauli transfer matrix form
             + `qubits`: default to None, the index of target qubit(s) we want to tomography, now only support full tomography
             + `prep_basis`: default to ``PauliMeasBasis``, the preparation (state) basis
@@ -64,7 +64,7 @@ class ProcessTomography(Tomography):
         self._qp: QProgram = qp
         self._qc: QComputer = qc
         self._method: str = kwargs.get('method', 'inverse')
-        self._shots: int = kwargs.get('shots', 8192)
+        self._shots: int = kwargs.get('shots', 4096)
         self._ptm: bool = kwargs.get('ptm', True)
         self._qubits: List[int] = kwargs.get('qubits', None)
         # Setup the preparation and measurement bases for quantum process tomography
@@ -84,7 +84,7 @@ class ProcessTomography(Tomography):
             + ``lstsq``: the least square method;
             + ``mle``: the maximum likelihood estimation method.
 
-        + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+        + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
         + `ptm`: default to ``False``, if the quantum process should be returned to the Pauli transfer matrix form
         + `prep_basis`: default to ``PauliMeasBasis``, the preparation (state) basis
         + `meas_basis`: default to ``PauliMeasBasis``, the measurement basis
@@ -118,7 +118,7 @@ class ProcessTomography(Tomography):
             >>> qc = QCompute.BackendName.LocalBaiduSim2
             >>> qc_name = typing.get_qc_name(qc)
             >>> st = tomography.ProcessTomography()
-            >>> noisy_ptm = st.fit(qp, qc, method='inverse', shots=8192, ptm=True)
+            >>> noisy_ptm = st.fit(qp, qc, method='inverse', shots=4096, ptm=True)
             >>> diff_ptm = ideal_ptm - noisy_ptm.data
             >>> tomography.compare_process_ptm(ptms=[ideal_ptm, noisy_ptm.data, diff_ptm])
 

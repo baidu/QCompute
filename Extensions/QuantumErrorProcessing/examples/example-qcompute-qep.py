@@ -16,10 +16,11 @@
 # limitations under the License.
 
 """
-This is a simple example to test if you can use the QEP module.
+This is a simple example to test if you have successfully installed the QEP module.
 """
+
 import sys
-sys.path.append('..')
+sys.path.append('../..')
 
 from QCompute import *
 import qcompute_qep.tomography as tomography
@@ -47,10 +48,10 @@ qc = BackendName.LocalBaiduSim2
 # Initialize a StateTomography instance
 st = tomography.StateTomography()
 # Alternatively, you may initialize the StateTomography instance as follows:
+# st = StateTomography(qp, qc, method='inverse', shots=4096)
 
-# st = StateTomography(qp, qc, method='inverse', shots=8192)
 # Call the tomography procedure and obtain the noisy quantum state
-noisy_state = st.fit(qp, qc, method='inverse', shots=8192)
+noisy_state = st.fit(qp, qc, method='inverse', shots=4096)
 
 print("***********************************************************************")
 print("Testing whether 'qcompute-qep' is successfully installed or not now ...\n")

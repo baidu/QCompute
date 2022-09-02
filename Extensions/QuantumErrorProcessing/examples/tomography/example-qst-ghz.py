@@ -39,21 +39,21 @@ qp = QEnv()  # qp is short for "quantum program", instance of QProgram
 qp.Q.createList(4)
 H(qp.Q[0])
 CX(qp.Q[0], qp.Q[1])
-CX(qp.Q[0], qp.Q[2])
-CX(qp.Q[0], qp.Q[3])
+CX(qp.Q[1], qp.Q[2])
+CX(qp.Q[2], qp.Q[3])
 
 ##########################################################################################
 # Step 2. Set the quantum computer (instance of QComputer).
 #         The QuantumComputer can be a simulator or a hardware interface.
 ##########################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-# qc = BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
 # qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
 
 ##########################################################################################
 # Step 3. Perform State Tomography, check how well the Bell state
@@ -62,10 +62,10 @@ qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
 # Initialize a StateTomography instance
 st = tomography.StateTomography()
 # Alternatively, you may initialize the StateTomography instance as follows:
-# st = StateTomography(qp, qc, method='inverse', shots=8192)
+# st = StateTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-noisy_state = st.fit(qp, qc, method='lstsq', shots=8192, ptm=False)
+noisy_state = st.fit(qp, qc, method='lstsq', shots=4096, ptm=False)
 
 # Compute the fidelity
 print('Fidelity between the ideal and noisy states is: F = {:.5f}'.format(st.fidelity))

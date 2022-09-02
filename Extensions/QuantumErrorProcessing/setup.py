@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 
-# Copyright (c) 2021 Baidu, Inc. All Rights Reserved.
+# Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='qcompute-qep',
-    version='1.0.0',
+    version='1.0.1',
     description='A Quantum Error Processing toolkit developed '
                 'by the Institute for Quantum Computing at Baidu Research.',
     long_description=long_description,
@@ -52,6 +52,7 @@ setup(
         'scipy==1.7.1',
         'seaborn==0.11.2',
         'tqdm==4.64.0',
+        'qcompute>=3.0.0',
 
         # Packages used in examples
         'qutip==4.7.0',

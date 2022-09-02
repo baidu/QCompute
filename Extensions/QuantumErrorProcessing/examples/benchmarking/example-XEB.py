@@ -40,7 +40,7 @@ Define.hubToken = "Token"
 qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
 # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
@@ -53,9 +53,9 @@ qc = BackendName.LocalBaiduSim2
 xeb = rb.XEB()
 xeb.benchmark(qc=qc,
               qubits=[0],
-              shots=8192,
-              seq_lengths=[1, 5, 10, 15, 25, 40, 75, 100],
-              repeats=10)
+              shots=4096,
+              seq_lengths=[1, 5, 10, 15, 20],
+              repeats=5)
 
 # Plot the cross-entropy benchmarking results
 fname = "XEB-{}.png".format(types.get_qc_name(qc))

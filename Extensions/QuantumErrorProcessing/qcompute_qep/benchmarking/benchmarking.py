@@ -40,7 +40,7 @@ class RandomizedBenchmarking(abc.ABC):
         The init function of the `RandomizedBenchmarking` class. Optional keywords list are:
 
         + ``method``: default to 'inverse', specify the tomography method
-        + ``shots``: default to :math:`8192`, the number of shots each measurement should carry out
+        + ``shots``: default to :math:`4096`, the number of shots each measurement should carry out
         + ``ptm``: default to 'False', the quantum object should be in the Pauli transfer matrix form
 
         :param qp: QProgram, quantum program for creating the target quantum state

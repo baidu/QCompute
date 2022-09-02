@@ -2,7 +2,7 @@
 
 ![](https://release-data.cdn.bcebos.com/github-qleaf%2F%E9%87%8F%E6%98%93%E4%BC%8F%E5%9B%BE%E6%A0%87.png)
 
-[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) [![](https://img.shields.io/badge/build-passing-green)]() ![](https://img.shields.io/badge/Python-3.7--3.9-blue) ![](https://img.shields.io/badge/release-v3.0.0-blue)
+[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) [![](https://img.shields.io/badge/build-passing-green)]() ![](https://img.shields.io/badge/Python-3.7--3.9-blue) ![](https://img.shields.io/badge/release-v3.0.1-blue)
 
 Quantum Leaf (量易伏) is a Cloud-Native quantum computing platform developed by the Institute for Quantum Computing, Baidu. It is used for programming, simulating and executing quantum computers, aiming at providing the quantum programming environment for Quantum infrastructure as a Service (QaaS).
 
@@ -12,7 +12,7 @@ QCompute provides services for creating and analyzing quantum circuits, and call
 
 **In particular, cloud service requires login at [Quantum-hub](https://quantum-hub.baidu.com). The token, credit points, large-scale results and more information can be found from the website.**
 
-![](https://release-data.cdn.bcebos.com/qleaf/3.0.0/architecture_light.png)
+![](https://release-data.cdn.bcebos.com/qleaf/3.0.1/architecture_light.png)
 
 ## Getting Started
 

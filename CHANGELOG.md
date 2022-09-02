@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.1] - Sept-02-2022
+
+### Changed
+
+- Disable mapping and enable unrolling when calling quantum hardware.
+
 ## [3.0.0] - June-31-2022
 
 ### Added

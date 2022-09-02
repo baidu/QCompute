@@ -19,6 +19,7 @@
 Using the Bell State as an example to illustrate the folding technique
 implemented in the Zero-Noise Extrapolation method.
 """
+
 import sys
 sys.path.append('../..')
 

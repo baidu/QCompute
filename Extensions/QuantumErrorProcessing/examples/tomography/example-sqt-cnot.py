@@ -26,7 +26,6 @@ in a SPAM-resistant fashion, using low resources in terms of gate sequence lengt
 """
 import qiskit
 from qiskit.providers.fake_provider import FakeSantiago
-
 import matplotlib.pyplot as plt
 from cmath import *
 import numpy as np
@@ -34,21 +33,21 @@ import numpy as np
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 import qcompute_qep.tomography as tomography
 
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 
 #######################################################################################################################
 # Set the quantum hardware for Spectral Quantum Tomography.
 #######################################################################################################################
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-qc = QCompute.BackendName.LocalBaiduSim2
+qc = BackendName.LocalBaiduSim2
 
 # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-# qc = QCompute.BackendName.CloudBaiduQPUQian
+# qc = BackendName.CloudBaiduQPUQian
 
 # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
 # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
@@ -57,13 +56,13 @@ qc = QCompute.BackendName.LocalBaiduSim2
 # Set the quantum program for the CNOT gate in Spectral Quantum Tomography.
 ##########################################################################################
 
-qp = QCompute.QEnv()  # qp is short for "quantum program", instance of QProgram
+qp = QEnv()  # qp is short for "quantum program", instance of QProgram
 qp.Q.createList(3)
 
 # Manually decompose the CNOT gate using the CZ gate, where CNOT: q2 -> q1
-QCompute.H(qp.Q[1])
-QCompute.CZ(qp.Q[2], qp.Q[1])
-QCompute.H(qp.Q[1])
+H(qp.Q[1])
+CZ(qp.Q[2], qp.Q[1])
+H(qp.Q[1])
 
 # Initialize a SpectralTomography instance
 st = tomography.SpectralTomography()

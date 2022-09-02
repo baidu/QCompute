@@ -36,22 +36,22 @@ from matplotlib import rc, pylab
 import sys
 sys.path.append('../..')
 
-import QCompute
+from QCompute import *
 from qcompute_qep.exceptions.QEPError import ArgumentError
 from qcompute_qep.measurement import InverseCorrector, LeastSquareCorrector, IBUCorrector, NeumannCorrector
 from qcompute_qep.measurement.correction import vector2dict, dict2vector
 from qcompute_qep.measurement.utils import plot_histograms
 from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits, get_qc_name
 from qcompute_qep.utils.circuit import execute, circuit_to_state
 
 # Set the token. You must set your VIP token in order to access the hardware.
-QCompute.Define.hubToken = "Token"
+Define.hubToken = "Token"
 # Set the default number of shots
-NUMBER_OF_SHOTS = 8192
+NUMBER_OF_SHOTS = 4096
 
 
-def calculator(qp: QCompute.QEnv = None, qc: QCompute.BackendName = None) -> Tuple[float, dict]:
+def calculator(qp: QEnv = None, qc: BackendName = None) -> Tuple[float, dict]:
     """
     Run the quantum program on the quantum computer and estimate the expectation value.
     This function must be specified by the user.
@@ -71,8 +71,8 @@ def calculator(qp: QCompute.QEnv = None, qc: QCompute.BackendName = None) -> Tup
     return expval_from_counts(o, counts), counts
 
 
-def corrected_calculator(qp: QCompute.QEnv = None,
-                         qc: QCompute.BackendName = None,
+def corrected_calculator(qp: QEnv = None,
+                         qc: BackendName = None,
                          method: str = 'least square') -> Tuple[float, dict]:
     """
     Run the quantum program on the quantum computer and estimate the expectation value.
@@ -117,25 +117,25 @@ def setup_mqc_circuit(n: int, phi: float) -> QProgram:
     :param phi: float, the rotation angle
     :return: QProgram, the quantum program that estimates the MQC of a GHZ state
     """
-    qp = QCompute.QEnv()
+    qp = QEnv()
     qp.Q.createList(n)
 
     # Prepare the GHZ state
-    QCompute.H(qp.Q[0])
+    H(qp.Q[0])
     for i in range(0, n - 1):
-        QCompute.CX(qp.Q[i], qp.Q[i + 1])
+        CX(qp.Q[i], qp.Q[i + 1])
 
     # Add the rotation gates layer
     for i in range(0, n):
-        QCompute.RZ(phi)(qp.Q[i])
+        RZ(phi)(qp.Q[i])
 
     # Reverse the preparation procedure
     for i in reversed(range(0, n - 1)):
-        QCompute.CX(qp.Q[i], qp.Q[i + 1])
-    QCompute.H(qp.Q[0])
+        CX(qp.Q[i], qp.Q[i + 1])
+    H(qp.Q[0])
 
     # Measure
-    QCompute.MeasureZ(*qp.Q.toListPair())
+    MeasureZ(*qp.Q.toListPair())
 
     return qp
 
@@ -166,7 +166,7 @@ def theo_mqc(n: int, phi: float) -> Tuple[float, dict]:
     return val, counts
 
 
-def mqc(n: int, phi: float, qc: QComputer = QCompute.BackendName.LocalBaiduSim2) -> Tuple[float, dict]:
+def mqc(n: int, phi: float, qc: QComputer = BackendName.LocalBaiduSim2) -> Tuple[float, dict]:
     """
     Given the number of qubits of the GHZ state and the rotation angle,
     estimate its MQC on the given quantum computer.
@@ -181,8 +181,10 @@ def mqc(n: int, phi: float, qc: QComputer = QCompute.BackendName.LocalBaiduSim2)
     return calculator(copy.deepcopy(qp), qc)
 
 
-def corrected_mqc(n: int, phi: float, qc: QComputer = QCompute.BackendName.CloudBaiduQPUQian, method: str = 'least square')\
-        -> Tuple[float, dict]:
+def corrected_mqc(n: int,
+                  phi: float,
+                  qc: QComputer = BackendName.CloudBaiduQPUQian,
+                  method: str = 'least square') -> Tuple[float, dict]:
     """
     Given the number of qubits of the GHZ state and the rotation angle,
     estimate its MQC on the given quantum computer.
@@ -229,13 +231,15 @@ if __name__ == '__main__':
     # Set the quantum hardware for estimating the multiple quantum coherence.
     #######################################################################################################################
     # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-    qc = QCompute.BackendName.LocalBaiduSim2
+    # qc = BackendName.LocalBaiduSim2
 
     # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-    # qc = QCompute.BackendName.CloudBaiduQPUQian
+    # qc = BackendName.CloudBaiduQPUQian
 
     # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-    # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+
+    qc_name = get_qc_name(qc)
 
     # Generate the dataset
     for phi in phi_list:
@@ -304,7 +308,7 @@ if __name__ == '__main__':
                     color=colors['hardware'],
                     edgecolors='none',
                     alpha=0.8,
-                    label="Santiago",
+                    label=qc_name,
                     s=16,
                     zorder=2)
 
@@ -314,7 +318,7 @@ if __name__ == '__main__':
                     color=colors['inverse'],
                     edgecolors='none',
                     alpha=1.0,
-                    label="Santiago Inverse",
+                    label="{} Inverse".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -324,7 +328,7 @@ if __name__ == '__main__':
                     color=colors['least square'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago LS",
+                    label="{} LS".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -335,7 +339,7 @@ if __name__ == '__main__':
                     edgecolors='none',
                     alpha=1,
                     s=18,
-                    label="Santiago IBU",
+                    label="{} IBU".format(qc_name),
                     zorder=2)
 
         # Plot the mitigated result using the Neumann approach
@@ -345,7 +349,7 @@ if __name__ == '__main__':
                     edgecolors='none',
                     alpha=1,
                     s=18,
-                    label="Santiago Neumann",
+                    label="{} Neumann".format(qc_name),
                     zorder=2)
 
         # Define the xticklables
@@ -402,13 +406,13 @@ if __name__ == '__main__':
         }
 
         x_range = range(1, len(phi_list)+1)
-        # Plot the IBM Santiago quantum computer result
+        # Plot the noisy quantum computer result
         plt.scatter(x_range, sorted(noisy_euc_list),
                     marker=markers['hardware'],
                     color=colors['hardware'],
                     edgecolors='none',
                     alpha=0.75,
-                    label="Santiago",
+                    label=qc_name,
                     s=16,
                     zorder=2)
 
@@ -418,7 +422,7 @@ if __name__ == '__main__':
                     color=colors['inverse'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Inverse",
+                    label="{} Inverse".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -428,7 +432,7 @@ if __name__ == '__main__':
                     color=colors['least square'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago LS",
+                    label="{} LS".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -438,7 +442,7 @@ if __name__ == '__main__':
                     color=colors['ibu'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago IBU",
+                    label="{} IBU".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -448,7 +452,7 @@ if __name__ == '__main__':
                     color=colors['neu'],
                     edgecolors='none',
                     alpha=1,
-                    label="Santiago Neumann",
+                    label="{} Neumann".format(qc_name),
                     s=18,
                     zorder=2)
 
@@ -483,7 +487,7 @@ if __name__ == '__main__':
         plot_histograms(counts=vals_diff,
                         legends=['Theo - Noisy', 'Theo - INV', 'Theo - LSC', 'Theo - IBU', 'Theo - Neumann'],
                         binary_labels=False,
-                        fig_name="GHZ_MQC_FakeSantiago_MEM2_N={}.png".format(n))
+                        fig_name="GHZ_MQC_{}_MEM2_N={}.png".format(qc_name, n))
 
         print("Euclidean distance between theoretical and noisy values: {}".format(np.linalg.norm(vals_diff[0, :])))
         print("Euclidean distance between theoretical and inverse values: {}".format(np.linalg.norm(vals_diff[1, :])))

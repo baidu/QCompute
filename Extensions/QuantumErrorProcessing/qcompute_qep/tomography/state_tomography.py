@@ -48,7 +48,7 @@ class StateTomography(Tomography):
         Optional keywords list are:
 
             + `method`: default to ``inverse``, specify the state tomography method
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
             + `basis`: default to ``PauliMeasBasis``, the measurement basis
             + `ptm`: default to ``False``, if the quantum state should be returned to the Pauli transfer matrix form
             + `qubits`: default to None, the index of target qubit(s) we want to tomography, now only support full tomography
@@ -61,7 +61,7 @@ class StateTomography(Tomography):
         self._qp: QProgram = qp
         self._qc: QComputer = qc
         self._method: str = kwargs.get('method', 'inverse')
-        self._shots: int = kwargs.get('shots', 8192)
+        self._shots: int = kwargs.get('shots', 4096)
         self._ptm: bool = kwargs.get('ptm', False)
         self._qubits: List[int] = kwargs.get('qubits', None)
         # Setup the measurement basis for quantum state tomography
@@ -80,7 +80,7 @@ class StateTomography(Tomography):
                 + ``lstsq``: the least square method;
                 + ``mle``: the maximum likelihood estimation method.
 
-            + `shots`: default to :math:`8192`, the number of shots each measurement should carry out
+            + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
 
             + `qubits`: default to None, the index of target qubit(s) we want to tomography
 
@@ -99,7 +99,7 @@ class StateTomography(Tomography):
 
             rho = StateTomography.fit(qp=qp, qc=qc)
             rho = StateTomography.fit(qp=qp, qc=qc, method='inverse')
-            rho = StateTomography.fit(qp=qp, qc=qc, method='lstsq', shots=8192)
+            rho = StateTomography.fit(qp=qp, qc=qc, method='lstsq', shots=4096)
 
         **Examples**
 
@@ -112,7 +112,7 @@ class StateTomography(Tomography):
             >>> QCompute.CX(qp.Q[0], qp.Q[1])
             >>> qc = QCompute.BackendName.LocalBaiduSim2
             >>> st = StateTomography()
-            >>> noisy_state = st.fit(qp, qc, method='inverse', shots=8192, ptm='False')
+            >>> noisy_state = st.fit(qp, qc, method='inverse', shots=4096, ptm='False')
             >>> print('Fidelity between the ideal and noisy states: F = {:.5f}'.format(st.fidelity))
 
             Fidelity between the ideal and noisy states: F = 1.00000
