@@ -28,7 +28,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '3.0.1'
+SDK_VERSION = '3.0.2'
 
 DESC = Path('./README.md').read_text(encoding='utf-8')
 
@@ -38,7 +38,7 @@ setup(
     install_requires=[
         # PySDK
         'protobuf==4.21.1',
-        'numpy==1.21.3',
+        'numpy>=1.17.3',
         'requests==2.28.0',
         'bidict==0.22.0',
         'bce-python-sdk==0.8.73',
@@ -46,15 +46,17 @@ setup(
         'py-expression-eval==0.3.14',
         'websocket-client==1.3.2',
         'tqdm==4.64.0',
+        'nanoid==2.0.0',
+        'pytest==7.2.0',
         
 
         # Example
-        'scipy==1.7.1',
+        'scipy>=1.8.0',
         'matplotlib==3.5.2',
         'sympy==1.10.1',
         'pyprimes==0.1',
     ],
-    python_requires='>=3.7, <3.10',
+    python_requires='>=3.8, <3.12',
     packages=find_packages(),
     url='https://quantum.baidu.com',
     license='Apache License 2.0',

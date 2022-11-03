@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.2] - Oct-30-2022
+
+### Added
+
+- API for QPU and simulator status monitor.
+
+### Changed
+
+- Modify python/numpy/scipy version requirements.
+
 ## [3.0.1] - Sept-02-2022
 
 ### Changed

@@ -16,18 +16,6 @@
 # limitations under the License.
 
 """
-Base Settings
+Export the entire directory as a library
 """
-from QCompute import Define
-
-
-Define.hubToken = ''
-
-
-def inputHubToken():
-    """
-    Get HubToken from user input.
-    """
-    if Define.hubToken == '':
-        print('Please provide a token:')
-        Define.hubToken = input()
+ModuleErrorCode = 2

@@ -25,7 +25,7 @@ import sys
 sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 3.0.1')
+matchSdkVersion('Python 3.0.2')
 
 # Your token:
 Define.hubToken = ''

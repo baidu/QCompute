@@ -32,6 +32,7 @@ from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
 from QCompute.OpenSimulator import QResult
 from QCompute.QPlatform import Error, ModuleErrorCode, BackendName, getBackendFromName
+from QCompute.QPlatform.BatchID import BatchID
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.InteractiveModule import InteractiveModule
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
@@ -107,8 +108,6 @@ class QEnv:
         procedure = self.procedureMap.get(name)
         if procedure is None:
             raise Error.ArgumentError(f"Don't have procedure name: {name}!", ModuleErrorCode, FileErrorCode, 2)
-        inversedProcedure = None  # type: 'QProcedure'
-        inversedProcedureName = None  # type: str
         if name.endswith('__inversed'):
             inversedProcedureName = name[:-10]
             inversedProcedure = self.procedureMap.get(inversedProcedureName)
@@ -139,8 +138,6 @@ class QEnv:
         procedure = self.procedureMap.get(name)
         if procedure is None:
             raise Error.ArgumentError(f"Don't have procedure name: {name}!", ModuleErrorCode, FileErrorCode, 3)
-        reversedProcedure = None  # type: 'QProcedure'
-        reversedProcedureName = None  # type: str
         if name.endswith('__reversed'):
             reversedProcedureName = name[:-10]
             reversedProcedure = self.procedureMap.get(reversedProcedureName)
@@ -164,6 +161,34 @@ class QEnv:
                 newLine.data = op
             reversedProcedure.circuit[index] = newLine
         return reversedProcedure, reversedProcedureName
+
+    def inverseCircuit(self) -> 'QEnv':
+        inversedEnv = deepcopy(self)
+        for index, circuitLine in enumerate(reversed(self.circuit)):
+            newLine = deepcopy(circuitLine)
+            if isinstance(newLine.data, QProcedureOP):
+                data, name = inversedEnv.inverseProcedure(circuitLine.data.name)
+                op = deepcopy(circuitLine.data)  # type: QProcedureOP
+                op.procedureData = data
+                op.name = name
+                newLine.data = op
+            else:
+                newLine.data = circuitLine.data.getInverse()
+            inversedEnv.circuit[index] = newLine
+        return inversedEnv
+
+    def reverseCircuit(self) -> 'QEnv':
+        reversedEnv = deepcopy(self)
+        for index, circuitLine in enumerate(reversed(self.circuit)):
+            newLine = deepcopy(circuitLine)
+            if isinstance(newLine.data, QProcedureOP):
+                data, name = self.reverseProcedure(circuitLine.data.name)
+                op = deepcopy(circuitLine.data)  # type: QProcedureOP
+                op.procedureData = data
+                op.name = name
+                newLine.data = op
+            reversedEnv.circuit[index] = newLine
+        return reversedEnv
 
     def publish(self, applyModule=True) -> List['ModuleImplement']:
         """
@@ -199,7 +224,8 @@ class QEnv:
         else:
             return self.usingModuleList
 
-    def commit(self, shots: int, fetchMeasure=True, downloadResult=True, notes=None
+    def commit(self, shots: int, fetchMeasure=True, downloadResult=True, batchID: Optional[BatchID] = None,
+               notes: Optional[str] = None
                
                ) -> Dict[
         str, Union[str, Dict[str, int]]]:
@@ -248,7 +274,7 @@ class QEnv:
             ret = self._localCommit(fetchMeasure, moduleList)
         elif self.backendName.value.startswith('cloud_'):
             self.publish(False)  # circuit in Protobuf format
-            ret = self._cloudCommit(fetchMeasure, downloadResult, notes
+            ret = self._cloudCommit(fetchMeasure, downloadResult, notes, batchID
                                     
                                     )
         elif self.backendName.value.startswith('service_'):
@@ -363,7 +389,7 @@ class QEnv:
 
         return {"status": "failed", "reason": backend.result.log}
 
-    def _cloudCommit(self, fetchMeasure: bool, downloadResult: bool, notes: str
+    def _cloudCommit(self, fetchMeasure: bool, downloadResult: bool, notes: str, batchID: Optional[BatchID]
                      
                      ) -> Dict[
         str, Union[str, Dict[str, int]]]:
@@ -392,7 +418,7 @@ class QEnv:
         task.uploadCircuit(programBuf)
         backend = self.backendName.value[6:]  # omit the prefix `cloud_`
         task.createCircuitTask(self.shots, backend, len(self.program.head.usingQRegList), self.backendArgument,
-                               usedModuleList, notes
+                               usedModuleList, notes, batchID
                                
                                )
 

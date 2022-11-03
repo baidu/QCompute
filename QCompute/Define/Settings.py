@@ -90,6 +90,13 @@ Cloud task don't write file.
 Values: True, False
 """
 
+autoBatchID = False
+"""
+Cloud task auto generate batch ID.
+
+Values: True, False
+"""
+
 linuxDirectSim2Cpp = False
 """
 Use local sim2 cpp directly in linux.

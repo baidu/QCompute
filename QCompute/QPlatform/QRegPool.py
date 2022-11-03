@@ -103,7 +103,7 @@ class QRegPool:
             raise Error.ArgumentError('createList is called when self.registerMap is not empty!', ModuleErrorCode,
                                       FileErrorCode, 1)
         for i in range(num):
-            self._get(i)
+            self.registerMap[i] = QRegStorage(i, self.env)
         return list(self.registerMap.values())
 
     def toListPair(self) -> Tuple[List[QRegStorage], List[int]]:

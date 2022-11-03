@@ -45,10 +45,12 @@ from QCompute import Define
 # submit the file id to cloud service, and finally get the results.
 from QCompute.Define import Settings
 from QCompute.QPlatform import Error, ModuleErrorCode
+from QCompute.QPlatform.BatchID import BatchID
 
 FileErrorCode = 7
 
 _bosClient = None  # type: BceClientConfiguration
+globalBatchID = None  # type: BatchID
 
 
 def _retryWhileNetworkError(func: Callable) -> Callable:
@@ -112,8 +114,7 @@ def _invokeBackend(target: str, params: object) -> Dict:
         if errCode == 401:
             raise Error.TokenError(errMsg, ModuleErrorCode, FileErrorCode, 2)
         else:
-            raise Error.LogicError(f'errCode: {errCode}; errMsg: {errMsg}; vendor: {vendor}', ModuleErrorCode,
-                                   FileErrorCode, 3)
+            raise Error.LogicError(f'errCode: {errCode}; errMsg: {errMsg}', vendor=vendor)
 
     return ret["data"]
 
@@ -216,8 +217,8 @@ class QTask:
         return ret
 
     @_retryWhileNetworkError
-    def createCircuitTask(self, shots: int, backend: str, qbits: int, backendParam: List[Union[str, Enum]] = None,
-                          modules: List[Tuple[str, Any]] = None, notes: str = None,
+    def createCircuitTask(self, shots: int, backend: str, qbits: int, backendParam: List[Union[str, Enum]],
+                          modules: List[Tuple[str, Any]], notes: str, batchID: Optional[BatchID],
                           debug: Optional[str] = None) -> None:
         """
         Create a task from the code
@@ -232,7 +233,7 @@ class QTask:
                 print(f'Notes len warning, {len(notes)}/{Define.maxNotesLen}(current/max).')
                 notes = notes[:Define.maxNotesLen]
 
-        task = {
+        req = {
             "token": Define.hubToken,
             "circuitId": self.circuitId,
             "taskType": backend,
@@ -243,10 +244,18 @@ class QTask:
             "qbits": qbits,
         }
 
+        global globalBatchID
+        if batchID is None and Settings.autoBatchID:
+            if globalBatchID is None:
+                globalBatchID = BatchID()
+            batchID = globalBatchID
+
         if notes is not None:
-            task['notes'] = notes
+            req['notes'] = notes
+        if batchID is not None:
+            req['batchID'] = batchID.id
         if debug:
-            task['debug'] = debug
+            req['debug'] = debug
 
         if backendParam:
             paramList = []
@@ -255,11 +264,11 @@ class QTask:
                     paramList.append(param)
                 else:
                     paramList.append(param.value)
-            task['backendParam'] = paramList
+            req['backendParam'] = paramList
 
         ret = _invokeBackend(
             "task/createTask",
-            task
+            req
         )
 
         self.taskId = ret['taskId']
@@ -270,7 +279,7 @@ class QTask:
         Create a blind task
         """
 
-        task = {
+        req = {
             "token": Define.hubToken,
             "service": backend,
             "params": params,
@@ -280,7 +289,7 @@ class QTask:
 
         ret = _invokeBackend(
             "task/createBlind",
-            task
+            req
         )
 
         self.taskId = ret['taskId']
@@ -299,29 +308,29 @@ class QTask:
         # originSize = result["originSize"]
         try:
             if not Settings.cloudTaskDoNotWriteFile:
-                self.originFile, downSize = _downloadToFile(originUrl,
-                                                            Define.outputDirPath / f"remote.{self.taskId}.origin.json")
+                self.originFile, downloadSize = _downloadToFile(originUrl,
+                                                                Define.outputDirPath / f"remote.{self.taskId}.origin.json")
             else:
-                self.originJson, downSize = _downloadToJson(originUrl)
+                self.originJson, downloadSize = _downloadToJson(originUrl)
         except Exception:
             # TODO split the disk write error
             raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 5)
         if Settings.outputInfo:
-            print(f'Download origin success {self.originFile} size = {downSize}')
+            print(f'Download origin success {self.originFile} size = {downloadSize}')
 
         measureUrl = result["measureUrl"]
         # measureSize = result["measureSize"]
         try:
             if not Settings.cloudTaskDoNotWriteFile:
-                self.measureFile, downSize = _downloadToFile(measureUrl,
-                                                             Define.outputDirPath / f"remote.{self.taskId}.measure.json")
+                self.measureFile, downloadSize = _downloadToFile(measureUrl,
+                                                                 Define.outputDirPath / f"remote.{self.taskId}.measure.json")
             else:
-                self.measureJson, downSize = _downloadToJson(measureUrl)
+                self.measureJson, downloadSize = _downloadToJson(measureUrl)
         except Exception:
             # TODO split the disk write error
             raise Error.NetworkError(traceback.format_exc(), ModuleErrorCode, FileErrorCode, 6)
         if Settings.outputInfo:
-            print(f'Download measure success {self.measureFile} size = {downSize}')
+            print(f'Download measure success {self.measureFile} size = {downloadSize}')
 
     def _fetchOriginResult(self) -> Optional[Dict]:
         """
@@ -348,30 +357,32 @@ class QTask:
             return None
 
     @_retryWhileNetworkError
-    def waitCircuitTask(self, fetchMeasure: bool = False, downloadResult: bool = True) -> Dict:
+    def waitCircuitTask(self, fetchMeasure: bool, downloadResult: bool) -> Dict:
         """
         Wait for a task from the taskId
         """
         if Settings.outputInfo:
             print(f'Task {self.taskId} is running, please wait...')
 
-        task = {
+        req = {
             "token": Define.hubToken,
             "taskId": self.taskId
         }
 
         stepStatus = _Status.waiting
+        stepStatusName = _Status(stepStatus).name
         while True:
             try:
                 time.sleep(Define.pollInterval)
-                ret = _invokeBackend('task/checkTask', task)
-                newStatus = _Status[ret["status"]]
-                stepStatusName = _Status(stepStatus).name
+                ret = _invokeBackend('task/checkTask', req)
+                newStatusName = ret["status"]
+                newStatus = _Status[newStatusName]
                 if newStatus > 0:
                     if Settings.outputInfo:
-                        print(f'status changed {stepStatusName} => {ret["status"]}')
+                        print(f'status changed {stepStatusName} => {newStatusName}')
                     stepStatus = newStatus
-                    result = {"taskId": self.taskId, "status": ret["status"]}
+                    stepStatusName = newStatusName
+                    result = {"taskId": self.taskId, "status": newStatusName}
 
                     if newStatus == _Status.success and "originUrl" in ret.get("result", {}):
                         if downloadResult:
@@ -405,7 +416,7 @@ class QTask:
                         continue
 
                     if Settings.outputInfo:
-                        print(f'status changed {stepStatusName} => {ret["status"]}')
+                        print(f'status changed {stepStatusName} => {newStatusName}')
                     stepStatus = newStatus
 
             except Error.Error as err:
@@ -422,7 +433,7 @@ class QTask:
         Wait for a task from the taskId
         """
 
-        task = {
+        req = {
             "token": Define.hubToken,
             "taskId": self.taskId
         }
@@ -431,7 +442,7 @@ class QTask:
         while True:
             try:
                 time.sleep(checkInterval)
-                ret = _invokeBackend('task/checkTask', task)
+                ret = _invokeBackend('task/checkTask', req)
                 newStatus = _Status[ret["status"]]
                 stepStatusName = _Status(stepStatus).name
 

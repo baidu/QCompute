@@ -38,25 +38,25 @@ class BackendName(Enum):
     LocalBaiduSim2 = 'local_baidu_sim2'
     """
     Local Baidu Sim2
-    
+
     This backend name (LocalBaiduSim2) is only available >= v1.0.0
-    
+
     Parameter can be a Sim2Argument enum or string.
-    
+
     Default is Sim2Argument.Dense_Matmul_Probability
-    
+
     Example: 
-    
+
     env = QEnv()
-    
+
     env.backend(BackendName.LocalBaiduSim2)
-    
+
     or
-    
+
     env.backend(BackendName.LocalBaiduSim2, Sim2Argument.Dense_Matmul_Probability)
-    
+
     or Added shots(must have space in string)
-    
+
     env.backend(BackendName.LocalBaiduSim2, Sim2Argument.Dense_Matmul_Probability.value + ' -s 20210210')
     """
 

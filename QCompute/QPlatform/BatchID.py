@@ -16,18 +16,14 @@
 # limitations under the License.
 
 """
-Base Settings
+Batch ID
 """
-from QCompute import Define
+import nanoid
 
 
-Define.hubToken = ''
-
-
-def inputHubToken():
+class BatchID:
     """
-    Get HubToken from user input.
+    Batch ID
     """
-    if Define.hubToken == '':
-        print('Please provide a token:')
-        Define.hubToken = input()
+    def __init__(self):
+        self.id = nanoid.generate()

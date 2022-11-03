@@ -27,14 +27,15 @@ class Error(Exception):
 
     type = 0x00
 
-    def __init__(self, msg: str, module: int = 0, file: int = 0, error: int = 0):
+    def __init__(self, msg: str, module: int = 0, file: int = 0, error: int = 0, vendor: str = None):
         self.message = msg
-        self.module = module
-        self.file = file
-        self.error = error
+        if vendor is None:
+            self.code = 'QC.{}.{}.{}.{}'.format(self.type, module, file, error)
+        else:
+            self.code = vendor
 
     def __str__(self) -> str:
-        return 'QC.{}.{}.{}.{}: {}'.format(self.type, self.module, self.file, self.error, self.message)
+        return '{}: {}'.format(self.code, self.message)
 
 
 class ArgumentError(Error):

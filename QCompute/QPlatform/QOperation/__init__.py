@@ -86,12 +86,9 @@ class QOperation:
                 qRegList):  # Barrier and QProcedure does not match bits configuration
             raise Error.ArgumentError('The number of QReg must match the setting!', ModuleErrorCode, FileErrorCode, 4)
 
-        if len(qRegList) <= 0:
-            raise Error.ArgumentError('Must have QReg in operation!', ModuleErrorCode, FileErrorCode, 5)
-
         if len(qRegList) != len(set(qReg for qReg in qRegList)):
             raise Error.ArgumentError('QReg of operators in circuit are not repeatable!', ModuleErrorCode,
-                                      FileErrorCode, 6)
+                                      FileErrorCode, 5)
 
         circuitLine = CircuitLine()
         circuitLine.data = self
@@ -105,6 +102,10 @@ class QOperation:
         :param qRegList: quantum register list
         :param cRegList: classic register list
         """
+        if len(qRegList) != len(cRegList):
+            raise Error.ArgumentError('QReg and CReg in measure must have same count!', ModuleErrorCode, FileErrorCode,
+                                      6)
+
         env = qRegList[0].env
         for qReg in qRegList:
             if qReg.env != env:
@@ -113,37 +114,29 @@ class QOperation:
         if env.__class__.__name__ == 'QProcedure':
             raise Error.ArgumentError('QProcedure must not be measured!', ModuleErrorCode, FileErrorCode, 8)
 
-        if self.bits is not None and self.bits != len(
-                qRegList):  # Barrier and QProcedure does not match bits configuration
-            raise Error.ArgumentError('The number of QReg must match the setting!', ModuleErrorCode, FileErrorCode, 9)
-
         if len(qRegList) <= 0:
-            raise Error.ArgumentError('Must have QReg in measure!', ModuleErrorCode, FileErrorCode, 10)
+            raise Error.ArgumentError('Must have QReg in measure!', ModuleErrorCode, FileErrorCode, 9)
 
         if len(qRegList) != len(set(qReg for qReg in qRegList)):
-            raise Error.ArgumentError('QReg of operators in circuit are not repeatable!', ModuleErrorCode,
-                                      FileErrorCode, 11)
+            raise Error.ArgumentError('QReg of measure in circuit are not repeatable!', ModuleErrorCode,
+                                      FileErrorCode, 10)
 
         for qReg in qRegList:  # Only in QEnv
             if qReg.index in env.measuredQRegSet:
-                raise Error.ArgumentError('Measure must be once on a QReg!', ModuleErrorCode, FileErrorCode, 12)
+                raise Error.ArgumentError('Measure must be once on a QReg!', ModuleErrorCode, FileErrorCode, 11)
             env.measuredQRegSet.add(qReg.index)
 
         if len(cRegList) <= 0:
-            raise Error.ArgumentError('Must have CReg in measure!', ModuleErrorCode, FileErrorCode, 13)
+            raise Error.ArgumentError('Must have CReg in measure!', ModuleErrorCode, FileErrorCode, 12)
 
         if len(cRegList) != len(set(cReg for cReg in cRegList)):
-            raise Error.ArgumentError('CReg of operators in measure are not repeatable!', ModuleErrorCode,
-                                      FileErrorCode, 14)
+            raise Error.ArgumentError('CReg of measure in circuit are not repeatable!', ModuleErrorCode,
+                                      FileErrorCode, 13)
 
         for cReg in cRegList:  # Only in QEnv
             if cReg in env.measuredCRegSet:
-                raise Error.ArgumentError('Measure must be once on a CReg!', ModuleErrorCode, FileErrorCode, 15)
+                raise Error.ArgumentError('Measure must be once on a CReg!', ModuleErrorCode, FileErrorCode, 14)
             env.measuredCRegSet.add(cReg)
-
-        if len(qRegList) != len(cRegList):
-            raise Error.ArgumentError('QReg and CReg in measure must have same count!', ModuleErrorCode, FileErrorCode,
-                                      16)
 
         circuitLine = CircuitLine()
         circuitLine.data = self

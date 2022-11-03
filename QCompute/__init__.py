@@ -34,6 +34,12 @@ from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
 from QCompute.OpenModule.ReverseCircuitModule import ReverseCircuitModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
 from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+from QCompute.Module.MappingToBaiduQPUQianModule import MappingToBaiduQPUQianModule
+from QCompute.Module.UnrollCircuitToBaiduQPUQianModule import UnrollCircuitToBaiduQPUQianModule
+from QCompute.Module.MappingToIoPCASModule import MappingToIoPCASModule
+from QCompute.Module.UnrollCircuitToIoPCASModule import UnrollCircuitToIoPCASModule
+from QCompute.Module.MappingToIonAPMModule import MappingToIonAPMModule
+from QCompute.Module.UnrollCircuitToIonAPMModule import UnrollCircuitToIonAPMModule
 
 
 from QCompute.OpenSimulator import (
