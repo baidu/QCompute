@@ -12,9 +12,10 @@ _sym_db = _symbol_database.Default()
 
 
 from QCompute.QProtobuf.Library import QOperation_pb2 as QOperation__pb2
+from QCompute.QProtobuf.Library import QNoise_pb2 as QNoise__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14PlatformStruct.proto\x1a\x10QOperation.proto\"`\n\x07Program\x12\x12\n\nsdkVersion\x18\x01 \x01(\t\x12\x13\n\x04head\x18\x02 \x01(\x0b\x32\x05.Head\x12\x13\n\x04\x62ody\x18\x03 \x01(\x0b\x32\x05.Body\x12\x17\n\x06source\x18\x04 \x01(\x0b\x32\x07.Source\"4\n\x04Head\x12\x15\n\rusingQRegList\x18\x01 \x03(\r\x12\x15\n\rusingCRegList\x18\x02 \x03(\r\"\x95\x01\n\x04\x42ody\x12\x1d\n\x07\x63ircuit\x18\x01 \x03(\x0b\x32\x0c.CircuitLine\x12-\n\x0cprocedureMap\x18\x02 \x03(\x0b\x32\x17.Body.ProcedureMapEntry\x1a?\n\x11ProcedureMapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x19\n\x05value\x18\x02 \x01(\x0b\x32\n.Procedure:\x02\x38\x01\"\x16\n\x06Source\x12\x0c\n\x04qasm\x18\x01 \x01(\t\"\xbd\x02\n\x0b\x43ircuitLine\x12\x1f\n\tfixedGate\x18\x01 \x01(\x0e\x32\n.FixedGateH\x00\x12%\n\x0crotationGate\x18\x02 \x01(\x0e\x32\r.RotationGateH\x00\x12)\n\x0e\x63ustomizedGate\x18\x03 \x01(\x0b\x32\x0f.CustomizedGateH\x00\x12\'\n\rcompositeGate\x18\x04 \x01(\x0e\x32\x0e.CompositeGateH\x00\x12\x17\n\rprocedureName\x18\x05 \x01(\tH\x00\x12\x1b\n\x07measure\x18\x06 \x01(\x0b\x32\x08.MeasureH\x00\x12\x11\n\x07\x62\x61rrier\x18\x07 \x01(\x08H\x00\x12\x10\n\x08qRegList\x18\x08 \x03(\r\x12\x19\n\x11\x61rgumentValueList\x18\t \x03(\x01\x12\x16\n\x0e\x61rgumentIdList\x18\n \x03(\x05\x42\x04\n\x02op\"Y\n\tProcedure\x12\x16\n\x0eparameterCount\x18\x01 \x01(\r\x12\x15\n\rusingQRegList\x18\x02 \x03(\r\x12\x1d\n\x07\x63ircuit\x18\x03 \x03(\x0b\x32\x0c.CircuitLineb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14PlatformStruct.proto\x1a\x10QOperation.proto\x1a\x0cQNoise.proto\"`\n\x07Program\x12\x12\n\nsdkVersion\x18\x01 \x01(\t\x12\x13\n\x04head\x18\x02 \x01(\x0b\x32\x05.Head\x12\x13\n\x04\x62ody\x18\x03 \x01(\x0b\x32\x05.Body\x12\x17\n\x06source\x18\x04 \x01(\x0b\x32\x07.Source\"4\n\x04Head\x12\x15\n\rusingQRegList\x18\x01 \x03(\r\x12\x15\n\rusingCRegList\x18\x02 \x03(\r\"\x81\x02\n\x04\x42ody\x12\x1d\n\x07\x63ircuit\x18\x01 \x03(\x0b\x32\x0c.CircuitLine\x12-\n\x0cprocedureMap\x18\x02 \x03(\x0b\x32\x17.Body.ProcedureMapEntry\x12%\n\x08noiseMap\x18\x03 \x03(\x0b\x32\x13.Body.NoiseMapEntry\x1a@\n\x11ProcedureMapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1a\n\x05value\x18\x02 \x01(\x0b\x32\x0b.QProcedure:\x02\x38\x01\x1a\x42\n\rNoiseMapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12 \n\x05value\x18\x02 \x01(\x0b\x32\x11.QNoiseDefineList:\x02\x38\x01\"\x16\n\x06Source\x12\x0c\n\x04qasm\x18\x01 \x01(\t\"\xd9\x02\n\x0b\x43ircuitLine\x12\x1f\n\tfixedGate\x18\x01 \x01(\x0e\x32\n.FixedGateH\x00\x12%\n\x0crotationGate\x18\x02 \x01(\x0e\x32\r.RotationGateH\x00\x12)\n\x0e\x63ustomizedGate\x18\x03 \x01(\x0b\x32\x0f.CustomizedGateH\x00\x12\'\n\rcompositeGate\x18\x04 \x01(\x0e\x32\x0e.CompositeGateH\x00\x12\x17\n\rprocedureName\x18\x05 \x01(\tH\x00\x12\x1b\n\x07measure\x18\x06 \x01(\x0b\x32\x08.MeasureH\x00\x12\x11\n\x07\x62\x61rrier\x18\x07 \x01(\x08H\x00\x12\x10\n\x08qRegList\x18\x08 \x03(\r\x12\x19\n\x11\x61rgumentValueList\x18\t \x03(\x01\x12\x16\n\x0e\x61rgumentIdList\x18\n \x03(\x05\x12\x1a\n\tnoiseList\x18\x0b \x03(\x0b\x32\x07.QNoiseB\x04\n\x02op\"Z\n\nQProcedure\x12\x16\n\x0eparameterCount\x18\x01 \x01(\r\x12\x15\n\rusingQRegList\x18\x02 \x03(\r\x12\x1d\n\x07\x63ircuit\x18\x03 \x03(\x0b\x32\x0c.CircuitLineb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'PlatformStruct_pb2', globals())
@@ -23,18 +24,22 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _BODY_PROCEDUREMAPENTRY._options = None
   _BODY_PROCEDUREMAPENTRY._serialized_options = b'8\001'
-  _PROGRAM._serialized_start=42
-  _PROGRAM._serialized_end=138
-  _HEAD._serialized_start=140
-  _HEAD._serialized_end=192
-  _BODY._serialized_start=195
-  _BODY._serialized_end=344
-  _BODY_PROCEDUREMAPENTRY._serialized_start=281
-  _BODY_PROCEDUREMAPENTRY._serialized_end=344
-  _SOURCE._serialized_start=346
-  _SOURCE._serialized_end=368
-  _CIRCUITLINE._serialized_start=371
-  _CIRCUITLINE._serialized_end=688
-  _PROCEDURE._serialized_start=690
-  _PROCEDURE._serialized_end=779
+  _BODY_NOISEMAPENTRY._options = None
+  _BODY_NOISEMAPENTRY._serialized_options = b'8\001'
+  _PROGRAM._serialized_start=56
+  _PROGRAM._serialized_end=152
+  _HEAD._serialized_start=154
+  _HEAD._serialized_end=206
+  _BODY._serialized_start=209
+  _BODY._serialized_end=466
+  _BODY_PROCEDUREMAPENTRY._serialized_start=334
+  _BODY_PROCEDUREMAPENTRY._serialized_end=398
+  _BODY_NOISEMAPENTRY._serialized_start=400
+  _BODY_NOISEMAPENTRY._serialized_end=466
+  _SOURCE._serialized_start=468
+  _SOURCE._serialized_end=490
+  _CIRCUITLINE._serialized_start=493
+  _CIRCUITLINE._serialized_end=838
+  _QPROCEDURE._serialized_start=840
+  _QPROCEDURE._serialized_end=930
 # @@protoc_insertion_point(module_scope)

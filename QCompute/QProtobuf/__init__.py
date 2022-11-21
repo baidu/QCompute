@@ -19,11 +19,12 @@
 Export the entire directory as a library
 """
 
+from QCompute.QProtobuf.Library.Complex_pb2 import Matrix as PBMatrix
 from QCompute.QProtobuf.Library.PlatformStruct_pb2 import Program as PBProgram, CircuitLine as PBCircuitLine, \
-    Procedure as PBProcedure
+    QProcedure as PBQProcedure
 from QCompute.QProtobuf.Library.QOperation_pb2 import FixedGate as PBFixedGate, RotationGate as PBRotationGate, \
     CustomizedGate as PBCustomizedGate, CompositeGate as PBCompositeGate, Measure as PBMeasure
-from QCompute.QProtobuf.Library.Complex_pb2 import Matrix as PBMatrix
+from QCompute.QProtobuf.Library.QNoise_pb2 import QNoise as PBQNoise, QNoiseDefine as PBQNoiseDefine
 from QCompute.QProtobuf.Library.QObj_pb2 import QObject as PBQObject, Experiment as PBExperiment, \
     Instruction as PBInstruction
 from QCompute.QProtobuf.Library.UniversalBlindQuantumComputing_pb2 import InitState as PBUbpcInitState, \

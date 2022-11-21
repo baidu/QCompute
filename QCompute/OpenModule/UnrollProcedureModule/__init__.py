@@ -25,9 +25,6 @@ from QCompute.OpenModule import ModuleImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QProtobuf import PBProgram, PBCircuitLine
 
-if TYPE_CHECKING:
-    pass
-
 FileErrorCode = 2
 
 
@@ -41,8 +38,8 @@ class UnrollProcedureModule(ModuleImplement):
 
     env.module(UnrollProcedureModule({'disable': True}))  # Disable
     """
-    _procedureMap = None  # type: Dict[str, 'PBProcedure']
-    _circuitOut = None  # type: List['PBCircuitLine']
+    _procedureMap: Dict[str, 'PBProcedure'] = None
+    _circuitOut: List['PBCircuitLine'] = None
 
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
         """

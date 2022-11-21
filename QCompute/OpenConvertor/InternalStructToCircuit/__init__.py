@@ -48,7 +48,7 @@ class InternalStructToCircuit(ConvertorImplement):
         :return: Protobuf format of the circuit
         """
 
-        pbCircuit = []  # type: List[PBCircuitLine]
+        pbCircuit: List[PBCircuitLine] = []
         for circuitLine in circuitLineList:
             pbCircuitLine = gateToProtobuf(circuitLine.data, circuitLine.qRegList,
                                            circuitLine.cRegList if hasattr(circuitLine, 'cRegList') else None)

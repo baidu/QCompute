@@ -22,6 +22,17 @@ from typing import List, TYPE_CHECKING, Tuple, Optional
 
 from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterStorage
+from QCompute.QPlatform.QNoise import QNoiseDefine
+from QCompute.QPlatform.QNoise.AmplitudeDamping import AmplitudeDamping
+from QCompute.QPlatform.QNoise.BitFlip import BitFlip
+from QCompute.QPlatform.QNoise.BitPhaseFlip import BitPhaseFlip
+from QCompute.QPlatform.QNoise.CustomizedNoise import CustomizedNoise
+from QCompute.QPlatform.QNoise.Depolarizing import Depolarizing
+from QCompute.QPlatform.QNoise.Depolarizing2 import Depolarizing2
+from QCompute.QPlatform.QNoise.PauliNoise import PauliNoise
+from QCompute.QPlatform.QNoise.PhaseDamping import PhaseDamping
+from QCompute.QPlatform.QNoise.PhaseFlip import PhaseFlip
+from QCompute.QPlatform.QNoise.ResetNoise import ResetNoise
 from QCompute.QPlatform.QOperation.Barrier import BarrierOP
 from QCompute.QPlatform.QOperation.CompositeGate import CompositeGateOP
 from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
@@ -31,7 +42,7 @@ from QCompute.QPlatform.QOperation.QProcedure import QProcedureOP
 from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP
 from QCompute.QPlatform.Utilities import numpyMatrixToProtobufMatrix
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, \
-    PBMeasure
+    PBMeasure, PBQNoise, PBQNoiseDefine
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QEnv import QEnv
@@ -56,6 +67,10 @@ def QEnvToProtobuf(program: PBProgram, env: 'QEnv') -> None:
         pbProcedure.usingQRegList[:] = sorted([qReg for qReg in procedure.Q.registerMap.keys()])
         for circuitLine in procedure.circuit:
             pbProcedure.circuit.append(circuitLineToProtobuf(circuitLine))
+
+    for name, noiseDefineList in env.noiseDefineMap.items():
+        for noiseDefine in noiseDefineList:
+            body.noiseMap[name].noiseDefineList.append(noiseDefineToProtobuf(noiseDefine))
 
 
 def circuitLineToProtobuf(circuitLine: 'CircuitLine') -> 'PBCircuitLine':
@@ -142,3 +157,39 @@ def gateToProtobuf(data: 'QOperation', qRegList: List[int], cRegList: Optional[L
     elif data.__class__.__name__ == 'BarrierOP':
         ret.barrier = True
     return ret
+
+
+def noiseDefineToProtobuf(noiseDefine: QNoiseDefine) -> PBQNoiseDefine:
+    pbQNoiseDefine = PBQNoiseDefine()
+    for noise in noiseDefine.noiseList:
+        pbNoise = PBQNoise()
+        if isinstance(noise, BitFlip):
+            pbNoise.bitFlip.probability = noise.probability
+        if isinstance(noise, PhaseFlip):
+            pbNoise.phaseFlip.probability = noise.probability
+        if isinstance(noise, BitPhaseFlip):
+            pbNoise.bitPhaseFlip.probability = noise.probability
+        if isinstance(noise, PauliNoise):
+            pbNoise.pauliNoise.probability1 = noise.probability1
+            pbNoise.pauliNoise.probability2 = noise.probability2
+            pbNoise.pauliNoise.probability3 = noise.probability3
+        if isinstance(noise, Depolarizing):
+            pbNoise.depolarizing.probability = noise.probability
+        if isinstance(noise, AmplitudeDamping):
+            pbNoise.amplitudeDamping.probability = noise.probability
+        if isinstance(noise, ResetNoise):
+            pbNoise.resetNoise.probability1 = noise.probability1
+            pbNoise.resetNoise.probability2 = noise.probability2
+        if isinstance(noise, PhaseDamping):
+            pbNoise.phaseDamping.probability = noise.probability
+        if isinstance(noise, Depolarizing2):
+            pbNoise.depolarizing2.probability = noise.probability
+        if isinstance(noise, CustomizedNoise):
+            for pbMatrix in [numpyMatrixToProtobufMatrix(matrix) for matrix in noise.krauses]:
+                pbNoise.customizedNoise.krauses.append(pbMatrix)
+        pbQNoiseDefine.noiseList.append(pbNoise)
+    if noiseDefine.qRegList:
+        pbQNoiseDefine.qRegList[:] = noiseDefine.qRegList
+    if noiseDefine.positionList:
+        pbQNoiseDefine.positionList[:] = noiseDefine.positionList
+    return pbQNoiseDefine

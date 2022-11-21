@@ -172,7 +172,7 @@ def contract1_2(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray, upO
         matrixParking = numpy.reshape(matrixParking, [2, 2, 2, 2])
     elif matrixParking.shape != (2, 2, 2, 2):
         raise Error.ArgumentError("Parking gate not a 2-qubit gate", ModuleErrorCode, FileErrorCode, 6)
-    newArray = None  # type: Optional[numpy.ndarray]
+    newArray: Optional[numpy.ndarray] = None
     if leftOrRight == 0:
         if upOrDown == 0:
             newArray = numpy.einsum("abcd,de->abce", matrixParking, matrixFloating)

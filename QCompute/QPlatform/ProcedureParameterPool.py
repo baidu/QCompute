@@ -46,7 +46,7 @@ class ProcedureParameterPool:
         """
 
         # the inner data for procedure params dict
-        self.parameterMap = {}  # type: Dict[int,ProcedureParameterStorage]
+        self.parameterMap: Dict[int,ProcedureParameterStorage] = {}
 
     def __getitem__(self, index: int) -> ProcedureParameterStorage:
         return self._get(index)

@@ -44,6 +44,7 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
         BackendName.CloudBaiduSim2Wind,
         BackendName.CloudBaiduSim2Lake,
         BackendName.CloudAerAtBD,
+        
     ]:
         return _filterSimulator(backendName, moduleList)
     
@@ -72,6 +73,8 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
             compressGateModule = module
         elif not module.disable:
             ret.append(module)
+
+    
 
     if unrollProcedureModule is not None:
         if not unrollProcedureModule.disable:

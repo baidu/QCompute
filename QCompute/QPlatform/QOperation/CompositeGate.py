@@ -44,7 +44,7 @@ class CompositeGateOP(QOperation):
     An example "MS" has been given in this class.
     """
 
-    argumentList = None  # type: List['RotationArgument']
+    argumentList: List['RotationArgument'] = None
 
     def __init__(self, gate: str, bits: int, allowArgumentCounts: List[int],
                  angleList: List['RotationArgument']) -> None:
@@ -58,7 +58,7 @@ class CompositeGateOP(QOperation):
     def __call__(self, *qRegList: 'QRegStorage') -> None:
         self._op(list(qRegList))
 
-    def getInverse(self) -> 'CompositeGateOP':
+    def getInversed(self) -> 'CompositeGateOP':
         for argument in self.argumentList:
             if isinstance(argument, ProcedureParameterStorage):
                 raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,

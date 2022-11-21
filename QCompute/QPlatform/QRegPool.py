@@ -31,15 +31,15 @@ FileErrorCode = 4
 
 class QRegStorage:
     """
-    The storage for quantum register
+    The storage for quantum register.
     """
 
     def __init__(self, index: int, env: Union['QEnv', 'QProcedure']) -> None:
         """
-        The quantum register object needs to know its index and related quantum environment
+        The quantum register object needs to know its index and related quantum environment.
 
-        :param index: the quantum register index
-        :param env: the related quantum environment or procedure
+        :param index: the quantum register index.
+        :param env: the related quantum environment or procedure.
         """
 
         self.index = index
@@ -48,20 +48,20 @@ class QRegStorage:
 
 class QRegPool:
     """
-    The quantum register dict
+    The quantum register dict.
     """
 
     def __init__(self, env: Union['QEnv', 'QProcedure']) -> None:
         """
-        The constructor of the QRegPool class
+        The constructor of the QRegPool class.
 
-        :param env: the related quantum environment or procedure
+        :param env: the related quantum environment or procedure.
         """
 
         # the quantum environment related with the quantum register dict
         self.env = env
         # the inner data for quantum register dict
-        self.registerMap = {}  # type: Dict[int, QRegStorage]
+        self.registerMap: Dict[int, QRegStorage] = {}
 
     def __getitem__(self, index: int) -> QRegStorage:
         return self._get(index)
@@ -71,11 +71,11 @@ class QRegPool:
 
     def _get(self, index: int) -> QRegStorage:
         """
-        Get the quantum register according to the index
+        Get the quantum register according to the index.
 
-        Create the register when it does not exists
+        Create the register when it does not exists.
 
-        :param index: the quantum register index
+        :param index: the quantum register index.
         :return: QuantumRegisterStorage
         """
 
@@ -111,8 +111,8 @@ class QRegPool:
         Get QReg list and index list
         """
 
-        qRegList = []  # type: List[QRegStorage]
-        indexList = []  # type: List[int]
+        qRegList: List[QRegStorage] = []
+        indexList: List[int] = []
         for index, qReg in self.registerMap.items():
             qRegList.append(qReg)
             indexList.append(index)

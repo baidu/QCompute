@@ -55,23 +55,23 @@ class CircuitToInternalStruct(ConvertorImplement):
         :return: Internal circuit struct list
         """
 
-        ret = []  # type: List[CircuitLine]
+        ret: List[CircuitLine] = []
         for pbCircuitLine in pbCircuitLineList:
             circuitLine = CircuitLine()
             op = pbCircuitLine.WhichOneof('op')
             if op == 'fixedGate':
-                fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = pbCircuitLine.fixedGate
                 gateName = PBFixedGate.Name(fixedGate)
                 circuitLine.data = getFixedGateInstance(gateName)
             elif op == 'rotationGate':
-                rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = pbCircuitLine.rotationGate
                 gateName = PBRotationGate.Name(rotationGate)
                 circuitLine.data = createRotationGateInstance(gateName, *pbCircuitLine.argumentValueList)
             elif op == 'customizedGate':
-                customizedGate = pbCircuitLine.customizedGate  # type: PBCustomizedGate
+                customizedGate: PBCustomizedGate = pbCircuitLine.customizedGate
                 circuitLine.data = CustomizedGateOP(protobufMatrixToNumpyMatrix(customizedGate.matrix))
             elif op == 'measure':
-                measure = pbCircuitLine.measure  # type: PBMeasure
+                measure: PBMeasure = pbCircuitLine.measure
                 circuitLine.data = getMeasureInstance(PBMeasure.Type.Name(measure.type))
                 circuitLine.cRegList = list(measure.cRegList)
             elif op == 'barrier':

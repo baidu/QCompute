@@ -55,7 +55,7 @@ def inv_opr(ops: List[QOperation.QOperation]) -> RotationGate.RotationGateOP:
     :param ops: List[QOperation], a list of `QOperation`-type quantum gates
     :return: a `QOperation`-type inverse quantum operation
     """
-    inv_mat = functools.reduce(np.dot, [g.getInverse().getMatrix() for g in ops])
+    inv_mat = functools.reduce(np.dot, [g.getInversed().getMatrix() for g in ops])
     # yzy-decomposition of a U3 gate
     _, theta, phi, lam = decompose_yzy(inv_mat)
     # construct a U3 gate

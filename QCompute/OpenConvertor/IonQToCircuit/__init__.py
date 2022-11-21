@@ -45,13 +45,13 @@ class IonQToCircuit(ConvertorImplement):
         :return: Protobuf format of the circuit
         """
 
-        ionQ = json.loads(ionQJsonStr)  # type: Dict
+        ionQ: Dict = json.loads(ionQJsonStr)
         pbProgram = PBProgram()
         regSet = set()
         pbCircuit = pbProgram.body.circuit
 
         for circuitLine in ionQ['body']['circuit']:
-            pbCircuitLineList = gateMapping(circuitLine, regSet)  # type: 'PBCircuitLine'
+            pbCircuitLineList: 'PBCircuitLine' = gateMapping(circuitLine, regSet)
             pbCircuit.extend(pbCircuitLineList)
 
         pbProgram.head.usingQRegList[:] = pbProgram.head.usingCRegList[:] = list(regSet)[:]
@@ -59,7 +59,7 @@ class IonQToCircuit(ConvertorImplement):
 
 
 def unrollV(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
-    ret = []  # type: List[PBCircuitLine]
+    ret: List[PBCircuitLine] = []
 
     pbCircuitLine = PBCircuitLine()
     pbCircuitLine.fixedGate = PBFixedGate.H
@@ -81,7 +81,7 @@ def unrollV(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
 
 
 def unrollVI(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
-    ret = []  # type: List[PBCircuitLine]
+    ret: List[PBCircuitLine] = []
 
     pbCircuitLine = PBCircuitLine()
     pbCircuitLine.fixedGate = PBFixedGate.H
@@ -103,7 +103,7 @@ def unrollVI(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
 
 
 def unrollXX(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
-    ret = []  # type: List[PBCircuitLine]
+    ret: List[PBCircuitLine] = []
 
     pbCircuitLine = PBCircuitLine()
     pbCircuitLine.fixedGate = PBFixedGate.CX
@@ -126,7 +126,7 @@ def unrollXX(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
 
 
 def unrollYY(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
-    ret = []  # type: List[PBCircuitLine]
+    ret: List[PBCircuitLine] = []
 
     pbCircuitLine = PBCircuitLine()
     pbCircuitLine.fixedGate = PBFixedGate.SDG
@@ -159,7 +159,7 @@ def unrollYY(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
 
 
 def unrollZZ(circuitLine: Dict, regSet: Set) -> List['PBCircuitLine']:
-    ret = []  # type: List[PBCircuitLine]
+    ret: List[PBCircuitLine] = []
 
     pbCircuitLine = PBCircuitLine()
     pbCircuitLine.fixedGate = PBFixedGate.CX

@@ -35,7 +35,7 @@ class Error(Exception):
             self.code = vendor
 
     def __str__(self) -> str:
-        return '{}: {}'.format(self.code, self.message)
+        return '###{}: {}###'.format(self.code, self.message)
 
 
 class ArgumentError(Error):

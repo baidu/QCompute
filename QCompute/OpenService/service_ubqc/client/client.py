@@ -79,9 +79,9 @@ class BrickworkVertex:
                                       FileErrorCode, 1)
 
         self.__position = position  # vertex position
-        self.__rotation_encryption_angle = None  # type: float # angle for rotation encryption
-        self.__flipping_encryption_angle = None  # type: float # angle for flipping encryption
-        self.__commands = []  # type: List[str] # commands to be executed
+        self.__rotation_encryption_angle: float = None  # angle for rotation encryption
+        self.__flipping_encryption_angletype: float = None  # angle for flipping encryption
+        self.__commands: List[str] = []  # commands to be executed
         self.__outcome = None  # measurement outcome
 
     def set_rotation_encryption_angle(self, angle: float = 0.0):
@@ -147,7 +147,7 @@ class BrickworkVertex:
         Args:
             which_command (Pattern.CommandM / Pattern.CommandX / Pattern.CommandZ / Pattern.CommandS): commands
         """
-        name = which_command.name  # type: str
+        name: str = which_command.name
         if not {name}.issubset(['M', 'X', 'Z', 'S']):
             raise Error.ArgumentError(f"Invalid command name: ({name})!\n"
                                       "Only 'M', 'X', 'Z' and 'S' are supported as the "

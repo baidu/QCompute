@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.1.0] - Nov-18-2022
+
+### Added
+
+- BatchID;
+  - A BatchID would be generated for every QComputeSDK-Python process. All related tasks belonging to the process are precisely the same. The BatchID can be used for variational algorithms and task group sets.
+
+### Changed
+
+- Slack the version requirements of matplotlib, tqdm.
+
 ## [3.0.2] - Oct-30-2022
 
 ### Added
@@ -21,8 +32,8 @@
 ### Added
 
 - New QPUs:
-    + CloudBaiduQPUQian;
-    + CloudIonAPM.
+    - CloudBaiduQPUQian;
+    - CloudIonAPM.
 
 ## [2.0.6] - June-11-2022
 
@@ -37,17 +48,17 @@
 
 - Support for the UBQC(Universal blind quantum computing) plugin;
 - More convertors
-    + Qasm Convertor;
-    + XanaduSF Convertor;
-    + IonQ Convertor;
+    - Qasm Convertor;
+    - XanaduSF Convertor;
+    - IonQ Convertor;
 - Calibration functions;
 - InteractiveModule.
 
 ### Changed
 
 - CompositeGate:
-    + CK Gate;
-    + MS Gate.
+    - CK Gate;
+    - MS Gate.
 
 ### Removed
 
@@ -81,24 +92,24 @@
 ### Added
 
 - Examples update;
-    + QAPP, quantum computing toolbox.
+    - QAPP, quantum computing toolbox.
 
 ## [2.0.0] - Jun-07-2021
 
 ### Added
 
 - New QPU:
-    + IoPCAS. 10 qubits superconducting QPU from Institute of Physics (IOP), Chinese Academy of Sciences
+    - IoPCAS. 10 qubits superconducting QPU from Institute of Physics (IOP), Chinese Academy of Sciences
 - New cloud simulators:
-    + cloud_baidu_sim2_lake. The simulator based on GPU
+    - cloud_baidu_sim2_lake. The simulator based on GPU
 - New module:
-    + InverseCircuit;
+    - InverseCircuit;
 - New functions for local simulator:
-    + output_probability;
-    + output_state;
+    - output_probability;
+    - output_state;
 - New debug sector for all backends:
-    + Ancilla;
-    + Auto workflow for modules.
+    - Ancilla;
+    - Auto workflow for modules.
 
 ## [1.1.0] - Apr-19-2021
 
@@ -107,8 +118,8 @@
 - Type hints
 - RegPool createList/toListPair;
 - New cloud simulators:
-    + cloud_baidu_sim2_wind
-    + cloud_qpu2
+    - cloud_baidu_sim2_wind
+    - cloud_qpu2
 
 ### Changed
 
@@ -124,10 +135,10 @@
 ### Added
 
 - New cloud simulators:
-    + cloud_baidu_sim2_water
-    + cloud_baidu_sim2_earth
-    + cloud_baidu_sim2_thunder
-    + cloud_baidu_sim2_heaven
+    - cloud_baidu_sim2_water
+    - cloud_baidu_sim2_earth
+    - cloud_baidu_sim2_thunder
+    - cloud_baidu_sim2_heaven
 - Examples update;
 - Related docs update;
 - Requirements update.
@@ -139,7 +150,7 @@
 ### Deprecated
 
 - cloud_baidu_sim2;
-    + New name is cloud_baidu_sim2_water
+    - New name is cloud_baidu_sim2_water
 
 ## [1.0.2] - Sep-14-2020
 

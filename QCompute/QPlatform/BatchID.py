@@ -25,5 +25,4 @@ class BatchID:
     """
     Batch ID
     """
-    def __init__(self):
-        self.id = nanoid.generate()
+    id = nanoid.generate()

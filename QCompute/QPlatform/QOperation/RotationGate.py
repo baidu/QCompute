@@ -36,9 +36,9 @@ FileErrorCode = 10
 
 class RotationGateOP(QOperation):
     """
-    Rotation gate
+    Rotation gate.
 
-    Use rotation parameters to create the quantum operators
+    Use rotation parameters to create the quantum operators.
     """
 
     def __init__(self, gate: str, bits: int, allowArgumentCounts: List[int],
@@ -49,8 +49,9 @@ class RotationGateOP(QOperation):
             raise Error.ArgumentError(f'allowArgumentCounts is not len(angleList)!',
                                       ModuleErrorCode, FileErrorCode, 1)
         self.allowArgumentCounts = allowArgumentCounts
-        self.argumentList = angleList  # type: List['RotationArgument']
-        self.uGateArgumentList = uGateArgumentList  # type: List['RotationArgument']
+        self.argumentList: List['RotationArgument'] = angleList
+        self.uGateArgumentList: List['RotationArgument'] = uGateArgumentList
+
 
     def __call__(self, *qRegList: QRegStorage) -> None:
         self._op(list(qRegList))
@@ -132,7 +133,7 @@ class RotationGateOP(QOperation):
         # elif uGateArgumentCount == 1:
         #     return self._cu1Matrix(*self.uGateArgumentList)
 
-    def getInverse(self) -> 'RotationGateOP':
+    def getInversed(self) -> 'RotationGateOP':
         for argument in self.argumentList:
             if isinstance(argument, ProcedureParameterStorage):
                 raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,
@@ -190,7 +191,7 @@ def U(theta: 'RotationArgument',
       phi: Optional['RotationArgument'] = None,
       lamda: Optional['RotationArgument'] = None) -> 'OperationFunc':
     """
-    U Gate
+    U Gate.
 
     Generate a single-qubit U1 (or U2 or U3) gate according to the number of angles.
 
@@ -208,7 +209,7 @@ U.allowArgumentCounts = UOpAllowArgumentCounts
 
 def RX(theta: 'RotationArgument') -> 'OperationFunc':
     """
-    RX Gate
+    RX Gate.
 
     Single-qubit rotation about the X-axis.
 
@@ -227,7 +228,7 @@ RX.allowArgumentCounts = RXOpAllowArgumentCounts
 
 def RY(theta: 'RotationArgument') -> 'OperationFunc':
     """
-    RY Gate
+    RY Gate.
 
     Single-qubit rotation about the Y-axis.
 
@@ -246,7 +247,7 @@ RY.allowArgumentCounts = RYOpAllowArgumentCounts
 
 def RZ(lamda: 'RotationArgument') -> 'OperationFunc':
     """
-    RZ Gate
+    RZ Gate.
 
     Single-qubit rotation about the Z-axis.
 
@@ -267,7 +268,7 @@ def CU(theta: 'RotationArgument',
        phi: 'RotationArgument',
        lamda: 'RotationArgument') -> 'OperationFunc':
     """
-    Controlled-rotation gate
+    Controlled-rotation gate.
 
     It contains two qubits: the control qubit and the target qubit.
 
@@ -285,7 +286,7 @@ CU.allowArgumentCounts = CUOpAllowArgumentCounts
 
 def CRX(theta: 'RotationArgument') -> 'OperationFunc':
     """
-    Controlled-RX gate
+    Controlled-RX gate.
     """
     angleList = [theta]
     uGateArgumentList = [theta, -numpy.math.pi / 2, numpy.math.pi / 2]
@@ -300,7 +301,7 @@ CRX.allowArgumentCounts = CRXOpAllowArgumentCounts
 
 def CRY(theta: 'RotationArgument') -> 'OperationFunc':
     """
-    Controlled-RY Gate
+    Controlled-RY Gate.
     """
     angleList = [theta]
     uGateArgumentList = [theta, 0, 0]
@@ -315,7 +316,7 @@ CRY.allowArgumentCounts = CRYOpAllowArgumentCounts
 
 def CRZ(lamda: 'RotationArgument') -> 'OperationFunc':
     """
-    Controlled-RZ Gate
+    Controlled-RZ Gate.
     """
     angleList = [lamda]
     uGateArgumentList = [0, 0, lamda]
@@ -330,7 +331,7 @@ CRZ.allowArgumentCounts = CRZOpAllowArgumentCounts
 
 def createRotationGateInstance(name: str, *angles: 'RotationArgument') -> 'OperationFunc':
     """
-    Create a new gate according to name and angles
+    Create a new gate according to name and angles.
 
     :param name : rotation gate name
     :param angles: angle param list

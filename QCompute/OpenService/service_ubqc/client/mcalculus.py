@@ -51,8 +51,8 @@ class MCalculus:
         self.__wild_pattern = []  # wild pattern
         self.__pattern = None  # standard pattern
         self.__measured_qubits = []  # measured qubits
-        self.__width = None  # type: int  # circuit width
-        self.__bw_depth = None  # type: int # circuit depth
+        self.__width: int = None  # circuit width
+        self.__bw_depth: int = None  # circuit depth
 
     def set_circuit(self, circuit):
         r"""Set a quantum circuit to ``MCalculus`` class.

@@ -51,7 +51,7 @@ class Backend(QImplement):
         # Collect the result to simulator for subsequent invoking
         self.result.startTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
 
-        ret = {}  # type: Dict[str,int]
+        ret: Dict[str,int] = {}
         width = 0
 
         client = PlatformClient(self.shots, self.program)

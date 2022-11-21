@@ -184,7 +184,7 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
             else:
                 raise Error.ArgumentError('Wrong construction of circuitMap!', ModuleErrorCode, FileErrorCode, 4)
 
-    circuitOut = []  # type: List[CircuitLine]
+    circuitOut: List[CircuitLine] = []
     for circuitLine in circuitIn_copy:  # Get the compressed gates and other circuitLines
         if circuitLine is not None:
             circuitOut.append(circuitLine)

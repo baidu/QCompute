@@ -74,13 +74,13 @@ def CalibrationUpdate(device: str):
         localKeys = json.loads(localKeysStr)
 
     # load online key list
-    onlineKeysDict = {}  # type: Dict[str, str]
+    onlineKeysDict: Dict[str, str] = {}
     for file in keys:
         fileName = path.basename(file)
         onlineKeysDict[fileName] = file
 
     # load local storage file list
-    localKeysSet = set()  # type: Set[str]
+    localKeysSet: Set[str] = set()
     if localKeys:
         for file in localKeys:
             fileName = path.basename(file)
@@ -128,7 +128,7 @@ class CalibrationData:
         self.time = datetime(year, *timeIntArray)
 
         # file data
-        self.data = None  # type: Dict
+        self.data: Dict = None
 
     def readData(self):
         """
@@ -161,7 +161,7 @@ def CalibrationReadData(device: str) -> List[CalibrationData]:
     localKeys = json.loads(localKeysStr)
 
     # build file information
-    ret = []  # type: List[CalibrationData]
+    ret: List[CalibrationData] = []
     for file in localKeys:
         fileName = path.basename(file)
         ret.append(CalibrationData(localDataPath / fileName, fileName[:14]))

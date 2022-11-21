@@ -52,7 +52,7 @@ class MeasureOP(QOperation):
 
 MeasureZ = MeasureOP('Z')
 """
-Z measure: measurement along computational basis
+Z measure: measurement along computational basis.
 """
 
 

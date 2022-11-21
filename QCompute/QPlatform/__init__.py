@@ -18,7 +18,6 @@
 """
 Export the entire directory as a library
 """
-import sys
 from enum import Enum, unique
 
 from QCompute.QPlatform import Error
@@ -77,10 +76,6 @@ class BackendName(Enum):
     Example: 
     
     env = QEnv()
-    
-    env.backend(BackendName.CloudBaiduSim2Water)
-    
-    or
     
     env.backend(BackendName.CloudBaiduSim2Water)
     

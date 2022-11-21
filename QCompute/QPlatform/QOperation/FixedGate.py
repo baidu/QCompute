@@ -44,7 +44,7 @@ class FixedGateOP(QOperation):
     def __call__(self, *qRegList: 'QRegStorage') -> None:
         self._op(list(qRegList))
 
-    def getInverse(self) -> 'FixedGateOP':
+    def getInversed(self) -> 'FixedGateOP':
         inversedName = InverseDict.get(self.name)
         if inversedName is not None:
             return getFixedGateInstance(inversedName)
@@ -84,7 +84,7 @@ Y = FixedGateOP('Y', 1,
                              [0. + 1.j, 0. + 0.j]])
                 )
 r"""
-Pauli-Y operator, similar to Pauli-X operator
+Pauli-Y operator, similar to Pauli-X operator.
 
 Matrix form:
 
@@ -96,7 +96,7 @@ Z = FixedGateOP('Z', 1,
                              [0. + 0.j, -1. + 0.j]])
                 )  # Pauli-Z operator
 r"""
-Pauli-Z operator, means changing a local phase
+Pauli-Z operator, means changing a local phase.
 
 For example: 
 
@@ -336,7 +336,7 @@ Matrix form:
 
 def getFixedGateInstance(name: str) -> 'FixedGateOP':
     """
-    Get a gate according to name
+    Get a gate according to name.
 
     :param name : fixed gate name
     :return: gate

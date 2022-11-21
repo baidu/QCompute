@@ -43,7 +43,7 @@ RotationArgument = Union[int, float, ProcedureParameterStorage]
 
 class QOperation:
     """
-    Basic classes for quantum operation
+    Basic classes for quantum operation.
     """
 
     def __init__(self, name: Optional[str] = None, bits: Optional[int] = None,
@@ -65,7 +65,7 @@ class QOperation:
             raise Error.ArgumentError(f'{self.__class__.__name__} do not have matrix!', ModuleErrorCode, FileErrorCode,
                                       1)
 
-    def getInverse(self) -> 'QOperation':
+    def getInversed(self) -> 'QOperation':
         return self
 
     def _op(self, qRegList: List['QRegStorage']) -> None:
@@ -97,7 +97,7 @@ class QOperation:
 
     def _opMeasure(self, qRegList: List['QRegStorage'], cRegList: List[int]) -> None:
         """
-        Measure operation base
+        Measure operation base.
 
         :param qRegList: quantum register list
         :param cRegList: classic register list
@@ -165,9 +165,9 @@ class CircuitLine:
                     gate, then `qubits` still be a List of the form `[i]`
         :param cRegList: a list of classical bit indices
         """
-        self.data = data  # type: Operation
-        self.qRegList = qRegList  # type: Operation
-        self.cRegList = cRegList  # type: List[int]
+        self.data: Operation = data
+        self.qRegList: List[int] = qRegList
+        self.cRegList: List[int] = cRegList
 
     def inverse(self) -> 'CircuitLine':
         """
@@ -175,5 +175,21 @@ class CircuitLine:
 
         :return: a `CircuitLine` instance whose `QOperation` data is the inverse of the origin one
         """
-        self.data = self.data.getInverse()
+        self.data = self.data.getInversed()
         return self
+
+
+def getGateInstance(name: str) -> Union['FixedGateOP', 'OperationFunc']:
+    """
+    Get a gate according to name
+
+    :param name : gate name
+    :return: gate
+    """
+    from QCompute.QPlatform.QOperation.FixedGate import getFixedGateInstance
+    from QCompute.QPlatform.QOperation.RotationGate import createRotationGateInstance
+
+    gate = getFixedGateInstance(name)
+    if not gate:
+        gate = createRotationGateInstance(name, 0, 0, 0)
+    return gate

@@ -24,9 +24,9 @@ from QCompute.QProtobuf import PBProgram, PBCircuitLine
 
 
 def checkRealCondition(program: 'PBProgram') -> Tuple[int, int, int]:
-    qRegSet = set()  # type: Set[int]
-    cRegSet = set()  # type: Set[int]
-    for circuitLine in program.body.circuit:  # type: PBCircuitLine
+    qRegSet: Set[int] = set()
+    cRegSet: Set[int] = set()
+    for circuitLine in program.body.circuit:
         qRegSet.update(circuitLine.qRegList)
         if circuitLine.WhichOneof('op') == 'measure':
             cRegSet.update(circuitLine.measure.cRegList)

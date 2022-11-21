@@ -41,7 +41,7 @@ FileErrorCode = 5
 class CircuitLine:
     def __init__(self):
         self.pbCircuitLine = PBCircuitLine()
-        self.pendingArgumentList = None  # type: List[str]
+        self.pendingArgumentList: List[str] = None
 
 
 class data(object):
@@ -122,19 +122,19 @@ class _Visitor(QASMVisitor):
         self.threeArgumentsOp = {'CCX', 'CSWAP'}
 
         
-        self.containMeasure = False  # type: bool
-        self.scopeStack = []  # type: List[ScopeLevel]
-        self.qRegVarMap = {}  # type: Dict[str, int]
-        self.cRegVarMap = {}  # type: Dict[str, int]
+        self.containMeasure = False
+        self.scopeStack: List[ScopeLevel] = []
+        self.qRegVarMap: Dict[str, int] = {}
+        self.cRegVarMap: Dict[str, int] = {}
         
         self.procedureVarSet = set()
-        self.procedureMap = {}  # type: Dict
-        self.procedureArgumentMap = {}  # type: Dict
+        self.procedureMap = {}
+        self.procedureArgumentMap = {}
         # Head
-        self.usingQRegList = []  # type: List[int]
-        self.usingCRegList = []  # type: List[int]
+        self.usingQRegList: List[int] = []
+        self.usingCRegList: List[int] = []
         # Body - circuit
-        self.circuitList = []  # type: List[CircuitLine]
+        self.circuitList: List[CircuitLine] = []
 
         # Default scope level: global. 
         # Default state: main procedure.

@@ -190,7 +190,7 @@ if __name__ == '__main__':
                 pauli_noisy[k][i][j] = calculator(qp_rescaled, qc_noisy)
 
             # Extrapolate to obtain the mitigated expectation value of the Pauli operator
-            pauli_mitig[k][i] = zne.extrapolator.extrapolate(xdata=scale_factors, ydata=pauli_noisy[k][i][:].tolist())
+            pauli_mitig[k][i] = zne.extrapolator.extrapolate(xdata=scale_factors, ydata=pauli_noisy[k][i].tolist())
 
     # Visualize the ideal, noisy, and mitigated expectation values in the Bloch sphere
     fig = plt.figure(figsize=(8, 8))

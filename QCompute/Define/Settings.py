@@ -71,7 +71,7 @@ Run simulator in or out process.
 The 'inProcessSimulator' option can significantly accelerate the calculation of simulator while 
 the outProcessSimulator can enhance the stability of simulator.  
 
-Supporting local_baidu_sim2
+Supporting local_baidu_sim2, local_baidu_sim2_with_noise, local_cuquantum
 
 Values: True, False
 """
@@ -86,13 +86,6 @@ Values: True, False
 cloudTaskDoNotWriteFile = False
 """
 Cloud task don't write file.
-
-Values: True, False
-"""
-
-autoBatchID = False
-"""
-Cloud task auto generate batch ID.
 
 Values: True, False
 """

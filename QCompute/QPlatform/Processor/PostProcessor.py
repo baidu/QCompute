@@ -50,7 +50,7 @@ def filterMeasure(counts: Dict[str, int], measuredQRegsToCRegsDict: Dict[int, in
         measuredQRegsToCRegsDict[key] = targetList.index(measuredQRegsToCRegsDict[key])
 
     zeroKey = '0' * qRegCount
-    binRet = {}  # type: Dict[str, int]
+    binRet: Dict[str, int] = {}
     for k, v in counts.items():
         hit = False
         for qReg in qRegList:
@@ -76,7 +76,7 @@ def filterMeasure(counts: Dict[str, int], measuredQRegsToCRegsDict: Dict[int, in
 
 def formatMeasure(counts: Dict[str, int], cRegCount: int, mFormat: MeasureFormat = Settings.measureFormat) -> Dict[
     str, int]:
-    ret = {}  # type: Dict[str, int]
+    ret: Dict[str, int] = {}
     for (k, v) in counts.items():
         if mFormat == MeasureFormat.Bin and k.startswith('0x'):
             num = int(k, 16)
@@ -91,7 +91,7 @@ def formatMeasure(counts: Dict[str, int], cRegCount: int, mFormat: MeasureFormat
 
 def formatReverseMeasure(counts: Dict[str, int], cRegCount: int, reverse: bool,
                          mFormat: MeasureFormat = Settings.measureFormat) -> Dict[Union[str, int], int]:
-    ret = {}  # type: Dict[Union[str, int], int]
+    ret: Dict[Union[str, int], int] = {}
     for (k, v) in counts.items():
         if k.startswith('0x'):
             numKey = int(k, 16)

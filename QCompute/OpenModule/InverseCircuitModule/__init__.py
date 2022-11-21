@@ -103,23 +103,23 @@ class InverseCircuitModule(ModuleImplement):
             ret = deepcopy(circuitLine)
             return ret
         if op == 'fixedGate':
-            fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+            fixedGate: PBFixedGate = circuitLine.fixedGate
             gateName = PBFixedGate.Name(fixedGate)
-            inversedGate = getFixedGateInstance(gateName).getInverse()
+            inversedGate = getFixedGateInstance(gateName).getInversed()
             return gateToProtobuf(inversedGate, circuitLine.qRegList)
         elif op == 'rotationGate':
-            rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+            rotationGate: PBRotationGate = circuitLine.rotationGate
             gateName = PBRotationGate.Name(rotationGate)
-            inversedGate = createRotationGateInstance(gateName, *circuitLine.argumentValueList).getInverse()
+            inversedGate = createRotationGateInstance(gateName, *circuitLine.argumentValueList).getInversed()
             return gateToProtobuf(inversedGate, circuitLine.qRegList)
         elif op == 'compositeGate':
-            compositeGate = circuitLine.compositeGate  # type: PBCompositeGate
+            compositeGate: PBCompositeGate = circuitLine.compositeGate
             gateName = PBCompositeGate.Name(compositeGate)
-            inversedGate = createCompositeGateInstance(gateName, *circuitLine.argumentValueList).getInverse()
+            inversedGate = createCompositeGateInstance(gateName, *circuitLine.argumentValueList).getInversed()
             return gateToProtobuf(inversedGate, circuitLine.qRegList)
         elif op == 'customizedGate':
             mat = protobufMatrixToNumpyMatrix(circuitLine.customizedGate.matrix)
-            return gateToProtobuf(CustomizedGateOP(mat).getInverse(), circuitLine.qRegList)
+            return gateToProtobuf(CustomizedGateOP(mat).getInversed(), circuitLine.qRegList)
 
         # unsupported gate
         if self.errorOnUnsupported:

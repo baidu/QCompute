@@ -50,7 +50,6 @@ from QCompute.QPlatform.BatchID import BatchID
 FileErrorCode = 7
 
 _bosClient = None  # type: BceClientConfiguration
-globalBatchID = None  # type: BatchID
 
 
 def _retryWhileNetworkError(func: Callable) -> Callable:
@@ -218,8 +217,7 @@ class QTask:
 
     @_retryWhileNetworkError
     def createCircuitTask(self, shots: int, backend: str, qbits: int, backendParam: List[Union[str, Enum]],
-                          modules: List[Tuple[str, Any]], notes: str, batchID: Optional[BatchID],
-                          debug: Optional[str] = None) -> None:
+                          modules: List[Tuple[str, Any]], notes: str, debug: Optional[str] = None) -> None:
         """
         Create a task from the code
 
@@ -234,26 +232,19 @@ class QTask:
                 notes = notes[:Define.maxNotesLen]
 
         req = {
-            "token": Define.hubToken,
-            "circuitId": self.circuitId,
-            "taskType": backend,
-            "shots": shots,
-            "sdkVersion": Define.sdkVersion,
-            "source": Define.taskSource,
-            "modules": modules,
-            "qbits": qbits,
+            'token': Define.hubToken,
+            'circuitId': self.circuitId,
+            'taskType': backend,
+            'shots': shots,
+            'sdkVersion': Define.sdkVersion,
+            'source': Define.taskSource,
+            'modules': modules,
+            'qbits': qbits,
+            'batchID': BatchID.id
         }
-
-        global globalBatchID
-        if batchID is None and Settings.autoBatchID:
-            if globalBatchID is None:
-                globalBatchID = BatchID()
-            batchID = globalBatchID
 
         if notes is not None:
             req['notes'] = notes
-        if batchID is not None:
-            req['batchID'] = batchID.id
         if debug:
             req['debug'] = debug
 
@@ -394,6 +385,7 @@ class QTask:
                                 originResult = self.originJson
 
                             result["moduleList"] = originResult["moduleList"]
+                            result["batchID"] = originResult["batchID"]
 
                             if fetchMeasure:
                                 if not Settings.cloudTaskDoNotWriteFile:

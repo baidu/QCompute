@@ -51,5 +51,5 @@ class CustomizedGateOP(QOperation):
     def __call__(self, *qRegList: 'QRegStorage') -> None:
         self._op(list(qRegList))
 
-    def getInverse(self) -> 'CustomizedGateOP':
+    def getInversed(self) -> 'CustomizedGateOP':
         return CustomizedGateOP(numpy.linalg.pinv(self.matrix))

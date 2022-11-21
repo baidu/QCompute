@@ -28,7 +28,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '3.0.2'
+SDK_VERSION = '3.1.0'
 
 DESC = Path('./README.md').read_text(encoding='utf-8')
 
@@ -45,14 +45,13 @@ setup(
         'antlr4-python3-runtime==4.10',
         'py-expression-eval==0.3.14',
         'websocket-client==1.3.2',
-        'tqdm==4.64.0',
+        'tqdm>=4.5.0',
         'nanoid==2.0.0',
-        'pytest==7.2.0',
         
 
         # Example
         'scipy>=1.8.0',
-        'matplotlib==3.5.2',
+        'matplotlib>=3.3.0',
         'sympy==1.10.1',
         'pyprimes==0.1',
     ],

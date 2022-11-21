@@ -41,8 +41,8 @@ class CircuitToQobj(ConvertorImplement):
     """
 
     def __init__(self):
-        self._instructions = None  # type: Optional[List['PBInstruction']]
-        self._measuredQRegsToCRegsBidict = None  # type: Optional[bidict]
+        self._instructions: Optional[List['PBInstruction']] = None
+        self._measuredQRegsToCRegsBidict: Optional[bidict] = None
         self._measured = False
 
     def convert(self, program: 'PBProgram', shots: int) -> 'PBQObject':
@@ -95,11 +95,11 @@ class CircuitToQobj(ConvertorImplement):
 
             instruction = PBInstruction()
             if op == 'fixedGate':  # fixed gate
-                fixedGate = circuitLine.fixedGate  # type: int
+                fixedGate: int = circuitLine.fixedGate
                 instruction.name = PBFixedGate.Name(fixedGate).lower()  # the name of fixed gate
                 instruction.qubits[:] = [qRegMap[qReg] for qReg in circuitLine.qRegList]  # quantum register lists
             elif op == 'rotationGate':  # rotation gate
-                rotationGate = circuitLine.rotationGate  # type: int
+                rotationGate: int = circuitLine.rotationGate
                 gate = createRotationGateInstance(PBRotationGate.Name(rotationGate), *circuitLine.argumentValueList)
                 instruction.name = f'u{len(gate.uGateArgumentList)}'  # rotation gate types: U1, U2, and U3
                 instruction.params[:] = gate.uGateArgumentList  # parameters for U gate
@@ -113,7 +113,7 @@ class CircuitToQobj(ConvertorImplement):
                                           ModuleErrorCode, FileErrorCode, 4)
                 # it is not implemented, flatten by UnrollProcedureModule
             elif op == 'measure':  # measure
-                measure = circuitLine.measure  # type: 'PBMeasure'
+                measure: 'PBMeasure' = circuitLine.measure
                 if measure.type == PBMeasure.Type.Z:  # only Z measure is supported
                     pass
                 else:  # unsupported measure types

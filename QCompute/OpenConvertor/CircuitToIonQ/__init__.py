@@ -55,11 +55,11 @@ class CircuitToIonQ(ConvertorImplement):
         for pbCircuitLine in pbProgram.body.circuit:
             op = pbCircuitLine.WhichOneof('op')
             if op == 'fixedGate':
-                fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = pbCircuitLine.fixedGate
                 gateName = PBFixedGate.Name(fixedGate)
                 circuitLine = fixedGateMapping(gateName, pbCircuitLine.qRegList)
             elif op == 'rotationGate':
-                rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = pbCircuitLine.rotationGate
                 gateName = PBRotationGate.Name(rotationGate)
                 circuitLine = rotationGateMapping(gateName, pbCircuitLine.argumentValueList, pbCircuitLine.qRegList)
             elif op == 'measure':

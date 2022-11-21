@@ -40,8 +40,8 @@ class UnrollCircuitModule(ModuleImplement):
 
     env.module(UnrollCircuitModule({'errorOnUnsupported': False, 'targetGates': ['CX', 'U'], 'sourceGates': ['CH', 'CSWAP']}))
     """
-    targetGatesNames = ['CX', 'U']  # type: List[str]
-    sourceGatesNames = []  # type: List[str]
+    targetGatesNames: List[str] = ['CX', 'U']
+    sourceGatesNames: List[str] = []
     errorOnUnsupported = True
 
     def __init__(self, arguments: Optional[Dict[str, Union[List[str], bool]]] = None):
@@ -93,7 +93,7 @@ class UnrollCircuitModule(ModuleImplement):
 
         op = circuitLine.WhichOneof('op')
         if op == 'procedureName' or op == 'measure' or op == 'barrier':
-            ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+            ret: 'PBCircuitLine' = deepcopy(circuitLine)
             circuitOut.append(ret)
             return
         elif op == 'fixedGate' or op == 'rotationGate':
@@ -110,17 +110,17 @@ class UnrollCircuitModule(ModuleImplement):
                                           FileErrorCode, 1)
 
             if op == 'fixedGate':
-                fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = circuitLine.fixedGate
                 # Recognize known gates
                 gateName = PBFixedGate.Name(fixedGate)
                 if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
                     # Don't need unroll: copy
-                    ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                    ret: 'PBCircuitLine' = deepcopy(circuitLine)
                     circuitOut.append(ret)
                     return
                 elif gateName in self.targetGatesNames:
                     # Already supported by target machine: copy
-                    ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                    ret: 'PBCircuitLine' = deepcopy(circuitLine)
                     circuitOut.append(ret)
                     return
                 elif fixedGate == PBFixedGate.ID:
@@ -272,7 +272,7 @@ class UnrollCircuitModule(ModuleImplement):
                     # }
                     return
             elif op == 'rotationGate':
-                rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = circuitLine.rotationGate
                 if len(circuitLine.argumentIdList) > 0:
                     raise Error.ArgumentError(f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!',
                                               ModuleErrorCode, FileErrorCode, 2)
@@ -290,7 +290,7 @@ class UnrollCircuitModule(ModuleImplement):
                 gateName = PBRotationGate.Name(rotationGate)
                 if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
                     # Don't need unroll: copy
-                    ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                    ret: 'PBCircuitLine' = deepcopy(circuitLine)
                     circuitOut.append(ret)
                     return
                 elif gateName in self.targetGatesNames:

@@ -89,11 +89,11 @@ class CircuitToDrawConsole(ConvertorImplement):
         for pbCircuitLine in pbCircuitLineList:
             op = pbCircuitLine.WhichOneof('op')
             if op == 'fixedGate':
-                fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = pbCircuitLine.fixedGate
                 gateName = PBFixedGate.Name(fixedGate)
                 self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'rotationGate':
-                rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = pbCircuitLine.rotationGate
                 gateName = PBRotationGate.Name(rotationGate)
                 argumentList = []
                 if pbCircuitLine.argumentIdList:
@@ -107,7 +107,7 @@ class CircuitToDrawConsole(ConvertorImplement):
                         argumentList.append(f'{argument}')
                 self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'compositeGate':
-                compositeGate = pbCircuitLine.compositeGate  # type: PBCompositeGate
+                compositeGate: PBCompositeGate = pbCircuitLine.compositeGate
                 gateName = PBCompositeGate.Name(compositeGate)
                 argumentList = []
                 if pbCircuitLine.argumentIdList:

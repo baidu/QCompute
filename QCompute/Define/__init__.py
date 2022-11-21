@@ -37,15 +37,15 @@ Values: 'prod', 'test'
 
 Used for prod or test environment.
 """
-if env == "test":
-    from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
-else:
+if env == "prod":
     # service address for production
     quantumHubAddr = 'https://quantum-hub.baidu.com/api'
     quantumBucket = 'quantum-task'
     blindCompAddr = 'wss://blindcomp.baidu.com'
+else:
+    from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 
-sdkVersion = 'Python 3.0.2'
+sdkVersion = 'Python 3.1.0'
 """
 SDK Version
 

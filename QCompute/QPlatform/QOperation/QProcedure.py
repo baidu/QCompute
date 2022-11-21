@@ -79,6 +79,6 @@ class QProcedureOP(QOperation):
     def __call__(self, *qRegList: 'QRegStorage') -> None:
         self._op(list(qRegList))
 
-    def getInverse(self) -> None:
-        raise Error.ArgumentError("QProcedureOP can't getInverse! Please use QEnv.inverseProcedure.", ModuleErrorCode,
+    def getInversed(self) -> None:
+        raise Error.ArgumentError("QProcedureOP can't getInversed! Please use QEnv.inverseProcedure.", ModuleErrorCode,
                                   FileErrorCode, 3)
