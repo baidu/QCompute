@@ -34,13 +34,12 @@ class CircuitToQasm(ConvertorImplement):
     """
 
     def __init__(self):
-        self.containMeasure = False  
+        self.containMeasure = False
         # Sort the order of procedures to analyze procedure calling.
         self.procedureNameList = []
         self.proceduresCode = {}
         self.proceduresDepends = {}
 
-    
     def getArgumentList(self, params: List[str], paramIds: List[int]) -> List:
         """
         Load called params according to arguments.
@@ -51,7 +50,7 @@ class CircuitToQasm(ConvertorImplement):
         :return: type: List. List of called params.
         """
         paramCall = []
-        
+
         checkParams = params and len(params)
         checkParamIds = paramIds and len(paramIds)
 
@@ -74,7 +73,7 @@ class CircuitToQasm(ConvertorImplement):
                     paramId = paramIds[i]
                     paramItem = f'param{paramId}'
                     paramCall.append(paramItem)
-            
+
             if checkParams:
                 paramCall = params
 
@@ -82,7 +81,6 @@ class CircuitToQasm(ConvertorImplement):
 
     continueZeroRe = re.compile('0+$')
 
-    
     def getFixedFloatNumber(self, realNum: float) -> str:
         """
         Format floating point number.
@@ -108,7 +106,6 @@ class CircuitToQasm(ConvertorImplement):
             params.append(paramFixed)
         return params
 
-
     def getTrimmedArgumentList(self, argumentValueList: List[float]) -> List[str]:
         """ 
         Convert float point number into string. Value None is converted to 0.
@@ -120,7 +117,6 @@ class CircuitToQasm(ConvertorImplement):
         convertedParams = [self.getFixedFloatNumber(p) for p in argumentValueList]
         return convertedParams
 
-    
     def getMeasureCommandCode(self, measure, qRegs: List[int], regName: str) -> str:
         """
         Convert measure code to command code.
@@ -134,12 +130,11 @@ class CircuitToQasm(ConvertorImplement):
         command = ''
         # Convert from quantum registers to conventional registers.
         for i in range(len(measure.cRegList)):
-            cr = measure.cRegList[i] # conventional register
-            qr = qRegs[i] # quantum register
+            cr = measure.cRegList[i]  # conventional register
+            qr = qRegs[i]  # quantum register
             command += f'measure {regName}[{qr}] -> c[{cr}];\n'
         return command
 
-    
     def getFixedCommandCode(self, fixedGate: int, regs: List[int], regName: str, usingIndex: bool = True) -> str:
         """
         Convert Fixed Gate to command code. 
@@ -158,7 +153,7 @@ class CircuitToQasm(ConvertorImplement):
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
-        
+
         # Index can not be used in the procedure. 
         # Set usingIndex=False to remove braket [].
         else:
@@ -168,7 +163,6 @@ class CircuitToQasm(ConvertorImplement):
         command += f'{gateName} {", ".join(regOp)};\n'
         return command
 
-    
     def getRotationCommandCode(self, rotationGate: int, regs: List[int], regName: str, usingIndex: bool = True,
                                paramValues: Optional[List[float]] = None, paramIds: Optional = None) -> str:
         """
@@ -197,7 +191,7 @@ class CircuitToQasm(ConvertorImplement):
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
-        
+
         # Index can not be used in the procedure. 
         # Set usingIndex=False to remove braket [].
         else:
@@ -209,7 +203,6 @@ class CircuitToQasm(ConvertorImplement):
 
         return command
 
-    
     def getBarrierCommandCode(self, regs: List[int], regName: str, usingIndex: bool = True) -> str:
         """
         Convert barrier code to command code.
@@ -245,12 +238,12 @@ class CircuitToQasm(ConvertorImplement):
         
         :return: type: str. Command code of procedure.
         """
-        
+
         # Convert None argument to 0.
         convertedParams = self.getTrimmedArgumentList(paramValues)
         # Convert params.
         paramCall = self.getArgumentList(convertedParams, paramIds)
-        
+
         if len(paramCall) > 0:
             params = f'({", ".join(paramCall)})'
         else:
@@ -260,7 +253,7 @@ class CircuitToQasm(ConvertorImplement):
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
             command = ''
-        
+
         # Call procedure.
         else:
             regOp = [f'{regName}{r}' for r in regs]
@@ -268,7 +261,6 @@ class CircuitToQasm(ConvertorImplement):
         command += f'{procedureName}{params} {", ".join(regOp)};\n'
         return command
 
-    
     def getCompositeCommandCode(self, compositeGate: int, regs: List[int], regName: str, usingIndex: bool = True,
                                 paramValues: Optional[List[float]] = None, paramIds: Optional = None) -> str:
         """
@@ -283,7 +275,7 @@ class CircuitToQasm(ConvertorImplement):
 
         :return: type: str. Command code of composite gate.
         """
-        
+
         # Get name of gate.
         gateName = PBCompositeGate.Name(compositeGate)
         # Check params.
@@ -301,7 +293,6 @@ class CircuitToQasm(ConvertorImplement):
         command += f'{gateName} ({", ".join(paramCall)}) {", ".join(regOp)};\n'
         return command
 
-    
     def getCircuitsCode(self, circuit: List, regName: str, usingIndex: bool = True) -> Tuple[str, Set[str]]:
         """
         Convert Circuits to qasm code. 
@@ -314,7 +305,7 @@ class CircuitToQasm(ConvertorImplement):
         :return qasmCode: type: str. Qasm code of circuit.
         :return depends: type: str. Dependencies of called procedures.
         """
-        
+
         # Process circuits recurrently.
         qasmCode = ''
         # If op == 'measure', adds measure code to the end of command code. 
@@ -351,7 +342,6 @@ class CircuitToQasm(ConvertorImplement):
 
         return qasmCode, depends
 
-    
     def getProcedureCode(self, procedureMaps: Dict[str, Any]) -> str:
         """
         Process procedure code
@@ -359,31 +349,17 @@ class CircuitToQasm(ConvertorImplement):
         :param procedureMaps: type: Dict[str, Any]. Map of procedures.
         
         :return: type: str. Procedure code.
-
-        
-        Example:
-        "nG1": {
-            "paramCount": 2,
-            "usingQRegs": [
-            ],
-            "circuit": [
-                {
-                    "fixedGate": 5,
-                    "qRegs": []
-                },
-            ]
-        }
         """
         procCode = ''
         for name, content in procedureMaps.items():
             # key: name of procedure
             # val: object of procedure content
             gateDefine = self.getProcDefineCode(name, content)
-            
+
             # Make sure definition of procedure is in front of procedure code.
             self.procedureNameList.append(name)
             self.proceduresCode[name] = gateDefine
-        
+
         # Reorder definitions of procedures according to procedureMaps.
         usedProcedure = []  # List[str]
         for name in self.procedureNameList:
@@ -406,41 +382,31 @@ class CircuitToQasm(ConvertorImplement):
                     else:
                         # Dependent code not found.
                         raise Error.ArgumentError(f'Invalid procedure name: {item}', ModuleErrorCode, FileErrorCode, 2)
-            
+
             if name in usedProcedure:
                 # Procedure has been used.
                 continue
-            
+
             # Assemble procedure code.
             procCode += self.proceduresCode.get(name)
             usedProcedure.append(name)
 
         return procCode
 
-    
     def getProcDefineCode(self, name: str, content) -> str:
         """
         Get definition code of procedure.
 
         :param name: type: str. Name of procedure.
-        :param content: type: object. Content includes {parameterCount, usingQRegList, circuit}. \
-            parameterCount: type: int. Number of defined params ranges from 1 to 3, corresponding to theta, phi, and lambda. 
-            usingQRegList: type: List[int]. List of quantum registers. Example: qb0-qbn.
-            circuit: type: List. List of gate operations.
+        :param content: type: object. Content includes {parameterCount, usingQRegList, circuit}.
+
+        parameterCount: type: int. Number of defined params ranges from 1 to 3, corresponding to theta, phi, and lambda.
+        usingQRegList: type: List[int]. List of quantum registers. Example: qb0-qbn.
+        circuit: type: List. List of gate operations.
  
         :return: type: str. Definition code of procedure.
-        
-        Example:
-            gate cu1(lambda) a,b
-            {
-                U(0,0,theta/2) a
-                CX a,b
-                U(0,0,-theta/2) b
-                CX a,b
-                U(0,0,theta/2) b
-            }
         """
-        
+
         if content.parameterCount > 0:
             paramsArray = [f'param{i}' for i in range(content.parameterCount)]
             paramsDef = f'({", ".join(paramsArray)})'
@@ -451,7 +417,6 @@ class CircuitToQasm(ConvertorImplement):
         qRegList = [f'qb{r}' for r in content.usingQRegList]
         qRegs = ', '.join(qRegList)
 
-        
         # Get type of gate operation. Measure code is excluded.
         if content.circuit is not None:
             circuitCode, depends = self.getCircuitsCode(content.circuit, 'qb', False)
@@ -463,7 +428,6 @@ class CircuitToQasm(ConvertorImplement):
         gateDefine = f'gate {name}{paramsDef} {qRegs}\n{{\n{circuitCode}}}\n'
 
         return gateDefine
-
 
     def convert(self, program: PBProgram) -> str:
         """
@@ -477,7 +441,7 @@ class CircuitToQasm(ConvertorImplement):
 
         if program.source.qasm != '':
             return program.source.qasm
-        
+
         # Size is maximum+1, since index starts from 0.
         maxQregSize = max(program.head.usingQRegList) + 1
         maxCregSize = max(program.head.usingCRegList) + 1
@@ -489,7 +453,7 @@ class CircuitToQasm(ConvertorImplement):
         if program.body.procedureMap:
             procedureCode = self.getProcedureCode(program.body.procedureMap)
             qasmCode += procedureCode
- 
+
         circuitCode, depends = self.getCircuitsCode(program.body.circuit, 'q')
         qasmCode += circuitCode
 

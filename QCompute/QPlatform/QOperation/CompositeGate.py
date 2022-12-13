@@ -100,7 +100,7 @@ def MS(theta: Optional['RotationArgument'] = None) -> 'OperationFunc':
     Native two-qubit gate in trapped ion quantum computing, and can create maximum entangle state
     by one step. For example:
 
-    :math: `MS|00>\rangle = \frac{1}{\sqrt 2}(|00\rangle - i|11\rangle)`
+    :math:`MS|00\rangle = \frac{1}{\sqrt 2}(|00\rangle - i|11\rangle)`
 
     Matrix form:
 
@@ -137,7 +137,7 @@ _CKNotified = False
 def CK(kappa: 'RotationArgument') -> 'OperationFunc':
     r"""
     The cross-Kerr (CK) is a nonlinear crystal that can act on two incident photons.
-    If two channels $i$ and $j$ have incident photons, then the emergent photons will change a phase
+    If two channels :math:`i` and :math:`j` have incident photons, then the emergent photons will change a phase
 
     :param kappa: the nonlinear crystal strength
 
@@ -166,7 +166,7 @@ def createCompositeGateInstance(name: str, *angles: 'RotationArgument') -> 'Oper
     """
     Create a new gate according to name and angles
 
-    :param name : rotation gate name
+    :param name: rotation gate name
     :param angles: angle param list
     :return: new gate
     """

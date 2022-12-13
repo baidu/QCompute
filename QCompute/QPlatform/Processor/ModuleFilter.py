@@ -20,11 +20,16 @@ Module Filter
 """
 from typing import List, Optional
 
-from QCompute import UnrollCircuitModule, CompressGateModule, UnrollProcedureModule, CompositeGateModule, \
-    InverseCircuitModule
-
+from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
+from QCompute.OpenModule.CompressGateModule import CompressGateModule
+from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
+from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
+from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
+from QCompute.Define import Settings
+
 
 FileErrorCode = 15
 
@@ -44,7 +49,7 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
         BackendName.CloudBaiduSim2Wind,
         BackendName.CloudBaiduSim2Lake,
         BackendName.CloudAerAtBD,
-        
+        BackendName.LocalBaiduSim2WithNoise,
     ]:
         return _filterSimulator(backendName, moduleList)
     
@@ -74,7 +79,8 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
         elif not module.disable:
             ret.append(module)
 
-    
+    if backendName == BackendName.LocalBaiduSim2WithNoise:
+        return [UnrollProcedureModule(), UnrollNoiseModule()]
 
     if unrollProcedureModule is not None:
         if not unrollProcedureModule.disable:
@@ -112,7 +118,9 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
 
 
 def printModuleListDescription(moduleList: List[str]):
-    for moduleName in moduleList:
+    if not Settings.outputInfo:
+        return
+    for moduleName in set(moduleList):
         if moduleName in [
             'MappingToBaiduQPUQianModule',
             'MappingToIoPCASModule',
@@ -155,3 +163,10 @@ def printModuleListDescription(moduleList: List[str]):
             print(
                 f'- {moduleName}: The subprocedure decomposition module expands all the subprocedures in the quantum circuit.'
             )
+        elif moduleName == 'UnrollNoiseModule':
+            print(
+                f'- {moduleName}: The noise unrolling module assigns all noises to the quantum circuit by user-defined rules.'
+            )
+    if len(moduleList) > 0:
+        print(
+            '*Tips: to close the output info, you can insert `QCompute.Define.Settings.outputInfo = False` at the beginning of your code.')

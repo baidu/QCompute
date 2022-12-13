@@ -28,7 +28,6 @@ from QCompute.QPlatform.QNoise.BitFlip import BitFlip
 from QCompute.QPlatform.QNoise.BitPhaseFlip import BitPhaseFlip
 from QCompute.QPlatform.QNoise.CustomizedNoise import CustomizedNoise
 from QCompute.QPlatform.QNoise.Depolarizing import Depolarizing
-from QCompute.QPlatform.QNoise.Depolarizing2 import Depolarizing2
 from QCompute.QPlatform.QNoise.PauliNoise import PauliNoise
 from QCompute.QPlatform.QNoise.PhaseDamping import PhaseDamping
 from QCompute.QPlatform.QNoise.PhaseFlip import PhaseFlip
@@ -174,6 +173,7 @@ def noiseDefineToProtobuf(noiseDefine: QNoiseDefine) -> PBQNoiseDefine:
             pbNoise.pauliNoise.probability2 = noise.probability2
             pbNoise.pauliNoise.probability3 = noise.probability3
         if isinstance(noise, Depolarizing):
+            pbNoise.depolarizing.bits = noise.bits
             pbNoise.depolarizing.probability = noise.probability
         if isinstance(noise, AmplitudeDamping):
             pbNoise.amplitudeDamping.probability = noise.probability
@@ -182,8 +182,6 @@ def noiseDefineToProtobuf(noiseDefine: QNoiseDefine) -> PBQNoiseDefine:
             pbNoise.resetNoise.probability2 = noise.probability2
         if isinstance(noise, PhaseDamping):
             pbNoise.phaseDamping.probability = noise.probability
-        if isinstance(noise, Depolarizing2):
-            pbNoise.depolarizing2.probability = noise.probability
         if isinstance(noise, CustomizedNoise):
             for pbMatrix in [numpyMatrixToProtobufMatrix(matrix) for matrix in noise.krauses]:
                 pbNoise.customizedNoise.krauses.append(pbMatrix)

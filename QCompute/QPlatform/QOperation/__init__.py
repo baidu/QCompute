@@ -193,3 +193,25 @@ def getGateInstance(name: str) -> Union['FixedGateOP', 'OperationFunc']:
     if not gate:
         gate = createRotationGateInstance(name, 0, 0, 0)
     return gate
+
+
+def getGateBits(name: str) -> int:
+    """
+    Get the gate bits according to its name
+
+    :param name : gate name
+    :return: bits
+    """
+    if name in GateNameDict['oneQubitGate']:
+        return 1
+    elif name in GateNameDict['twoQubitGate']:
+        return 2
+    elif name in GateNameDict['threeQubitGate']:
+        return 3
+
+
+GateNameDict = {
+    'oneQubitGate': ['ID', 'X', 'Y', 'Z', 'H', 'S', 'SDG', 'T', 'TDG', 'U', 'RX', 'RY', 'RZ'],
+    'twoQubitGate': ['CX', 'CY', 'CZ', 'CH', 'SWAP', 'CU', 'CRX', 'CRY', 'CRZ', 'MS', 'CK'],
+    'threeQubitGate': ['CCX', 'CSWAP']
+}

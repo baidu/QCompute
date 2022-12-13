@@ -21,7 +21,7 @@ Cloud Full Test
 from QCompute import *
 
 
-def cloudFullTest():
+def cloudFullTest() -> None:
     """
     Cloud Full Test
     """

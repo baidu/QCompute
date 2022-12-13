@@ -16,7 +16,7 @@
 # limitations under the License.
 
 """
-  The setup script to install  for python
+  The setup script to install for python
 """
 
 from __future__ import absolute_import
@@ -28,7 +28,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '3.1.0'
+SDK_VERSION = '3.2.0'
 
 DESC = Path('./README.md').read_text(encoding='utf-8')
 
@@ -55,7 +55,7 @@ setup(
         'sympy==1.10.1',
         'pyprimes==0.1',
     ],
-    python_requires='>=3.8, <3.12',
+    python_requires='>=3.8, <3.11',
     packages=find_packages(),
     url='https://quantum.baidu.com',
     license='Apache License 2.0',

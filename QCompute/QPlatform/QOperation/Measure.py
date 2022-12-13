@@ -60,7 +60,7 @@ def getMeasureInstance(name: str) -> 'MeasureOP':
     """
     Get a measure according to name
 
-    :param name : measure name
+    :param name: measure name
     :return: gate
     """
 

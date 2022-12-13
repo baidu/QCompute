@@ -30,6 +30,7 @@ from QCompute.Define import Settings
 from QCompute.Define.Utils import loadPythonModule, clearOutputDir
 from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
+from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
 from QCompute.OpenSimulator import QResult
 from QCompute.QPlatform import Error, ModuleErrorCode, BackendName, getBackendFromName
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
@@ -37,15 +38,14 @@ from QCompute.QPlatform.InteractiveModule import InteractiveModule
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
 from QCompute.QPlatform.Processor.ModuleFilter import filterModule, printModuleListDescription
 from QCompute.QPlatform.Processor.PostProcessor import formatMeasure
-from QCompute.QPlatform.QOperation import getGateInstance
+from QCompute.QPlatform.QNoise import QNoise, QNoiseDefine
+from QCompute.QPlatform.QOperation import getGateBits
 from QCompute.QPlatform.QOperation.QProcedure import QProcedure, QProcedureOP
 from QCompute.QPlatform.QRegPool import QRegPool
 from QCompute.QPlatform.QTask import QTask
 from QCompute.QPlatform.Utilities import destoryObject
 from QCompute.QProtobuf import PBProgram
 from QCompute.Utilize.ControlledCircuit import getControlledCircuit
-
-
 
 if TYPE_CHECKING:
     from QCompute.QPlatform import ServerModule
@@ -91,7 +91,7 @@ class QEnv:
 
         self.noiseDefineMap = {}  # type: Dict[str, List[QNoiseDefine]]
 
-    def backend(self, backendName: 'BackendName', *backendArgument: Any) -> None:
+    def backend(self, backendName: Union['BackendName', str], *backendArgument: Any) -> None:
         """
         Set backend.
         """
@@ -292,6 +292,10 @@ class QEnv:
 
         ret = None  # type: Dict[str, Union[str, Dict[str, int]]]
         if self.backendName.value.startswith('local_'):
+            if self.backendName == BackendName.LocalBaiduSim2WithNoise:
+                self.usingModuleList.clear()
+                self.module(UnrollProcedureModule())
+                self.module(UnrollNoiseModule())
             usedModuleList = self.publish()  # circuit in Protobuf format
             moduleList = [{
                 'module': module.__class__.__name__,
@@ -301,7 +305,7 @@ class QEnv:
         elif self.backendName.value.startswith('cloud_'):
             self.publish(False)  # circuit in Protobuf format
 
-
+            
             moduleList = [(module.__class__.__name__, module.arguments) for module in self.usingModuleList]
             moduleList.extend(self.usedServerModuleList)
 
@@ -520,9 +524,34 @@ class QEnv:
 
         env.module(UnrollCircuit({'errorOnUnsupported': True, 'targetGates': [CX, U]}))
 
-        :param moduleObj: module object
+        :param module: module object
         """
 
         self.usedServerModuleList.append((module.value, arguments))
 
-    
+    def noise(self, gateNameList: List[str], noiseList: List[QNoise], qRegList: List[int] = None,
+              positionList: List[int] = None) -> None:
+        """
+        Add noise
+
+        :param gateNameList: a list of gate names
+        :param noiseList: a list of noises
+        :param qRegList: a list of qubits. When it's None, noises act on gates in all qubits; otherwise, noises act on gates in the specified qubits.
+        :param positionList: a list of noise inserting locations. When it's None, noises act on all gates; otherwise, noises act on the specified gates in specified position.
+        """
+        for gateName in gateNameList:
+            gateBits = getGateBits(gateName)
+            if qRegList:
+                if gateBits != len(set(qRegList)):
+                    raise Error.ArgumentError(f"Invalid qRegList({qRegList}) in noise {gateName}!", ModuleErrorCode,
+                                              FileErrorCode, 9)
+            for noise in noiseList:
+                if 0 < noise.bits != gateBits:
+                    raise Error.ArgumentError(f"Invalid bits({gateBits}/{noise.bits}) in noise {gateName}!",
+                                              ModuleErrorCode, FileErrorCode, 10)
+            noiseDefine = QNoiseDefine(noiseList, qRegList, positionList)
+            defineList = self.noiseDefineMap.get(gateName)
+            if defineList is None:
+                defineList = []
+                self.noiseDefineMap[gateName] = defineList
+            defineList.append(noiseDefine)

@@ -128,3 +128,13 @@ from QCompute.QPlatform import Utilities
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 
 
+
+from QCompute.QPlatform.QNoise.AmplitudeDamping import AmplitudeDamping
+from QCompute.QPlatform.QNoise.BitFlip import BitFlip
+from QCompute.QPlatform.QNoise.BitPhaseFlip import BitPhaseFlip
+from QCompute.QPlatform.QNoise.CustomizedNoise import CustomizedNoise
+from QCompute.QPlatform.QNoise.Depolarizing import Depolarizing
+from QCompute.QPlatform.QNoise.PauliNoise import PauliNoise
+from QCompute.QPlatform.QNoise.PhaseDamping import PhaseDamping
+from QCompute.QPlatform.QNoise.PhaseFlip import PhaseFlip
+from QCompute.QPlatform.QNoise.ResetNoise import ResetNoise

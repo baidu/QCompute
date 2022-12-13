@@ -35,6 +35,7 @@ from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
 from QCompute.OpenModule.ReverseCircuitModule import ReverseCircuitModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
 from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
 from QCompute.QPlatform import QEnv, BackendName
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.Processor.ModuleFilter import filterModule
@@ -44,6 +45,10 @@ _SimulatorModuleList = [
     [UnrollProcedureModule, CompositeGateModule, UnrollCircuitModule, CompressGateModule],
     [InverseCircuitModule, ReverseCircuitModule]
 ]
+_SimulatorWithNoiseModuleList = [
+    [UnrollProcedureModule, UnrollNoiseModule],
+    []
+]
 _HardwareOptionalModuleList = [UnrollProcedureModule, CompositeGateModule, InverseCircuitModule, ReverseCircuitModule]
 _AerSimulatorModuleList = [
     [UnrollProcedureModule, CompositeGateModule, UnrollCircuitModule],
@@ -52,6 +57,7 @@ _AerSimulatorModuleList = [
 
 BackendModuleDict = {
     BackendName.LocalBaiduSim2: _SimulatorModuleList,
+    BackendName.LocalBaiduSim2WithNoise: _SimulatorWithNoiseModuleList,
     
     BackendName.CloudBaiduSim2Water: _SimulatorModuleList,
     BackendName.CloudBaiduSim2Earth: _SimulatorModuleList,

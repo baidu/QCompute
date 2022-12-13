@@ -338,7 +338,7 @@ def getFixedGateInstance(name: str) -> 'FixedGateOP':
     """
     Get a gate according to name.
 
-    :param name : fixed gate name
+    :param name: fixed gate name
     :return: gate
     """
 

@@ -333,7 +333,7 @@ def createRotationGateInstance(name: str, *angles: 'RotationArgument') -> 'Opera
     """
     Create a new gate according to name and angles.
 
-    :param name : rotation gate name
+    :param name: rotation gate name
     :param angles: angle param list
     :return: new gate
     """

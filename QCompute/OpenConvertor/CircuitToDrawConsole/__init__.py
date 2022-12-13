@@ -91,10 +91,12 @@ class CircuitToDrawConsole(ConvertorImplement):
             if op == 'fixedGate':
                 fixedGate: PBFixedGate = pbCircuitLine.fixedGate
                 gateName = PBFixedGate.Name(fixedGate)
+                gateName = self._appendNoise(gateName, pbCircuitLine)
                 self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'rotationGate':
                 rotationGate: PBRotationGate = pbCircuitLine.rotationGate
                 gateName = PBRotationGate.Name(rotationGate)
+                gateName = self._appendNoise(gateName, pbCircuitLine)
                 argumentList = []
                 if pbCircuitLine.argumentIdList:
                     for index, argumentId in enumerate(pbCircuitLine.argumentIdList):
@@ -109,6 +111,7 @@ class CircuitToDrawConsole(ConvertorImplement):
             elif op == 'compositeGate':
                 compositeGate: PBCompositeGate = pbCircuitLine.compositeGate
                 gateName = PBCompositeGate.Name(compositeGate)
+                gateName = self._appendNoise(gateName, pbCircuitLine)
                 argumentList = []
                 if pbCircuitLine.argumentIdList:
                     for index, argumentId in enumerate(pbCircuitLine.argumentIdList):
@@ -124,7 +127,9 @@ class CircuitToDrawConsole(ConvertorImplement):
                 customizedGate = pbCircuitLine.customizedGate  # type: PBCustomizedGate
                 matrixBytes = protobufMatrixToNumpyMatrix(customizedGate.matrix).tobytes()
                 hash = blake2b(matrixBytes, digest_size=Settings.drawCircuitCustomizedGateHashLength)
-                self._draw(qRegCount, f'|Custom[{hash.hexdigest()}]|', pbCircuitLine.qRegList, circuitArray)
+                gateName = f'Custom[{hash.hexdigest()}]'
+                gateName = self._appendNoise(gateName, pbCircuitLine)
+                self._draw(qRegCount, f'|{gateName}]|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'procedureName':
                 gateName = pbCircuitLine.procedureName
                 argumentList = []
@@ -155,7 +160,7 @@ class CircuitToDrawConsole(ConvertorImplement):
             self.stringIO.write('\n')
         self.stringIO.write('\n')
 
-    def _draw(self, qRegCount: int, operation: str, qRegList: List[int], circuitArray: List[List[str]]) -> List[str]:
+    def _draw(self, qRegCount: int, operation: str, qRegList: List[int], circuitArray: List[List[str]]) -> None:
         maxQRegAsciiLen = len(str(max(qRegList)))
         maxLen = gapLen + max(maxQRegAsciiLen, len(operation))
         op = gap + operation
@@ -186,3 +191,32 @@ class CircuitToDrawConsole(ConvertorImplement):
                     circuitArray[i].append(bridgeLine)
                 else:
                     circuitArray[i].append(line)
+
+    def _appendNoise(self, gateName: str, pbCircuitLine: PBCircuitLine):
+        if len(pbCircuitLine.noiseList) == 0:
+            return gateName
+
+        gateName += '_{'
+        for pbNoise in pbCircuitLine.noiseList:
+            noise = pbNoise.WhichOneof('noise')
+            if noise == 'bitFlip':
+                gateName += 'BF-'
+            elif noise == 'phaseFlip':
+                gateName += 'PF-'
+            elif noise == 'bitPhaseFlip':
+                gateName += 'BPF-'
+            elif noise == 'pauliNoise':
+                gateName += 'PN-'
+            elif noise == 'amplitudeDamping':
+                gateName += 'AD-'
+            elif noise == 'resetNoise':
+                gateName += 'RN-'
+            elif noise == 'phaseDamping':
+                gateName += 'PD-'
+            elif noise == 'depolarizing':
+                gateName += 'DP-'
+            elif noise == 'customizedNoise':
+                gateName += 'CN-'
+        gateName = gateName[:-1]
+        gateName += '}'
+        return gateName

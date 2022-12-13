@@ -18,54 +18,80 @@
 """
 Quantum Noise
 """
-from typing import List
+from typing import Optional, List
 import numpy as np
 
+from itertools import product
+
+from QCompute.QPlatform.QNoise.Utilities import noiseTensor, numpyMatrixToTensorMatrix
 
 # A random FileErrorCode, need to be changed
 FileErrorCode = 15
 
+
 class QNoise:
     """
-    Quantum Noise
+    QNoise abstract class.
+
+    Quantum noise arises from inherint principles of quantum mechnics. It widely exists in 
+    realistic quantum operations (e.g., H and RX gates) and quantum channels (e.g., Bell states).
+
+    A quantum noise which satifies complete positive and trace preserving can itself be represented as a quantum channel.
+
+    Any pre-defined noise classes and the user-defined noise class must inherit it.
     """
 
-    def __init__(self, bits: int):
+    def __init__(self, bits: int) -> None:
         self.bits = bits
 
-    @staticmethod
-    def sigmaop(k):
+    def _tensorKrauses(self, krausList: List[np.ndarray]) -> List[np.ndarray]:
         """
-        sigmaop
-        """
-        if k == 0:
-            return np.eye(2)
-        elif k == 1:
-            return np.array([[0.0, 1.0], [1.0, 0.0]])
-        elif k == 2:
-            return np.array([[0.0, -1.0j], [1.0j, 0.0]])
-        elif k == 3:
-            return np.array([[1.0, 0.0], [0.0, -1.0]])
+        Generate Kraus operators for n tensor of an identical noise.
 
-    def calcKrausLowerBound(self):
-        """
-        Calculate the lower bound of probabilities for sampling among a set of kraus operators
+        :param krausList: List[np.ndarray], Kraus operators for a single noise
         """
 
-        LowerBound = []
-        for i in range(len(self.krauses)):   
-            if self.krauses[i].shape == (2,2):
-                tempOperator = np.dot(self.krauses[i].T.conjugate(), self.krauses[i])            
-            elif self.krauses[i].shape == (2,2,2,2):
-                tempKraus = np.reshape(self.krauses[i], [4,4])
-                tempOperator = np.dot(tempKraus.T.conjugate(), tempKraus)
-#            else:
-#                raise Error.ArgumentError(f'Unsupported noise type {noise_type}!', ModuleErrorCode, FileErrorCode, 9)
-            tempBound = min(list(np.linalg.eig(tempOperator)[0]))
-            LowerBound.append(tempBound)
-        
-        return LowerBound
+        bits = self.bits
+        krauses = krausList
 
+        if bits == 1:
+            return krauses
+        else:
+            for _ in range(bits - 1):
+                krauses = noiseTensor(krausList, krauses)
+            return [numpyMatrixToTensorMatrix(_) for _ in krauses]
+
+    def _tensorProbabilitiesLocal(self, probabilityList: List[float]) -> Optional[List[float]]:
+        """
+        Generate probabilities for local noise tensor.
+
+        :param probabilityList: List[float], the probabilities that any kraus operators occur for a mixed unitary noise
+        """
+        bits = self.bits
+        probabilities = probabilityList
+
+        if probabilities:
+            for _ in range(bits - 1):
+                probabilities = [probabilities[index_1] * probabilityList[index_2]
+                                 for index_1, index_2 in product(range(len(probabilities)), range(len(probabilityList)))]
+
+        return probabilities
+
+    def _tensorProbabilitiesNonLocal(self, probability: float) -> List[float]:
+        """
+        Generate probabilities for nonlocal noise tensor.
+
+        :param probability: float, the strength of a noise
+
+        Works for depolarizing noise.
+        """
+        bits = self.bits
+
+        probabilityEachError = probability / (4 ** bits)
+
+        probabilities = [
+            1 - (4 ** bits - 1) * probability / (4 ** bits)] + [probabilityEachError] * (4 ** bits - 1)
+        return probabilities
 
 
 class QNoiseDefine:
@@ -73,13 +99,7 @@ class QNoiseDefine:
     Quantum Noise Define
     """
 
-    def __init__(self, noiseList: List[QNoise], qRegList: List[int], positionList: List[int]):
+    def __init__(self, noiseList: List[QNoise], qRegList: List[int], positionList: List[int]) -> None:
         self.noiseList = noiseList
         self.qRegList = qRegList
         self.positionList = positionList
-
-
-    
-
-
-            

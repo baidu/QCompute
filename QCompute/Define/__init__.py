@@ -45,7 +45,7 @@ if env == "prod":
 else:
     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 
-sdkVersion = 'Python 3.1.0'
+sdkVersion = 'Python 3.2.0'
 """
 SDK Version
 

@@ -56,7 +56,7 @@ coverage.xml
 /study/
 
 # JetBrains
-.idea
+.idea/
 
 Output/
 /Calibration/

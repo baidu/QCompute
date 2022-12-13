@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0] - Dec-05-2022
+
+### Added
+
+- Noise;
+  - Support for noisy simulation, including simulator, noise models and examples.
+
 ## [3.1.0] - Nov-18-2022
 
 ### Added

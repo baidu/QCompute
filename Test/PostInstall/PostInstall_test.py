@@ -27,20 +27,24 @@ from QCompute.QPlatform import Error
 from Test.BaseSettings import inputHubToken
 from Test.PostInstall.CloudFullTest import cloudFullTest
 from Test.PostInstall.LocalGateTest import localGateTest
+from Test.PostInstall.LocalNoiseTest import localNoiseTest
 
 inputHubToken()
 Settings.outputInfo = False
 
 
-def test_local():
+def test_local() -> None:
     """
     Local test
     """
     localGateTest()
     print('Local test successed.')
+    
+    localNoiseTest()
+    print('Local noise test successed')
 
 
-def test_cloud():
+def test_cloud() -> None:
     """
     Cloud test
     """

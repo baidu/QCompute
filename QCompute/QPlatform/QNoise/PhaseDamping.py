@@ -19,41 +19,62 @@
 Phase Damping
 """
 import random
-
 import numpy as np
-
+from typing import TYPE_CHECKING, List
 from QCompute.QPlatform.QNoise import QNoise
+from QCompute.QPlatform.QNoise.Utilities import sigma
+
+if TYPE_CHECKING:   
+    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
 
 
 class PhaseDamping(QNoise):
-    """
-    Phase Damping
-    Equivalent to a PhaseFlip noise 
+    r"""
+    Phase damping class.
+
+    The Kraus operators of such noise are as follows:  
+
+    :math:`E_0 = \begin{bmatrix} 1.0 & 0.0 \\ 0.0 & \sqrt{1 - p} \end{bmatrix}`
+
+    :math:`E_1 = \begin{bmatrix} 0.0 & 0.0\\ 0.0 & \sqrt{p} \end{bmatrix}`  
+
+    Here, :math:`p` is the strength of noise.
+
+    Phase damping noise is equivalent to a phase flip noise with probability as follows,
+
+    :math:`p_{pf} = (1 - \sqrt{1.0 - p}) / 2`
     """
 
-    def __init__(self, probability: float):
+    def __init__(self, probability: float) -> None:
         super().__init__(1)
         self.probability = (1 - np.sqrt(1.0 - probability)) / 2
 
-        self.krauses = [self.sigmaop(0), self.sigmaop(3)]
+        self.krauses = [sigma(0), sigma(3)]
         self.probabilities = [1.0 - probability, probability]
 
-        self.noise_class = 'mixed_unitary_noise'
-        
-        assert probability >= 0 
+        self.noiseClass = 'mixed_unitary_noise'
+
+        assert probability >= 0
         assert probability <= 1
 
-    
-    def calc_batched_noise_rng(self, num: int):
+    def calc_batched_noise_rng(self, num: int) -> List[int]:
         """
-        calc_batched_noise_matrix
+        Generate a batch of sampled random numbers.
+
+        :param num: int, the number of sampled random numbers
+        :return: List[int], a set of random numbers
         """
 
-        return [random.choices(range(len(self.krauses)), self.probabilities)[0] for i in range(num)]
+        return [random.choices(range(len(self.krauses)), self.probabilities)[0] for _ in range(num)]
 
-    def calc_noise_matrix(self, transfer, state, qRegList):
+    def calc_noise_matrix(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> np.ndarray:
         """
-        calc_noise_matrix
+        Generate a sampled Kraus operator.
+
+        :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+        :param state: np.ndarray, current state in simulator
+        :param qRegList: List[int], quantum register where the noise is added
+        :return: np.ndarray, a sampled Kraus operator
         """
 
         return random.choices(self.krauses, self.probabilities)[0]

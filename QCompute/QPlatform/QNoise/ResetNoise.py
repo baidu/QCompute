@@ -19,101 +19,101 @@
 Reset Noise
 """
 import random
-
 import numpy as np
-
+from typing import TYPE_CHECKING, List, Dict
 from QCompute.QPlatform.QNoise import QNoise
+
+if TYPE_CHECKING:   
+    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
 
 
 class ResetNoise(QNoise):
-    """
-    Reset Noise
+    r"""
+    Reset noise class.
+
+    The Kraus operators of such noise are as follows:
+
+    :math:`E_0 = \begin{bmatrix} \sqrt{p_1} & 0.0 \\ 0.0 & 0.0 \end{bmatrix}`
+
+    :math:`E_1 = \begin{bmatrix} 0.0 & \sqrt{p_1} \\ 0.0 & 0.0 \end{bmatrix}`
+
+    :math:`E_2 = \begin{bmatrix} 0.0 & 0.0 \\ \sqrt{p_2} & 0.0 \end{bmatrix}`
+
+    :math:`E_3 = \begin{bmatrix} 0.0 & 0.0 \\ 0.0 & \sqrt{p_2} \end{bmatrix}`
+
+    Here, :math:`p` is the strength of noise.
     """
 
-    def __init__(self, probability1: float, probability2: float):
+    def __init__(self, probability1: float, probability2: float) -> None:
         super().__init__(1)
         self.probability1 = probability1
         self.probability2 = probability2
 
         self.krauses = [
-            np.array([[np.sqrt(probability1), 0.0], [0.0, 0.0]]), np.array([[0.0, np.sqrt(probability1)], [0.0, 0.0]]),
-            np.array([[0.0, 0.0], [np.sqrt(probability2), 0.0]]), np.array([[0.0, 0.0], [0.0, np.sqrt(probability2)]]),
+            np.array([[np.sqrt(probability1), 0.0], [0.0, 0.0]]), np.array(
+                [[0.0, np.sqrt(probability1)], [0.0, 0.0]]),
+            np.array([[0.0, 0.0], [np.sqrt(probability2), 0.0]]), np.array(
+                [[0.0, 0.0], [0.0, np.sqrt(probability2)]]),
             np.eye(2) * np.sqrt(1 - probability1 - probability2)
         ]
 
-        self.noise_class = 'nonmixed_unitary_noise'
+        self.noiseClass = 'non_mixed_unitary_noise'
 
-        assert probability1 >= 0 
+        assert probability1 >= 0
         assert probability2 >= 0
         assert probability1 + probability2 <= 1
 
-    def calc_batched_noise_rng_nonmixed(self, transfer, stateDict, qRegList):
+    def calc_batched_noise_rng_non_mixed(self, transfer: 'TransferProcessor', stateDict: Dict[str, np.ndarray],
+                                         qRegList: List[int]) -> List[int]:
         """
-        calc a batch of samples for nonmixed_unitary_noise
-        """   
-        
-        rngList = []
-        rngList = [self.calc_noise_rng_nonmixed(transfer, stateDict[k], qRegList) for k in stateDict.keys() for i in k]
-   
+        Generate a batch of sampled random numbers for non-mixed-unitary noise.
+
+        :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+        :param stateDict: Dict[str, np.ndarray], current state dict in simulator
+        :param qRegList: List[int], quantum register where the noise is added
+        :return: List[int], a set of random numbers
+        """
+
+        rngList = [self.calc_noise_rng_non_mixed(
+            transfer, stateDict[key], qRegList) for key in stateDict.keys() for _ in key]
         return rngList
 
-
-
-    def calc_noise_matrix(self, transfer, state, qRegList):
+    def calc_noise_matrix(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> np.ndarray:
         """
-        calc_noise_matrix
-        """
-        # calc lower bounds for each kraus opeartor and its summation
-        listS = self.calcKrausLowerBound()
+        Generate a sampled Kraus operator.
 
-        if self.noise_class == 'mixed_unitary_noise':
-
-            return random.choices(self.krauses, listS)[0]
-        else:
-            r = random.random()    
-    
-            totalS = sum(listS)
-            if r <= totalS:  
-                for i in range(len(self.krauses)):                    
-                    if r < listS[i]:
-                        state_copy = transfer(state, self.krauses[i], qRegList)
-                        pro_i = np.vdot(state_copy, state_copy) 
-                        return self.krauses[i] / np.sqrt(pro_i)
-                    else:
-                        r = r - listS[i]
-            else:    
-                r = r - totalS                    
-                for i in range(len(self.krauses)):
-                    state_copy = transfer(state, self.krauses[i], qRegList)
-                    pro_i = np.vdot(state_copy, state_copy) 
-
-                    if r < pro_i - listS[i]:
-                        return self.krauses[i] / np.sqrt(pro_i)
-                    else:
-                        r = r - (pro_i - listS[i])
-              
-    def calc_noise_rng_nonmixed(self, transfer, state, qRegList):
+        :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+        :param state: np.ndarray, current state in simulator
+        :param qRegList: List[int], quantum register where the noise is added
+        :return: np.ndarray, a sampled Kraus operator
         """
-        calc_noise_matrix
-        """
-        
-        listS = self.calcKrausLowerBound()
-        totalS = sum(listS)
 
         r = random.random()
-        if r <= totalS:  
-            for i in range(len(self.krauses)):                    
-                if r < listS[i]:
-                    return i
-                else:
-                    r = r - listS[i]
-        else:    
-            r = r - totalS                    
-            for i in range(len(self.krauses)):
-                state_copy = transfer(state, self.krauses[i], qRegList)
-                pro_i = np.vdot(state_copy, state_copy) 
+        for index in range(len(self.krauses)):
+            stateCopy = transfer(state, self.krauses[index], qRegList)
+            proCopy = np.vdot(stateCopy, stateCopy)
 
-                if r < pro_i - listS[i]:
-                    return i
-                else:
-                    r = r - (pro_i - listS[i])
+            if r < proCopy:
+                return self.krauses[index] / np.sqrt(proCopy)
+            else:
+                r = r - proCopy
+
+    def calc_noise_rng_non_mixed(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> int:
+        """
+        Generate a sampled random number for non-mixed-unitary noise.
+
+        :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+        :param state: np.ndarray, current state in simulator
+        :param qRegList: List[int], quantum register where the noise is added
+        :return: int, a sampled random number
+        """
+
+        r = random.random()
+        for index in range(len(self.krauses)):
+            stateCopy = transfer(state, self.krauses[index], qRegList)
+            proCopy = np.vdot(stateCopy, stateCopy)
+
+            if r < proCopy:
+                return index
+            else:
+                r = r - proCopy

@@ -19,47 +19,57 @@
 Bit Phase Flip
 """
 import random
-
 import numpy as np
-
+from typing import TYPE_CHECKING, List
 from QCompute.QPlatform.QNoise import QNoise
-from QCompute.QPlatform.QNoise.BitFlip import BitFlip
+from QCompute.QPlatform.QNoise.Utilities import sigma
+
+if TYPE_CHECKING:   
+    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
 
 
 class BitPhaseFlip(QNoise):
-    """
-    Bit Phase Flip
+    r"""
+    Bit phase flip class.
+
+    The Kraus operators of such noise are as follows:
+
+    :math:`E_0 = \sqrt{1 - p} \ ID`
+
+    :math:`E_1 = \sqrt{p} \ Y`
+
+    Here, :math:`p` is the strength of noise.
     """
 
-    def __init__(self, probability: float):
+    def __init__(self, probability: float) -> None:
         super().__init__(1)
         self.probability = probability
-        self.krauses = [self.sigmaop(0), self.sigmaop(2)]
+        self.krauses = [sigma(0), sigma(2)]
         self.probabilities = [1.0 - probability, probability]
-    
-        self.noise_class = 'mixed_unitary_noise'
 
-        assert probability >= 0 
+        self.noiseClass = 'mixed_unitary_noise'
+
+        assert probability >= 0
         assert probability <= 1
 
-
-    def calc_batched_noise_rng(self, num: int):
+    def calc_batched_noise_rng(self, num: int) -> List[int]:
         """
-        calc_batched_noise_matrix
+        Generate a batch of sampled random numbers.
+
+        :param num: the number of sampled random numbers
+        :return: List[int], a set of random numbers
         """
 
-        return [random.choices(range(len(self.krauses)), self.probabilities)[0] for i in range(num)]
+        return [random.choices(range(len(self.krauses)), self.probabilities)[0] for _ in range(num)]
 
-    def calc_noise_matrix(self, transfer, state, qRegList):
+    def calc_noise_matrix(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> np.ndarray:
         """
-        calc_noise_matrix
+        Generate a sampled Kraus operator.
+
+        :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+        :param state: np.ndarray, current state in simulator
+        :param qRegList: List[int], quantum register where the noise is added
+        :return: np.ndarray, a sampled Kraus operator
         """
 
         return random.choices(self.krauses, self.probabilities)[0]
-
-    if __name__ == '__main__':
-        p = 0.3
-        noise = BitFlip(p)        
-   
-        noiseList = noise.calc_batched_noise_rng(5)
-        print(noiseList)

@@ -19,38 +19,70 @@
 Depolarizing
 """
 import random
-
 import numpy as np
-
+from typing import TYPE_CHECKING, List
 from QCompute.QPlatform.QNoise import QNoise
+from QCompute.QPlatform.QNoise.Utilities import sigma
+
+if TYPE_CHECKING:   
+    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
 
 
 class Depolarizing(QNoise):
-    """
-    Depolarizing
+    r"""
+    Depolarizing noise class.
+
+    The Kraus operators of one qubit depolarizing noise are as follows:
+
+    :math:`E_0 = \sqrt{1 - 3.0  p / 4.0} \ ID`
+
+    :math:`E_1 = \sqrt{p / 4.0} \ X`
+
+    :math:`E_2 = \sqrt{p / 4.0} \ Y`
+
+    :math:`E_3 = \sqrt{p / 4.0} \ Z`
+
+    Here, :math:`p` is the strength of noise.
+
+    Example:
+
+    Depolarizing(bits=2, probability=0.1)
     """
 
-    def __init__(self, probability: float):
-        super().__init__(1)
+    def __init__(self, bits: int, probability: float) -> None:
+        super().__init__(bits)
         self.probability = probability
-        self.krauses = [self.sigmaop(0), self.sigmaop(1), self.sigmaop(2), self.sigmaop(3)]
-        self.probabilities = [1.0 - 3.0 * probability / 4.0, probability / 4.0, probability / 4.0, probability / 4.0]        
-        self.noise_class = 'mixed_unitary_noise'
-        
-        assert probability >= 0 
+
+        oneQubitKrauses = [sigma(index) for index in range(4)]
+
+        self.krauses = self._tensorKrauses(oneQubitKrauses)
+        self.probabilities = self._tensorProbabilitiesNonLocal(self.probability)
+
+        self.noiseClass = 'mixed_unitary_noise'
+
+        assert probability >= 0
         assert probability <= 1
-   
 
-    def calc_batched_noise_rng(self, num: int):
+    def calc_batched_noise_rng(self, num: int) -> List[int]:
         """
-        calc_batched_noise_matrix
+        Generate a batch of sampled random numbers.
+
+        :param num: int, the number of sampled random numbers
+        :return: List[int], the sampled random numbers
         """
 
-        return [random.choices(range(len(self.krauses)), self.probabilities)[0] for i in range(num)]
-        
-    def calc_noise_matrix(self, transfer, state, qRegList):
+        return [random.choices(range(len(self.krauses)), self.probabilities)[0] for _ in range(num)]
+
+    def calc_noise_matrix(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> np.ndarray:
         """
-        calc_noise_matrix
+        Generate a sampled Kraus operator.
+
+        :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+        :param state: np.ndarray, current state in simulator
+        :param qRegList: List[int], quantum register where the noise is added
+        :return: np.ndarray, a sampled Kraus operator
         """
 
         return random.choices(self.krauses, self.probabilities)[0]
+
+

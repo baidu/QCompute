@@ -71,7 +71,8 @@ Run simulator in or out process.
 The 'inProcessSimulator' option can significantly accelerate the calculation of simulator while 
 the outProcessSimulator can enhance the stability of simulator.  
 
-Supporting local_baidu_sim2, local_baidu_sim2_with_noise, local_cuquantum
+Supporting local_baidu_sim2, local_baidu_sim2_with_noise
+
 
 Values: True, False
 """
