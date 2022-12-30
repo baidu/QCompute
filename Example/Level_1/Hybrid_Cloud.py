@@ -26,7 +26,7 @@ from pprint import pprint
 sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 3.2.0')
+matchSdkVersion('Python 3.2.1')
 
 # Your token:
 Define.hubToken = ''

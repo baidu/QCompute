@@ -1,18 +1,30 @@
 # Changelog
 
+## [3.2.1] - Dec-30-2022
+
+### Added
+
+- Noise;
+    - Add parallelization method for noisy simulator.
+
+### Changed
+
+- Combine local ideal simulator and noisy simulator.
+
 ## [3.2.0] - Dec-05-2022
 
 ### Added
 
 - Noise;
-  - Support for noisy simulation, including simulator, noise models and examples.
+    - Support for noisy simulation, including simulator, noise models and examples.
 
 ## [3.1.0] - Nov-18-2022
 
 ### Added
 
 - BatchID;
-  - A BatchID would be generated for every QComputeSDK-Python process. All related tasks belonging to the process are precisely the same. The BatchID can be used for variational algorithms and task group sets.
+    - A BatchID would be generated for every QComputeSDK-Python process. All related tasks belonging to the process are
+      precisely the same. The BatchID can be used for variational algorithms and task group sets.
 
 ### Changed
 

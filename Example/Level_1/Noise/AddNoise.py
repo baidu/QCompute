@@ -24,12 +24,12 @@ import sys
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.2.0')
+matchSdkVersion('Python 3.2.1')
 
 # Create environment
 env = QEnv()
 # Choose backend Baidu local simulator
-env.backend(BackendName.LocalBaiduSim2WithNoise)
+env.backend(BackendName.LocalBaiduSim2)
 
 # Initialize a 2-qubit circuit
 q = env.Q.createList(2)

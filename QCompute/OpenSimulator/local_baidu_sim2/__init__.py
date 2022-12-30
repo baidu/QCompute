@@ -28,11 +28,11 @@ from QCompute import Define
 from QCompute.Define import Settings
 from QCompute.Define.Utils import filterConsoleOutput, findUniError
 from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
-from QCompute.OpenSimulator import QImplement, ModuleErrorCode
+from QCompute.OpenSimulator import QImplement, ModuleErrorCode, withNoise
 from QCompute.OpenSimulator.local_baidu_sim2.Simulator import runSimulator
 from QCompute.QPlatform import Error
 
-FileErrorCode = 1
+FileErrorCode = 4
 
 
 class Backend(QImplement):
@@ -48,15 +48,29 @@ class Backend(QImplement):
 
         The combinations are not 2**3=8 cases. We only implement several combination checks:
 
-        1)DENSE-EINSUM-SINGLE
+        case 1), for ideal circuit:
 
-        2)DENSE-EINSUM-PROB
+            1)DENSE-EINSUM-SINGLE
 
-        3)DENSE-MATMUL-SINGLE
+            2)DENSE-EINSUM-PROB
 
-        4)DENSE-MATMUL-PROB
+            3)DENSE-MATMUL-SINGLE
 
-        
+            4)DENSE-MATMUL-PROB
+
+            
+
+        case 2), for noisy circuit:
+
+            1)DENSE-MATMUL-PROB
+
+            2)DENSE-MATMUL-STATE
+
+            3)DENSE-MATMUL-SINGLE
+
+            4)DENSE-MATMUL-OUTPROB
+
+            
 
         Param of above is used in env.backend()
 
@@ -76,20 +90,25 @@ class Backend(QImplement):
                                      f'Currently, QReg in the program counts {self.program.head.usingQRegList}.',
                                      ModuleErrorCode, FileErrorCode, 1)
 
-        if Settings.inProcessSimulator:
+        if Settings.inProcessSimulator and not (
+                withNoise(self.program) and Settings.noiseMultiprocessingSimulator):
             self.runInProcess()
         else:
             self.runOutProcess()
 
     def runInProcess(self):
         """
-        Executed in the process (for debugging purpose)
+        Executed in the process (for low latency)
         """
 
         self.result = runSimulator(self._makeArguments(), self.program)
         self.result.output = self.result.toJson()
 
         if Settings.outputInfo:
+            print('UsedQRegList', self.result.ancilla.usedQRegList)
+            print('UsedCRegList', self.result.ancilla.usedCRegList)
+            print('CompactedQRegDict', self.result.ancilla.compactedQRegDict)
+            print('CompactedCRegDict', self.result.ancilla.compactedCRegDict)
             print('Shots', self.result.shots)
             print('Counts', self.result.counts)
             print('State', self.result.state)
@@ -141,6 +160,7 @@ class Backend(QImplement):
             print('CompactedCRegDict', self.result.ancilla.compactedCRegDict)
             print('Shots', self.result.shots)
             print('Counts', self.result.counts)
+            print('State', self.result.state)
             print('Seed', self.result.seed)
 
     def _makeArguments(self) -> List[str]:

@@ -28,7 +28,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '3.2.0'
+SDK_VERSION = '3.2.1'
 
 DESC = Path('./README.md').read_text(encoding='utf-8')
 
@@ -47,6 +47,7 @@ setup(
         'websocket-client==1.3.2',
         'tqdm>=4.5.0',
         'nanoid==2.0.0',
+        'multiprocess==0.70.14',
         
 
         # Example

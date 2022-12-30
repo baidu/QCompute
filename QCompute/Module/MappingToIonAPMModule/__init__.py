@@ -32,6 +32,8 @@ class MappingToIonAPMModule(ModuleImplement):
     Example:
 
     env.module(MappingToIonAPMModule())
+
+    env.serverModule(ServerModule.MappingToIonAPMModule, {"disable": True})
     """
 
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):

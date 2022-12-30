@@ -33,6 +33,8 @@ class MappingToBaiduQPUQianModule(ModuleImplement):
     Example:
 
     env.module(MappingToBaiduQPUQianModule())
+
+    env.serverModule(ServerModule.MappingToBaiduQPUQianModule, {"disable": True})
     """
 
     

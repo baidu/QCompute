@@ -40,7 +40,7 @@ def setup_environment(qRegs_number: int, backendname: 'BackendName' = None,
     Setup execution environment
     """
     if backendname is None:
-        backendname = BackendName.LocalBaiduSim2WithNoise
+        backendname = BackendName.LocalBaiduSim2
     env = QEnv()
     if seeds is None:
         env.backend(backendname)
@@ -85,7 +85,7 @@ noiseType = Union['AmplitudeDamping', 'BitFlip', 'CustomizedNoise', 'BitPhaseFli
 
 def core(noise_list: List[noiseType], pre_gate_list: List[operatorType] = None,
          post_gate_list: List[operatorType] = None, bits: Union[List[int], int] = 0, module: 'ModuleImplement' = None,
-         num: int = None, backendname: 'BackendName' = BackendName.LocalBaiduSim2WithNoise,
+         num: int = None, backendname: 'BackendName' = BackendName.LocalBaiduSim2,
          seeds: str = normal_seed) -> Dict[str, Union[str, Dict[str, int]]]:
     """
     The core to construct circuits

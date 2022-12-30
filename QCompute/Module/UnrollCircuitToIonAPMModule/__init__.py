@@ -45,6 +45,8 @@ class UnrollCircuitToIonAPMModule(ModuleImplement):
     env.module(UnrollCircuitToIonAPMModule({'errorOnUnsupported': True, 'targetGates': ['RX', 'RY']}))
 
     env.module(UnrollCircuitToIonAPMModule({'errorOnUnsupported': False, 'targetGates': ['RX', 'RY'], 'sourceGates': ['S', 'T']}))
+
+    env.serverModule(ServerModule.UnrollCircuitToIonAPMModule, {"disable": True})
     """
     
 

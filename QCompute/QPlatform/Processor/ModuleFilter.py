@@ -49,7 +49,6 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
         BackendName.CloudBaiduSim2Wind,
         BackendName.CloudBaiduSim2Lake,
         BackendName.CloudAerAtBD,
-        BackendName.LocalBaiduSim2WithNoise,
     ]:
         return _filterSimulator(backendName, moduleList)
     
@@ -58,6 +57,7 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
 
 
 def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement']) -> List['ModuleImplement']:
+    unrollNoiseModule = None  # type: Optional[UnrollNoiseModule]
     unrollProcedureModule = None  # type: Optional[UnrollProcedureModule]
     compositeGateModule = None  # type: Optional[CompositeGateModule]
     inverseCircuitModule = None  # type: Optional[InverseCircuitModule]
@@ -66,7 +66,9 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
     ret = []  # type: List['ModuleImplement']
     for module in moduleList:
         
-        if module.__class__.__name__ == 'UnrollProcedureModule':
+        if module.__class__.__name__ == 'UnrollNoiseModule':
+            unrollNoiseModule = module
+        elif module.__class__.__name__ == 'UnrollProcedureModule':
             unrollProcedureModule = module
         elif module.__class__.__name__ == 'CompositeGateModule':
             compositeGateModule = module
@@ -79,8 +81,8 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
         elif not module.disable:
             ret.append(module)
 
-    if backendName == BackendName.LocalBaiduSim2WithNoise:
-        return [UnrollProcedureModule(), UnrollNoiseModule()]
+    if unrollNoiseModule is not None:
+        return moduleList
 
     if unrollProcedureModule is not None:
         if not unrollProcedureModule.disable:

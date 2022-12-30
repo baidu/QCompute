@@ -45,6 +45,8 @@ class UnrollCircuitToBaiduQPUQianModule(ModuleImplement):
     env.module(UnrollCircuitToBaiduQPUQianModule({'errorOnUnsupported': True, 'targetGates': ['RY', 'RZ', 'CZ']}))
 
     env.module(UnrollCircuitToBaiduQPUQianModule({'errorOnUnsupported': False, 'targetGates': ['RY', 'RZ', 'CZ'], 'sourceGates': ['CH', 'CSWAP']}))
+
+    env.serverModule(ServerModule.UnrollCircuitToBaiduQPUQianModule, {"disable": True})
     """
     
 

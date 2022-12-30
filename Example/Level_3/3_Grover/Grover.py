@@ -37,7 +37,7 @@ from random import randint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-# matchSdkVersion('Python 3.2.0')
+# matchSdkVersion('Python 3.2.1')
 
 
 def func_find_borrowable_qubits(reg_work, num_qubits_borrowed=1):

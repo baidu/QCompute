@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, List, Dict
 from QCompute.QPlatform.QNoise import QNoise
 
 if TYPE_CHECKING:   
-    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
+    from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
 class AmplitudeDamping(QNoise):
@@ -47,7 +47,7 @@ class AmplitudeDamping(QNoise):
         self.krauses = [np.array([[1.0, 0.0], [0.0, np.sqrt(1 - probability)]]),
                         np.array([[0.0, np.sqrt(probability)], [0.0, 0.0]])]
 
-        self.lowerBoundList = [1 - probability, 0]
+        self.lowerBoundList = [1 - probability, 0.0]
         self.noiseClass = self._verify_mixed_unitary_noise()
 
         assert probability >= 0
@@ -107,32 +107,22 @@ class AmplitudeDamping(QNoise):
         if self.noiseClass == 'mixed_unitary_noise':
             return random.choices(self.krauses, self.lowerBoundList)[0]
         else:
-            # calc lower bounds for each Kraus operator and the maximum one
-            listS = self.lowerBoundList
-            maxLowerBound = max(listS)
-            maxLowerBoundIndex = listS.index(maxLowerBound)
+            # joint sort lowerBoundList+krauses by lowerBoundList in descending order
+            sortedLowerBoundList, sortedKrauses = zip(*sorted(zip(self.lowerBoundList, self.krauses),
+                                                                key=lambda x: x[0], reverse=True))
 
             r = random.random()
 
-            stateMax = transfer(state, self.krauses[maxLowerBoundIndex], qRegList)
-            proMax = np.vdot(stateMax, stateMax)
+            for kraus in sortedKrauses:
+                stateCopy = transfer(state, kraus, qRegList)
+                proCopy = np.vdot(stateCopy, stateCopy)
 
-            if r < proMax:
-                return self.krauses[maxLowerBoundIndex] / np.sqrt(proMax)
-
-            else:
-                r = r - proMax
-                listIndex = [index for index in range(
-                    len(self.krauses)) if index != maxLowerBoundIndex]
-
-                for _ in listIndex:
-                    stateCopy = transfer(state, self.krauses[_], qRegList)
-                    proCopy = np.vdot(stateCopy, stateCopy)
-
-                    if r < proCopy:
-                        return self.krauses[_] / np.sqrt(proCopy)
-                    else:
-                        r = r - proCopy
+                if r < proCopy:
+                    return kraus / np.sqrt(proCopy)
+                else:
+                    r = r - proCopy
+            
+            assert False
 
     def calc_noise_rng_non_mixed(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> int:
         """
@@ -144,29 +134,22 @@ class AmplitudeDamping(QNoise):
         :return: int, a sampled random number
         """
 
-        listS = self.lowerBoundList
-        maxLowerBound = max(listS)
-        maxLowerBoundIndex = listS.index(maxLowerBound)
+        # joint sort lowerBoundList+krauses+krausID by lowerBoundList in descending order
+        sortedLowerBoundList, sortedKrauses, sortedKrausesID = zip(*sorted(zip(self.lowerBoundList, self.krauses,
+                                                                               range(len(self.krauses))),
+                                                                           key=lambda x: x[0], reverse=True))
 
         r = random.random()
-        if r <= maxLowerBound:
-            return maxLowerBoundIndex
-        else:
-            stateCopy = transfer(state, self.krauses[maxLowerBoundIndex], qRegList)
-            proCopy = np.vdot(stateCopy, stateCopy)
-
-            if r < proCopy:
-                return maxLowerBoundIndex
+        for bound, kraus, krausID in zip(sortedLowerBoundList, sortedKrauses, sortedKrausesID):
+            if r < bound:
+                return krausID
             else:
-                r = r - proCopy
-                listIndex = [index for index in range(len(self.krauses)) if index != maxLowerBoundIndex]
+                stateCopy = transfer(state, kraus, qRegList)
+                proCopy = np.vdot(stateCopy, stateCopy)
 
-                for _ in listIndex:
-                    stateCopy = transfer(state, self.krauses[_], qRegList)
-                    proCopy = np.vdot(stateCopy, stateCopy)
-
-                    if r < proCopy:
-                        return _
-                    else:
-                        r = r - proCopy
-
+                if r < proCopy:
+                    return krausID
+                else:
+                    r = r - proCopy
+        
+        assert False

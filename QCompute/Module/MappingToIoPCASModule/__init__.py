@@ -33,6 +33,8 @@ class MappingToIoPCASModule(ModuleImplement):
     Example:
 
     env.module(MappingToIoPCASModule())
+
+    env.serverModule(ServerModule.MappingToIoPCASModule, {"disable": True})
     """
 
     

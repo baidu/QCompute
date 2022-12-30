@@ -26,7 +26,7 @@ import numpy as np
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.2.0')
+matchSdkVersion('Python 3.2.1')
 
 noiseType = 'Depolarizing'
 
@@ -47,7 +47,7 @@ def test_circuit_2qubit(noises: List[noiseType], bool_gate_dict: Dict[int, List[
     # Create environment
     env = QEnv()
     # Choose backend Baidu local simulator with noise
-    env.backend(BackendName.LocalBaiduSim2WithNoise)
+    env.backend(BackendName.LocalBaiduSim2)
 
     q = env.Q.createList(2)
 

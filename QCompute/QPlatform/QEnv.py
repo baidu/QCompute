@@ -65,7 +65,7 @@ class QEnv:
 
     Configurations can be passed to the backend according to alternative parameters.
 
-    The commitXXX function series call local or cloud subroutine according to prefix of backend names
+    The commit function series call local or cloud subroutine according to prefix of backend names
 
     The publish function generates circuit definition in Protobuf format from the statical circuit data.
 
@@ -292,7 +292,7 @@ class QEnv:
 
         ret = None  # type: Dict[str, Union[str, Dict[str, int]]]
         if self.backendName.value.startswith('local_'):
-            if self.backendName == BackendName.LocalBaiduSim2WithNoise:
+            if len(self.noiseDefineMap) > 0:
                 self.usingModuleList.clear()
                 self.module(UnrollProcedureModule())
                 self.module(UnrollNoiseModule())
@@ -520,9 +520,7 @@ class QEnv:
 
         Example:
 
-        env.module(CompositeGate())
-
-        env.module(UnrollCircuit({'errorOnUnsupported': True, 'targetGates': [CX, U]}))
+        env.serverModule(ServerModule.MappingToBaiduQPUQian, {"disable": True})
 
         :param module: module object
         """

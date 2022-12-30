@@ -45,7 +45,7 @@ if env == "prod":
 else:
     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 
-sdkVersion = 'Python 3.2.0'
+sdkVersion = 'Python 3.2.1'
 """
 SDK Version
 
@@ -66,7 +66,7 @@ From http://quantum-hub.baidu.com
 
 Token Management -> Creat/View Token
 
-In circuit .py file, use: 
+Please provide the token before submitting the circuit task to quantum-hub, use:
 
 Define.hubToken = 'xxx'
 """

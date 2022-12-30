@@ -21,10 +21,11 @@ Reset Noise
 import random
 import numpy as np
 from typing import TYPE_CHECKING, List, Dict
+
 from QCompute.QPlatform.QNoise import QNoise
 
 if TYPE_CHECKING:   
-    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
+    from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
 class ResetNoise(QNoise):
@@ -32,14 +33,16 @@ class ResetNoise(QNoise):
     Reset noise class.
 
     The Kraus operators of such noise are as follows:
+    
+    :math:`E_0 = \sqrt{1 - p_1 - p_2 - p_3} \ ID`
 
-    :math:`E_0 = \begin{bmatrix} \sqrt{p_1} & 0.0 \\ 0.0 & 0.0 \end{bmatrix}`
+    :math:`E_1 = \begin{bmatrix} \sqrt{p_1} & 0.0 \\ 0.0 & 0.0 \end{bmatrix}`
 
-    :math:`E_1 = \begin{bmatrix} 0.0 & \sqrt{p_1} \\ 0.0 & 0.0 \end{bmatrix}`
+    :math:`E_2 = \begin{bmatrix} 0.0 & \sqrt{p_1} \\ 0.0 & 0.0 \end{bmatrix}`
 
-    :math:`E_2 = \begin{bmatrix} 0.0 & 0.0 \\ \sqrt{p_2} & 0.0 \end{bmatrix}`
+    :math:`E_3 = \begin{bmatrix} 0.0 & 0.0 \\ \sqrt{p_2} & 0.0 \end{bmatrix}`
 
-    :math:`E_3 = \begin{bmatrix} 0.0 & 0.0 \\ 0.0 & \sqrt{p_2} \end{bmatrix}`
+    :math:`E_4 = \begin{bmatrix} 0.0 & 0.0 \\ 0.0 & \sqrt{p_2} \end{bmatrix}`
 
     Here, :math:`p` is the strength of noise.
     """
@@ -50,12 +53,12 @@ class ResetNoise(QNoise):
         self.probability2 = probability2
 
         self.krauses = [
+            np.eye(2) * np.sqrt(1 - probability1 - probability2),
             np.array([[np.sqrt(probability1), 0.0], [0.0, 0.0]]), np.array(
                 [[0.0, np.sqrt(probability1)], [0.0, 0.0]]),
             np.array([[0.0, 0.0], [np.sqrt(probability2), 0.0]]), np.array(
-                [[0.0, 0.0], [0.0, np.sqrt(probability2)]]),
-            np.eye(2) * np.sqrt(1 - probability1 - probability2)
-        ]
+                [[0.0, 0.0], [0.0, np.sqrt(probability2)]])        
+            ]
 
         self.noiseClass = 'non_mixed_unitary_noise'
 
@@ -89,14 +92,16 @@ class ResetNoise(QNoise):
         """
 
         r = random.random()
-        for index in range(len(self.krauses)):
-            stateCopy = transfer(state, self.krauses[index], qRegList)
+        for kraus in self.krauses:
+            stateCopy = transfer(state, kraus, qRegList)
             proCopy = np.vdot(stateCopy, stateCopy)
 
             if r < proCopy:
-                return self.krauses[index] / np.sqrt(proCopy)
+                return kraus / np.sqrt(proCopy)
             else:
                 r = r - proCopy
+        
+        assert False
 
     def calc_noise_rng_non_mixed(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> int:
         """
@@ -117,3 +122,4 @@ class ResetNoise(QNoise):
                 return index
             else:
                 r = r - proCopy
+        assert False

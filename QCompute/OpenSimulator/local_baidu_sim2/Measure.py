@@ -32,7 +32,6 @@ import numpy
 
 from QCompute.OpenSimulator.local_baidu_sim2.InitState import MatrixType
 from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor, Algorithm
-from QCompute.QPlatform import Error
 
 
 @unique

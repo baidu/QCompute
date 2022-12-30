@@ -20,12 +20,13 @@ Customized Noise
 """
 from typing import TYPE_CHECKING, List, Dict
 import random
+import math
 import numpy as np
 from QCompute.QPlatform.QNoise import QNoise
 from QCompute.QPlatform.QNoise.Utilities import isTracePreserving, numpyMatrixToTensorMatrix, calcKrausLowerBound
 
 if TYPE_CHECKING:   
-    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
+    from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
 class CustomizedNoise(QNoise):
@@ -38,15 +39,11 @@ class CustomizedNoise(QNoise):
     """
 
     def __init__(self, krauses: List[np.ndarray]) -> None:
+        bits = int(math.log2(math.sqrt(krauses[0].size)) + 0.5)
 
-        if krauses[0].shape[0] > 2 or krauses[0].shape[1] > 2:
-            binSize = str(bin(krauses[0].shape[0] - 1))[2:]  # e.g., 4 -> '11', 8 -> '111'
-            bits = len(binSize)
+        expected_shape = [(2 ** bits, 2 ** bits), (2, 2) * bits]
 
-            assert krauses[0].shape[0] == krauses[0].shape[1], 'Available for n-qubit matrix only' 
-            assert sum([int(idex) for idex in binSize]) == bits, 'Available for n-qubit matrix only'
-        else:
-            bits = int(len(krauses[0].shape) / 2)
+        assert krauses[0].shape in expected_shape, 'Available for n-qubit matrix only' 
 
         super().__init__(bits)
         self.krauses = krauses
@@ -77,7 +74,7 @@ class CustomizedNoise(QNoise):
 
     def calc_noise_matrix(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> np.ndarray:
         """
-        Generate a sampled Kraus operator.
+        Generate a sampled Kraus operator which is chosen from all Kraus operators.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
         :param state: np.ndarray, current state in simulator
@@ -88,35 +85,26 @@ class CustomizedNoise(QNoise):
         if self.noiseClass == 'mixed_unitary_noise':
             return random.choices(self.krauses, self.lowerBoundList)[0]
         else:
-            # calc lower bounds for each Kraus operator and the maximum one
-            listS = self.lowerBoundList
-            maxLowerBound = max(listS)
-            maxLowerBoundIndex = listS.index(maxLowerBound)
 
             if self.bits > 1 and self.krauses[0].shape[0] > 2:
                 self.krauses = self.krauses = [numpyMatrixToTensorMatrix(_) for _ in self.krauses]
 
+            # joint sort lowerBoundList+krauses by lowerBoundList in descending order
+            sortedLowerBoundList, sortedKrauses = zip(*sorted(zip(self.lowerBoundList, self.krauses),
+                                                                key=lambda x: x[0], reverse=True))
+
             r = random.random()
-            stateMax = transfer(
-                state, self.krauses[maxLowerBoundIndex], qRegList)
-            proMax = np.vdot(stateMax, stateMax)
 
-            if r < proMax:
-                return self.krauses[maxLowerBoundIndex] / np.sqrt(proMax)
+            for kraus in sortedKrauses:
+                stateCopy = transfer(state, kraus, qRegList)
+                proCopy = np.vdot(stateCopy, stateCopy)
 
-            else:
-                r = r - proMax
-                listIndex = [index for index in range(
-                    len(self.krauses)) if index != maxLowerBoundIndex]
-
-                for _ in listIndex:
-                    stateCopy = transfer(state, self.krauses[_], qRegList)
-                    proCopy = np.vdot(stateCopy, stateCopy)
-
-                    if r < proCopy:
-                        return self.krauses[_] / np.sqrt(proCopy)
-                    else:
-                        r = r - proCopy
+                if r < proCopy:
+                    return kraus / np.sqrt(proCopy)
+                else:
+                    r = r - proCopy
+            
+            assert False
 
     def calc_noise_rng_non_mixed(self, transfer: 'TransferProcessor', state: np.ndarray, qRegList: List[int]) -> int:
         """
@@ -128,30 +116,22 @@ class CustomizedNoise(QNoise):
         :return: int, a sampled random number
         """
 
-        listS = self.lowerBoundList
-        maxLowerBound = max(listS)
-        maxLowerBoundIndex = listS.index(maxLowerBound)
+        # joint sort lowerBoundList+krauses+krausID by lowerBoundList in descending order
+        sortedLowerBoundList, sortedKrauses, sortedKrausesID = zip(*sorted(zip(self.lowerBoundList, self.krauses,
+                                                                               range(len(self.krauses))),
+                                                                           key=lambda x: x[0], reverse=True))
 
         r = random.random()
-        if r <= maxLowerBound:
-            return maxLowerBoundIndex
-        else:
-            stateCopy = transfer(
-                state, self.krauses[maxLowerBoundIndex], qRegList)
-            proCopy = np.vdot(stateCopy, stateCopy)
-
-            if r < proCopy:
-                return maxLowerBoundIndex
+        for bound, kraus, krausID in zip(sortedLowerBoundList, sortedKrauses, sortedKrausesID):
+            if r < bound:
+                return krausID
             else:
-                r = r - proCopy
-                listIndex = [index for index in range(
-                    len(self.krauses)) if index != maxLowerBoundIndex]
+                stateCopy = transfer(state, kraus, qRegList)
+                proCopy = np.vdot(stateCopy, stateCopy)
 
-                for _ in listIndex:
-                    stateCopy = transfer(state, self.krauses[_], qRegList)
-                    proCopy = np.vdot(stateCopy, stateCopy)
-
-                    if r < proCopy:
-                        return _
-                    else:
-                        r = r - proCopy
+                if r < proCopy:
+                    return krausID
+                else:
+                    r = r - proCopy
+        
+        assert False

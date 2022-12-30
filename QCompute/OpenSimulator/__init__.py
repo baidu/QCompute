@@ -264,7 +264,7 @@ class QImplement:
     Send to the simulator when submitting a task.
     """
 
-    program = None  # type: 'PBProgram'
+    program = None  # type:
     """
     Protobuf format of the circuit
     """
@@ -289,3 +289,10 @@ class QImplement:
         Commit task
         """
         pass
+
+
+def withNoise(program: 'PBProgram') -> bool:
+    """
+    With noise
+    """
+    return any(len(circLine.noiseList) >= 1 for circLine in program.body.circuit)

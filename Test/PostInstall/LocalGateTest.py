@@ -84,7 +84,7 @@ def localGateTest():
     """
     Local Gate Test
     """
-    for backendname in [BackendName.LocalBaiduSim2, BackendName.LocalBaiduSim2WithNoise]:
+    for backendname in [BackendName.LocalBaiduSim2]:
         ret = core(ID, backendname=backendname)
         assert ret['counts']['0'] == 1024
         ret = core(H, backendname=backendname)

@@ -45,6 +45,8 @@ class UnrollCircuitToIoPCASModule(ModuleImplement):
     env.module(UnrollCircuitToIoPCASModule({'errorOnUnsupported': True, 'targetGates': ['RY', 'RZ', 'CZ']}))
 
     env.module(UnrollCircuitToIoPCASModule({'errorOnUnsupported': False, 'targetGates': ['RY', 'RZ', 'CZ'], 'sourceGates': ['CH', 'CSWAP']}))
+
+    env.serverModule(ServerModule.UnrollCircuitToIoPCASModule, {"disable": True})
     """
     
 

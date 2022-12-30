@@ -25,7 +25,7 @@ from QCompute.QPlatform.QNoise import QNoise
 from QCompute.QPlatform.QNoise.Utilities import sigma
 
 if TYPE_CHECKING:   
-    from QCompute.OpenSimulator.local_baidu_sim2_with_noise.Transfer import TransferProcessor
+    from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
 class PhaseDamping(QNoise):

@@ -57,7 +57,6 @@ _AerSimulatorModuleList = [
 
 BackendModuleDict = {
     BackendName.LocalBaiduSim2: _SimulatorModuleList,
-    BackendName.LocalBaiduSim2WithNoise: _SimulatorWithNoiseModuleList,
     
     BackendName.CloudBaiduSim2Water: _SimulatorModuleList,
     BackendName.CloudBaiduSim2Earth: _SimulatorModuleList,
@@ -91,6 +90,10 @@ class InteractiveModule:
         QEnvToProtobuf(self.originProgram, env)
         self.backendName = env.backendName  # type: BackendName
         self.moduleSetting = BackendModuleDict.get(self.backendName)
+
+        if self.moduleSetting is _SimulatorModuleList and len(env.noiseDefineMap) > 0:
+            self.moduleSetting = _SimulatorWithNoiseModuleList
+
         if self.moduleSetting:
             self.moduleDict = {}  # type: Dict[str, Type[ModuleImplement]]
             self.usingModuleList = []  # type: List[ModuleImplement]

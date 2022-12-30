@@ -54,28 +54,23 @@ class QNoise:
         bits = self.bits
         krauses = krausList
 
-        if bits == 1:
-            return krauses
-        else:
-            for _ in range(bits - 1):
-                krauses = noiseTensor(krausList, krauses)
-            return [numpyMatrixToTensorMatrix(_) for _ in krauses]
+        for _ in range(bits - 1):
+            krauses = noiseTensor(krausList, krauses)
+        return [numpyMatrixToTensorMatrix(_) for _ in krauses]
 
-    def _tensorProbabilitiesLocal(self, probabilityList: List[float]) -> Optional[List[float]]:
+
+    def _tensorProbabilitiesLocal(self, probabilityList: List[float]) -> List[float]:
         """
         Generate probabilities for local noise tensor.
 
         :param probabilityList: List[float], the probabilities that any kraus operators occur for a mixed unitary noise
         """
-        bits = self.bits
-        probabilities = probabilityList
 
-        if probabilities:
-            for _ in range(bits - 1):
-                probabilities = [probabilities[index_1] * probabilityList[index_2]
-                                 for index_1, index_2 in product(range(len(probabilities)), range(len(probabilityList)))]
+        for _ in range(self.bits - 1):
+            probabilityList = [probabilityList[index_1] * probabilityList[index_2]
+                             for index_1, index_2 in product(range(len(probabilityList)), range(len(probabilityList)))]
 
-        return probabilities
+        return probabilityList
 
     def _tensorProbabilitiesNonLocal(self, probability: float) -> List[float]:
         """

@@ -28,7 +28,7 @@ from QCompute import *
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.2.0')
+matchSdkVersion('Python 3.2.1')
 
 noiseType = Union['AmplitudeDamping', 'BitFlip', 'CustomizedNoise', 'BitPhaseFlip',
                   'Depolarizing', 'PauliNoise', 'PhaseDamping', 'PhaseFlip', 'ResetNoise']
@@ -49,7 +49,7 @@ def test_circuit_1qubit(noises: List[noiseType], bool_Xgate: bool, bool_Hgate: b
     # Create environment
     env = QEnv()
     # Choose backend Baidu local simulator with noise
-    env.backend(BackendName.LocalBaiduSim2WithNoise)
+    env.backend(BackendName.LocalBaiduSim2)
 
     q = env.Q.createList(1)
 

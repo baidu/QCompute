@@ -18,8 +18,7 @@
 """
 Configuration
 """
-
-
+from enum import Enum, IntEnum, unique
 from QCompute.Define import MeasureFormat
 
 outputInfo = True
@@ -71,10 +70,44 @@ Run simulator in or out process.
 The 'inProcessSimulator' option can significantly accelerate the calculation of simulator while 
 the outProcessSimulator can enhance the stability of simulator.  
 
-Supporting local_baidu_sim2, local_baidu_sim2_with_noise
+Supporting local_baidu_sim2
 
 
 Values: True, False
+"""
+
+
+@unique
+class NoiseMethod(IntEnum):
+    """
+    # different methods
+    # mixed unitary noise
+    # general noise
+    # low noise circuit, speed up
+    """
+    MixedUnitaryNoise = 0
+    GeneralNoise = MixedUnitaryNoise + 1
+    LowNoiseCircuit = GeneralNoise + 1
+
+noiseMethod = NoiseMethod.LowNoiseCircuit
+"""
+Noise method
+
+Values: NoiseMethod enum
+
+Default noisemethod == NoiseMethod.LowNoiseCircuit 
+"""
+
+noiseMultiprocessingSimulator = True
+"""
+Run noise simulator in multiprocessing.
+
+Values: True, False
+
+For default noiseMethod, turn on noiseMultiprocessingSimulator
+    for case 1) if circuit depth :math:`\geq 30` and qubits  :math:`\leq 10`;
+
+    or case 2) if qubits > 10.
 """
 
 autoClearOutputDirAfterFetchMeasure = False
