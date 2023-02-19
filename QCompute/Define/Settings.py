@@ -70,8 +70,7 @@ Run simulator in or out process.
 The 'inProcessSimulator' option can significantly accelerate the calculation of simulator while 
 the outProcessSimulator can enhance the stability of simulator.  
 
-Supporting local_baidu_sim2
-
+Supporting local_baidu_sim2, local_cuquantum
 
 Values: True, False
 """
@@ -81,8 +80,11 @@ Values: True, False
 class NoiseMethod(IntEnum):
     """
     # different methods
+
     # mixed unitary noise
+
     # general noise
+    
     # low noise circuit, speed up
     """
     MixedUnitaryNoise = 0
@@ -105,6 +107,7 @@ Run noise simulator in multiprocessing.
 Values: True, False
 
 For default noiseMethod, turn on noiseMultiprocessingSimulator
+
     for case 1) if circuit depth :math:`\geq 30` and qubits  :math:`\leq 10`;
 
     or case 2) if qubits > 10.

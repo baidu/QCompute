@@ -19,15 +19,17 @@
 VQSD
 """
 import copy
+import sys
+from typing import List, Dict
 
 import numpy as np
 
-import sys
+from QCompute.QPlatform.QRegPool import QRegStorage
 
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.2.1')
+matchSdkVersion('Python 3.3.0')
 
 shots = 100000
 n = 2  # n-qubit
@@ -37,7 +39,7 @@ N = 15  # number of parameters
 para = np.random.rand(N) * 2 * np.pi  # initial parameters
 
 
-def state_prepare(q, i):
+def state_prepare(q: List[QRegStorage], i: int):
     """
     This function is used to prepare state
     """
@@ -49,7 +51,7 @@ def state_prepare(q, i):
     RZ(1.2)(q[i])
 
 
-def universal_cir(q, i, para):
+def universal_cir(q: List[QRegStorage], i: int, para: List[float]):
     """
     This function builds a 15-parameterized circuit, which is
     enough to simulate any 2-qubit Unitaries
@@ -83,7 +85,7 @@ def universal_cir(q, i, para):
     RZ(para[14])(q[i + 1])
 
 
-def my_cir(para):
+def my_cir(para: List[float]):
     """
     This function returns the measurement result
     """
@@ -110,7 +112,7 @@ def my_cir(para):
     return taskResult['counts']
 
 
-def data_processing(data_dic):
+def data_processing(data_dic: Dict[str, int]):
     """
     This function returns the frequency of getting 00xx
     """
@@ -130,7 +132,7 @@ def loss_fun(para):
     return -data_processing(my_cir(para))
 
 
-def diff_fun(f, para):
+def diff_fun(f, para: List[float]):
     """
     It returns a updated parameter set, para is a np.array
     """

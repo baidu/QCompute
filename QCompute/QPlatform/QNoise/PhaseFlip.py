@@ -34,7 +34,7 @@ class PhaseFlip(QNoise):
 
     The Kraus operators of such noise are as follows:
 
-    :math:`E_0 = \sqrt{1.0 - p} \ ID`
+    :math:`E_0 = \sqrt{1 - p} \ ID`
     
     :math:`E_1 = \sqrt{p} \ Z`
 

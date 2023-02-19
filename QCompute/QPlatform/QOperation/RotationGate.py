@@ -141,11 +141,11 @@ class RotationGateOP(QOperation):
 
         nAngles = len(self.argumentList)
         if nAngles == 1:
-            [theta] = self.argumentList  # type: float
+            [theta] = self.argumentList
         elif nAngles == 2:
-            [theta, phi] = self.argumentList  # type: float
+            [theta, phi] = self.argumentList
         elif nAngles == 3:
-            [theta, phi, lamda] = self.argumentList  # type: float
+            [theta, phi, lamda] = self.argumentList
         else:
             raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
                                       FileErrorCode, 3)

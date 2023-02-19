@@ -31,6 +31,7 @@ from typing import List, Union, Dict, Optional
 import multiprocess
 import numpy
 from google.protobuf.json_format import MessageToDict, ParseDict
+
 from QCompute import Define
 from QCompute.Define import Settings
 from QCompute.Define.Settings import NoiseMethod
@@ -153,7 +154,7 @@ class StateVector:
                         for i in range(len(noise_rngList[0])):
                             array = []
                             for j in range(len(noise_rngList)):
-                                 array.append(noise_rngList[j][i])
+                                array.append(noise_rngList[j][i])
                             noise_rng_array.append(array)
                         countsList = list(pool.map(self.core_once_mixed_unitary_noise, noise_rng_array))
                     else:
@@ -381,10 +382,10 @@ class StateVector:
         for circuitLine in program.body.circuit:  # Traverse the circuit
             op = circuitLine.WhichOneof('op')
 
-            qRegList = [qRegMap[_] for _ in circuitLine.qRegList]  # type List[int]
+            qRegList: List[int] = [qRegMap[_] for _ in circuitLine.qRegList]
 
             if op == 'fixedGate':  # fixed gate
-                fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = circuitLine.fixedGate
                 matrix = operationDict.get(fixedGate)
                 if matrix is None:
                     raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
@@ -393,7 +394,7 @@ class StateVector:
                 transfer_noise_matrix(noise_rng)
 
             elif op == 'rotationGate':  # rotation gate
-                uGate = getRotationGate(circuitLine)  # type RotationGateOp
+                uGate: RotationGateOP = getRotationGate(circuitLine)
 
                 if matrixType == MatrixType.Dense:
                     matrix = uGate.getMatrix()
@@ -402,7 +403,7 @@ class StateVector:
                 state = transfer(state, matrix, qRegList)
                 transfer_noise_matrix(noise_rng)
             elif op == 'customizedGate':  # customized gate
-                customizedGate = circuitLine.customizedGate  # type: PBCustomizedGate
+                customizedGate: PBCustomizedGate = circuitLine.customizedGate
                 if matrixType == MatrixType.Dense:
                     matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
                 else:
@@ -414,7 +415,7 @@ class StateVector:
                                           ModuleErrorCode, FileErrorCode, 12)
                 # it is not implemented, flattened by UnrollProcedureModule
             elif op == 'measure':  # measure
-                measure = circuitLine.measure  # type: PBMeasure
+                measure: PBMeasure = circuitLine.measure
                 if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                     raise Error.ArgumentError(
                         f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
@@ -496,7 +497,7 @@ class StateVector:
             op = circuitLine.WhichOneof('op')
 
             if op == 'fixedGate':  # fixed gate
-                fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = circuitLine.fixedGate
                 matrix = operationDict.get(fixedGate)
                 if matrix is None:
                     raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
@@ -506,7 +507,7 @@ class StateVector:
                 if rngList:
                     batchedNoiseRng.append(rngList)
             elif op == 'rotationGate':  # rotation gate
-                rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = circuitLine.rotationGate
                 if rotationGate - PBRotationGate.U > 7:  # current support 8 rotation gates
                     raise Error.ArgumentError(
                         f'Unsupported operation {PBRotationGate.Name(rotationGate)}!', ModuleErrorCode, FileErrorCode,
@@ -623,17 +624,17 @@ class StateVector:
         for circuitLine in program.body.circuit:  # Traverse the circuit
             op = circuitLine.WhichOneof('op')
 
-            qRegList = [qRegMap[_] for _ in circuitLine.qRegList]  # type List[int]
+            qRegList: List[int] = [qRegMap[_] for _ in circuitLine.qRegList]
 
             if op == 'fixedGate':  # fixed gate
-                fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = circuitLine.fixedGate
                 matrix = operationDict.get(fixedGate)
                 if matrix is None:
                     raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
                                               FileErrorCode, 10)
                 transfer_noise_list()
             elif op == 'rotationGate':  # rotation gate
-                uGate = getRotationGate(circuitLine)  # type RotationGateOp
+                uGate: RotationGateOP = getRotationGate(circuitLine)
 
                 if matrixType == MatrixType.Dense:
                     matrix = uGate.getMatrix()
@@ -641,7 +642,7 @@ class StateVector:
                     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
                 transfer_noise_list()
             elif op == 'customizedGate':  # customized gate
-                customizedGate = circuitLine.customizedGate  # type: PBCustomizedGate
+                customizedGate: PBCustomizedGate = circuitLine.customizedGate
                 if matrixType == MatrixType.Dense:
                     matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
                 else:
@@ -652,7 +653,7 @@ class StateVector:
                                           ModuleErrorCode, FileErrorCode, 12)
                 # it is not implemented, flattened by UnrollProcedureModule
             elif op == 'measure':  # measure
-                measure = circuitLine.measure  # type: PBMeasure
+                measure: PBMeasure = circuitLine.measure
                 if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                     raise Error.ArgumentError(
                         f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
@@ -907,20 +908,20 @@ class StateVector:
         for circuitLine in program.body.circuit:  # Traverse the circuit
             op = circuitLine.WhichOneof('op')
 
-            qRegList = [qRegMap[_] for _ in circuitLine.qRegList]  # type List[int]
+            qRegList: List[int] = [qRegMap[_] for _ in circuitLine.qRegList]
 
             if not stateDict:  # Verify the output stateDict is not None
                 return {}
             else:
                 if op == 'fixedGate':  # fixed gate
-                    fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                    fixedGate: PBFixedGate = circuitLine.fixedGate
                     matrix = operationDict.get(fixedGate)
                     if matrix is None:
                         raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!',
                                                   ModuleErrorCode, FileErrorCode, 10)
                     transfer_batch_noisy_gate(matrix, num)
                 elif op == 'rotationGate':  # rotation gate
-                    uGate = getRotationGate(circuitLine)  # type RotationGateOp
+                    uGate: RotationGateOP = getRotationGate(circuitLine)
 
                     if matrixType == MatrixType.Dense:
                         matrix = uGate.getMatrix()
@@ -928,7 +929,7 @@ class StateVector:
                         from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
                     transfer_batch_noisy_gate(matrix, num)
                 elif op == 'customizedGate':  # customized gate
-                    customizedGate = circuitLine.customizedGate  # type: PBCustomizedGate
+                    customizedGate: PBCustomizedGate = circuitLine.customizedGate
                     if matrixType == MatrixType.Dense:
                         matrix = protobufMatrixToNumpyMatrix(
                             customizedGate.matrix)
@@ -940,7 +941,7 @@ class StateVector:
                                               'UnrollProcedureModule!', ModuleErrorCode, FileErrorCode, 12)
                     # it is not implemented, flattened by UnrollProcedureModule
                 elif op == 'measure':  # measure
-                    measure = circuitLine.measure  # type: PBMeasure
+                    measure: PBMeasure = circuitLine.measure
                     if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                         raise Error.ArgumentError(
                             f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
@@ -971,7 +972,7 @@ class StateVector:
 
     def core_once_without_noise(self) -> Union[Dict[str, int], Dict[str, float], numpy.ndarray]:
         """
-        Simulaton process for ideal circuit
+        Simulation process for ideal circuit
         """
 
         if self.program is None:
@@ -1002,17 +1003,17 @@ class StateVector:
         for circuitLine in program.body.circuit:  # Traverse the circuit
             op = circuitLine.WhichOneof('op')
 
-            qRegList = [qRegMap[qReg] for qReg in circuitLine.qRegList]  # type List[int]
+            qRegList: List[int] = [qRegMap[qReg] for qReg in circuitLine.qRegList]
 
             if op == 'fixedGate':  # fixed gate
-                fixedGate = circuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = circuitLine.fixedGate
                 matrix = operationDict.get(fixedGate)
                 if matrix is None:
                     raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
                                               FileErrorCode, 7)
                 state = transfer(state, matrix, qRegList)
             elif op == 'rotationGate':  # rotation gate
-                rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = circuitLine.rotationGate
                 if rotationGate != PBRotationGate.U:
                     raise Error.ArgumentError(
                         f'Unsupported operation {PBRotationGate.Name(rotationGate)}!', ModuleErrorCode, FileErrorCode,
@@ -1024,7 +1025,7 @@ class StateVector:
                     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
                 state = transfer(state, matrix, qRegList)
             elif op == 'customizedGate':  # customized gate
-                customizedGate = circuitLine.customizedGate  # type: PBCustomizedGate
+                customizedGate: PBCustomizedGate = circuitLine.customizedGate
                 if matrixType == MatrixType.Dense:
                     matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
                 else:
@@ -1035,7 +1036,7 @@ class StateVector:
                                           ModuleErrorCode, FileErrorCode, 9)
                 # it is not implemented, flattened by UnrollProcedureModule
             elif op == 'measure':  # measure
-                measure = circuitLine.measure  # type: PBMeasure
+                measure: PBMeasure = circuitLine.measure
                 if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                     raise Error.ArgumentError(
                         f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
@@ -1065,7 +1066,7 @@ class StateVector:
         Load the matrix of the gate
         """
         if matrixType == MatrixType.Dense:
-            operationDict = {
+            operationDict: Dict['PBFixedGate', Union[numpy.ndarray, 'COO']] = {
                 PBFixedGate.ID: ID.getMatrix(),
                 PBFixedGate.X: X.getMatrix(),
                 PBFixedGate.Y: Y.getMatrix(),
@@ -1082,7 +1083,7 @@ class StateVector:
                 PBFixedGate.SWAP: SWAP.getMatrix(),
                 PBFixedGate.CCX: CCX.getMatrix(),
                 PBFixedGate.CSWAP: CSWAP.getMatrix()
-            }  # type: Dict['PBFixedGate', Union[numpy.ndarray, 'COO']]
+            }
         else:
             from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
         return operationDict
@@ -1092,7 +1093,7 @@ def getRotationGate(circuitLine: 'PBCircuitLine') -> 'RotationGateOP':
     """
     Get the rotation gate instance form PBCircuitLine
     """
-    rotationGate = circuitLine.rotationGate  # type: PBRotationGate
+    rotationGate: PBRotationGate = circuitLine.rotationGate
     if rotationGate - PBRotationGate.U == 0:
         ugate = U(*circuitLine.argumentValueList)
     elif rotationGate - PBRotationGate.U == 1:
@@ -1177,12 +1178,12 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     parser.add_argument('-inputFile', default=None, type=str)
 
     args = parser.parse_args(args=args)
-    matrixType = args.mt.lower()  # type: str
-    algorithm = args.a.lower()  # type: str
-    measureMethod = args.mm.lower()  # type: str
-    seed = args.s  # type: int
-    shots = args.shots  # type: int
-    inputFile = args.inputFile  # type: str
+    matrixType: str = args.mt.lower()
+    algorithm: str = args.a.lower()
+    measureMethod: str = args.mm.lower()
+    seed: int = args.s
+    shots: int = args.shots
+    inputFile: str = args.inputFile
 
     if shots < 1 or shots > Define.maxShots:
         raise Error.ArgumentError(f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode,
@@ -1192,7 +1193,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
             raise Error.ArgumentError(f'Invalid seed {seed}, should in [0, {Define.maxSeed}]', ModuleErrorCode,
                                       FileErrorCode, 2)
 
-    matrixTypeValue = None  # type: Optional[MatrixType]
+    matrixTypeValue: Optional[MatrixType] = None
     if matrixType == 'dense':
         matrixTypeValue = MatrixType.Dense
     
@@ -1200,7 +1201,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
         raise Error.ArgumentError(
             f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 2)
 
-    algorithmValue = None  # type: Optional[Algorithm]
+    algorithmValue: Optional[Algorithm] = None
     if algorithm == 'matmul':
         algorithmValue = Algorithm.Matmul
     elif algorithm == 'einsum':
@@ -1209,7 +1210,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
         raise Error.ArgumentError(
             f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 4)
 
-    measureMethodValue = None  # type: Optional[MeasureMethod]
+    measureMethodValue: Optional[MeasureMethod] = None
     if measureMethod == 'probability':
         measureMethodValue = MeasureMethod.Probability
     elif measureMethod == 'output_probability':

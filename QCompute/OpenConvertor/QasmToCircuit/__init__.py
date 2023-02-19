@@ -161,7 +161,7 @@ class _Visitor(QASMVisitor):
         :return: type: List[float]. List of arguments (floating point data type).
         """
         argumentList = arguments.split(',')
-        return [float(argument) for argument in argumentList]  # type: List[float]
+        return [float(argument) for argument in argumentList]
 
     
     def prepareArguments(self, arguments: str) -> List[str]:
@@ -181,7 +181,7 @@ class _Visitor(QASMVisitor):
         :return: type: Tuple[str, List[int]]. Converted arguments and list of argument ids.
         """
         arguments = ''
-        argumentIdList = []  # type: List[int]
+        argumentIdList: List[int] = []
         
         explist = ctx.explist()
         if explist:
@@ -205,7 +205,7 @@ class _Visitor(QASMVisitor):
         :return realArgumentList: type: List[float]. List of real values of arguments.
         """
         argumentArray = procArguments.split(',')
-        realArgumentList = []  # type: List[float]
+        realArgumentList: List[float] = []
         if pendingArgumentList:
             for argument in pendingArgumentList:
                 realVal = argument
@@ -413,7 +413,7 @@ class _Visitor(QASMVisitor):
 
         :return: type: bool. True. If the same register is used, throws exception.
         """
-        checkIds = []  # type: List[str]
+        checkIds: List[str] = []
         for id in idArgumentList:
             rId = id.getText()
             # Check if quantum register is defined.
@@ -485,7 +485,7 @@ class _Visitor(QASMVisitor):
         :return: bool. True. If the count of arguments is different from operation, throws exception.
         """
         checkOp = opId.upper()
-        error = False  # type: bool
+        error = False
         if checkOp in self.oneArgumentOp:
             if argumentCount != 1:
                 error = True
@@ -567,7 +567,7 @@ class _Visitor(QASMVisitor):
                 ModuleErrorCode, FileErrorCode, 18)
 
     def genSequenceArray(self, size: int):
-        return [i for i in range(size)]  # type: List[int]
+        return [i for i in range(size)]
 
 
     def getProcCircuitList(self, procName: str, procArguments: str, regIdList: List[int]):
@@ -591,7 +591,7 @@ class _Visitor(QASMVisitor):
         
         :return: List[CircuitLine]. The circuits of procedures.
         """
-        circuitList = []  # type: List[CircuitLine]
+        circuitList: List[CircuitLine] = []
         procedureCircuitList = self.procedureMap[procName].circuitList
         
         argumentMap = self.procedureArgumentMap[procName]
@@ -600,7 +600,7 @@ class _Visitor(QASMVisitor):
             procedureName = circuit.pbCircuitLine.procedureName
             pendingArgumentList = circuit.pendingArgumentList
             
-            newQRegList = []  # type: List[int]
+            newQRegList: List[int] = []
             for i in circuit.pbCircuitLine.qRegList:
                 q = regIdList[i]
                 newQRegList.append(q)
@@ -710,10 +710,10 @@ class _Visitor(QASMVisitor):
 
         :param ctx: type: object. QASMParser.QRegContext
         """
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
-        id = ctx.ID().getText()  # type: str
+        id: str = ctx.ID().getText()
         self.checkQregLimit(id, line, position)
         regSize = int(ctx.INT().getText())
         # create sequence number list for array
@@ -735,10 +735,10 @@ class _Visitor(QASMVisitor):
 
         :param ctx: type: object. QASMParser.CRegContext
         """
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
-        id = ctx.ID().getText()  # type: str
+        id: str = ctx.ID().getText()
         self.checkCregLimit(id, line, position)
         regSize = int(ctx.INT().getText())
         # create sequence number list for array
@@ -760,13 +760,13 @@ class _Visitor(QASMVisitor):
         :param ctx: type: object. QASMParser.UopContext
         """
         # line number
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
-        opCmd = ctx.ID()  # type: str
+        opCmd = ctx.ID()
 
         if opCmd:
-            opId = opCmd.getText()
+            opId: str = opCmd.getText()
         else:
             raise Error.ArgumentError(f'Illegal operation on gate. line: {line}, position: {position}.',
                                       ModuleErrorCode, FileErrorCode, 21)
@@ -783,8 +783,8 @@ class _Visitor(QASMVisitor):
 
         :return: type: Tuple[str, Union[str,int], bool]. (gateType, gateName, argumentIdField)
         """
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
         argumentIdField = False
         state = self.getScopeData().state
         if state == QasmParseState.Procedure:
@@ -839,15 +839,15 @@ class _Visitor(QASMVisitor):
         :param circuitList: type: List[CircuitLine]. List of circuitLines.
         """
         # line number
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
         gateType, gateName, argumentIdField = self.getGateNameType(ctx, opId)
         arguments, argumentIdList = self.getArguments(ctx)
 
         idArguments = idList.ID()
         self.checkUOpArgumentIdList(idArguments, line, position)
         # Check variable declaration. Only one id argument uses.
-        argument = idArguments[0].getText()  # type: str
+        argument: str = idArguments[0].getText()
         scopeData = self.getScopeData()
         state = scopeData.state
         qReg = scopeData.qReg
@@ -859,7 +859,7 @@ class _Visitor(QASMVisitor):
         if idLens > 1:
             # command of procedure. Call registers declared in multiple procedures. 
             # Get list of registers according to their positions.
-            regList = [regMap[id.getText()] for id in idArguments]  # type: List[int]
+            regList: List[int] = [regMap[id.getText()] for id in idArguments]
             
             if gateType == 'procedureName':
                 self.checkProcName(procName, gateName, line, position)
@@ -888,8 +888,8 @@ class _Visitor(QASMVisitor):
         :param mixList: type: object. QASMParser.MixedlistContext
         :param circuitList: type: List[CircuitLine]. List of circuitLines.
         """
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
         gateType, gateName, argumentIdField = self.getGateNameType(ctx, opId)
         arguments, argumentIdList = self.getArguments(ctx)
         scopeData = self.getScopeData()
@@ -906,7 +906,7 @@ class _Visitor(QASMVisitor):
         self.checkArgumentsCount(opId, len(mixId), line, position)
 
         # Check validity of variables.
-        regName = None  # type: str
+        regName: str = None
         for m in mixId:
             mid = m.getText()
             if not regName:
@@ -958,8 +958,8 @@ class _Visitor(QASMVisitor):
         """
 
         # line number
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
         # Check the current state. If procedure is being processed, 
         # turns to process the circuitList of procedureMap.
@@ -996,15 +996,15 @@ class _Visitor(QASMVisitor):
 
         measure q[0] -> c[0];
         """
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
         argument = ctx.argument()
         qReg = argument[0]
         cReg = argument[1]
 
-        qRegId = qReg.ID().getText()
-        cRegId = cReg.ID().getText()
+        qRegId: str = qReg.ID().getText()
+        cRegId: str = cReg.ID().getText()
 
         self.checkQregVar(qRegId, line, position)
         self.checkCregVar(cRegId, line, position)
@@ -1086,7 +1086,7 @@ class _Visitor(QASMVisitor):
                                           ModuleErrorCode, FileErrorCode, 25)
 
             # Check validity of variables.
-            regName = None  # type: str
+            regName: str = None
             for m in mixId:
                 mid = m.getText()
                 if not regName:
@@ -1110,8 +1110,8 @@ class _Visitor(QASMVisitor):
 
         :return: expression. 
         """
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
         scopeData = self.getScopeData()
         argumentIdList = scopeData.argumentIdList
         argumentValueList = scopeData.argumentValueList
@@ -1175,8 +1175,8 @@ class _Visitor(QASMVisitor):
             }
         """
 
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
         exprList = []
 
@@ -1186,7 +1186,7 @@ class _Visitor(QASMVisitor):
         
         calcArgumentList = []
         
-        checkItem = []  # type: List[bool]
+        checkItem: List[bool] = []
         for i in range(count):
             item = ctx.getChild(i)
             itemText = item.getText()
@@ -1254,10 +1254,10 @@ class _Visitor(QASMVisitor):
         :param ctx: type: object. QASMParser.GatedeclContext
         """
         # line number
-        line = ctx.start.line  # type: int
-        position = ctx.start.column  # type: int
+        line: int = ctx.start.line
+        position: int = ctx.start.column
 
-        gateId = ctx.ID().getText()
+        gateId: str = ctx.ID().getText()
         # Check duplication of procedure names.
         if gateId in self.procedureVarSet:
             # Duplication

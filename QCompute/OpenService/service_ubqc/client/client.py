@@ -227,8 +227,8 @@ class PlatformClient:
 
         # Queue is thread-safe so that it can be shared
         self.shot_outbox = Queue()
-        self.ret = {}  # type: Dict[str,int]
-        self.shot_threadings = {}  # type: Dict[int, threading.Thread]
+        self.ret: Dict[str,int] = {}
+        self.shot_threadings: Dict[int, threading.Thread] = {}
         self.program = program
         self.phase_auth = True  # whether or not in the testing process
         self.entry = None
@@ -506,12 +506,12 @@ class UbqcClient(threading.Thread):
         self.__circuit = None  # circuit
         self.__client_knowledge = {}  # client knowledge
         self.__bw_pattern = None  # brickwork pattern
-        self.__width = None  # type: int # width
-        self.__depth = None  # type: int # depth
-        self.__shots = shots  # type: int # shot
+        self.__width: int = None  # width
+        self.__depth: int = None  # depth
+        self.__shots: int = shots # shot
         self.__states = None
-        self.inbox = inbox  # type: Queue
-        self.outbox = outbox  # type: Queue
+        self.inbox: Queue = inbox
+        self.outbox: Queue = outbox
         self.program = program
         super().__init__()
 
@@ -577,7 +577,7 @@ class UbqcClient(threading.Thread):
             vec_buf = numpyMatrixToProtobufMatrix(vec)
             _init_.vector.append(vec_buf)
 
-        init_stateBuf = _init_.SerializeToString()  # type: bytes
+        init_stateBuf: bytes = _init_.SerializeToString()
 
         self.send_back(
             'remote',
@@ -620,7 +620,7 @@ class UbqcClient(threading.Thread):
             req.angles.append(angle)
 
         # Encode the message by serialization
-        reqBuf = req.SerializeToString()  # type: bytes
+        reqBuf: bytes = req.SerializeToString()
 
         self.send_back(
             'remote',
@@ -732,11 +732,11 @@ class UbqcClient(threading.Thread):
         for i in range(width):
             circuit.h(i)
 
-        for PBGate in pbCircuit:  # type: PBCircuitLine
+        for PBGate in pbCircuit:
             op = PBGate.WhichOneof('op')
             # Map ``fixedGate`` (including 'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ') to the methods in ``Circuit``
             if op == 'fixedGate':
-                fixedGate = PBGate.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = PBGate.fixedGate
                 gateName = PBFixedGate.Name(fixedGate)
                 bit_idx = PBGate.qRegList
                 if gateName == 'H':
@@ -766,7 +766,7 @@ class UbqcClient(threading.Thread):
 
             # Map ``rotationGate`` (including 'RX', 'RY', 'RZ', 'U') to the methods in ``Circuit``
             elif op == 'rotationGate':
-                rotationGate = PBGate.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = PBGate.rotationGate
                 gateName = PBRotationGate.Name(rotationGate)
                 bit_idx = PBGate.qRegList
 
@@ -822,7 +822,7 @@ class UbqcClient(threading.Thread):
                                               FileErrorCode, 10)
 
                 for qReg in PBGate.qRegList:
-                    typeName = PBMeasure.Type.Name(PBGate.measure.type)  # type: PBMeasure
+                    typeName: PBMeasure = PBMeasure.Type.Name(PBGate.measure.type)
                     if typeName == 'Z':
                         circuit.measure(qReg)
                     else:

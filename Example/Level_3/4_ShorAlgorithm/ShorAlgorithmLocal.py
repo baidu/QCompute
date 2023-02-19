@@ -28,19 +28,23 @@ The quantum backend choosing and token information refers to the function func_q
 
 import math
 import sys
+from random import randint
+from typing import List, Dict
+
 import numpy as np
 from numpy import pi
 from sympy.ntheory import isprime
 from sympy.ntheory.residue_ntheory import n_order
-from random import randint
+
+from QCompute.QPlatform.QRegPool import QRegStorage
 
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.2.1')
+matchSdkVersion('Python 3.3.0')
 
 
-def CU1(q1, q2, float_theta):
+def CU1(q1: QRegStorage, q2: QRegStorage, float_theta: float) -> None:
     """
     a single-parameter two-qubit gate, which is the ctrl version for U1 gate,
     the matrix form of CU1(theta) is the diagonal matrix {1,1,1,e^{i theta}}
@@ -53,7 +57,7 @@ def CU1(q1, q2, float_theta):
     CU(0, 0, float_theta)(q1, q2)
 
 
-def CCU1(q1, q2, q3, float_theta):
+def CCU1(q1: QRegStorage, q2: QRegStorage, q3: QRegStorage, float_theta: float) -> None:
     """
     a single-parameter three-qubit gate, which is the double-ctrl version for U1 gate,
     the matrix form of CCU1(theta) is the diagonal matrix {1,1,1,1,1,1,1,e^{i theta}}
@@ -72,7 +76,7 @@ def CCU1(q1, q2, q3, float_theta):
     CU(0, 0, float_theta_half)(q1, q3)
 
 
-def func_qftadd(reg_system, int_adder):
+def func_qftadd(reg_system: List[QRegStorage], int_adder: int):
     """
     a circuit implement the addition under the Fourier bases
     :param reg_system: QFT|s>, we write the state as a image of the Fourier transform
@@ -84,7 +88,7 @@ def func_qftadd(reg_system, int_adder):
             reg_system[-1 - idx_qubit])
 
 
-def func_qftadd_inverse(reg_system, int_adder):
+def func_qftadd_inverse(reg_system: List[QRegStorage], int_adder: int):
     """
     the inverse circuit for func_qftadd
     :param reg_system: QFT|s+a>
@@ -96,7 +100,7 @@ def func_qftadd_inverse(reg_system, int_adder):
             reg_system[-1 - idx_qubit])
 
 
-def func_ctrl_qftadd(reg_system, qubit_ctrlling, int_adder):
+def func_ctrl_qftadd(reg_system: List[QRegStorage], qubit_ctrlling: QRegStorage, int_adder: int):
     """
     the ctrl version for func_qftadd
     :param qubit_ctrlling: the ctrlling qubit |c>
@@ -109,7 +113,7 @@ def func_ctrl_qftadd(reg_system, qubit_ctrlling, int_adder):
             2 * pi * np.mod(int_adder, 2 ** (idx_qubit + 1)) / (2 ** (idx_qubit + 1)))
 
 
-def func_ctrl_qftadd_inverse(reg_system, qubit_ctrlling, int_adder):
+def func_ctrl_qftadd_inverse(reg_system: List[QRegStorage], qubit_ctrlling: QRegStorage, int_adder: int):
     """
     the inverse circuit for func_ctrl_qftadd; also the ctrl version for func_qftadd_inverse
     :param qubit_ctrlling: |c>
@@ -122,7 +126,7 @@ def func_ctrl_qftadd_inverse(reg_system, qubit_ctrlling, int_adder):
             -2 * pi * np.mod(int_adder, 2 ** (idx_qubit + 1)) / (2 ** (idx_qubit + 1)))
 
 
-def func_double_ctrl_qftadd(reg_system, reg_ctrlling, int_adder):
+def func_double_ctrl_qftadd(reg_system: List[QRegStorage], reg_ctrlling: List[QRegStorage], int_adder: int):
     """
     the double-ctrl version for func_qftadd
     :param reg_ctrlling: a list of two ctrlling qubit [|c_1>,|c_2>]
@@ -135,7 +139,7 @@ def func_double_ctrl_qftadd(reg_system, reg_ctrlling, int_adder):
              2 * pi * np.mod(int_adder, 2 ** (idx_qubit + 1)) / (2 ** (idx_qubit + 1)))
 
 
-def func_double_ctrl_qftadd_inverse(reg_system, reg_ctrlling, int_adder):
+def func_double_ctrl_qftadd_inverse(reg_system: List[QRegStorage], reg_ctrlling: List[QRegStorage], int_adder: int):
     """
     the inverse version for func_double_qftadd; also the double-ctrl version for func_qftadd_inverse
     :param reg_ctrlling: a list of two qubit [|c_1>,|c_2>]
@@ -148,7 +152,7 @@ def func_double_ctrl_qftadd_inverse(reg_system, reg_ctrlling, int_adder):
              -2 * pi * np.mod(int_adder, 2 ** (idx_qubit + 1)) / (2 ** (idx_qubit + 1)))
 
 
-def func_swap_in_qft(reg_system):
+def func_swap_in_qft(reg_system: List[QRegStorage]):
     """
     Reverse the reg |q_0>|q_1>...|q_n> -> |q_n>...|q_1>|q_0> by using SWAP gates
     :param reg_system: |q_0>|q_1>...|q_n> a quantum register
@@ -159,7 +163,7 @@ def func_swap_in_qft(reg_system):
         SWAP(reg_system[idx_qubit], reg_system[number_qubit - idx_qubit - 1])
 
 
-def func_qft_without_swap(reg_system):
+def func_qft_without_swap(reg_system: List[QRegStorage]):
     """
     Quantum Fourier Transform without the swap step, |s> -> QFT|s>
     :param reg_system: |s>
@@ -176,7 +180,7 @@ def func_qft_without_swap(reg_system):
     H(reg_system[number_qubit - 1])  # Do not forget there is a H gate operating on the last qubit
 
 
-def func_qft_without_swap_inverse(reg_system):
+def func_qft_without_swap_inverse(reg_system: List[QRegStorage]):
     """
     the inverse of Quantum Fourier Transform without the swap step, QFT|s> -> |s>
     :param reg_system: |s>
@@ -191,7 +195,8 @@ def func_qft_without_swap_inverse(reg_system):
     H(reg_system[0])
 
 
-def func_double_ctrl_qftaddmod(reg_system, reg_ctrlling, qubit_zeroed, int_adder, int_divisor):
+def func_double_ctrl_qftaddmod(reg_system: List[QRegStorage], reg_ctrlling: List[QRegStorage],
+                               qubit_zeroed: QRegStorage, int_adder: int, int_divisor: int):
     """
     CC-qftadd(int_adder)mod(int_divisor)
     |c_1>|c_2>QFT|s> -> <0|c_1*c_2>*|c_1>|c_2>QFT|s> + <1|c_1*c_2>*|c_1>|c_2>QFT|s+a mod d>
@@ -218,7 +223,8 @@ def func_double_ctrl_qftaddmod(reg_system, reg_ctrlling, qubit_zeroed, int_adder
     func_double_ctrl_qftadd(reg_system, reg_ctrlling, int_adder)
 
 
-def func_double_ctrl_qftaddmod_inverse(reg_system, reg_ctrlling, qubit_zeroed, int_adder, int_divisor):
+def func_double_ctrl_qftaddmod_inverse(reg_system: List[QRegStorage], reg_ctrlling: List[QRegStorage],
+                                       qubit_zeroed: QRegStorage, int_adder: int, int_divisor: int):
     """
     the inverse of CC-qftadd(int_adder)mod(int_divisor)
     :param reg_system: QFT|s> with s < d
@@ -243,7 +249,8 @@ def func_double_ctrl_qftaddmod_inverse(reg_system, reg_ctrlling, qubit_zeroed, i
     func_double_ctrl_qftadd_inverse(reg_system, reg_ctrlling, int_adder)
 
 
-def func_ctrl_addprodmod(reg_system, reg_factor_1, qubit_ctrlling, qubit_zeroed, int_factor_2, int_divisor):
+def func_ctrl_addprodmod(reg_system: List[QRegStorage], reg_factor_1: List[QRegStorage], qubit_ctrlling: QRegStorage,
+                         qubit_zeroed: QRegStorage, int_factor_2: int, int_divisor: int):
     """
     :param reg_system: |s> with s < d
     :param reg_factor_1: |f_1>, a quantum state encoding the factor_1
@@ -262,7 +269,9 @@ def func_ctrl_addprodmod(reg_system, reg_factor_1, qubit_ctrlling, qubit_zeroed,
     func_qft_without_swap_inverse(reg_system)
 
 
-def func_ctrl_addprodmod_inverse(reg_system, reg_factor_1, qubit_ctrlling, qubit_zeroed, int_factor_2, int_divisor):
+def func_ctrl_addprodmod_inverse(reg_system: List[QRegStorage], reg_factor_1: List[QRegStorage],
+                                 qubit_ctrlling: QRegStorage, qubit_zeroed: QRegStorage, int_factor_2: int,
+                                 int_divisor: int):
     """
     the inverse for func_ctrl_addprodmod
     :param reg_system:
@@ -281,7 +290,8 @@ def func_ctrl_addprodmod_inverse(reg_system, reg_factor_1, qubit_ctrlling, qubit
     func_qft_without_swap_inverse(reg_system)
 
 
-def func_ctrl_multmod(reg_system, reg_zeroed, qubit_ctrlling, qubit_zeroed, int_factor, int_divisor):
+def func_ctrl_multmod(reg_system: List[QRegStorage], reg_zeroed: List[QRegStorage], qubit_ctrlling: QRegStorage,
+                      qubit_zeroed: QRegStorage, int_factor: int, int_divisor: int):
     """
     |c>|s> -> <0|c>|c>|s>  + <1|c>|c>|s * f mod d>
     the complement comes from the Figure 7 in arXiv quant-ph/0205095
@@ -301,7 +311,7 @@ def func_ctrl_multmod(reg_system, reg_zeroed, qubit_ctrlling, qubit_zeroed, int_
                                  int_divisor)
 
 
-def func_from_fraction_continued(list_int_generator):
+def func_from_fraction_continued(list_int_generator: List[int]) -> int:
     """
     a int list such as [0,1,2,3] -> the denominator 7 of 0+1/(1+1/(2+1/3)))=10/7
     :param list_int_generator: a int list such as [0,1,2,3]
@@ -319,7 +329,7 @@ def func_from_fraction_continued(list_int_generator):
     return int_numerator  # We return the denominator even though the func returns a variable called int_numerator
 
 
-def func_result_to_order(int_numerator, number_qubit, int_max_denominator):
+def func_result_to_order(int_numerator: int, number_qubit: int, int_max_denominator: int):
     """
     :param int_numerator: N, may come from a quantum state
     :param number_qubit: n, number of qubit, corresponding to a denominator 2^n
@@ -341,7 +351,7 @@ def func_result_to_order(int_numerator, number_qubit, int_max_denominator):
     return func_from_fraction_continued(list_int_generator_fraction)
 
 
-def func_result_to_order_list(int_numerator, number_qubit, int_max_denominator):
+def func_result_to_order_list(int_numerator: int, number_qubit: int, int_max_denominator: int):
     """
     For the case that the number of ancilla qubits is not enough, we need to traverse all probable denominator in the
     step of continued fraction expansions. Thus this func returns all possible orders.
@@ -369,7 +379,7 @@ def func_result_to_order_list(int_numerator, number_qubit, int_max_denominator):
     return list_int_order
 
 
-def func_qof_data_processing(int_divisor, number_qubit_ancilla, dict_task_result_counts):
+def func_qof_data_processing(int_divisor: int, number_qubit_ancilla: int, dict_task_result_counts: Dict[str, int]):
     """
     :param int_divisor: d
     :param number_qubit_ancilla: the number of qubits for the estimating the phase
@@ -382,7 +392,7 @@ def func_qof_data_processing(int_divisor, number_qubit_ancilla, dict_task_result
     For the case that the ancilla is enough we compute the maximal denominator, and for the case that the ancilla is not
     enough we compute all the possible denominators.
     """
-    dict_order = {}
+    dict_order: Dict[str, int] = {}
     # The case that the number of ancilla is enough
     if number_qubit_ancilla >= math.log(int_divisor, 2) * 2:
         for idx_key in dict_task_result_counts.keys():  # We need to transform the key in dict_task
@@ -410,7 +420,8 @@ def func_qof_data_processing(int_divisor, number_qubit_ancilla, dict_task_result
     return dict_order
 
 
-def func_quantum_order_finding(int_factor, int_divisor, int_shots, number_qubit_ancilla):
+def func_quantum_order_finding(int_factor: int, int_divisor: int, int_shots: int, number_qubit_ancilla: int) \
+        -> Dict[str, int]:
     """
     :param int_factor: f
     :param int_divisor: d
@@ -459,7 +470,7 @@ def func_quantum_order_finding(int_factor, int_divisor, int_shots, number_qubit_
         int_shots, fetchMeasure=True)["counts"])
 
 
-def func_Shor_algorithm(int_divisor, number_qubit_ancilla=None, int_shots=2, int_factor=None):
+def func_Shor_algorithm(int_divisor: int, number_qubit_ancilla: int = None, int_shots=2, int_factor: int = None):
     """
     We want to factor the int int_divisor
     :param int_divisor: d, which we want to factor
@@ -492,7 +503,7 @@ def func_Shor_algorithm(int_divisor, number_qubit_ancilla=None, int_shots=2, int
                 return idx_int
         # The case that d is even
         if int_divisor % 2 == 0:
-            print("{0[0]} = {0[1]} * {0[2]}".format([int_divisor, 2, int_divisor // 2]))
+            print("{0[0]} = 2 * {0[2]}".format([int_divisor, int_divisor // 2]))
             return 2
         else:
             # Generate a random f (int_factor) which can be assigned when called
@@ -506,7 +517,7 @@ def func_Shor_algorithm(int_divisor, number_qubit_ancilla=None, int_shots=2, int
             int_gcd = math.gcd(int_factor, int_divisor)
             # The case that f and d are not co-prime
             if int_gcd != 1:
-                print('{0[0]} = {0[1]} * {0[2]}, not quantum'.format([int_divisor, int_gcd, int_divisor // int_gcd]))
+                print('{0[0]} = {0[1]} * {0[2]}, not quantum.'.format([int_divisor, int_gcd, int_divisor // int_gcd]))
                 return int_gcd
             else:
                 # From now on, we entry the quantum part
@@ -540,8 +551,8 @@ def func_Shor_algorithm(int_divisor, number_qubit_ancilla=None, int_shots=2, int
                             return math.gcd(int_divisor, int_pow_half - 1)
                         else:
                             # Maybe we compute a wrong order, maybe f and its order cannot give the factorization of d
-                            print('Perhaps ord({0[0]} mod {0[1]}) = {0[2]},\n'.format([int_factor, int_divisor,
-                                                                                       int_order]))
+                            print('Perhaps ord({0[0]} mod {0[1]}) = {0[2]},'.format([int_factor, int_divisor,
+                                                                                     int_order]))
                             print('but it cannot give the factorization of {0}.'.format(int_divisor))
                             # We haven't compute the correct order and need to recompute
                             func_Shor_algorithm(int_divisor, number_qubit_ancilla=number_qubit_ancilla,
@@ -573,7 +584,7 @@ def func_Shor_algorithm(int_divisor, number_qubit_ancilla=None, int_shots=2, int
                 else:  # The case that the number of ancilla is not enough, where the cost is more.
                     print("Since the ancilla qubits are not enough to estimate the order with a high probability,")
                     print("we need to traverse all probable denominator in the step of continued fraction expansions.")
-                    print("Thus some order may be obtained for twice as many times as the number of shots.\n")
+                    print("Thus some order may be obtained for twice as many times as the number of shots.")
                     # A dict storing the possible order and its corresponding number of shots
                     dict_order = func_quantum_order_finding(int_factor, int_divisor, int_shots, number_qubit_ancilla)
                     # The list of possible order
@@ -597,7 +608,7 @@ def func_Shor_algorithm(int_divisor, number_qubit_ancilla=None, int_shots=2, int
                         else:
                             # Maybe we compute a wrong order, maybe f and its order cannot give the factorization of d
                             if int_order == 0:  # We haven't computed the correct order of int_factor
-                                print("We haven't computed the correct order of {0[0]} mod {0[1]}.\n".format(
+                                print("We haven't computed the correct order of {0[0]} mod {0[1]}.".format(
                                     [int_factor, int_divisor]))
                             else:  # int_factor cannot introduce the factorization of d
                                 print("Perhaps ord({0[0]} mod {0[1]}) = {0[2]},".format(

@@ -34,15 +34,15 @@ class PhaseDamping(QNoise):
 
     The Kraus operators of such noise are as follows:  
 
-    :math:`E_0 = \begin{bmatrix} 1.0 & 0.0 \\ 0.0 & \sqrt{1 - p} \end{bmatrix}`
+    :math:`E_0 = \begin{bmatrix} 1 & 0 \\ 0 & \sqrt{1 - p} \end{bmatrix}`
 
-    :math:`E_1 = \begin{bmatrix} 0.0 & 0.0\\ 0.0 & \sqrt{p} \end{bmatrix}`  
+    :math:`E_1 = \begin{bmatrix} 0 & 0 \\ 0 & \sqrt{p} \end{bmatrix}`  
 
     Here, :math:`p` is the strength of noise.
 
     Phase damping noise is equivalent to a phase flip noise with probability as follows,
 
-    :math:`p_{pf} = (1 - \sqrt{1.0 - p}) / 2`
+    :math:`p_{pf} = (1 - \sqrt{1 - p}) / 2`
     """
 
     def __init__(self, probability: float) -> None:

@@ -18,6 +18,7 @@
 """
 Quantum Environment
 """
+import copy
 import json
 import os
 import tempfile
@@ -31,7 +32,7 @@ from QCompute.Define.Utils import loadPythonModule, clearOutputDir
 from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
 from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
-from QCompute.OpenSimulator import QResult
+from QCompute.OpenSimulator import QResult, QImplement
 from QCompute.QPlatform import Error, ModuleErrorCode, BackendName, getBackendFromName
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.InteractiveModule import InteractiveModule
@@ -76,20 +77,20 @@ class QEnv:
         self.Q = QRegPool(self)
         self.Parameter = ProcedureParameterPool()
 
-        self.measuredQRegSet = set()  # type: Set[int]
-        self.measuredCRegSet = set()  # type: Set[int]
-        self.circuit = []  # type: List['CircuitLine']
-        self.procedureMap = {}  # type: Dict[str, 'QProcedure']
-        self.program = None  # type: Optional['PBProgram']
+        self.measuredQRegSet: Set[int] = set()
+        self.measuredCRegSet: Set[int] = set()
+        self.circuit: List['CircuitLine'] = []
+        self.procedureMap: Dict[str, 'QProcedure'] = {}
+        self.program: Optional['PBProgram'] = None
 
-        self.backendName = None  # type: Optional[BackendName]
-        self.backendArgument = None  # type: Optional[List]
-        self.shots = 0  # type: int
+        self.backendName: Optional[BackendName] = None
+        self.backendArgument: Optional[List] = None
+        self.shots = 0
 
-        self.usingModuleList = []  # type: List['ModuleImplement']
-        self.usedServerModuleList = []  # type: List[Tuple[str, Dict]]
+        self.usingModuleList: List['ModuleImplement'] = []
+        self.usedServerModuleList: List[Tuple[str, Dict]] = []
 
-        self.noiseDefineMap = {}  # type: Dict[str, List[QNoiseDefine]]
+        self.noiseDefineMap: Dict[str, List[QNoiseDefine]] = {}
 
     def backend(self, backendName: Union['BackendName', str], *backendArgument: Any) -> None:
         """
@@ -104,6 +105,12 @@ class QEnv:
     def convertToProcedure(self, name: str, env: 'QEnv') -> 'QProcedure':
         if name in env.procedureMap:
             raise Error.ArgumentError(f'Duplicate procedure name: {name}!', ModuleErrorCode, FileErrorCode, 1)
+
+        if len(self.procedureMap) > 0:
+            for subName, subProc in self.procedureMap.items():
+                if subName not in env.procedureMap:
+                    env.procedureMap[subName] = subProc
+
         procedure = QProcedure(name, self.Q, self.Parameter, self.circuit)
         env.procedureMap[name] = procedure
         destoryObject(self)
@@ -130,7 +137,7 @@ class QEnv:
             newLine = deepcopy(circuitLine)
             if isinstance(newLine.data, QProcedureOP):
                 data, name = self.inverseProcedure(circuitLine.data.name)
-                op = deepcopy(circuitLine.data)  # type: QProcedureOP
+                op: QProcedureOP = deepcopy(circuitLine.data)
                 op.procedureData = data
                 op.name = name
                 newLine.data = op
@@ -160,7 +167,7 @@ class QEnv:
             newLine = deepcopy(circuitLine)
             if isinstance(newLine.data, QProcedureOP):
                 data, name = self.reverseProcedure(circuitLine.data.name)
-                op = deepcopy(circuitLine.data)  # type: QProcedureOP
+                op: QProcedureOP = deepcopy(circuitLine.data)
                 op.procedureData = data
                 op.name = name
                 newLine.data = op
@@ -173,7 +180,7 @@ class QEnv:
             newLine = deepcopy(circuitLine)
             if isinstance(newLine.data, QProcedureOP):
                 data, name = inversedEnv.inverseProcedure(circuitLine.data.name)
-                op = deepcopy(circuitLine.data)  # type: QProcedureOP
+                op: QProcedureOP = deepcopy(circuitLine.data)
                 op.procedureData = data
                 op.name = name
                 newLine.data = op
@@ -188,7 +195,7 @@ class QEnv:
             newLine = deepcopy(circuitLine)
             if isinstance(newLine.data, QProcedureOP):
                 data, name = self.reverseProcedure(circuitLine.data.name)
-                op = deepcopy(circuitLine.data)  # type: QProcedureOP
+                op: QProcedureOP = deepcopy(circuitLine.data)
                 op.procedureData = data
                 op.name = name
                 newLine.data = op
@@ -212,7 +219,7 @@ class QEnv:
         controlledProcedure.circuit.clear()
         self.procedureMap[controlledProcedureName] = controlledProcedure
         for circuitLine in procedure.circuit:
-            newCircuitLineList = getControlledCircuit(circuitLine, controlQRegIndex, cuFirst)
+            newCircuitLineList = getControlledCircuit(self, circuitLine, controlQRegIndex, cuFirst)
             controlledProcedure.circuit.extend(newCircuitLineList)
         return controlledProcedure, controlledProcedureName
 
@@ -290,7 +297,7 @@ class QEnv:
 
         self.shots = shots
 
-        ret = None  # type: Dict[str, Union[str, Dict[str, int]]]
+        ret: Dict[str, Union[str, Dict[str, int]]] = None
         if self.backendName.value.startswith('local_'):
             if len(self.noiseDefineMap) > 0:
                 self.usingModuleList.clear()
@@ -323,7 +330,7 @@ class QEnv:
             raise Error.ArgumentError(f"Invalid backendName => {self.backendName.value}", ModuleErrorCode,
                                       FileErrorCode, 5)
         if Settings.outputInfo and 'moduleList' in ret:
-            moduleList = [moduleSetting['module'] for moduleSetting in ret['moduleList']]  # type: List[str]
+            moduleList: List[str] = [moduleSetting['module'] for moduleSetting in ret['moduleList']]
             interactiveModule = InteractiveModule(self)
             print('Modules called sequentially')
             interactiveModule.printModuleList(moduleList)
@@ -355,7 +362,7 @@ class QEnv:
         backendClass = getattr(module, 'Backend')
 
         # configure the parameters
-        backend = backendClass()  # type: 'QImplement'
+        backend: QImplement = backendClass()
         backend.program = self.program
         backend.shots = self.shots
         backend.backendArgument = self.backendArgument
@@ -435,7 +442,7 @@ class QEnv:
         """
 
         # the sequential bytes of the circuit which is already in PB
-        programBuf = self.program.SerializeToString()  # type: bytes
+        programBuf: bytes = self.program.SerializeToString()
 
         if not Settings.cloudTaskDoNotWriteFile:
             circuitPackageFd, circuitPackageFn = tempfile.mkstemp(prefix="circuit.", suffix=".pb",
@@ -487,7 +494,7 @@ class QEnv:
         backendClass = getattr(module, 'Backend')
 
         # configure the parameters
-        backend = backendClass()  # type: 'QImplement'
+        backend: QImplement = backendClass()
         backend.program = self.program
         backend.shots = self.shots
         backend.backendArgument = self.backendArgument
@@ -553,3 +560,52 @@ class QEnv:
                 defineList = []
                 self.noiseDefineMap[gateName] = defineList
             defineList.append(noiseDefine)
+
+    def join(self, env: 'QEnv', startQRegIndex: int = 0) -> None:
+        """
+        Join quantum environment
+
+        :param env: a target quantum environment, which is joined in the current environment.
+        :param startQRegIndex: a index of QRegister is used to indicate which qubit the connection starts from.
+        """
+
+        if len(env.noiseDefineMap) > 0:
+            raise Error.ArgumentError(f"Unsupported noise in QEnv.join and concatEnv!",
+                                      ModuleErrorCode, FileErrorCode, 11)
+        env = copy.deepcopy(env)
+        nameMap: Dict[str, str] = {}
+        for procedureName, procedure in env.procedureMap.items():
+            newProcedureName = procedureName + '_joined'
+            num = 0
+            while newProcedureName + str(num) in self.procedureMap:
+                num += 1
+            nameMap[procedureName] = newProcedureName + str(num)
+        for procedureName, procedure in env.procedureMap.items():
+            for circuitLine in procedure.circuit:
+                if isinstance(circuitLine.data, QProcedureOP):
+                    circuitLine.data.name = nameMap[circuitLine.data.name]
+                    circuitLine.data.procedureData.name = circuitLine.data.name
+            self.procedureMap[nameMap[procedureName]] = procedure
+        for circuitLine in env.circuit:
+            self.circuit.append(circuitLine)
+            for index, qreg in enumerate(circuitLine.qRegList):
+                qreg += startQRegIndex
+                circuitLine.qRegList[index] = qreg
+                self.Q(qreg)
+            if isinstance(circuitLine.data, QProcedureOP):
+                circuitLine.data.name = nameMap[circuitLine.data.name]
+                circuitLine.data.procedureData.name = circuitLine.data.name
+
+
+def concatQEnv(*envList: QEnv) -> QEnv:
+    """
+    Concatenate quantum environments
+
+    :param envList: a list of quantum environments
+    :return: a new quantum environment with all environments concatenated
+    """
+
+    ret = copy.deepcopy(envList[0])
+    for env in envList[1:]:
+        ret.join(env)
+    return ret

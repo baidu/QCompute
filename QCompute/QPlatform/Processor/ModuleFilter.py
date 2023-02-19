@@ -20,15 +20,16 @@ Module Filter
 """
 from typing import List, Optional
 
-from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
-from QCompute.OpenModule.CompressGateModule import CompressGateModule
-from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
-from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
-from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
-from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
-from QCompute.OpenModule import ModuleImplement
-from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
 from QCompute.Define import Settings
+from QCompute.OpenModule import ModuleImplement
+from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
+from QCompute.OpenModule.CompressGateModule import CompressGateModule
+from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
+from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
+from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
+from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
+
 
 
 FileErrorCode = 15
@@ -41,6 +42,7 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
 
     if backendName in [
         BackendName.LocalBaiduSim2,
+        BackendName.LocalCuQuantum,
         
         BackendName.CloudBaiduSim2Water,
         BackendName.CloudBaiduSim2Earth,
@@ -57,13 +59,13 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
 
 
 def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement']) -> List['ModuleImplement']:
-    unrollNoiseModule = None  # type: Optional[UnrollNoiseModule]
-    unrollProcedureModule = None  # type: Optional[UnrollProcedureModule]
-    compositeGateModule = None  # type: Optional[CompositeGateModule]
-    inverseCircuitModule = None  # type: Optional[InverseCircuitModule]
-    unrollCircuitModule = None  # type: Optional[UnrollCircuitModule]
-    compressGateModule = None  # type: Optional[CompressGateModule]
-    ret = []  # type: List['ModuleImplement']
+    unrollNoiseModule: Optional[UnrollNoiseModule] = None
+    unrollProcedureModule: Optional[UnrollProcedureModule] = None
+    compositeGateModule: Optional[CompositeGateModule] = None
+    inverseCircuitModule: Optional[InverseCircuitModule] = None
+    unrollCircuitModule: Optional[UnrollCircuitModule] = None
+    compressGateModule: Optional[CompressGateModule] = None
+    ret: List['ModuleImplement'] = []
     for module in moduleList:
         
         if module.__class__.__name__ == 'UnrollNoiseModule':

@@ -18,11 +18,12 @@
 """
 Controlled Circuit
 """
+import copy
 from typing import List
 
 import numpy
 
-from QCompute.QPlatform import Error
+from QCompute.QPlatform import Error, QEnv
 from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.QOperation.FixedGate import CX, CY, CH, CCX, SDG, S, H, CSWAP, CZ
 from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP, CU, CRX, CRY, CRZ, U
@@ -31,7 +32,7 @@ from QCompute.Utilize import ModuleErrorCode
 FileErrorCode = 1
 
 
-def getControlledCircuit(circuitLine: CircuitLine, controlQRegIndex: int, cuFirst: bool) \
+def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: int, cuFirst: bool) \
         -> List[CircuitLine]:
     ret: List['CircuitLine'] = []
 
@@ -49,6 +50,8 @@ def getControlledCircuit(circuitLine: CircuitLine, controlQRegIndex: int, cuFirs
         q1 = circuitLine.qRegList[1]
         q2 = circuitLine.qRegList[2]
         q3 = controlQRegIndex
+    elif op.__class__.__name__ == 'QProcedureOP':
+        pass
     else:
         raise Error.ArgumentError(f'Wrong bits count. bits value: {op.bits}!', ModuleErrorCode,
                                   FileErrorCode, 1)
@@ -56,11 +59,11 @@ def getControlledCircuit(circuitLine: CircuitLine, controlQRegIndex: int, cuFirs
     if isinstance(op, RotationGateOP):
         nAngles = len(op.argumentList)
         if nAngles == 1:
-            [theta] = op.argumentList  # type: float
+            [theta] = op.argumentList
         elif nAngles == 2:
-            [theta, phi] = op.argumentList  # type: float
+            [theta, phi] = op.argumentList
         elif nAngles == 3:
-            [theta, phi, lamda] = op.argumentList  # type: float
+            [theta, phi, lamda] = op.argumentList
         else:
             raise Error.ArgumentError(f'Wrong angles count. angles value: {op.argumentList}!', ModuleErrorCode,
                                       FileErrorCode, 2)
@@ -484,6 +487,16 @@ def getControlledCircuit(circuitLine: CircuitLine, controlQRegIndex: int, cuFirs
         newCircuitLine = CircuitLine()
         newCircuitLine.data = CRZ(-numpy.pi / 2)
         newCircuitLine.qRegList = [q1, q2]
+        ret.append(newCircuitLine)
+
+    elif op.__class__.__name__ == 'QProcedureOP':
+        newProcedure, newProcedureName = env.controlProcedure(op.name, cuFirst)
+        env.procedureMap[newProcedureName] = newProcedure
+
+        newCircuitLine = CircuitLine()
+        newCircuitLine.data = newProcedure(*op.argumentList)
+        newCircuitLine.qRegList = copy.copy(circuitLine.qRegList)
+        newCircuitLine.qRegList.append(controlQRegIndex)
         ret.append(newCircuitLine)
 
     # Unsupported

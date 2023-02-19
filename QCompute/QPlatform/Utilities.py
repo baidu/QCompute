@@ -145,10 +145,10 @@ def nKron(AMatrix: numpy.ndarray, BMatrix: numpy.ndarray, *args) -> numpy.ndarra
 
 
 def contract1_1(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray) -> numpy.ndarray:
-    """
+    r"""
     The first indicator of the gate is the output,
     and the latter indicator is the input,
-    just like writing matrix vector multiplication, U{ket0}
+    just like writing matrix vector multiplication, :math:`U |0\rangle`
     """
     if matrixFloating.shape != (2, 2):
         raise Error.ArgumentError("Floating gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 3)

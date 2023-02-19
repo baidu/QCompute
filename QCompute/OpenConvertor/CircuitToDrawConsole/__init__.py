@@ -42,7 +42,7 @@ class CircuitToDrawConsole(ConvertorImplement):
     """
 
     def __init__(self):
-        self.stringIO = None  # typing: StringIO
+        self.stringIO: StringIO = None
 
     def convert(self, pbProgram: PBProgram) -> str:
         """
@@ -75,7 +75,7 @@ class CircuitToDrawConsole(ConvertorImplement):
         if qRegCount <= 0:
             return 'Enpty circuit.'
 
-        circuitArray = []  # typing: List[List[str]]
+        circuitArray: List[List[str]] = []
 
         maxQRegNameLen = len(str(qRegCount - 1)) + 1
         for i in range(qRegCount):
@@ -124,7 +124,7 @@ class CircuitToDrawConsole(ConvertorImplement):
                         argumentList.append(f'{argument}')
                 self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'customizedGate':
-                customizedGate = pbCircuitLine.customizedGate  # type: PBCustomizedGate
+                customizedGate: PBCustomizedGate = pbCircuitLine.customizedGate
                 matrixBytes = protobufMatrixToNumpyMatrix(customizedGate.matrix).tobytes()
                 hash = blake2b(matrixBytes, digest_size=Settings.drawCircuitCustomizedGateHashLength)
                 gateName = f'Custom[{hash.hexdigest()}]'
@@ -145,7 +145,7 @@ class CircuitToDrawConsole(ConvertorImplement):
                 self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
             elif op == 'measure':
                 for qReg in pbCircuitLine.qRegList:
-                    measure = pbCircuitLine.measure  # type: PBMeasure
+                    measure: PBMeasure = pbCircuitLine.measure
                     typeName = PBMeasure.Type.Name(measure.type)
                     self._draw(qRegCount, f'|M[{typeName.lower()}]|', [qReg], circuitArray)
             elif op == 'barrier':

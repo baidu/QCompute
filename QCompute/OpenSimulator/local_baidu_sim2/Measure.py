@@ -158,7 +158,7 @@ class Measurer:
         """
 
         # print("Measure method Single Accu")
-        result = {}  # type: Dict[str, int]
+        result: Dict[str, int] = {}
         for i in range(shots):
             outs = self._measureAll(state)
             if outs not in result:
@@ -192,7 +192,7 @@ class Measurer:
 
         samples = numpy.random.choice(range(2 ** n), shots, p=prob_array)
         count_samples = Counter(samples)
-        result = {}  # type: Dict[str, int]
+        result: Dict[str, int] = {}
         for idex in count_samples:
             """
             result[prob_key[idex]] = count_samples[idex]

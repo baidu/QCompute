@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0] - Feb-16-2023
+
+### Added
+
+- New Simulator;
+    - LocalCuQuantum, the brand-new local quantum simulator is constructed under cuQuantum SDK (https://developer.nvidia.com/cuquantum-sdk)  and is supported by NVIDIA.
+
 ## [3.2.1] - Dec-30-2022
 
 ### Added

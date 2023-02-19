@@ -33,7 +33,7 @@ class CustomizedNoise(QNoise):
     """
     Customized noise class.
 
-    Generate a noise defined by customers which is described by Kraus operator summation representation.
+    Generate a noise defined by customers which is described by Kraus operator-sum representation.
 
     Available for Kraus operators of numpy formation.
     """

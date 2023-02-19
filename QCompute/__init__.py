@@ -20,26 +20,24 @@ Export the entire directory as a library
 """
 
 from QCompute import Define
-
 from QCompute.Define import (
     sdkVersion,
     outputDirPath,
 )
-
 from QCompute.Define.Utils import matchSdkVersion
-
+from QCompute.Module.MappingToBaiduQPUQianModule import MappingToBaiduQPUQianModule
+from QCompute.Module.MappingToIoPCASModule import MappingToIoPCASModule
+from QCompute.Module.MappingToIonAPMModule import MappingToIonAPMModule
+from QCompute.Module.UnrollCircuitToBaiduQPUQianModule import UnrollCircuitToBaiduQPUQianModule
+from QCompute.Module.UnrollCircuitToIoPCASModule import UnrollCircuitToIoPCASModule
+from QCompute.Module.UnrollCircuitToIonAPMModule import UnrollCircuitToIonAPMModule
 from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
 from QCompute.OpenModule.CompressGateModule import CompressGateModule
 from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
 from QCompute.OpenModule.ReverseCircuitModule import ReverseCircuitModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
 from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
-from QCompute.Module.MappingToBaiduQPUQianModule import MappingToBaiduQPUQianModule
-from QCompute.Module.UnrollCircuitToBaiduQPUQianModule import UnrollCircuitToBaiduQPUQianModule
-from QCompute.Module.MappingToIoPCASModule import MappingToIoPCASModule
-from QCompute.Module.UnrollCircuitToIoPCASModule import UnrollCircuitToIoPCASModule
-from QCompute.Module.MappingToIonAPMModule import MappingToIonAPMModule
-from QCompute.Module.UnrollCircuitToIonAPMModule import UnrollCircuitToIonAPMModule
+
 
 
 from QCompute.OpenSimulator import (
@@ -52,7 +50,7 @@ from QCompute.QPlatform import (
     Sim2Argument,
     ServerModule,
 )
-from QCompute.QPlatform.QEnv import QEnv
+from QCompute.QPlatform.QEnv import QEnv, concatQEnv
 from QCompute.QPlatform.QEnvOperation import QEnvOperation
 from QCompute.QPlatform.InteractiveModule import InteractiveModule
 
@@ -127,7 +125,9 @@ from QCompute.QPlatform import QStatus
 from QCompute.QPlatform import Utilities
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 
-
+if True:  # prevent scrambling
+    
+    pass
 
 from QCompute.QPlatform.QNoise.AmplitudeDamping import AmplitudeDamping
 from QCompute.QPlatform.QNoise.BitFlip import BitFlip

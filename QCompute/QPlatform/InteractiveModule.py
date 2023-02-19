@@ -57,6 +57,7 @@ _AerSimulatorModuleList = [
 
 BackendModuleDict = {
     BackendName.LocalBaiduSim2: _SimulatorModuleList,
+    BackendName.LocalCuQuantum: _SimulatorModuleList,
     
     BackendName.CloudBaiduSim2Water: _SimulatorModuleList,
     BackendName.CloudBaiduSim2Earth: _SimulatorModuleList,
@@ -88,19 +89,19 @@ class InteractiveModule:
         self.originProgram = PBProgram()
         self.originProgram.sdkVersion = Define.sdkVersion
         QEnvToProtobuf(self.originProgram, env)
-        self.backendName = env.backendName  # type: BackendName
+        self.backendName: BackendName = env.backendName
         self.moduleSetting = BackendModuleDict.get(self.backendName)
 
         if self.moduleSetting is _SimulatorModuleList and len(env.noiseDefineMap) > 0:
             self.moduleSetting = _SimulatorWithNoiseModuleList
 
         if self.moduleSetting:
-            self.moduleDict = {}  # type: Dict[str, Type[ModuleImplement]]
-            self.usingModuleList = []  # type: List[ModuleImplement]
+            self.moduleDict: Dict[str, Type[ModuleImplement]] = {}
+            self.usingModuleList: List[ModuleImplement] = []
             self.necessaryModuleList = self.moduleSetting[0]
             self.optionalModuleList = self.moduleSetting[1]
-            self.necessaryModuleNameList = []  # type: List[str]
-            self.optionalModuleNameList = []  # type: List[str]
+            self.necessaryModuleNameList: List[str] = []
+            self.optionalModuleNameList: List[str] = []
             for module in self.necessaryModuleList:
                 self.necessaryModuleNameList.append(module.__name__)
                 self.moduleDict[module.__name__] = module
@@ -134,15 +135,15 @@ class InteractiveModule:
 
     def refurbishStatus(self):
         usingModuleList = filterModule(self.backendName, self.usingModuleList)
-        usingModuleNameList = []  # type: List[str]
-        reorderUsingModuleList = []  # type: List[ModuleImplement]
+        usingModuleNameList: List[str] = []
+        reorderUsingModuleList: List[ModuleImplement] = []
         for module in usingModuleList:
             if module in self.usingModuleList:
                 usingModuleNameList.append(module.__class__.__name__)
                 reorderUsingModuleList.append(module)
         self.usingModuleList = reorderUsingModuleList
 
-        canBeUsedModuleNameList = []  # type: List[str]
+        canBeUsedModuleNameList: List[str] = []
         for moduleName in self.optionalModuleNameList:
             if moduleName not in usingModuleNameList:
                 canBeUsedModuleNameList.append(moduleName)
@@ -154,7 +155,7 @@ class InteractiveModule:
         print(f'Modules used by order: {usingModuleListFormArrow}')
 
     def _markModuleNameList(self, moduleNameList: List[str]) -> str:
-        nameList = []  # type: List[str]
+        nameList: List[str] = []
         for moduleName in moduleNameList:
             if moduleName in self.necessaryModuleNameList:
                 nameList.append('(*)' + moduleName)
@@ -255,7 +256,7 @@ class InteractiveModule:
         sys.exit()
 
     def printModuleList(self, moduleList: List[str]) -> None:
-        nameList = []  # type: List[str]
+        nameList: List[str] = []
         for moduleName in moduleList:
             if moduleName in self.necessaryModuleNameList:
                 nameList.append('(*)' + moduleName)

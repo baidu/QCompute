@@ -25,13 +25,13 @@ import sys
 sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 3.2.1')
+matchSdkVersion('Python 3.3.0')
 
 # Flag of interactions
 uValue = 1
 for _ in range(15):
 
-    print('uValue is :', uValue)
+    print('uValue is:', uValue)
 
     # Create environment
     env = QEnv()

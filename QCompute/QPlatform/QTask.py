@@ -49,7 +49,7 @@ from QCompute.QPlatform.BatchID import BatchID
 
 FileErrorCode = 7
 
-_bosClient = None  # type: BceClientConfiguration
+_bosClient: BceClientConfiguration = None
 
 
 def _retryWhileNetworkError(func: Callable) -> Callable:
@@ -61,7 +61,7 @@ def _retryWhileNetworkError(func: Callable) -> Callable:
         retryCount = 0
         ret = None
         
-        lastError = None  # type: Exception
+        lastError: Exception = None
         while retryCount < Define.waitTaskRetryTimes:
             try:
                 ret = func(*args, **kwargs)

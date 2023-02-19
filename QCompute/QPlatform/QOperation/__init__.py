@@ -165,7 +165,7 @@ class CircuitLine:
                     gate, then `qubits` still be a List of the form `[i]`
         :param cRegList: a list of classical bit indices
         """
-        self.data: Operation = data
+        self.data = data
         self.qRegList: List[int] = qRegList
         self.cRegList: List[int] = cRegList
 

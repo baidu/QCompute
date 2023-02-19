@@ -298,8 +298,7 @@ class CircuitToQasm(ConvertorImplement):
         Convert Circuits to qasm code. 
 
         :param circuit: type: List. List of gate operations.
-        :param regName: type: str. Name of register. The name of register \
-            used in the procedure is different from that in external program.
+        :param regName: type: str. Name of register. The name of register used in the procedure is different from that in external program.
         :param usingIndex: type: bool. If True, adds braket [] for register index. Default: True.
 
         :return qasmCode: type: str. Qasm code of circuit.
@@ -311,7 +310,7 @@ class CircuitToQasm(ConvertorImplement):
         # If op == 'measure', adds measure code to the end of command code. 
         measureCode = ''
         # Dependency of procedures.
-        depends = set()  # type: Set[str]
+        depends: Set[str] = set()
         for gate in circuit:
             # Type of gate operation.
             op = gate.WhichOneof('op')

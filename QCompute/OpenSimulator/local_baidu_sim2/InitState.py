@@ -26,8 +26,6 @@ import numpy
 
 
 
-from QCompute.QPlatform import Error
-
 
 @unique
 class MatrixType(IntEnum):

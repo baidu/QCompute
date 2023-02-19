@@ -26,7 +26,7 @@ from pprint import pprint
 sys.path.append('../..')
 from QCompute import *
 
-matchSdkVersion('Python 3.2.1')
+matchSdkVersion('Python 3.3.0')
 
 # Your token:
 Define.hubToken = ''
@@ -39,7 +39,7 @@ env.backend(BackendName.CloudBaiduSim2Water)
 # Initialize the two-qubit circuit
 q = env.Q.createList(2)
 
-# Apply an Hadamard gate on the 0th qubit firstly.
+# Apply a Hadamard gate on the 0th qubit firstly.
 H(q[0])
 
 # Apply a CX gate to generate an entangle quantum state

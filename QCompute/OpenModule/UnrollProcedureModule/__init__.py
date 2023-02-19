@@ -80,7 +80,7 @@ class UnrollProcedureModule(ModuleImplement):
         for circuitLine in circuit:
             op = circuitLine.WhichOneof('op')
             if op in ['fixedGate', 'rotationGate', 'compositeGate', 'measure', 'barrier']:
-                ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                ret = deepcopy(circuitLine)
                 if len(ret.argumentIdList) > 0:
                     if len(ret.argumentValueList) == 0:
                         ret.argumentValueList[:] = [0.0] * len(ret.argumentIdList)

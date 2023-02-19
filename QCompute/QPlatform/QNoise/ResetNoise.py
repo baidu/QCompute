@@ -34,15 +34,15 @@ class ResetNoise(QNoise):
 
     The Kraus operators of such noise are as follows:
     
-    :math:`E_0 = \sqrt{1 - p_1 - p_2 - p_3} \ ID`
+    :math:`E_0 = \sqrt{1 - p_1 - p_2} \ ID`
 
-    :math:`E_1 = \begin{bmatrix} \sqrt{p_1} & 0.0 \\ 0.0 & 0.0 \end{bmatrix}`
+    :math:`E_1 = \begin{bmatrix} \sqrt{p_1} & 0 \\ 0 & 0 \end{bmatrix}`
 
-    :math:`E_2 = \begin{bmatrix} 0.0 & \sqrt{p_1} \\ 0.0 & 0.0 \end{bmatrix}`
+    :math:`E_2 = \begin{bmatrix} 0 & \sqrt{p_1} \\ 0 & 0 \end{bmatrix}`
 
-    :math:`E_3 = \begin{bmatrix} 0.0 & 0.0 \\ \sqrt{p_2} & 0.0 \end{bmatrix}`
+    :math:`E_3 = \begin{bmatrix} 0 & 0 \\ \sqrt{p_2} & 0 \end{bmatrix}`
 
-    :math:`E_4 = \begin{bmatrix} 0.0 & 0.0 \\ 0.0 & \sqrt{p_2} \end{bmatrix}`
+    :math:`E_4 = \begin{bmatrix} 0 & 0 \\ 0 & \sqrt{p_2} \end{bmatrix}`
 
     Here, :math:`p` is the strength of noise.
     """

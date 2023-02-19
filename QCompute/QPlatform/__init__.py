@@ -59,6 +59,19 @@ class BackendName(Enum):
     env.backend(BackendName.LocalBaiduSim2, Sim2Argument.Dense_Matmul_Probability.value + ' -s 20210210')
     """
 
+    LocalCuQuantum = 'local_cuquantum'
+    """
+    Local CuQuantum
+    
+    This backend name (LocalCuQuantum) is only available >= v3.3.0
+    
+    Example: 
+    
+    env = QEnv()
+    
+    env.backend(BackendName.LocalCuQuantum)
+    """
+
     LocalBaiduSim2WithNoise = 'local_baidu_sim2'
     """
     Local Baidu Sim2 With Noise

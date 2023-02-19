@@ -66,14 +66,14 @@ class UnrollNoiseModule(ModuleImplement):
 
     def _findGate(self, pbCircuit: List[PBCircuitLine], gateName: str, qRegList: List[int],
                   positionList: Optional[List[int]]) -> List[PBCircuitLine]:
-        gateList = []  # type: List[PBCircuitLine]
+        gateList: List[PBCircuitLine] = []
         for pbCircuitLine in pbCircuit:
             op = pbCircuitLine.WhichOneof('op')
             if op == 'fixedGate':
-                fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
+                fixedGate: PBFixedGate = pbCircuitLine.fixedGate
                 opName = PBFixedGate.Name(fixedGate)
             elif op == 'rotationGate':
-                rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
+                rotationGate: PBRotationGate = pbCircuitLine.rotationGate
                 opName = PBRotationGate.Name(rotationGate)
             else:
                 continue

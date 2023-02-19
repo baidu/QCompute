@@ -90,7 +90,7 @@ class TransferProcessor:
         
 
     def __call__(self, state: Union[numpy.ndarray, 'COO'], gate_matrix: Union[numpy.ndarray, 'COO'], bits: List[int]) -> \
-    Union[numpy.ndarray, 'COO']:
+            Union[numpy.ndarray, 'COO']:
         """
         :param state:
         :param gate_matrix:

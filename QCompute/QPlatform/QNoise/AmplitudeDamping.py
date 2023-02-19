@@ -33,9 +33,9 @@ class AmplitudeDamping(QNoise):
 
     The Kraus operators of such noise are as follows:
 
-    :math:`E_0 = \begin{bmatrix} 1.0 & 0.0 \\ 0.0 & \sqrt{1 - p} \end{bmatrix}`
+    :math:`E_0 = \begin{bmatrix} 1 & 0 \\ 0 & \sqrt{1 - p} \end{bmatrix}`
 
-    :math:`E_1 = \begin{bmatrix} 0.0 &  \sqrt{p}\\ 0.0 & 0.0 \end{bmatrix}`
+    :math:`E_1 = \begin{bmatrix} 0 &  \sqrt{p}\\ 0 & 0 \end{bmatrix}`
 
     Here, :math:`p` is the strength of noise.
     """
@@ -63,7 +63,7 @@ class AmplitudeDamping(QNoise):
         else:
             return 'non_mixed_unitary_noise'
 
-    def calc_batched_noise_rng(self, num: int) -> List[float]:
+    def calc_batched_noise_rng(self, num: int) -> List[int]:
         """
         Generate a batch of sampled random numbers for mixed-unitary noise.
 

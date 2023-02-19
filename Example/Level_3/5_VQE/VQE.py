@@ -18,25 +18,27 @@
 """
 VQE
 """
-from copy import copy
 import multiprocessing as mp
+import os
 import pickle
 import random
+import sys
+import time
+from copy import copy
 from functools import reduce
+from typing import Tuple, List, Dict
 
 import numpy as np
 import scipy
 import scipy.linalg
 from matplotlib import pyplot as plt
-import time
-import os
 
-import sys
+from QCompute.QPlatform.QRegPool import QRegStorage
 
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.2.1')
+matchSdkVersion('Python 3.3.0')
 
 # Hyper-parameter setting
 shots = 1024
@@ -56,7 +58,7 @@ N = 3 * n * L  # N is the number of parameters needed for the circuit
 random.seed(SEED)
 
 
-def random_pauli_generator(l):
+def random_pauli_generator(l: int):
     """
     The following functions are used to generate random Hamiltonian
     """
@@ -67,7 +69,7 @@ def random_pauli_generator(l):
     return s
 
 
-def random_H_generator(n, k):
+def random_H_generator(n: int, k: int):
     """
     n is the number of qubits, k is the number of local Hamiltonian in H
     """
@@ -97,7 +99,7 @@ def NKron(AMatrix, BMatrix, *args):
         np.kron(AMatrix, BMatrix), )
 
 
-def ground_energy(Ha):
+def ground_energy(Ha: List[Tuple[float, str]]):
     """
     It returns the ground energy of Hamiltonian Ha,
     which looks like [[12, 'xyiz'], [21, 'zzxz'], [10, 'iixy']].
@@ -105,21 +107,14 @@ def ground_energy(Ha):
 
     # It is a local function
     def my_f(s):
-        s = s.lower()
-
-        I = np.eye(2) + 0j
-        X = np.array([[0, 1], [1, 0]]) + 0j
-        Y = np.array([[0, -1j], [1j, 0]])
-        Z = np.array([[1, 0], [0, -1]]) + 0j
-
         if s == 'x':
-            return X
+            return np.array([[0, 1], [1, 0]]) + 0j
         elif s == 'y':
-            return Y
+            return np.array([[0, -1j], [1j, 0]])
         elif s == 'z':
-            return Z
+            return np.array([[1, 0], [0, -1]]) + 0j
         else:
-            return I
+            return np.eye(2) + 0j
 
     # It is a local function
     def my_g(s_string):
@@ -132,11 +127,11 @@ def ground_energy(Ha):
     for ele in Ha:
         sum += ele[0] * my_g(ele[1])
 
-    eigen_vector = np.sort(scipy.linalg.eig(sum)[0])
-    return eigen_vector[0].real
+    eigen_value_vector = np.sort(scipy.linalg.eig(sum)[0])
+    return eigen_value_vector[0].real
 
 
-def fig_name():
+def fig_name() -> str:
     """
     Generate a title of figure with time.
     """
@@ -160,7 +155,7 @@ def eigen_plot(eigenv_list, actual_eigenv):
     # plt.show()
 
 
-def prob_calc(data_dic):
+def prob_calc(data_dic: Dict[str, int]):
     """
     Measure the first (ancillary) qubit. Return the value
     of 'the probability of getting 0' minus 'the probability of getting 1'.
@@ -178,7 +173,7 @@ def prob_calc(data_dic):
 
 # TODO: Add entangled layer
 
-def add_block(q, loc, para):
+def add_block(q: List[QRegStorage], loc, para):
     """
     Add a RzRyRz gate block. Each block has 3 parameters.
     """
@@ -188,7 +183,7 @@ def add_block(q, loc, para):
     RZ(para[2])(q[loc])
 
 
-def add_layer(para, q):
+def add_layer(q: List[QRegStorage], para):
     """
     Add a layer, which has 3*n parameters. para is a 2-D numpy array
     """
@@ -222,7 +217,7 @@ def self_defined_circuit(para, hamiltonian):
 
     # Add parameterized circuit
     for i in range(L):
-        add_layer(high_D_para[i], q)
+        add_layer(q, high_D_para[i])
 
     for i in range(n):
         # Set up Pauli measurement circuit
@@ -296,7 +291,7 @@ def main():
     """
     main
     """
-    
+
     pool = mp.Pool(experiment_num)
     pool.map(multi_process_fun, range(experiment_num))
     loss_list = []

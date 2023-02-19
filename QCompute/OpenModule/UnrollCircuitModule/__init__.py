@@ -303,7 +303,7 @@ class UnrollCircuitModule(ModuleImplement):
                             gateToProtobuf(U(*_expandAnglesInUGate(list(circuitLine.argumentValueList))), [a]))
                         return
                     else:
-                        ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+                        ret = deepcopy(circuitLine)
                         circuitOut.append(ret)
                         return
                 elif rotationGate == PBRotationGate.RX:
@@ -386,7 +386,7 @@ class UnrollCircuitModule(ModuleImplement):
             raise Error.ArgumentError(f'Unsupported operation {circuitLine}!', ModuleErrorCode, FileErrorCode, 4)
         else:
             # ignore
-            ret = deepcopy(circuitLine)  # type: 'PBCircuitLine'
+            ret = deepcopy(circuitLine)
             circuitOut.append(ret)
 
     def _decompose(self, circuitOut: List['PBCircuitLine'], circuitIn: List['PBCircuitLine']):

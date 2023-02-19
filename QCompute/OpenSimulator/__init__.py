@@ -37,22 +37,22 @@ class SimulatorVersion:
     The version of quantum simulator.
     """
 
-    gitHash = None  # type: str
+    gitHash: str = None
     """
     Git Hash
     """
 
-    gitTime = None  # type: str
+    gitTime: str = None
     """
     Git Time
     """
 
-    fileHash = None  # type: str
+    fileHash: str = None
     """
     File Hash
     """
 
-    compileTime = None  # type: str
+    compileTime: str = None
     """
     Compile Time
     """
@@ -68,22 +68,22 @@ class Ancilla:
     """
     Ancilla
     """
-    usedQRegList = None  # type: List[int]
+    usedQRegList: List[int] = None
     """
     used qReg list
     """
 
-    usedCRegList = None  # type: List[int]
+    usedCRegList: List[int] = None
     """
     used cReg list
     """
 
-    compactedQRegDict = None  # type: Dict[int, int]
+    compactedQRegDict: Dict[int, int] = None
     """
     computed qReg list
     """
 
-    compactedCRegDict = None  # type: Dict[int, int]
+    compactedCRegDict: Dict[int, int] = None
     """
     measured qReg list
     """
@@ -105,7 +105,7 @@ class QResult:
     SDK Version from Define.sdkVersion
     """
 
-    simulatorVersion = None  # type: SimulatorVersion
+    simulatorVersion: SimulatorVersion = None
     """
     The version of quantum simulator
     """
@@ -130,12 +130,12 @@ class QResult:
     output results
     """
 
-    ancilla = Ancilla()  # type: Ancilla
+    ancilla: Ancilla = Ancilla()
     """
     ancilla
     """
 
-    moduleList = None  # type:Dict[str,Any]
+    moduleList:Dict[str,Any] = None
     """
     moduleList
     """
@@ -145,12 +145,12 @@ class QResult:
     number of shots
     """
 
-    counts = None  # type: Union[Dict[str, int], Dict[str, float]]
+    counts: Union[Dict[str, int], Dict[str, float]] = None
     """
     counts for results
     """
 
-    state = None  # type: numpy.ndarray
+    state: numpy.ndarray = None
     """
     counts for results
     """
@@ -264,7 +264,7 @@ class QImplement:
     Send to the simulator when submitting a task.
     """
 
-    program = None  # type:
+    program = None
     """
     Protobuf format of the circuit
     """

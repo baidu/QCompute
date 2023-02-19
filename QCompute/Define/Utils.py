@@ -86,15 +86,15 @@ def loadPythonModule(moduleName: str):
     return module
 
 
-def matchSdkVersion(tagretVersion: str):
+def matchSdkVersion(targetVersion: str):
     """
     Match sdk version.
     """
-    if QCompute.Define.sdkVersion != tagretVersion:
+    if QCompute.Define.sdkVersion != targetVersion:
         import warnings
 
         warnings.warn(
-            f'This example({tagretVersion}) '
+            f'This example({targetVersion}) '
             f'does not match the correct sdk version({QCompute.Define.sdkVersion}). '
             'Please update the sdk.',
             FutureWarning)

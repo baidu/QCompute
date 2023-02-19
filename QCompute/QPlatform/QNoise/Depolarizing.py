@@ -34,13 +34,13 @@ class Depolarizing(QNoise):
 
     The Kraus operators of one qubit depolarizing noise are as follows:
 
-    :math:`E_0 = \sqrt{1 - 3.0  p / 4.0} \ ID`
+    :math:`E_0 = \sqrt{1 - 3 p / 4} \ ID`
 
-    :math:`E_1 = \sqrt{p / 4.0} \ X`
+    :math:`E_1 = \sqrt{p / 4} \ X`
 
-    :math:`E_2 = \sqrt{p / 4.0} \ Y`
+    :math:`E_2 = \sqrt{p / 4} \ Y`
 
-    :math:`E_3 = \sqrt{p / 4.0} \ Z`
+    :math:`E_3 = \sqrt{p / 4} \ Z`
 
     Here, :math:`p` is the strength of noise.
 

@@ -176,7 +176,7 @@ twoQubitsSet = set()
 
 
 def thirdConvert(pbProgram: 'PBProgram', ret: StringIO):
-    qRegMap = {}  # type: Dict[int, int]
+    qRegMap: Dict[int, int] = {}
     for qReg in pbProgram.head.usingQRegList:
         sfQReg = len(qRegMap)
         qRegMap[qReg] = sfQReg
@@ -189,10 +189,10 @@ def thirdConvert(pbProgram: 'PBProgram', ret: StringIO):
     for pbCircuitLine in pbProgram.body.circuit:
         op = pbCircuitLine.WhichOneof('op')
         if op == 'fixedGate':
-            fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
+            fixedGate: PBFixedGate = pbCircuitLine.fixedGate
             thirdFixedGateMapping(fixedGate, pbCircuitLine.qRegList, qRegMap, ret)
         elif op == 'rotationGate':
-            rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
+            rotationGate: PBRotationGate = pbCircuitLine.rotationGate
             thirdRotationGateMapping(rotationGate, pbCircuitLine.argumentValueList, pbCircuitLine.qRegList, qRegMap,
                                      ret)
         elif op == 'measure':
@@ -261,7 +261,7 @@ def thirdRotationGateMapping(pbRotationGate: PBRotationGate, argumentValueList: 
 
 
 def kerrConvert(pbProgram: 'PBProgram', ret: StringIO):
-    qRegMap = {}  # type: Dict[int, int]
+    qRegMap: Dict[int, int] = {}
     for qReg in pbProgram.head.usingQRegList:
         sfQReg = len(qRegMap)
         qRegMap[qReg] = sfQReg
@@ -271,10 +271,10 @@ def kerrConvert(pbProgram: 'PBProgram', ret: StringIO):
     for pbCircuitLine in pbProgram.body.circuit:
         op = pbCircuitLine.WhichOneof('op')
         if op == 'fixedGate':
-            fixedGate = pbCircuitLine.fixedGate  # type: PBFixedGate
+            fixedGate: PBFixedGate = pbCircuitLine.fixedGate
             kerrFixedGateMapping(TwoQubitsGate.kerr, fixedGate, pbCircuitLine.qRegList, qRegMap, ret)
         elif op == 'rotationGate':
-            rotationGate = pbCircuitLine.rotationGate  # type: PBRotationGate
+            rotationGate: PBRotationGate = pbCircuitLine.rotationGate
             kerrRotationGateMapping(TwoQubitsGate.kerr, rotationGate, pbCircuitLine.argumentValueList,
                                     pbCircuitLine.qRegList, qRegMap, ret)
         elif op == 'measure':

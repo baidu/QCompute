@@ -68,11 +68,11 @@ class CompositeGateOP(QOperation):
         if nAngles == 0:
             pass
         elif nAngles == 1:
-            [theta] = self.argumentList  # type: List[float]
+            [theta] = self.argumentList
         elif nAngles == 2:
-            [theta, phi] = self.argumentList  # type: List[float]
+            [theta, phi] = self.argumentList
         elif nAngles == 3:
-            [theta, phi, lamda] = self.argumentList  # type: List[float]
+            [theta, phi, lamda] = self.argumentList
         else:
             raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
                                       FileErrorCode, 3)
