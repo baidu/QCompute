@@ -69,7 +69,7 @@ Institute for Quantum Computing, Baidu.
 
 ## Integrations
 
-The new backend "local_cuquantum" is constructed under cuQuantum SDK (https://developer.nvidia.com/cuquantum-sdk)  and is supported by NVIDIA.
+The new backend "local_cuquantum" is constructed under cuQuantum SDK (https://developer.nvidia.com/cuquantum-sdk).
 
 ## Changelog
 
