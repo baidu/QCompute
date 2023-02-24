@@ -5,7 +5,7 @@
 ### Added
 
 - New Simulator;
-    - LocalCuQuantum, the brand-new local quantum simulator is constructed under cuQuantum SDK (https://developer.nvidia.com/cuquantum-sdk).
+    - LocalCuQuantum, the brand-new local quantum simulator is constructed with the NVIDIA cuQuantum SDK (https://developer.nvidia.com/cuquantum-sdk).
 
 ## [3.2.1] - Dec-30-2022
 
