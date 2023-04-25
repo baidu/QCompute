@@ -385,7 +385,7 @@ The [PyOnline](https://quantum-hub.baidu.com/#/) code is following:
 from QCompute import *
 from numpy import pi
 
-matchSdkVersion('Python 3.3.1')
+matchSdkVersion('Python 3.3.2')
 
 
 def func_order_finding_2_mod_63():

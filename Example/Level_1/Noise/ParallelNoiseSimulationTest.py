@@ -29,7 +29,7 @@ Settings.outputInfo = False
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.1')
+matchSdkVersion('Python 3.3.2')
 
 
 def self_defined_noisy_circuit() -> 'QEnv':
