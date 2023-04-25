@@ -41,7 +41,7 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.2')
+matchSdkVersion('Python 3.3.3')
 
 
 def CU1(q1: QRegStorage, q2: QRegStorage, float_theta: float) -> None:

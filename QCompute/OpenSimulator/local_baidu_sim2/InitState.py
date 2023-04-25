@@ -24,28 +24,18 @@ from typing import Union
 
 import numpy
 
-# Trim start
-if True:  # prevent scrambling
-    import sparse
-    from sparse import COO
 
-
-# Trim end
 
 
 @unique
 class MatrixType(IntEnum):
     """
-    # Trim start
-    Sparse Matrix support.
-    # Trim end
+    
     DEFINE the matrix type here.
     """
 
     Dense = 0
-    # Trim start
-    Sparse = Dense + 1
-    # Trim end
+    
 
 
 def initState_1_0(matrixType: MatrixType, n: int) -> Union[numpy.ndarray, 'COO']:
@@ -71,18 +61,4 @@ def initStateDense_1_0(n: int) -> numpy.ndarray:
     return state
 
 
-# Trim start
-def initStateSparse_1_0(n: int) -> 'COO':
-    """
-    Generate an n-qubit state on sparse structure
-    :param n: number of qubits
-    :return: tensor of state
-    """
 
-    # state = np.zeros([2] * n, complex)
-    # state.reshape(-1)[0] = 1.0
-    coords = [[0]] * n
-    state = sparse.COO(coords, [1 + 0j], shape=(2,) * n)
-    # print(state.todense())
-    return state
-# Trim end

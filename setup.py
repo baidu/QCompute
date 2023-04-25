@@ -28,7 +28,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-SDK_VERSION = '3.3.2'
+SDK_VERSION = '3.3.3'
 
 DESC = Path('./README.md').read_text(encoding='utf-8')
 

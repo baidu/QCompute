@@ -28,7 +28,7 @@ from QCompute import *
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.2')
+matchSdkVersion('Python 3.3.3')
 
 noiseType = Union['AmplitudeDamping', 'BitFlip', 'CustomizedNoise', 'BitPhaseFlip',
                   'Depolarizing', 'PauliNoise', 'PhaseDamping', 'PhaseFlip', 'ResetNoise']

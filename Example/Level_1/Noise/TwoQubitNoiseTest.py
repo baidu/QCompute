@@ -26,7 +26,7 @@ import numpy as np
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.2')
+matchSdkVersion('Python 3.3.3')
 
 noiseType = 'Depolarizing'
 

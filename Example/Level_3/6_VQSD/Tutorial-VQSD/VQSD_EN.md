@@ -54,7 +54,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.2')
+matchSdkVersion('Python 3.3.3')
 ```
 Set up hyper-parameters and parameters:
 ```python

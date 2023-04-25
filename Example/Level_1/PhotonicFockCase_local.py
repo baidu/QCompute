@@ -29,7 +29,7 @@ from QCompute.Define import Settings
 
 Settings.outputInfo = True
 
-matchSdkVersion('Python 3.3.2')
+matchSdkVersion('Python 3.3.3')
 
 # Create environment
 env = QEnv()
