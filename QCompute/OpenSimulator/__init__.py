@@ -135,7 +135,7 @@ class QResult:
     ancilla
     """
 
-    moduleList:Dict[str,Any] = None
+    moduleList: Dict[str, Any] = None
     """
     moduleList
     """
@@ -185,7 +185,7 @@ class QResult:
         self.startTimeUtc = ''
         self.endTimeUtc = ''
 
-    def fromJson(self, text: str):
+    def fromJson(self, text: str) -> Dict[str, Any]:
         """
         fromJson
         """
@@ -204,7 +204,7 @@ class QResult:
         if 'ancilla' in data:
             if 'usedQRegList' in data['ancilla'] and data['ancilla']['usedQRegList'] is not None:
                 self.ancilla.usedQRegList = data['ancilla']['usedQRegList']
-            if 'usedCRegList' in ['ancilla'] and data['ancilla']['usedCRegList'] is not None:
+            if 'usedCRegList' in data['ancilla'] and data['ancilla']['usedCRegList'] is not None:
                 self.ancilla.usedCRegList = data['ancilla']['usedCRegList']
             if 'compactedQRegDict' in data['ancilla'] and data['ancilla']['compactedQRegDict'] is not None:
                 self.ancilla.compactedQRegDict = data['ancilla']['compactedQRegDict']
@@ -219,8 +219,9 @@ class QResult:
         self.seed = data['seed']
         self.startTimeUtc = data['startTimeUtc']
         self.endTimeUtc = data['endTimeUtc']
+        return data
 
-    def toJson(self, inside: bool = None):
+    def toJson(self, inside: bool = None) -> str:
         """
         toJson
         """
@@ -257,6 +258,32 @@ class QResult:
         return json.dumps(ret)
 
 
+class QPhotonicResult(QResult):
+    """
+    The result of photonic experiment.
+
+    For homodyne measure and heterodyne measure.
+    """
+
+    value: Union[Dict[str, int], Dict[str, float]] = None
+    """
+    value for results
+    """
+
+    def __int__(self):
+        self.value = None
+
+    def fromJson(self, text: str):
+        data = super().fromJson(text)
+        self.value = data['value']
+
+    def toJson(self, inside: bool = None):
+        ret = super().toJson(inside)
+        data = json.loads(ret)
+        data['value'] = self.value
+        return json.dumps(data)
+
+
 class QImplement:
     """
     Implement params for quantum execution.
@@ -279,7 +306,7 @@ class QImplement:
     The arguments of backend
     """
 
-    result = QResult()
+    result: Union[QResult, QPhotonicResult] = None
     """
     The final result
     """

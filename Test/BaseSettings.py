@@ -21,7 +21,7 @@ Base Settings
 from QCompute import Define
 
 
-Define.hubToken = ''
+# Define.hubToken = ''
 
 
 def inputHubToken():

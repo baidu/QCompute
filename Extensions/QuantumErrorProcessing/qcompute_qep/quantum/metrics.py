@@ -131,10 +131,16 @@ def process_fidelity(proc_M: np.ndarray, proc_N: np.ndarray) -> float:
 
     where :math:`[\mathcal{M}]` is the Pauli transfer matrix of the quantum process and
     :math:`d` is the dimension of the input quantum system.
+    Note that at least one of the quantum processes must be a unitary process.
+
+    .. admonition:: Warning
+
+        To compute the process fidelity of two quantum processes using this function,
+        at least one of the processes must be a unitary process; otherwise, the function is not normalized.
 
     :param proc_M: np.ndarray, the Pauli transfer matrix of quantum process @M
     :param proc_N: np.ndarray, the Pauli transfer matrix of quantum process @N
-    :return: float, the process fidelity of the input quantum maps
+    :return: float, the process fidelity of the input quantum processes
     """
     if proc_M.shape != proc_N.shape:
         raise ArgumentError("in process_fidelity(): the dimensions of two quantum processes mismatch.")
@@ -156,6 +162,7 @@ def entanglement_fidelity(proc_M: np.ndarray, proc_N: np.ndarray) -> float:
 
     where :math:`[\mathcal{M}]_u` is the unital part of the Pauli transfer matrix and
     :math:`d` is the dimension of the input quantum system.
+    Note that at least one of the quantum processes must be a unitary process.
 
     The definition is excerpted from the following reference:
 
@@ -163,9 +170,15 @@ def entanglement_fidelity(proc_M: np.ndarray, proc_N: np.ndarray) -> float:
             "Spectral quantum tomography."
             npj Quantum Information 5.1 (2019): 1-11.
 
+    .. admonition:: Warning
+
+        To compute the entanglement fidelity of two quantum processes using this function,
+        at least one of the processes must be a unitary process; otherwise, the function is not normalized.
+
+
     :param proc_M: np.ndarray, the Pauli transfer matrix of quantum process @M
     :param proc_N: np.ndarray, the Pauli transfer matrix of quantum process @N
-    :return: float, the entanglement fidelity of the input quantum maps
+    :return: float, the entanglement fidelity of the input quantum processes
     """
     if proc_M.shape != proc_N.shape:
         raise ArgumentError("in entanglement_fidelity(): the dimensions of two quantum processes mismatch.")
@@ -205,7 +218,7 @@ def average_gate_fidelity(proc_M: np.ndarray, proc_N: np.ndarray) -> float:
 
     :param proc_M: np.ndarray, the Pauli transfer matrix of quantum process @M
     :param proc_N: np.ndarray, the Pauli transfer matrix of quantum process @N
-    :return: float, the average gate fidelity of the input quantum maps
+    :return: float, the average gate fidelity of the input quantum processes
     """
     if proc_M.shape != proc_N.shape:
         raise ArgumentError("in average_gate_fidelity(): the dimensions of two quantum processes mismatch.")

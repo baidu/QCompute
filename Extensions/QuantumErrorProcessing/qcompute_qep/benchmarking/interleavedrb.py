@@ -28,23 +28,19 @@ import scipy.stats as st
 from tqdm import tqdm
 import warnings
 
-warnings.filterwarnings('ignore')
-
-try:
-    from matplotlib import pyplot as plt
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-    import pylab
-
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-
 import QCompute
 from qcompute_qep.utils import expval_from_counts, execute
 from qcompute_qep.quantum import clifford
 from qcompute_qep.utils.types import QComputer, get_qc_name
 import qcompute_qep.exceptions.QEPError as QEPError
 import qcompute_qep.benchmarking as rb
+
+warnings.filterwarnings('ignore')
+try:
+    from matplotlib import pyplot as plt
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+except ImportError:
+    raise ImportError('IRB requires matplotlib to visualize results. Run "pip install matplotlib" first.')
 
 
 class InterleavedRB(rb.RandomizedBenchmarking):
@@ -365,8 +361,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         # Calculate r_target_error
         alpha_err_sq = (alpha_err / alpha) * (alpha_err / alpha)
         alpha_c_err_sq = (alpha_c_err / alpha_c) * (alpha_c_err / alpha_c)
-        r_target_err = ((d - 1) / d) * (alpha_c / alpha) \
-                       * (np.sqrt(alpha_err_sq + alpha_c_err_sq))
+        r_target_err = ((d - 1) / d) * (alpha_c / alpha) * (np.sqrt(alpha_err_sq + alpha_c_err_sq))
 
         # Store the target_gate results in results['target_gate']
         _results['r'] = r_target
@@ -386,9 +381,6 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         :param show: bool, default to True, show the plot figure or not
         :param fname: figure name for saving. If fname is None, do not save the figure
         """
-        if not HAS_MATPLOTLIB:
-            raise ImportError('Function "plot_results" requires matplotlib. Run "pip install matplotlib" first.')
-
         srb_results = self.results['StandardRB']
         irb_results = self.results['InterleavedRB']
         target_gate_results = self.results['target_gate']

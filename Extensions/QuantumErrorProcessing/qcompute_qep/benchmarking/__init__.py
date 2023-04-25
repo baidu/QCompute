@@ -24,7 +24,6 @@ from qcompute_qep.benchmarking.xeb import XEB
 from qcompute_qep.benchmarking.interleavedrb import InterleavedRB
 
 __all__ = [
-    'RandomizedBenchmarking', 'StandardRB', 'UnitarityRB', 'XEB',
-    'default_prep_circuit', 'default_meas_circuit',
-    'InterleavedRB'
+    'RandomizedBenchmarking', 'StandardRB', 'UnitarityRB', 'XEB', 'InterleavedRB',
+    'default_prep_circuit', 'default_meas_circuit'
 ]

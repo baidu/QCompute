@@ -26,7 +26,8 @@ from QCompute.Define import Settings
 from QCompute.OpenConvertor import ConvertorImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
-from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, PBMeasure
+from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, PBMeasure, \
+    PBPhotonicGaussianGate, PBPhotonicGaussianMeasure, PBPhotonicFockGate, PBPhotonicFockMeasure
 
 FileErrorCode = 2
 
@@ -151,6 +152,42 @@ class CircuitToDrawConsole(ConvertorImplement):
             elif op == 'barrier':
                 for qReg in pbCircuitLine.qRegList:
                     self._draw(qRegCount, '|', [qReg], circuitArray)
+            elif op == 'photonicGaussianGate':
+                photonicGaussianGate: PBPhotonicGaussianGate = pbCircuitLine.photonicGaussianGate
+                gateName = PBPhotonicGaussianGate.Name(photonicGaussianGate)
+                # argumentList = []
+                # if pbCircuitLine.argumentIdList:
+                #     for index, argumentId in enumerate(pbCircuitLine.argumentIdList):
+                #         if argumentId == -1:
+                #             argumentList.append(f'{pbCircuitLine.argumentValueList[index]}')
+                #         else:
+                #             argumentList.append(f'P{argumentId}')
+                # else:
+                #     for argument in pbCircuitLine.argumentValueList:
+                #         argumentList.append(f'{argument}')
+                self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
+            elif op == 'photonicGaussianMeasure':
+                for qReg in pbCircuitLine.qRegList:
+                    photonicGaussianMeasure: PBPhotonicGaussianMeasure = pbCircuitLine.photonicGaussianMeasure
+                    typeName = PBPhotonicGaussianMeasure.Type.Name(photonicGaussianMeasure.type)
+                    self._draw(qRegCount, f'|M[{typeName.lower()}]|', [qReg], circuitArray)
+            elif op == 'photonicFockGate':
+                photonicFockGate: PBPhotonicFockGate = pbCircuitLine.photonicFockGate
+                gateName = PBPhotonicFockGate.Name(photonicFockGate)
+                # argumentList = []
+                # if pbCircuitLine.argumentIdList:
+                #     for index, argumentId in enumerate(pbCircuitLine.argumentIdList):
+                #         if argumentId == -1:
+                #             argumentList.append(f'{pbCircuitLine.argumentValueList[index]}')
+                #         else:
+                #             argumentList.append(f'P{argumentId}')
+                # else:
+                #     for argument in pbCircuitLine.argumentValueList:
+                #         argumentList.append(f'{argument}')
+                self._draw(qRegCount, f'|{gateName}|', pbCircuitLine.qRegList, circuitArray)
+            elif op == 'photonicFockMeasure':
+                for qReg in pbCircuitLine.qRegList:
+                    self._draw(qRegCount, f'|M[{"PhotonCount".lower()}]|', [qReg], circuitArray)
             else:
                 raise Error.ArgumentError(f'DrawConsole Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 1)
 

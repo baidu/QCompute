@@ -148,7 +148,7 @@ class CircuitToQasm(ConvertorImplement):
         """
 
         # Get name of gate.
-        gateName = PBFixedGate.Name(fixedGate)
+        gateName = PBFixedGate.Name(fixedGate).lower()
         # Convert registers.
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
@@ -180,7 +180,7 @@ class CircuitToQasm(ConvertorImplement):
         """
 
         # Get name of gate.
-        gateName = PBRotationGate.Name(rotationGate)
+        gateName = PBRotationGate.Name(rotationGate).lower()
 
         # Check if optional arguments paramValues and paramIds are None.
         params = self.getFixedArgumentList(paramValues)
@@ -216,12 +216,12 @@ class CircuitToQasm(ConvertorImplement):
         # Convert registers.
         if usingIndex:
             regOp = [f'{regName}[{r}]' for r in regs]
-            command = ''
+            command = f'barrier {", ".join(regOp)};\n'
         else:
-            regOp = [f'{regName}{r}' for r in regs]
-            # Indent=2.
-            command = '  '
-        command += f'barrier {", ".join(regOp)};\n'
+            command = ''
+            for r in regs:
+                # Indent=2.
+                command += f'  barrier {regName}{r};\n'
         return command
 
     def getProcCommandCode(self, procedureName: str, regs: List[int], regName: str, usingIndex: bool = True,

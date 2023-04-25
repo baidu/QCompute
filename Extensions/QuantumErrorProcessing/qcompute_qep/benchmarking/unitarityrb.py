@@ -29,6 +29,7 @@ from typing import List
 from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
 from copy import deepcopy
+import warnings
 
 import QCompute
 from qcompute_qep.utils.linalg import tensor
@@ -41,20 +42,19 @@ from QCompute import *
 from QCompute.QPlatform.QOperation import CircuitLine
 from qcompute_qep.exceptions.QEPError import ArgumentError
 
+warnings.filterwarnings('ignore')
 try:
     from matplotlib import pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
-    import pylab
-
-    HAS_MATPLOTLIB = True
 except ImportError:
-    HAS_MATPLOTLIB = False
+    raise ImportError('URB requires matplotlib to visualize results. Run "pip install matplotlib" first.')
 
 
 class UnitarityRB(rb.RandomizedBenchmarking):
     """The Unitarity Randomized Benchmarking class.
 
-    Aim to benchmark the coherence(unitarity) noise of a complete set of Cliffords.
+    Unitarity Randomized Benchmarking aims to benchmark the coherence (also known as unitarity)
+    noise of a complete set of Cliffords.
     """
 
     def __init__(self, qc: QComputer = None, qubits: List[int] = None, **kwargs):
@@ -89,8 +89,6 @@ class UnitarityRB(rb.RandomizedBenchmarking):
 
         # Store the URB results. Initialize to an empty dictionary
         self._results = dict()
-
-        # Store the URB parameters. Initialize to an empty dictionary
         self._params = dict()
 
     @property
@@ -309,9 +307,9 @@ class UnitarityRB(rb.RandomizedBenchmarking):
             def func(m, u, A):
                 return (m - 1) * np.log(u) + np.log(A)
 
-            popt, pcov = curve_fit(func, xdata, ydata,
-                                   p0=p0, sigma=sigma,
-                                   bounds=bounds, method='dogbox')
+            popt, pcov, *_ = curve_fit(func, xdata, ydata,
+                                       p0=p0, sigma=sigma,
+                                       bounds=bounds, method='dogbox')
 
             # Store the randomized benchmarking results
             params_err = np.sqrt(np.diag(pcov))
@@ -349,9 +347,9 @@ class UnitarityRB(rb.RandomizedBenchmarking):
                 if np.mean(tmp) < 1.0:
                     p0[1] = np.mean(tmp)
 
-            popt, pcov = curve_fit(self._fit_func, xdata, ydata,
-                                   p0=p0, sigma=sigma,
-                                   bounds=bounds, method='dogbox')
+            popt, pcov, *_ = curve_fit(self._fit_func, xdata, ydata,
+                                       p0=p0, sigma=sigma,
+                                       bounds=bounds, method='dogbox')
 
             # Store the randomized benchmarking results
             params_err = np.sqrt(np.diag(pcov))
@@ -372,10 +370,6 @@ class UnitarityRB(rb.RandomizedBenchmarking):
         :param show: bool, default to True, show the plot figure or not
         :param fname: figure name for saving. If fname is None, do not save the figure
         """
-
-        if not HAS_MATPLOTLIB:
-            raise ImportError('Function "plot_results" requires matplotlib. Run "pip install matplotlib" first.')
-
         fig, ax = plt.subplots(figsize=(12, 8))
 
         xdata = self._seq_lengths

@@ -26,18 +26,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 from matplotlib.ticker import MaxNLocator
 import scipy.stats as st
-import functools
+import itertools
 import warnings
-
-warnings.filterwarnings('ignore')
-try:
-    from matplotlib import pyplot as plt
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-    import pylab
-
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
 
 import QCompute
 from qcompute_qep.utils import expval_from_counts, execute
@@ -45,13 +35,20 @@ from qcompute_qep.quantum import clifford
 from qcompute_qep.utils.types import QComputer, get_qc_name
 import qcompute_qep.exceptions.QEPError as QEPError
 import qcompute_qep.benchmarking as rb
-from qcompute_qep.utils.circuit import decompose_yzy, print_circuit
+
+warnings.filterwarnings('ignore')
+try:
+    from matplotlib import pyplot as plt
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+except ImportError:
+    raise ImportError('SRB requires matplotlib to visualize results. Run "pip install matplotlib" first.')
 
 
 class StandardRB(rb.RandomizedBenchmarking):
-    r"""
-    The Standard Randomized Benchmarking class.
-    Aim to benchmark the complete set of Clifford gates by a single parameter called EPC (Error Per Clifford).
+    r"""The Standard Randomized Benchmarking class.
+
+        Standard Randomized Benchmarking aims to benchmark the complete set of Clifford gates
+        by a single parameter called EPC (Error Per Clifford).
     """
 
     def __init__(self, qc: QComputer = None, qubits: List[int] = None, **kwargs):
@@ -68,8 +65,8 @@ class StandardRB(rb.RandomizedBenchmarking):
                         of the SRB circuits and set the quantum observable to
                         :math:`\vert 0\cdots 0\rangle\!\langle 0\cdots 0\vert`
 
-        for `prep_circuit` and `meas_circuit` see more details in benchmarking.utils.default_prep_circuit
-                        and benchmarking.utils.default_meas_circuit
+        for `prep_circuit` and `meas_circuit` see more details in `benchmarking.utils.default_prep_circuit`
+                        and `benchmarking.utils.default_meas_circuit`.
 
         :param qc: QComputer, the quantum computer on which the RB carries out
         :param qubits: List[int], the qubits who will be benchmarked
@@ -86,8 +83,6 @@ class StandardRB(rb.RandomizedBenchmarking):
 
         # Store the standard randomized benchmarking results. Initialize to an empty dictionary
         self._results = dict()
-
-        # Store the standard randomized benchmarking parameters. Initialize to an empty dictionary
         self._params = dict()
 
     @property
@@ -114,7 +109,7 @@ class StandardRB(rb.RandomizedBenchmarking):
 
     @property
     def params(self) -> dict:
-        r"""Return the used parameters in randomized benchmarking in a dictionary.
+        r"""Parameters used in randomized benchmarking in a dictionary.
         """
         if not self._params:
             rb_params = dict()
@@ -138,12 +133,12 @@ class StandardRB(rb.RandomizedBenchmarking):
 
         where
 
-        + :math:`x` is the sequence length, i.e., the number of Clifford gates in the sequence,
+        + :math:`x` is the sequence length, i.e., the number of :math:`n`-qubit Clifford gates in the sequence,
         + :math:`f` is the fidelity parameter of the twirled depolarizing channel,
         + :math:`A` and :math:`B` absorb the State Preparation and Measurement errors (SPAM).
 
-        note that we simply apply the inverse of every Clifford gates on the circuit,
-        so the function turn to be like this.
+        Note that we simply apply the inverse of every Clifford gate to the end of the circuit,
+        so the function has a scaling coefficient :math:`2x-1` instead of the commonly used :math:`x`.
 
         :param x: int, corresponds to the sequence length
         :param f: float, the fidelity parameter of the depolarizing channel
@@ -154,7 +149,7 @@ class StandardRB(rb.RandomizedBenchmarking):
         return A * f ** (2 * x - 1) + B
 
     def benchmark(self, qc: QComputer, qubits: List[int], **kwargs) -> dict:
-        r"""Execute the randomized benchmarking procedure on the quantum computer.
+        r"""Execute randomized benchmarking on the quantum computer.
 
         The parameters `qc` and `qubits` must be set either by the init() function or here,
         otherwise the randomized benchmarking procedure will not carry out.
@@ -174,10 +169,9 @@ class StandardRB(rb.RandomizedBenchmarking):
         .. code-block:: python
             :linenos:
 
-            rb_results = rb.benchmark(qubits=[1], qc=qc)
-            rb_results = rb.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100])
-            rb_results = rb.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100], repeats=10, shots=1024)
-
+            rb_results = benchmarking.benchmark(qubits=[1], qc=qc)
+            rb_results = benchmarking.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100])
+            rb_results = benchmarking.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100], repeats=10, shots=1024)
 
         :return: dict, the randomized benchmarking results
 
@@ -187,10 +181,10 @@ class StandardRB(rb.RandomizedBenchmarking):
             >>> from qiskit.providers.fake_provider import FakeSantiago
             >>> from qcompute_qep.benchmarking.standardrb import StandardRB
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
-            >>> rb = StandardRB()
-            >>> rb_results = rb.benchmark(qubits=[1], qc=qc)
+            >>> benchmarking = StandardRB()
+            >>> rb_results = benchmarking.benchmark(qubits=[1], qc=qc)
             >>> print(rb_results)
-            >>> rb.plot_results()
+            >>> benchmarking.plot_results()
         """
         # Parse the arguments from the key list. If not set, use default arguments from the init function
         self._qc = qc if qc is not None else self._qc
@@ -202,56 +196,71 @@ class StandardRB(rb.RandomizedBenchmarking):
         self._meas_circuit = kwargs.get('meas_circuit', self._meas_circuit)
 
         if self._qc is None:
-            raise QEPError.ArgumentError("Standard RB: the quantum computer for benchmarking is not specified!")
+            raise QEPError.ArgumentError("SRB: the quantum computer for benchmarking is not specified!")
         if self._qubits is None:
-            raise QEPError.ArgumentError("Standard RB: the qubits for benchmarking are not specified!")
+            raise QEPError.ArgumentError("SRB: the qubits for benchmarking are not specified!")
 
         ###############################################################################################################
-        # Step 1. Data Collection Phase.
-        #   First construct the list of benchmarking quantum circuits.
-        #   Then for each RB quantum circuit, evaluate its expectation value.
+        # Step 1. Construct a list of benchmarking quantum circuits.
         ###############################################################################################################
-        # Store the estimated expectation values, which is a :math:`R \times M` array,
-        # where :math:`R` is the number of repeats and :math:`M` is the number of sequences
-        expvals = np.empty([len(self._seq_lengths), self._repeats], dtype=float)
+        pbar = tqdm(total=100, desc='SRB Step 1/4: Constructing benchmarking quantum circuits ...', initial=0)
+
         n = len(self._qubits)  # number of qubits
         num_of_register_qubits = max(x for x in self._qubits) + 1
-        pbar = tqdm(total=100, desc='Step 1/1 : Implement the SRB...', ncols=100, )
-        for m, seq_m in enumerate(self._seq_lengths):
-            for r in range(self._repeats):
+        # Quantum programs and quantum observables list
+        rb_qp_list = []
+        rb_ob_list = []
+        seq_lengths = list(itertools.chain.from_iterable(itertools.repeat(seq, self._repeats)
+                                                         for seq in self._seq_lengths))
+        for seq_m in seq_lengths:
+            # Construct a random sequence of Clifford gates of length seq_m
+            cliffords = clifford.random_clifford(n, seq_m)
+            # Initialize the randomized benchmarking quantum circuit
+            rb_qp = QCompute.QEnv()
+            q = rb_qp.Q.createList(num_of_register_qubits)
+            # Create a list to store the inverse circuit of every Clifford gate
+            inv_circuit = []
+            for i, c in enumerate(cliffords):
+                c(q, self._qubits)
+                inv_circuit.append(c.get_inverse_circuit(self._qubits))
+            # Reverse the sequence of applied Clifford gates and operate them on the inputs
+            rb_qp.circuit += sum(inv_circuit[::-1], [])
+            # Prepare the input quantum state
+            rb_qp = self._prep_circuit(rb_qp)
+            # Add the desired measurement corresponds to the target quantum observable
+            rb_qp, rb_ob = self._meas_circuit(rb_qp)
 
-                # Construct a random sequence of Clifford gates of length seq_m
-                cliffords = clifford.random_clifford(n, seq_m)
-
-                # Setup the randomized benchmarking quantum circuit
-                rb_qp = QCompute.QEnv()
-                q = rb_qp.Q.createList(num_of_register_qubits)
-                # Create a list to store the inverse circuit of every Clifford gate
-                inv_circuit = []
-                for i, c in enumerate(cliffords):
-                    c(q, self._qubits)
-                    inv_circuit.append(c.get_inverse_circuit(self._qubits))
-                # Reverse the sequence of applied Clifford gates and operate them on the inputs
-                rb_qp.circuit += sum(inv_circuit[::-1], [])
-                # Prepare the input quantum state
-                rb_qp = self._prep_circuit(rb_qp)
-                # Add the desired measurement corresponds to the target quantum observable
-                rb_qp, rb_ob = self._meas_circuit(rb_qp)
-
-                # Run the RB quantum circuit, estimate the expectation value, and store the data
-                counts = execute(qp=rb_qp, qc=self._qc, **kwargs)
-                expval = expval_from_counts(A=rb_ob, counts=counts)
-                expvals[m, r] = expval
-                pbar.update(100 / (self._repeats * len(self._seq_lengths)))
-        pbar.close()
+            rb_qp_list.append(rb_qp)
+            rb_ob_list.append(rb_ob)
 
         ###############################################################################################################
-        # Step 2. Data Processing Phase.
-        #   Fit the list of averaged expectation values to the exponential model and extract the fitting results.
+        # Step 2. Run the quantum circuits in batch.
         ###############################################################################################################
+        pbar.desc = "SRB Step 2/4: Running quantum circuits, which might be very time consuming ..."
+        pbar.update(100 / 4)
+
+        counts_list = execute(qp=rb_qp_list, qc=self._qc, **kwargs)
+        ###############################################################################################################
+        # Step 3. Estimate the expectation values from the measurement outcomes.
+        ###############################################################################################################
+        pbar.desc = "SRB Step 3/4: Estimating expectation values from the measurement outcomes ..."
+        pbar.update(100 / 4)
+
+        # Store the estimated expectation values, which is a :math:`M \times R` array,
+        # where :math:`M` is the number of sequences and :math:`R` is the number of repeats of each sequence.
+        expvals = np.empty((len(self._seq_lengths), self._repeats), dtype=float)
+        for k in range(len(rb_qp_list)):
+            m, r = divmod(k, self._repeats)
+            expvals[m][r] = expval_from_counts(A=rb_ob_list[k], counts=counts_list[k])
+
+        ###############################################################################################################
+        # Step 4. Fit the expectation values to the exponential model.
+        ###############################################################################################################
+        pbar.desc = "SRB Step 4/4: Fitting expectation values to the exponential model ..."
+        pbar.update(100 / 4)
+        # Set the bounds for the parameters tuple: :math:`(f, A, B)`
         # min_eig = min(np.diag(rb_ob))
         # max_eig = max(np.diag(rb_ob))
-        # Set the bounds for the parameters tuple: :math:`(f, A, B)`
         # bounds = ([0, min_eig - max_eig, min_eig], [1, max_eig - min_eig, max_eig])
         bounds = ([0, 0, 1 / 2 ** n], [1, 1, 1])
 
@@ -278,13 +287,13 @@ class StandardRB(rb.RandomizedBenchmarking):
             if ydata[j] > p0[2]:
                 tmp.append((ydata[j] - p0[2]) / (p0[0] ** (2 * xdata[j])))
 
-        if tmp:
-            if np.mean(tmp) < 1.0:
-                p0[1] = np.mean(tmp)
+        if tmp and np.mean(tmp) < 1.0:
+            p0[1] = np.mean(tmp)
 
-        popt, pcov = curve_fit(self._fit_func, xdata, ydata,
-                               p0=p0, sigma=sigma, maxfev=500000,
-                               bounds=bounds, method='dogbox')
+        # Must call `curve_fit` with `*_` to avoid the error "ValueError: too many values to unpack"
+        popt, pcov, *_ = curve_fit(f=self._fit_func, xdata=np.asarray(xdata), ydata=ydata,
+                                   p0=np.asarray(p0), sigma=sigma,
+                                   bounds=bounds, maxfev=500000, method='dogbox')
 
         # Store the randomized benchmarking results
         params_err = np.sqrt(np.diag(pcov))
@@ -297,6 +306,10 @@ class StandardRB(rb.RandomizedBenchmarking):
         self._results['epc'] = (d - 1) / d * (1 - popt[0])
         self._results['epc_err'] = (d - 1) / d * (1 - params_err[0])
 
+        pbar.desc = "SRB successfully finished!"
+        pbar.update(100 - pbar.n)
+        pbar.close()
+
         return self._results
 
     def plot_results(self, show: bool = True, fname: str = None):
@@ -308,9 +321,6 @@ class StandardRB(rb.RandomizedBenchmarking):
         :param show: bool, default to True, show the plot figure or not
         :param fname: figure name for saving. If fname is None, do not save the figure
         """
-        if not HAS_MATPLOTLIB:
-            raise ImportError('Function "plot_results" requires matplotlib. Run "pip install matplotlib" first.')
-
         fig, ax = plt.subplots(figsize=(12, 8))
 
         xdata = self._seq_lengths
@@ -341,21 +351,21 @@ class StandardRB(rb.RandomizedBenchmarking):
         plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
         # Show the legend
-        plt.legend(loc='lower left', fontsize=16)
+        plt.legend(loc='lower left', fontsize='large')
 
         # Add the estimated fidelity and EPC parameters
         bbox_props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.5)
         ax.text(0.8, 0.9,
-                "Average gate fidelity: {:.4f}({:.1e}) \n "
-                "Error per Clifford: {:.4f}({:.1e})".format(self.results['f'],
+                "Average Gate Fidelity: {:.4f}({:.1e}) \n "
+                "Error Per Clifford: {:.4f}({:.1e})".format(self.results['f'],
                                                             self.results['f_err'],
                                                             self.results['epc'],
                                                             self.results['epc_err']),
-                ha="center", va="center", fontsize=12, bbox=bbox_props, transform=ax.transAxes)
+                ha="center", va="center", fontsize='large', bbox=bbox_props, transform=ax.transAxes)
 
         # Save the figure if `fname` is set
         if fname is not None:
             plt.savefig(fname, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
-        # Show the figure if `show==True`
+        # Show the figure if `show` is True
         if show:
             plt.show()

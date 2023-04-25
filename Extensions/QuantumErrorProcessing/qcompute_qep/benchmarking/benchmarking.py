@@ -25,7 +25,7 @@ import numpy as np
 import QCompute
 import functools
 
-from qcompute_qep.utils.types import QProgram, QComputer, number_of_qubits
+from qcompute_qep.utils.types import QProgram
 import qcompute_qep.utils.circuit as circuit
 
 
@@ -49,7 +49,7 @@ class RandomizedBenchmarking(abc.ABC):
         pass
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        return self.benchmark(*args, **kwargs)
+        return self.benchmark(**kwargs)
 
     @property
     def results(self):
@@ -170,5 +170,5 @@ def default_meas_circuit(qp: QProgram) -> Tuple[QProgram, np.ndarray]:
     # Set the quantum observable observable to :math:`\vert 0\cdots 0\rangle\!\langle 0\cdots 0\vert`
     n = len(qubit_indices)
     proj0 = np.array([[1, 0], [0, 0]]).astype(float)
-    A = functools.reduce(np.kron, [proj0] * n)
-    return qp, A
+    ob = functools.reduce(np.kron, [proj0] * n)
+    return qp, ob

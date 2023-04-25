@@ -28,7 +28,8 @@ References:
 
 import collections
 import copy
-from typing import List, Union, Tuple
+import abc
+from typing import List, Tuple, Any
 import numpy as np
 import itertools
 from QCompute.QPlatform.QOperation import CircuitLine
@@ -100,7 +101,7 @@ class Clifford:
         0: ---H---X---H---I---S---S---
     """
 
-    def __init__(self, n, pattern: List[List[List[str]]] = None) -> None:
+    def __init__(self, n, pattern: List[List[List[str]]] = None, **kwargs) -> None:
         if pattern is None:
             pattern = random_pattern(n)
         else:
@@ -111,7 +112,8 @@ class Clifford:
         self._norm_form = None
         self._n = n
         self._pattern = pattern
-        self._gate_set = self._basic_gate_set()
+        self._gateset_name = kwargs.get('gateset_name', 'peter_selinger')
+        self._gateset = self._get_gateset()
 
     @property
     def matrix(self) -> np.ndarray:
@@ -167,10 +169,10 @@ class Clifford:
                 cir.extend(self._construct_circuit(gate, *idx))
             self._cir = cir
         if not self._cir:
-            circuitline = CircuitLine()
-            circuitline.data = FixedGate.getFixedGateInstance('ID')
-            circuitline.qRegList = list(range(self._n))
-            self._cir.append(circuitline)
+            cl = CircuitLine()
+            cl.data = FixedGate.getFixedGateInstance('ID')
+            cl.qRegList = list(range(self._n))
+            self._cir.append(cl)
         return self._cir
 
     @property
@@ -209,14 +211,13 @@ class Clifford:
             qubits.sort()
             if self.circuit:
                 for original_cir in self.circuit:
-                    circuitline = CircuitLine()
-                    circuitline.data = original_cir.data
-                    circuitline.qRegList = [qubits[idx] for idx in original_cir.qRegList]
-                    env.circuit.append(circuitline)
+                    cl = CircuitLine()
+                    cl.data = original_cir.data
+                    cl.qRegList = [qubits[idx] for idx in original_cir.qRegList]
+                    env.circuit.append(cl)
 
     def __str__(self):
-        """
-        Print the quantum circuit (in elementary quantum gates) that implements the Clifford.
+        r"""Print the quantum circuit (in elementary quantum gates) that implements the Clifford.
         """
         cir = self.circuit
         if cir:
@@ -277,56 +278,73 @@ class Clifford:
         # TODO: Will be implemented in the next version
         return
 
-    @staticmethod
-    def _basic_gate_set() -> 'collections.defaultdict':
-        """The default gate set for clifford circuits.
+    def _get_gateset(self) -> 'collections.defaultdict':
+        """Get the specified gate set by the given gateset name.
 
-        There are five types of basic gates:
+        For a valid gateset, the following gate names must be given:
 
-        + A = {A1, A2, A3},
+            ('A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'D1', 'D2', 'D3', 'D4', 'E1', 'E2', 'E3', 'E4')
 
-        + B = {B1, B2, B3, B4},
-
-        + C = {C1, C2},
-
-        + D = {D1, D2, D3, D4}, and
-
-        + E = {E1, E2, E3, E4}.
+        :return: collections.defaultdict, a dictionary describing the gate set.
         """
         gate_set = collections.defaultdict(list)
-
-        # Here, we have simplified some of the gates
-        # For example,
-        # ---H---S---S---H--- =   ---X---
-        #
-        # ------@-------          ------@------
-        #       |             =         |
-        # --H---Z---H---          ------X------
-        #
-        # ---S---S---         =   ---Z---
-
-        gate_set['A1'] = [(None, 0)]
-        gate_set['A2'] = [('H', 0)]
-        gate_set['A3'] = [('H', 0), ('S', 0), ('H', 0)]
-
-        gate_set['B1'] = [('CX', 2), ('CX', 3), ('CX', 2), ('H', 1)]
-        gate_set['B2'] = [('H', 1), ('CX', 2), ('CX', 3), ('H', 0)]
-        gate_set['B3'] = [('H', 0), ('H', 1), ('S', 0), ('CX', 2), ('CX', 3), ('H', 1)]
-        gate_set['B4'] = [('CX', 3), ('CX', 2), ('H', 1)]
-
-        gate_set['C1'] = [(None, 0)]
-        gate_set['C2'] = [('X', 0)]
-
-        gate_set['D1'] = [('H', 1), ('CX', 2), ('CX', 3), ('CX', 2)]
-        gate_set['D2'] = [('CX', 3), ('CX', 2)]
-        gate_set['D3'] = [('H', 1), ('S', 1), ('CX', 3), ('CX', 2), ]
-        gate_set['D4'] = [('H', 1), ('CX', 3), ('CX', 2)]
-
-        gate_set['E1'] = [(None, 0)]
-        gate_set['E2'] = [('S', 0)]
-        gate_set['E3'] = [('Z', 0)]
-        gate_set['E4'] = [('Z', 0), ('S', 0)]
-
+        # For single-qubit gates, ('GateName', index) means that operate `GateName` on qubit `index`.
+        # Notice that in this case, `index` can only be `0` or `1`.
+        # For two-qubit gates, ('GateName', index) means that:
+        # If index == 2, the control qubit is qubit 0 and the source qubit is qubit 1
+        # If index == 3, the control qubit is qubit 1 and the source qubit is qubit 0
+        # Notice that in this case, `index` can only be `2` or `3`.
+        if self._gateset_name == 'peter_selinger':
+            # This gate set is described in Figure 1 of [S15].
+            # A type gates
+            gate_set['A1'] = [(None, 0)]
+            gate_set['A2'] = [('H', 0)]
+            gate_set['A3'] = [('H', 0), ('S', 0), ('H', 0)]
+            # B type gates
+            gate_set['B1'] = [('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
+            gate_set['B2'] = [('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
+            gate_set['B3'] = [('H', 0), ('S', 0), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
+            gate_set['B4'] = [('H', 0), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
+            # C type gates
+            gate_set['C1'] = [(None, 0)]
+            gate_set['C2'] = [('H', 0), ('S', 0), ('S', 0), ('H', 0)]
+            # D type gates
+            gate_set['D1'] = [('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
+            gate_set['D2'] = [('H', 0), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
+            gate_set['D3'] = [('H', 0), ('H', 1), ('S', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
+            gate_set['D4'] = [('H', 0), ('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
+            # E type gates
+            gate_set['E1'] = [(None, 0)]
+            gate_set['E2'] = [('S', 0)]
+            gate_set['E3'] = [('S', 0), ('S', 0)]
+            gate_set['E4'] = [('S', 0), ('S', 0), ('S', 0)]
+        elif self._gateset_name == 'simplified':
+            # This gate set is a simplified version of the 'peter_selinger' gate set,
+            # aiming to reduce the number of gates
+            # A type gates
+            gate_set['A1'] = [(None, 0)]
+            gate_set['A2'] = [('H', 0)]
+            gate_set['A3'] = [('H', 0), ('S', 0), ('H', 0)]
+            # B type gates
+            gate_set['B1'] = [('CX', 2), ('CX', 3), ('CX', 2), ('H', 1)]
+            gate_set['B2'] = [('H', 1), ('CX', 2), ('CX', 3), ('H', 0)]
+            gate_set['B3'] = [('H', 0), ('H', 1), ('S', 0), ('CX', 2), ('CX', 3), ('H', 1)]
+            gate_set['B4'] = [('CX', 3), ('CX', 2), ('H', 1)]
+            # C type gates
+            gate_set['C1'] = [(None, 0)]
+            gate_set['C2'] = [('X', 0)]
+            # D type gates
+            gate_set['D1'] = [('H', 1), ('CX', 2), ('CX', 3), ('CX', 2)]
+            gate_set['D2'] = [('CX', 3), ('CX', 2)]
+            gate_set['D3'] = [('H', 1), ('S', 1), ('CX', 3), ('CX', 2), ]
+            gate_set['D4'] = [('H', 1), ('CX', 3), ('CX', 2)]
+            # E type gates
+            gate_set['E1'] = [(None, 0)]
+            gate_set['E2'] = [('S', 0)]
+            gate_set['E3'] = [('Z', 0)]
+            gate_set['E4'] = [('Z', 0), ('S', 0)]
+        else:
+            raise ArgumentError("in _get_gateset(): undefined gateset name {}!".format(self._gateset_name))
         return gate_set
 
     @staticmethod
@@ -376,13 +394,13 @@ class Clifford:
         """
         total_cir = []
         idx = list(idx)
-        gate_list = self._gate_set[gate_type]
+        gate_list = self._gateset[gate_type]
 
         for gate_name, i in gate_list:
             cir = CircuitLine()
             if gate_name is not None:
                 cir.data = FixedGate.getFixedGateInstance(gate_name)
-                if gate_name == 'CX':
+                if gate_name == 'CX' or gate_name == 'CZ':
                     # Be careful about the control qubits and target qubits
                     if i == 2:
                         cir.qRegList = [idx[0], idx[1]]
@@ -437,7 +455,7 @@ def random_pattern(n: int) -> List[List[List[str]]]:
     return pattern
 
 
-def random_clifford(n: int, m: int = 1) -> List[Clifford]:
+def random_clifford(n: int, m: int = 1, **kwargs) -> List[Clifford]:
     r"""Randomly generate :math:`m` :math:`n`-qubits Clifford operators.
 
     Notice that when :math:`m=1`, i.e., a single-qubit Clifford is generated, the return value is still a List.
@@ -477,7 +495,7 @@ def random_clifford(n: int, m: int = 1) -> List[Clifford]:
 
     for i in range(m):
         pattern = random_pattern(n)
-        cliff = Clifford(n, pattern)
+        cliff = Clifford(n, pattern, **kwargs)
         clifford_list.append(cliff)
 
     return clifford_list
@@ -530,13 +548,3 @@ def complete_cliffords(n: int, ) -> List[Clifford]:
     backtrack(n, [])
 
     return complete_cliff
-
-
-if __name__ == '__main__':
-    # pattern = random_pattern(2)
-    # print(pattern)
-    cliffs = random_clifford(3, 1)
-    for cliff in cliffs:
-        print(cliff._pattern)
-        print(cliff)
-    # print(len(complete_cliffords(2)))

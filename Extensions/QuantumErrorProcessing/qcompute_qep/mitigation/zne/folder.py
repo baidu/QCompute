@@ -406,11 +406,13 @@ class GateFolder(Folder):
 
                     .. math:: V \mapsto G_i V
 
-                + If :math:`G_i` is a multi-qubit gate and belongs to @folding_indices, fold :math:`G_i` :math:`n+1` times and append, i.e.,
+                + If :math:`G_i` is a multi-qubit gate and belongs to @folding_indices,
+                    fold :math:`G_i` :math:`n+1` times and append, i.e.,
 
                     .. math:: V \mapsto (G_i G_i^\dagger)^{n+1} V
 
-                + If :math:`G_i` is a multi-qubit gate and does not belong to @folding_indices, fold :math:`G_i` :math:`n` times and append, i.e.,
+                + If :math:`G_i` is a multi-qubit gate and does not belong to @folding_indices,
+                    fold :math:`G_i` :math:`n` times and append, i.e.,
 
                     .. math:: V \mapsto (G_i G_i^\dagger)^{n} V
 

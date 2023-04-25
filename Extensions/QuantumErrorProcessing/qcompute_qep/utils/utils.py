@@ -26,6 +26,23 @@ import functools
 import numpy as np
 from typing import Tuple
 
+r"""
+Color table for beautiful terminal print.
+Common usage:
+
+>>> print("{}".format(COLOR_TABLE['red'] + "Content to be Printed in Color" + COLOR_TABLE.['end']))
+
+Reference: https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
+"""
+COLOR_TABLE = {'red': '\33[31m',
+               'green': '\33[32m',
+               'yellow': '\33[33m',
+               'blue': '\33[34m',
+               'violet': '\33[35m',
+               'beige': '\33[36m',
+               'white': '\33[37m',
+               'end': '\033[0m'}
+
 
 def global_phase(U: np.ndarray) -> float:
     r"""Compute the global phase of a :math:`2\times 2` unitary matrix.

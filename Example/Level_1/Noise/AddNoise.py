@@ -24,7 +24,7 @@ import sys
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.0')
+matchSdkVersion('Python 3.3.1')
 
 # Create environment
 env = QEnv()

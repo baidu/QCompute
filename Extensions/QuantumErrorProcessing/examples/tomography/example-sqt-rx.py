@@ -24,25 +24,16 @@ in a SPAM-resistant fashion, using low resources in terms of gate sequence lengt
         "Spectral quantum tomography."
         npj Quantum Information 5.1 (2019): 1-11.
 """
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago
-import pickle
-import os
 import matplotlib.pyplot as plt
 from cmath import *
 import numpy as np
 
-import sys
-sys.path.append('../..')
-
 from QCompute import *
+
+import qcompute_qep.quantum.channel
 import qcompute_qep.tomography as tomography
-import qcompute_qep.quantum.pauli as pauli
 import qcompute_qep.utils.circuit
 
-
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 #######################################################################################################################
 # Set the quantum hardware for Spectral Quantum Tomography.
@@ -50,11 +41,14 @@ Define.hubToken = "Token"
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
 qc = BackendName.LocalBaiduSim2
 
-# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
 
-# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+# from qiskit.providers.fake_provider import FakeSantiago
+# qc = FakeSantiago()
 
 ##########################################################################################
 # Set the quantum program for the CNOT gate in Spectral Quantum Tomography.
@@ -66,7 +60,7 @@ RX(np.math.pi / 4)(qp.Q[1])
 
 # Compute numerically the ideal CNOT for reference
 ideal_cnot = qcompute_qep.utils.circuit.circuit_to_unitary(qp)
-ideal_ptm = pauli.unitary_to_ptm(ideal_cnot).data
+ideal_ptm = qcompute_qep.quantum.channel.unitary_to_ptm(ideal_cnot).data
 # Calculate the eigenvalues of PTM representation
 ideal_eigvals, _ = np.linalg.eig(ideal_ptm)
 

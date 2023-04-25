@@ -24,6 +24,9 @@ from QCompute.QProtobuf.Library.PlatformStruct_pb2 import Program as PBProgram, 
     QProcedure as PBQProcedure
 from QCompute.QProtobuf.Library.QOperation_pb2 import FixedGate as PBFixedGate, RotationGate as PBRotationGate, \
     CustomizedGate as PBCustomizedGate, CompositeGate as PBCompositeGate, Measure as PBMeasure
+from QCompute.QProtobuf.Library.QPhotonicOperation_pb2 import \
+    PhotonicGaussianGate as PBPhotonicGaussianGate, PhotonicGaussianMeasure as PBPhotonicGaussianMeasure, \
+    PhotonicFockGate as PBPhotonicFockGate, PhotonicFockMeasure as PBPhotonicFockMeasure
 from QCompute.QProtobuf.Library.QNoise_pb2 import QNoise as PBQNoise, QNoiseDefine as PBQNoiseDefine
 from QCompute.QProtobuf.Library.QObj_pb2 import QObject as PBQObject, Experiment as PBExperiment, \
     Instruction as PBInstruction

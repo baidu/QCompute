@@ -276,7 +276,7 @@ def CU(theta: 'RotationArgument',
     """
     uGateArgumentList = angleList = [theta, phi, lamda]
     gate = RotationGateOP('CU', 2, CUOpAllowArgumentCounts, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateCUMatrix()
+    gate.generateMatrix = gate._generateCUMatrix
     return gate
 
 
@@ -291,7 +291,7 @@ def CRX(theta: 'RotationArgument') -> 'OperationFunc':
     angleList = [theta]
     uGateArgumentList = [theta, -numpy.math.pi / 2, numpy.math.pi / 2]
     gate = RotationGateOP('CRX', 2, CRXOpAllowArgumentCounts, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateCUMatrix()
+    gate.generateMatrix = gate._generateCUMatrix
     return gate
 
 
@@ -306,7 +306,7 @@ def CRY(theta: 'RotationArgument') -> 'OperationFunc':
     angleList = [theta]
     uGateArgumentList = [theta, 0, 0]
     gate = RotationGateOP('CRY', 2, CRYOpAllowArgumentCounts, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateCUMatrix()
+    gate.generateMatrix = gate._generateCUMatrix
     return gate
 
 
@@ -321,7 +321,7 @@ def CRZ(lamda: 'RotationArgument') -> 'OperationFunc':
     angleList = [lamda]
     uGateArgumentList = [0, 0, lamda]
     gate = RotationGateOP('CRZ', 2, CRZOpAllowArgumentCounts, angleList, uGateArgumentList)
-    gate.generateMatrix = gate._generateCUMatrix()
+    gate.generateMatrix = gate._generateCUMatrix
     return gate
 
 

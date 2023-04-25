@@ -45,7 +45,7 @@ if env == "prod":
 else:
     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 
-sdkVersion = 'Python 3.3.0'
+sdkVersion = 'Python 3.3.1'
 """
 SDK Version
 
@@ -142,8 +142,10 @@ Do not modify by user.
 Retry delay for waittask in case network failed.
 """
 
-outputDirPath = Path('Output').absolute()
-
+outputDirPath = os.environ.get('OUTPUTPATH', None)
+if outputDirPath is None:
+    outputDirPath = Path('Output').absolute()
+    
 """
 Output Dir Path
 

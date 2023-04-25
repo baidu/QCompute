@@ -20,9 +20,6 @@ Using the Bell State as an example to illustrate the folding technique
 implemented in the Zero-Noise Extrapolation method.
 """
 
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 import qcompute_qep.mitigation as mitigation
 import qcompute_qep.utils.circuit as circuit

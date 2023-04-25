@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qcompute_qapp.algorithm &mdash; QCompute-QAPP 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qcompute_qapp.application" href="qcompute_qapp.application.html" />
+    <link rel="prev" title="QCompute-QAPP Package" href="qcompute_qapp.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> QCompute-QAPP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Docs</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qcompute_qapp.html">QCompute-QAPP Package</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.algorithm</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE"><code class="docutils literal notranslate"><span class="pre">VQE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE.get_measure"><code class="docutils literal notranslate"><span class="pre">VQE.get_measure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE.get_gradient"><code class="docutils literal notranslate"><span class="pre">VQE.get_gradient()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE.get_loss"><code class="docutils literal notranslate"><span class="pre">VQE.get_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE.run"><code class="docutils literal notranslate"><span class="pre">VQE.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE.minimum_eigenvalue"><code class="docutils literal notranslate"><span class="pre">VQE.minimum_eigenvalue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.VQE.set_backend"><code class="docutils literal notranslate"><span class="pre">VQE.set_backend()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.algorithm.SSVQE"><code class="docutils literal notranslate"><span class="pre">SSVQE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.SSVQE.get_gradient"><code class="docutils literal notranslate"><span class="pre">SSVQE.get_gradient()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.SSVQE.get_loss"><code class="docutils literal notranslate"><span class="pre">SSVQE.get_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.SSVQE.run"><code class="docutils literal notranslate"><span class="pre">SSVQE.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.SSVQE.minimum_eigenvalues"><code class="docutils literal notranslate"><span class="pre">SSVQE.minimum_eigenvalues</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.SSVQE.set_backend"><code class="docutils literal notranslate"><span class="pre">SSVQE.set_backend()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA"><code class="docutils literal notranslate"><span class="pre">QAOA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA.get_measure"><code class="docutils literal notranslate"><span class="pre">QAOA.get_measure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA.get_gradient"><code class="docutils literal notranslate"><span class="pre">QAOA.get_gradient()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA.get_loss"><code class="docutils literal notranslate"><span class="pre">QAOA.get_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA.run"><code class="docutils literal notranslate"><span class="pre">QAOA.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA.maximum_eigenvalue"><code class="docutils literal notranslate"><span class="pre">QAOA.maximum_eigenvalue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.QAOA.set_backend"><code class="docutils literal notranslate"><span class="pre">QAOA.set_backend()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.algorithm.KernelClassifier"><code class="docutils literal notranslate"><span class="pre">KernelClassifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.KernelClassifier.fit"><code class="docutils literal notranslate"><span class="pre">KernelClassifier.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.algorithm.KernelClassifier.predict"><code class="docutils literal notranslate"><span class="pre">KernelClassifier.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.application.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.application</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.circuit.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.circuit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.optimizer.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.optimizer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.utils.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.utils</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QCompute-QAPP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="qcompute_qapp.html">QCompute-QAPP Package</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.algorithm</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qcompute_qapp.algorithm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-qcompute_qapp.algorithm">
+<span id="qcompute-qapp-algorithm"></span><h1><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.algorithm</span></code><a class="headerlink" href="#module-qcompute_qapp.algorithm" title="Permalink to this heading"></a></h1>
+<p>The variational quantum algorithm library</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.algorithm.</span></span><span class="sig-name descname"><span class="pre">VQE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamiltonian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ansatz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="qcompute_qapp.circuit.html#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><span class="pre">ParameterizedCircuit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="qcompute_qapp.optimizer.html#qcompute_qapp.optimizer.BasicOptimizer" title="qcompute_qapp.optimizer.basic_optimizer.BasicOptimizer"><span class="pre">BasicOptimizer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.algorithm.VQE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Variational Quantum Eigensolver class</p>
+<p>The constructor of the VQE class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+hamiltonian (list): Hamiltonian whose minimum eigenvalue is to be solved
+ansatz (ParameterizedCircuit): Ansatz used to search for the ground state of the Hamiltonian
+optimizer (BasicOptimizer): Optimizer used to optimize the parameters in the ansatz
+backend (str): Backend to be used in this task. Please refer to <a class="reference external" href="https://quantum-hub.baidu.com/quickGuide">https://quantum-hub.baidu.com/quickGuide</a></p>
+<blockquote>
+<div><p>for details</p>
+</div></blockquote>
+<dl class="simple">
+<dt>measurement (str): Method chosen from ‘default’, ‘ancilla’, and ‘SimMeasure’ for measuring the expectation</dt><dd><p>value, defaults to ‘default’</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE.get_measure">
+<span class="sig-name descname"><span class="pre">get_measure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.VQE.get_measure" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the measurement results</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Measurement results in bitstrings with the number of counts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE.get_gradient">
+<span class="sig-name descname"><span class="pre">get_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.VQE.get_gradient" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the gradient with respect to current parameters in circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Gradient with respect to current parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE.get_loss">
+<span class="sig-name descname"><span class="pre">get_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.VQE.get_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the loss with respect to current parameters in circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Loss with respect to current parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.VQE.run" title="Permalink to this definition"></a></dt>
+<dd><p>Searches for the minimum eigenvalue of the input Hamiltonian with the given ansatz and optimizer</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE.minimum_eigenvalue">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimum_eigenvalue</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qcompute_qapp.algorithm.VQE.minimum_eigenvalue" title="Permalink to this definition"></a></dt>
+<dd><p>The optimized minimum eigenvalue from last run</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Union[str, float]: Optimized minimum eigenvalue from last run</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.VQE.set_backend">
+<span class="sig-name descname"><span class="pre">set_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.VQE.set_backend" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the backend to be used</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>backend (str): Backend to be used</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.SSVQE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.algorithm.</span></span><span class="sig-name descname"><span class="pre">SSVQE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ex_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamiltonian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ansatz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="qcompute_qapp.circuit.html#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><span class="pre">ParameterizedCircuit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="qcompute_qapp.optimizer.html#qcompute_qapp.optimizer.BasicOptimizer" title="qcompute_qapp.optimizer.basic_optimizer.BasicOptimizer"><span class="pre">BasicOptimizer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.algorithm.SSVQE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Subspace-Search Variational Quantum Eigensolver class</p>
+<p>Please see <a class="reference external" href="https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.1.033062">https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.1.033062</a> for details on this algorithm.</p>
+<p>The constructor of the SSVQE class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+ex_num (int): Number of extra eignevalues to be solved. When ex_num = 0, only compute the minimum eigenvalue
+hamiltonian (list): Hamiltonian whose eigenvalues are to be solved
+ansatz (ParameterizedCircuit): Ansatz used to search for the eigenstates of the Hamiltonian
+optimizer (BasicOptimizer): Optimizer used to optimize the parameters in the ansatz
+backend (str): Backend to be used in this task. Please refer to <a class="reference external" href="https://quantum-hub.baidu.com/quickGuide">https://quantum-hub.baidu.com/quickGuide</a></p>
+<blockquote>
+<div><p>for details</p>
+</div></blockquote>
+<dl class="simple">
+<dt>measurement (str): Method chosen from ‘default’, ‘ancilla’, and ‘SimMeasure’ for measuring the expectation</dt><dd><p>value, defaults to ‘default’</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.SSVQE.get_gradient">
+<span class="sig-name descname"><span class="pre">get_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.SSVQE.get_gradient" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the gradient with respect to current parameters in circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Gradient with respect to current parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.SSVQE.get_loss">
+<span class="sig-name descname"><span class="pre">get_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.SSVQE.get_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the loss with respect to current parameters in circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Loss with respect to current parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.SSVQE.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.SSVQE.run" title="Permalink to this definition"></a></dt>
+<dd><p>Searches for the minimum eigenvalue of the input Hamiltonian with the given ansatz and optimizer</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.SSVQE.minimum_eigenvalues">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimum_eigenvalues</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qcompute_qapp.algorithm.SSVQE.minimum_eigenvalues" title="Permalink to this definition"></a></dt>
+<dd><p>The optimized minimum eigenvalue from last run</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Union[str, list]: Optimized minimum eigenvalues from last run</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.SSVQE.set_backend">
+<span class="sig-name descname"><span class="pre">set_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.SSVQE.set_backend" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the backend to be used</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>backend (str): Backend to be used</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.algorithm.</span></span><span class="sig-name descname"><span class="pre">QAOA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamiltonian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ansatz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="qcompute_qapp.circuit.html#qcompute_qapp.circuit.QAOAAnsatz" title="qcompute_qapp.circuit.qaoa_ansatz.QAOAAnsatz"><span class="pre">QAOAAnsatz</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="qcompute_qapp.optimizer.html#qcompute_qapp.optimizer.BasicOptimizer" title="qcompute_qapp.optimizer.basic_optimizer.BasicOptimizer"><span class="pre">BasicOptimizer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Quantum Approximate Optimization Algorithm class</p>
+<p>The constructor of the QAOA class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+hamiltonian (list): Hamiltonian used to construct the QAOA ansatz
+ansatz (QAOAAnsatz): QAOA ansatz used to search for the maximum eigenstate of the Hamiltonian</p>
+<blockquote>
+<div><p>optimizer (BasicOptimizer): Optimizer used to optimize the parameters in the ansatz</p>
+</div></blockquote>
+<dl class="simple">
+<dt>backend (str): Backend to be used in this task. Please refer to <a class="reference external" href="https://quantum-hub.baidu.com/quickGuide">https://quantum-hub.baidu.com/quickGuide</a></dt><dd><p>for details</p>
+</dd>
+<dt>measurement (str): Method chosen from ‘default’, ‘ancilla’, and ‘SimMeasure’ for measuring the expectation</dt><dd><p>value, defaults to ‘default’</p>
+</dd>
+</dl>
+<p>delta (float): Parameter used to calculate gradients, defaults to 0.1</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA.get_measure">
+<span class="sig-name descname"><span class="pre">get_measure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA.get_measure" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the measurement results</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>float : Measurement results in bitstrings with the number of counts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA.get_gradient">
+<span class="sig-name descname"><span class="pre">get_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA.get_gradient" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the gradient with respect to current parameters in circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Gradient with respect to current parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA.get_loss">
+<span class="sig-name descname"><span class="pre">get_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA.get_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the loss with respect to current parameters in circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Loss with respect to current parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA.run" title="Permalink to this definition"></a></dt>
+<dd><p>Searches for the maximum eigenvalue of the input Hamiltonian with the given ansatz and optimizer</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA.maximum_eigenvalue">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maximum_eigenvalue</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA.maximum_eigenvalue" title="Permalink to this definition"></a></dt>
+<dd><p>The optimized maximum eigenvalue from last run</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Union[str, float]: Optimized maximum eigenvalue from last run</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.QAOA.set_backend">
+<span class="sig-name descname"><span class="pre">set_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.QAOA.set_backend" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the backend to be used</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>backend: Backend to be used</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.KernelClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.algorithm.</span></span><span class="sig-name descname"><span class="pre">KernelClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'IQP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'qke'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.algorithm.KernelClassifier" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Kernel Classifier class</p>
+<p>The constructor of the KernelClassifier class</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>backend (str): Backend to be used in this task. Please refer to <a class="reference external" href="https://quantum-hub.baidu.com/quickGuide">https://quantum-hub.baidu.com/quickGuide</a></dt><dd><p>for details</p>
+</dd>
+</dl>
+<p>encoding_style (str): Encoding scheme to be used, defaults to ‘IQP’, which uses the default encoding scheme
+kernel_type (str): Type of kernel to be used, defaults to ‘qke’, i.e., &lt;x1|x2&gt;
+shots (int): Number of measurement shots, defaults to 1024</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.KernelClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.KernelClassifier.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Trains the classifier with known data</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>X (np.ndarray): Set of classical data vectors as the training data
+y (np.ndarray): Known labels of the training data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.algorithm.KernelClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#qcompute_qapp.algorithm.KernelClassifier.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predicts labels of new data</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x (np.ndarray): Set of data vectors with unknown labels</p>
+</dd>
+<dt>Return:</dt><dd><p>np.ndarray: Predicted labels of the input data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qcompute_qapp.html" class="btn btn-neutral float-left" title="QCompute-QAPP Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qcompute_qapp.application.html" class="btn btn-neutral float-right" title="qcompute_qapp.application" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Institute for Quantum Computing, Baidu Inc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

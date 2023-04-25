@@ -18,25 +18,21 @@
 """
 This file aims to collect functions related to the Quantum Detector Tomography.
 """
-import itertools
-import functools
 import math
 import copy
 from tqdm import tqdm
-from typing import List, Union, Dict
+from typing import List, Union
 import scipy.linalg as la
 import numpy as np
 from QCompute import *
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, MeasurementBasis, init_measurement_basis
+from qcompute_qep.tomography import Tomography
 from qcompute_qep.tomography.basis import PauliPrepBasis
 from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
 from qcompute_qep.utils.circuit import execute
-from qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm
+from qcompute_qep.quantum.pauli import operator_to_ptm
 from qcompute_qep.quantum import pauli
-from qcompute_qep.utils.utils import expval_from_counts
 from qcompute_qep.measurement.utils import state_labels
 
 try:

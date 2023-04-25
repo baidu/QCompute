@@ -18,23 +18,12 @@
 """
 Example to demonstrate quantum state tomography on the four-qubit GHZ state.
 """
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago
-
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 import qcompute_qep.tomography as tomography
 
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
-##########################################################################################
-# Step 1. Setup the quantum program for preparing the four-qubit GHZ state
-#         We aim to investigate how well the GHZ state is prepared.
-##########################################################################################
-
+# Step 1. Set up the quantum program for preparing the GHZ state
+# We aim to investigate how well the GHZ state is prepared.
 qp = QEnv()  # qp is short for "quantum program", instance of QProgram
 qp.Q.createList(4)
 H(qp.Q[0])
@@ -42,30 +31,36 @@ CX(qp.Q[0], qp.Q[1])
 CX(qp.Q[1], qp.Q[2])
 CX(qp.Q[2], qp.Q[3])
 
-##########################################################################################
 # Step 2. Set the quantum computer (instance of QComputer).
-#         The QuantumComputer can be a simulator or a hardware interface.
-##########################################################################################
-# For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-qc = BackendName.LocalBaiduSim2
+# The QuantumComputer can be a simulator or a hardware interface.
 
-# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+# For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
+# qc = BackendName.LocalBaiduSim2
+
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
 
-# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeMontreal simulator
+from qiskit.providers.fake_provider import FakeMontrealV2
+qc = FakeMontrealV2()
 
-##########################################################################################
-# Step 3. Perform State Tomography, check how well the Bell state
-#         is implemented in the QuantumComputer.
-##########################################################################################
-# Initialize a StateTomography instance
+# Step 3. Execute quantum state tomography,
+# check how well the GHZ state is implemented in the QuantumComputer.
 st = tomography.StateTomography()
-# Alternatively, you may initialize the StateTomography instance as follows:
-# st = StateTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-noisy_state = st.fit(qp, qc, method='lstsq', shots=4096, ptm=False)
+qubits = list(range(4))
+st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
+print('Fidelity of the GHZ state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
 
-# Compute the fidelity
-print('Fidelity between the ideal and noisy states is: F = {:.5f}'.format(st.fidelity))
+# You can also perform quantum state tomography on other qubits, for example [q1, q2]
+qubits = [1, 3, 5, 7]
+st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
+print('Fidelity of the GHZ state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
+
+# You can also perform quantum state tomography on other qubits, for example [q0, q2]
+qubits = [2, 4, 6, 8]
+st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
+print('Fidelity of the GHZ state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))

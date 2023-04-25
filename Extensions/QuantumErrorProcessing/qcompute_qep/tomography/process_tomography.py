@@ -22,7 +22,6 @@ This file aims to collect functions related to the Quantum Process Tomography.
 import scipy.linalg as la
 import numpy as np
 from typing import List
-from copy import deepcopy
 from tqdm import tqdm
 
 from qcompute_qep.exceptions.QEPError import ArgumentError
@@ -31,8 +30,7 @@ from qcompute_qep.tomography import Tomography, StateTomography, MeasurementBasi
 from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
 from qcompute_qep.utils.linalg import dagger
 from qcompute_qep.utils.circuit import circuit_to_unitary
-from qcompute_qep.quantum.pauli import ptm_to_process, unitary_to_ptm
-from qcompute_qep.quantum.channel import QuantumChannel, PTM
+from qcompute_qep.quantum.channel import QuantumChannel, PTM, unitary_to_ptm, ptm_to_process
 from qcompute_qep.quantum.metrics import average_gate_fidelity
 
 
@@ -49,16 +47,18 @@ class ProcessTomography(Tomography):
         Optional keywords list are:
 
             + `method`: default to ``inverse``, specify the process tomography method
+
             + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
+
             + `ptm`: default to ``True``, if the quantum process should be returned to the Pauli transfer matrix form
-            + `qubits`: default to None, the index of target qubit(s) we want to tomography, now only support full tomography
-            + `prep_basis`: default to ``PauliMeasBasis``, the preparation (state) basis
+
+            + `qubits`: default to ``None``, the indices of qubits we actually want to tomography.
+
+            + `prep_basis`: default to ``PauliMeasBasis``, the state preparation basis
             + `meas_basis`: default to ``PauliMeasBasis``, the measurement basis
 
         :param qp: QProgram, a quantum program for creating the target quantum process
         :param qc: QComputer, the quantum computer
-
-
         """
         super().__init__(qp, qc, **kwargs)
         self._qp: QProgram = qp
@@ -67,7 +67,7 @@ class ProcessTomography(Tomography):
         self._shots: int = kwargs.get('shots', 4096)
         self._ptm: bool = kwargs.get('ptm', True)
         self._qubits: List[int] = kwargs.get('qubits', None)
-        # Setup the preparation and measurement bases for quantum process tomography
+        # Set up the preparation and measurement bases for quantum process tomography
         self._prep_basis: PreparationBasis = init_preparation_basis(kwargs.get('prep_basis', None))
         self._meas_basis: MeasurementBasis = init_measurement_basis(kwargs.get('meas_basis', None))
         self._noisy_ptm: np.ndarray = None
@@ -81,12 +81,17 @@ class ProcessTomography(Tomography):
         + `method`: default to ``inverse``, specify the process tomography method. Current support:
 
             + ``inverse``: the inverse method;
+
             + ``lstsq``: the least square method;
+
             + ``mle``: the maximum likelihood estimation method.
 
         + `shots`: default to :math:`4096`, the number of shots each measurement should carry out
+
         + `ptm`: default to ``False``, if the quantum process should be returned to the Pauli transfer matrix form
+
         + `prep_basis`: default to ``PauliMeasBasis``, the preparation (state) basis
+
         + `meas_basis`: default to ``PauliMeasBasis``, the measurement basis
 
         :param qp: QProgram, quantum program for creating the target quantum process
@@ -105,10 +110,10 @@ class ProcessTomography(Tomography):
 
         **Examples**
 
+            >>> from qcompute_qep.quantum.channel import unitary_to_ptm
             >>> import QCompute
             >>> import qcompute_qep.tomography as tomography
             >>> from qcompute_qep.utils.circuit import circuit_to_unitary
-            >>> from qcompute_qep.quantum.pauli import unitary_to_ptm
             >>> import qcompute_qep.utils.types as typing
             >>> qp = QCompute.QEnv()
             >>> qp.Q.createList(2)
@@ -117,11 +122,10 @@ class ProcessTomography(Tomography):
             >>> ideal_ptm = unitary_to_ptm(ideal_cnot).data
             >>> qc = QCompute.BackendName.LocalBaiduSim2
             >>> qc_name = typing.get_qc_name(qc)
-            >>> st = tomography.ProcessTomography()
-            >>> noisy_ptm = st.fit(qp, qc, method='inverse', shots=4096, ptm=True)
+            >>> qpt = tomography.ProcessTomography()
+            >>> noisy_ptm = qpt.fit(qp, qc, method='inverse', shots=4096, ptm=True)
             >>> diff_ptm = ideal_ptm - noisy_ptm.data
             >>> tomography.compare_process_ptm(ptms=[ideal_ptm, noisy_ptm.data, diff_ptm])
-
         """
         # Parse the arguments. If not set, use the default arguments set by the init function
         self._qp = qp if qp is not None else self._qp
@@ -130,21 +134,25 @@ class ProcessTomography(Tomography):
         self._shots = kwargs.get('shots', self._shots)
         self._ptm = kwargs.get('ptm', self._ptm)
         self._qubits = kwargs.get('qubits', self._qubits)
-        # Setup the the preparation and measurement bases for quantum process tomography
+        # Set up the preparation and measurement bases for quantum process tomography
         self._prep_basis = init_preparation_basis(kwargs.get('prep_basis', self._prep_basis))
         self._meas_basis = init_measurement_basis(kwargs.get('meas_basis', self._meas_basis))
 
         # If the quantum program or the quantum computer is not set, the process tomography cannot be executed
         if self._qp is None:
-            raise ArgumentError("in ProcessTomography.fit(): the quantum program is not set!")
+            raise ArgumentError("ProcessTomography.fit(): the quantum program is not set!")
         if self._qc is None:
-            raise ArgumentError("in ProcessTomography.fit(): the quantum computer is not set!")
+            raise ArgumentError("ProcessTomography.fit(): the quantum computer is not set!")
         if self._qubits is None:
             self._qubits = list(range(number_of_qubits(qp)))
-        else:
-            qubits_set = set(self._qubits)
-            if len(qubits_set) != len(self._qubits):
-                raise ArgumentError("in ProcessTomography.fit(): the input qubits are not repeatable!")
+        # Check if the indices in self._qubits is unique
+        if len(set(self._qubits)) != len(self._qubits):
+            raise ArgumentError("ProcessTomography.fit(): the input qubits are not repeatable!")
+        # Check if the number of qubits in @qp and @qubits are equal
+        if len(self._qubits) != number_of_qubits(qp):
+            raise ArgumentError("ProcessTomography.fit(): the number of qubits in '@qp' "
+                                "must be equal to the number of qubits in '@qubits'!")
+
         # Number of qubits in the quantum program
         n = len(self._qubits)
 
@@ -155,8 +163,8 @@ class ProcessTomography(Tomography):
         ptm = np.zeros((meas_size, prep_size), dtype=complex)
 
         # Step 1. construct a list of preparation quantum circuits from the quantum program
-        pbar = tqdm(total=100, desc='QPT Step 1/3 : Constructing quantum circuits...', ncols=80)
-        prep_qps = self._prep_basis.prep_circuits(self._qp, self._qubits)
+        pbar = tqdm(total=100, desc='QPT Step 1/3 : Constructing quantum circuits...')
+        prep_qps = self._prep_basis.prep_circuits(self._qp)
         pbar.update(100 / 3)
         # Step 2. for each preparation quantum circuit, carry out the quantum state tomography and obtain the estimates
         pbar.desc = "QPT Step 2/3 : Running quantum circuits..."
@@ -183,7 +191,7 @@ class ProcessTomography(Tomography):
             process_ptm = None
             pass
         else:
-            raise ArgumentError("In ProcessTomography.fit(), unsupported tomography method '{}'".format(self._method))
+            raise ArgumentError("ProcessTomography.fit(), unsupported tomography method '{}'".format(self._method))
         pbar.update(100-pbar.n)
         pbar.desc = "Successfully finished QPT!"
         self._noisy_ptm = PTM(process_ptm)
@@ -200,21 +208,16 @@ class ProcessTomography(Tomography):
         if self._qp is None:
             raise ArgumentError("The quantum program characterizing the quantum process is not given!")
 
-        if self._qubits is None:
-            self._qubits = [i for i in range(len(self._qp.Q.registerMap.keys()))]
-
-        U = circuit_to_unitary(self._qp, self._qubits)
-
-        return unitary_to_ptm(U).data
+        return unitary_to_ptm(circuit_to_unitary(self._qp)).data
 
     @property
     def noisy_ptm(self):
         r"""Noisy state in matrix form obtained via state tomography.
         """
         if self._noisy_ptm is None:
-            raise ArgumentError("Run quantum state tomography first to obtain the noisy state!")
+            raise ArgumentError("Run quantum process tomography first to obtain the noisy quantum process!")
         else:
-            return self._noisy_ptm
+            return self._noisy_ptm.data
 
     @property
     def fidelity(self):
@@ -240,6 +243,6 @@ class ProcessTomography(Tomography):
         :param noisy_ptm: np.ndarray, the Pauli transfer matrix of real quantum process
         :return: float, the average gate fidelity between ideal and noisy process's PTM
         """
-        fid = average_gate_fidelity(self.ideal_ptm, self.noisy_ptm.data)
+        fid = average_gate_fidelity(self.ideal_ptm, self.noisy_ptm)
 
         return fid if fid < 1.0 else 1.0

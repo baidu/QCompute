@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1] - Apr-19-2023
+
+### Added
+
+- New Simulator;
+    - LocalBaiduSimPhotonic, used for simulating photonic quantum circuit based on gaussian or fock state.
+
 ## [3.3.0] - Feb-16-2023
 
 ### Added

@@ -1,0 +1,200 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.BasicCircuit method}, 
+		\hyperpage{7}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.BasisEncodingCircuit method}, 
+		\hyperpage{8}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.ComplexAlternatingLayeredCircuit method}, 
+		\hyperpage{13}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.ComplexEntangledCircuit method}, 
+		\hyperpage{12}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.IQPEncodingCircuit method}, 
+		\hyperpage{8}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.KernelEstimationCircuit method}, 
+		\hyperpage{8}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.ParameterizedCircuit method}, 
+		\hyperpage{9}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuit method}, 
+		\hyperpage{9}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuitWithAncilla method}, 
+		\hyperpage{10}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.QAOAAnsatz method}, 
+		\hyperpage{11}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.RealAlternatingLayeredCircuit method}, 
+		\hyperpage{12}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.RealEntangledCircuit method}, 
+		\hyperpage{12}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.SimultaneousPauliMeasurementCircuit method}, 
+		\hyperpage{10}
+  \item \spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.UniversalCircuit method}, 
+		\hyperpage{11}
+
+  \indexspace
+  \bigletter B
+  \item \spxentry{BasicCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{7}
+  \item \spxentry{BasicOptimizer}\spxextra{class in qcompute\_qapp.optimizer}, \hyperpage{13}
+  \item \spxentry{BasisEncodingCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{8}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{ComplexAlternatingLayeredCircuit}\spxextra{class in qcompute\_qapp.circuit}, 
+		\hyperpage{13}
+  \item \spxentry{ComplexEntangledCircuit}\spxextra{class in qcompute\_qapp.circuit}, 
+		\hyperpage{12}
+  \item \spxentry{compute\_ground\_state\_energy()}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy method}, 
+		\hyperpage{6}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{decode\_bitstring()}\spxextra{qcompute\_qapp.application.optimization.MaxCut method}, 
+		\hyperpage{7}
+
+  \indexspace
+  \bigletter F
+  \item \spxentry{fit()}\spxextra{qcompute\_qapp.algorithm.KernelClassifier method}, \hyperpage{5}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{get\_expectation()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuit method}, 
+		\hyperpage{9}
+  \item \spxentry{get\_expectation()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuitWithAncilla method}, 
+		\hyperpage{10}
+  \item \spxentry{get\_expectation()}\spxextra{qcompute\_qapp.circuit.SimultaneousPauliMeasurementCircuit method}, 
+		\hyperpage{11}
+  \item \spxentry{get\_gradient()}\spxextra{qcompute\_qapp.algorithm.QAOA method}, \hyperpage{4}
+  \item \spxentry{get\_gradient()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}, \hyperpage{3}
+  \item \spxentry{get\_gradient()}\spxextra{qcompute\_qapp.algorithm.VQE method}, \hyperpage{1}
+  \item \spxentry{get\_loss()}\spxextra{qcompute\_qapp.algorithm.QAOA method}, \hyperpage{4}
+  \item \spxentry{get\_loss()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}, \hyperpage{3}
+  \item \spxentry{get\_loss()}\spxextra{qcompute\_qapp.algorithm.VQE method}, \hyperpage{2}
+  \item \spxentry{get\_measure()}\spxextra{qcompute\_qapp.algorithm.QAOA method}, \hyperpage{4}
+  \item \spxentry{get\_measure()}\spxextra{qcompute\_qapp.algorithm.VQE method}, \hyperpage{1}
+  \item \spxentry{graph\_to\_hamiltonian()}\spxextra{qcompute\_qapp.application.optimization.MaxCut method}, 
+		\hyperpage{7}
+  \item \spxentry{grouping\_hamiltonian()}\spxextra{in module qcompute\_qapp.utils}, \hyperpage{16}
+
+  \indexspace
+  \bigletter H
+  \item \spxentry{hamiltonian}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy property}, 
+		\hyperpage{6}
+  \item \spxentry{hamiltonian}\spxextra{qcompute\_qapp.application.optimization.MaxCut property}, 
+		\hyperpage{7}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{IQPEncodingCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{7}
+
+  \indexspace
+  \bigletter K
+  \item \spxentry{KernelClassifier}\spxextra{class in qcompute\_qapp.algorithm}, \hyperpage{5}
+  \item \spxentry{KernelEstimationCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{8}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{load\_hamiltonian\_from\_file()}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy method}, 
+		\hyperpage{6}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{MaxCut}\spxextra{class in qcompute\_qapp.application.optimization}, \hyperpage{6}
+  \item \spxentry{maximum\_eigenvalue}\spxextra{qcompute\_qapp.algorithm.QAOA property}, 
+		\hyperpage{4}
+  \item \spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.BasicOptimizer method}, 
+		\hyperpage{13}
+  \item \spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.Powell method}, \hyperpage{15}
+  \item \spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SGD method}, \hyperpage{14}
+  \item \spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SLSQP method}, \hyperpage{14}
+  \item \spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SMO method}, \hyperpage{15}
+  \item \spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SPSA method}, \hyperpage{15}
+  \item \spxentry{minimum\_eigenvalue}\spxextra{qcompute\_qapp.algorithm.VQE property}, 
+		\hyperpage{2}
+  \item \spxentry{minimum\_eigenvalues}\spxextra{qcompute\_qapp.algorithm.SSVQE property}, 
+		\hyperpage{3}
+  \item \spxentry{module}
+    \subitem \spxentry{qcompute\_qapp.algorithm}, \hyperpage{1}
+    \subitem \spxentry{qcompute\_qapp.application.chemistry}, \hyperpage{5}
+    \subitem \spxentry{qcompute\_qapp.application.optimization}, \hyperpage{6}
+    \subitem \spxentry{qcompute\_qapp.circuit}, \hyperpage{7}
+    \subitem \spxentry{qcompute\_qapp.optimizer}, \hyperpage{13}
+    \subitem \spxentry{qcompute\_qapp.utils}, \hyperpage{16}
+  \item \spxentry{MolecularGroundStateEnergy}\spxextra{class in qcompute\_qapp.application.chemistry}, 
+		\hyperpage{5}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{num\_qubits}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy property}, 
+		\hyperpage{6}
+  \item \spxentry{num\_qubits}\spxextra{qcompute\_qapp.application.optimization.MaxCut property}, 
+		\hyperpage{7}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{ParameterizedCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{8}
+  \item \spxentry{parameters}\spxextra{qcompute\_qapp.circuit.ParameterizedCircuit property}, 
+		\hyperpage{9}
+  \item \spxentry{pauli\_terms\_to\_matrix()}\spxextra{in module qcompute\_qapp.utils}, 
+		\hyperpage{16}
+  \item \spxentry{PauliMeasurementCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{9}
+  \item \spxentry{PauliMeasurementCircuitWithAncilla}\spxextra{class in qcompute\_qapp.circuit}, 
+		\hyperpage{10}
+  \item \spxentry{Powell}\spxextra{class in qcompute\_qapp.optimizer}, \hyperpage{15}
+  \item \spxentry{predict()}\spxextra{qcompute\_qapp.algorithm.KernelClassifier method}, 
+		\hyperpage{5}
+
+  \indexspace
+  \bigletter Q
+  \item \spxentry{QAOA}\spxextra{class in qcompute\_qapp.algorithm}, \hyperpage{3}
+  \item \spxentry{QAOAAnsatz}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{11}
+  \item \spxentry{qcompute\_qapp.algorithm}
+    \subitem \spxentry{module}, \hyperpage{1}
+  \item \spxentry{qcompute\_qapp.application.chemistry}
+    \subitem \spxentry{module}, \hyperpage{5}
+  \item \spxentry{qcompute\_qapp.application.optimization}
+    \subitem \spxentry{module}, \hyperpage{6}
+  \item \spxentry{qcompute\_qapp.circuit}
+    \subitem \spxentry{module}, \hyperpage{7}
+  \item \spxentry{qcompute\_qapp.optimizer}
+    \subitem \spxentry{module}, \hyperpage{13}
+  \item \spxentry{qcompute\_qapp.utils}
+    \subitem \spxentry{module}, \hyperpage{16}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{RealAlternatingLayeredCircuit}\spxextra{class in qcompute\_qapp.circuit}, 
+		\hyperpage{12}
+  \item \spxentry{RealEntangledCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{11}
+  \item \spxentry{run()}\spxextra{qcompute\_qapp.algorithm.QAOA method}, \hyperpage{4}
+  \item \spxentry{run()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}, \hyperpage{3}
+  \item \spxentry{run()}\spxextra{qcompute\_qapp.algorithm.VQE method}, \hyperpage{2}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{set\_backend()}\spxextra{qcompute\_qapp.algorithm.QAOA method}, \hyperpage{5}
+  \item \spxentry{set\_backend()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}, \hyperpage{3}
+  \item \spxentry{set\_backend()}\spxextra{qcompute\_qapp.algorithm.VQE method}, \hyperpage{2}
+  \item \spxentry{set\_circuit()}\spxextra{qcompute\_qapp.optimizer.BasicOptimizer method}, 
+		\hyperpage{13}
+  \item \spxentry{set\_parameters()}\spxextra{qcompute\_qapp.circuit.ParameterizedCircuit method}, 
+		\hyperpage{9}
+  \item \spxentry{SGD}\spxextra{class in qcompute\_qapp.optimizer}, \hyperpage{13}
+  \item \spxentry{SimultaneousPauliMeasurementCircuit}\spxextra{class in qcompute\_qapp.circuit}, 
+		\hyperpage{10}
+  \item \spxentry{SLSQP}\spxextra{class in qcompute\_qapp.optimizer}, \hyperpage{14}
+  \item \spxentry{SMO}\spxextra{class in qcompute\_qapp.optimizer}, \hyperpage{15}
+  \item \spxentry{SPSA}\spxextra{class in qcompute\_qapp.optimizer}, \hyperpage{14}
+  \item \spxentry{SSVQE}\spxextra{class in qcompute\_qapp.algorithm}, \hyperpage{2}
+
+  \indexspace
+  \bigletter U
+  \item \spxentry{UniversalCircuit}\spxextra{class in qcompute\_qapp.circuit}, \hyperpage{11}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{VQE}\spxextra{class in qcompute\_qapp.algorithm}, \hyperpage{1}
+
+\end{sphinxtheindex}

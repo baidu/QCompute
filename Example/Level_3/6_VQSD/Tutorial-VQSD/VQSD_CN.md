@@ -56,7 +56,7 @@ import sys
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.0')
+matchSdkVersion('Python 3.3.1')
 ```
 设置好参数和超参数
 ```python

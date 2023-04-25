@@ -27,7 +27,7 @@ Supports for more types of quantum programs and quantum computers are scheduled.
 """
 import re
 import qiskit
-from typing import Union, Any, get_args, Type
+from typing import Union, Any, get_args, Type, Callable
 import QCompute
 
 from qcompute_qep.exceptions.QEPError import ArgumentError
@@ -37,7 +37,7 @@ r"""The Quantum Program data type in ``qcompute_qep``.
 """
 
 QComputer: Type[Union[str, QCompute.QPlatform.BackendName, qiskit.providers.Backend]] \
-    = Union[str, QCompute.QPlatform.BackendName, qiskit.providers.Backend]
+    = Union[str, QCompute.QPlatform.BackendName, qiskit.providers.Backend, Callable]
 r"""The Quantum Computer data type in ``qcompute_qep``.
 """
 

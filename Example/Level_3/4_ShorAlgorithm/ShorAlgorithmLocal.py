@@ -41,7 +41,7 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.0')
+matchSdkVersion('Python 3.3.1')
 
 
 def CU1(q1: QRegStorage, q2: QRegStorage, float_theta: float) -> None:
@@ -432,7 +432,7 @@ def func_quantum_order_finding(int_factor: int, int_divisor: int, int_shots: int
     """
     # Create the quantum environment
     env = QEnv()
-    Define.hubToken = ''
+    # Define.hubToken = ''
     # Choose backend
     env.backend(BackendName.LocalBaiduSim2)
     # env.backend(BackendName.CloudBaiduSim2Water)

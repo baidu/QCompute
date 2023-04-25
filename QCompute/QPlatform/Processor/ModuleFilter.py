@@ -21,11 +21,13 @@ Module Filter
 from typing import List, Optional
 
 from QCompute.Define import Settings
+from QCompute.QProtobuf import PBProgram
 from QCompute.OpenModule import ModuleImplement
 from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
 from QCompute.OpenModule.CompressGateModule import CompressGateModule
 from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
+from QCompute.OpenModule.CompressNoiseModule import CompressNoiseModule
 from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
 from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
 from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
@@ -35,7 +37,7 @@ from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
 FileErrorCode = 15
 
 
-def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleImplement']) \
+def filterModule(programe: PBProgram, backendName: Optional['BackendName'], moduleList: List['ModuleImplement']) \
         -> List['ModuleImplement']:
     if backendName is None:
         return moduleList
@@ -43,6 +45,7 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
     if backendName in [
         BackendName.LocalBaiduSim2,
         BackendName.LocalCuQuantum,
+        BackendName.LocalBaiduSimPhotonic,
         
         BackendName.CloudBaiduSim2Water,
         BackendName.CloudBaiduSim2Earth,
@@ -52,14 +55,16 @@ def filterModule(backendName: Optional['BackendName'], moduleList: List['ModuleI
         BackendName.CloudBaiduSim2Lake,
         BackendName.CloudAerAtBD,
     ]:
-        return _filterSimulator(backendName, moduleList)
+        return _filterSimulator(programe, backendName, moduleList)
     
     else:
         return moduleList
 
 
-def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement']) -> List['ModuleImplement']:
+def _filterSimulator(programe: PBProgram, backendName: BackendName, moduleList: List['ModuleImplement']) -> List[
+    'ModuleImplement']:
     unrollNoiseModule: Optional[UnrollNoiseModule] = None
+    compressNoiseModule: Optional[CompressNoiseModule] = None
     unrollProcedureModule: Optional[UnrollProcedureModule] = None
     compositeGateModule: Optional[CompositeGateModule] = None
     inverseCircuitModule: Optional[InverseCircuitModule] = None
@@ -68,8 +73,13 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
     ret: List['ModuleImplement'] = []
     for module in moduleList:
         
-        if module.__class__.__name__ == 'UnrollNoiseModule':
-            unrollNoiseModule = module
+        if backendName in [
+            
+        ] and module.__class__.__name__ == 'CompressGateModule' \
+                and not module.disable:
+            raise Error.ArgumentError(f'Unsupported {module.__class__.__name__} in {backendName.name}',
+                                      ModuleErrorCode,
+                                      FileErrorCode, 2)
         elif module.__class__.__name__ == 'UnrollProcedureModule':
             unrollProcedureModule = module
         elif module.__class__.__name__ == 'CompositeGateModule':
@@ -80,11 +90,36 @@ def _filterSimulator(backendName: BackendName, moduleList: List['ModuleImplement
             unrollCircuitModule = module
         elif module.__class__.__name__ == 'CompressGateModule':
             compressGateModule = module
+        if module.__class__.__name__ == 'UnrollNoiseModule':
+            unrollNoiseModule = module
+        if module.__class__.__name__ == 'CompressNoiseModule':
+            compressNoiseModule = module
         elif not module.disable:
             ret.append(module)
 
-    if unrollNoiseModule is not None:
-        return moduleList
+    if backendName == BackendName.LocalBaiduSimPhotonic:
+        return []
+
+    if len(programe.body.noiseMap) > 0:
+        if unrollProcedureModule is not None:
+            if not unrollProcedureModule.disable:
+                ret.append(unrollProcedureModule)
+        else:
+            ret.append(UnrollProcedureModule())
+
+        if unrollNoiseModule is not None:
+            if not unrollNoiseModule.disable:
+                ret.append(unrollNoiseModule)
+        else:
+            ret.append(UnrollNoiseModule())
+
+        if compressNoiseModule is not None:
+            if not compressNoiseModule.disable:
+                ret.append(compressNoiseModule)
+        else:
+            ret.append(CompressNoiseModule())
+
+        return ret
 
     if unrollProcedureModule is not None:
         if not unrollProcedureModule.disable:
@@ -170,6 +205,10 @@ def printModuleListDescription(moduleList: List[str]):
         elif moduleName == 'UnrollNoiseModule':
             print(
                 f'- {moduleName}: The noise unrolling module assigns all noises to the quantum circuit by user-defined rules.'
+            )
+        elif moduleName == 'CompressNoiseModule':
+            print(
+                f'- {moduleName}: The compress noise module compress single qubit noiseless gates into two-qubit gates and reorder gates to construct a more dense circuit.'
             )
     if len(moduleList) > 0:
         print(

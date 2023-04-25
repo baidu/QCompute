@@ -25,15 +25,10 @@ We use the measurement error mitigation technique to improve the performance. Re
 """
 import copy
 from typing import Tuple
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib import rc, pylab
-
-import sys
-sys.path.append('../..')
 
 from QCompute import *
 from QCompute.QPlatform.QOperation import RotationGate
@@ -45,8 +40,6 @@ from qcompute_qep.utils import expval_z_from_counts
 from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits, get_qc_name
 from qcompute_qep.utils.circuit import execute, circuit_to_state
 
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096
 
@@ -242,17 +235,20 @@ if __name__ == '__main__':
     neu_val_diff_list = []
     neu_euc_list = []
 
-    #######################################################################################################################
+    ###############################################################################################
     # Set the quantum hardware for estimating the parity oscillation.
-    #######################################################################################################################
+    ###############################################################################################
     # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
     qc = BackendName.LocalBaiduSim2
 
-    # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+    # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+    # You must set your VIP token first in order to access the Baidu hardware.
+    # Define.hubToken = "Token"
     # qc = BackendName.CloudBaiduQPUQian
 
-    # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-    # qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+    # from qiskit.providers.fake_provider import FakeSantiago
+    # qc = FakeSantiago()
 
     qc_name = get_qc_name(qc)
 
@@ -291,9 +287,9 @@ if __name__ == '__main__':
         neu_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(neu_counts))/NUMBER_OF_SHOTS))
         neu_val_diff_list.append(abs(theo_val - neu_val))
 
-    ###################################################################################################################
+    ###############################################################################################
     # The following plot visualizes the ideal, noisy, and corrected expectation values
-    ###################################################################################################################
+    ###############################################################################################
     VISUALIZE_EXPECTATION_VALUES = True
     if VISUALIZE_EXPECTATION_VALUES:
         plt.figure()
@@ -396,9 +392,9 @@ if __name__ == '__main__':
 
         plt.show()
     pass
-    ###################################################################################################################
+    ###############################################################################################
     # The following plot visualizes the Euclidean distances between the ideal and noisy/corrected counts.
-    ###################################################################################################################
+    ###############################################################################################
     VISUALIZE_EUCLIDEAN_DISTANCES = True
     if VISUALIZE_EUCLIDEAN_DISTANCES:
         plt.figure()
@@ -535,9 +531,9 @@ if __name__ == '__main__':
 
         plt.show()
     pass
-    ###################################################################################################################
+    ###############################################################################################
     # The following plot visualizes the Euclidean distances between the ideal and noisy/corrected expectation values.
-    ###################################################################################################################
+    ###############################################################################################
     VISUALIZE_EXP_EUCLIDEAN_DISTANCES = True
     if VISUALIZE_EXP_EUCLIDEAN_DISTANCES:
         vals_diff = np.zeros((5, len(phi_list)), dtype=float)

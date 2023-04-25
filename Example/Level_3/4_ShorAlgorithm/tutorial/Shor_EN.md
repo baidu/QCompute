@@ -385,7 +385,7 @@ The [PyOnline](https://quantum-hub.baidu.com/#/) code is following:
 from QCompute import *
 from numpy import pi
 
-matchSdkVersion('Python 3.3.0')
+matchSdkVersion('Python 3.3.1')
 
 
 def func_order_finding_2_mod_63():
@@ -1006,7 +1006,7 @@ def func_quantum_order_finding(int_factor, int_divisor, int_shots, number_qubit_
     """
     # Create the quantum environment
     env = QEnv()
-    Define.hubToken = ''
+    # Define.hubToken = ''
     # Choose backend
     env.backend(BackendName.LocalBaiduSim2)
     # env.backend(BackendName.CloudBaiduSim2Water)

@@ -18,7 +18,7 @@
 """
 Quantum Operation
 """
-from typing import List, Union, Optional, Callable, TYPE_CHECKING
+from typing import List, Union, Optional, Callable, TYPE_CHECKING, Tuple
 
 import numpy
 
@@ -34,6 +34,8 @@ if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation.Barrier import BarrierOP
     from QCompute.QPlatform.QOperation.Measure import MeasureOP
     from QCompute.QPlatform.QRegPool import QRegStorage
+    from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianGate import PhotonicGaussianGateOP
+    from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianMeasure import PhotonicGaussianMeasureOP
 
 FileErrorCode = 9
 
@@ -55,15 +57,26 @@ class QOperation:
     def getMatrix(self) -> numpy.ndarray:
         if self.__class__.__name__ == 'FixedGateOP':
             return self.matrix
-        elif self.__class__.__name__ == 'RotationGateOP':
+        elif self.__class__.__name__ == 'RotationGateOP' or self.__class__.__name__ == 'PhotonicFockGateOP':
             if self.matrix is None:
-                self.generateMatrix()
-            return self.matrix
+                return self.generateMatrix()  # include generate self.matrix
+            else:
+                return self.matrix
         elif self.__class__.__name__ == 'CustomizedGateOP':
             return self.matrix
         else:
             raise Error.ArgumentError(f'{self.__class__.__name__} do not have matrix!', ModuleErrorCode, FileErrorCode,
                                       1)
+
+    def getMatrixAndVector(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        if self.__class__.__name__ == 'PhotonicGaussianGateOP':
+            if self.matrix is None:
+                return self.generateMatrixAndVector()  # include generate self.matrix and self.displace_vector
+            else:
+                return self.matrix, self.displace_verctor
+        else:
+            raise Error.ArgumentError(f'{self.__class__.__name__} only support photonic gate!', ModuleErrorCode,
+                                      FileErrorCode, 2)
 
     def getInversed(self) -> 'QOperation':
         return self
@@ -77,18 +90,18 @@ class QOperation:
         env = qRegList[0].env
         for qReg in qRegList:
             if qReg.env != env:
-                raise Error.ArgumentError('QReg must belong to the same env!', ModuleErrorCode, FileErrorCode, 2)
+                raise Error.ArgumentError('QReg must belong to the same env!', ModuleErrorCode, FileErrorCode, 3)
 
         if env.__class__.__name__ == 'QProcedure':
-            raise Error.ArgumentError('QProcedure should not be operated!', ModuleErrorCode, FileErrorCode, 3)
+            raise Error.ArgumentError('QProcedure should not be operated!', ModuleErrorCode, FileErrorCode, 4)
 
         if self.bits is not None and self.bits != len(
                 qRegList):  # Barrier and QProcedure does not match bits configuration
-            raise Error.ArgumentError('The number of QReg must match the setting!', ModuleErrorCode, FileErrorCode, 4)
+            raise Error.ArgumentError('The number of QReg must match the setting!', ModuleErrorCode, FileErrorCode, 5)
 
         if len(qRegList) != len(set(qReg for qReg in qRegList)):
             raise Error.ArgumentError('QReg of operators in circuit are not repeatable!', ModuleErrorCode,
-                                      FileErrorCode, 5)
+                                      FileErrorCode, 6)
 
         circuitLine = CircuitLine()
         circuitLine.data = self
@@ -104,38 +117,38 @@ class QOperation:
         """
         if len(qRegList) != len(cRegList):
             raise Error.ArgumentError('QReg and CReg in measure must have same count!', ModuleErrorCode, FileErrorCode,
-                                      6)
+                                      7)
 
         env = qRegList[0].env
         for qReg in qRegList:
             if qReg.env != env:
-                raise Error.ArgumentError('QReg must belong to the same env!', ModuleErrorCode, FileErrorCode, 7)
+                raise Error.ArgumentError('QReg must belong to the same env!', ModuleErrorCode, FileErrorCode, 8)
 
         if env.__class__.__name__ == 'QProcedure':
-            raise Error.ArgumentError('QProcedure must not be measured!', ModuleErrorCode, FileErrorCode, 8)
+            raise Error.ArgumentError('QProcedure must not be measured!', ModuleErrorCode, FileErrorCode, 9)
 
         if len(qRegList) <= 0:
-            raise Error.ArgumentError('Must have QReg in measure!', ModuleErrorCode, FileErrorCode, 9)
+            raise Error.ArgumentError('Must have QReg in measure!', ModuleErrorCode, FileErrorCode, 10)
 
         if len(qRegList) != len(set(qReg for qReg in qRegList)):
             raise Error.ArgumentError('QReg of measure in circuit are not repeatable!', ModuleErrorCode,
-                                      FileErrorCode, 10)
+                                      FileErrorCode, 11)
 
         for qReg in qRegList:  # Only in QEnv
             if qReg.index in env.measuredQRegSet:
-                raise Error.ArgumentError('Measure must be once on a QReg!', ModuleErrorCode, FileErrorCode, 11)
+                raise Error.ArgumentError('Measure must be once on a QReg!', ModuleErrorCode, FileErrorCode, 12)
             env.measuredQRegSet.add(qReg.index)
 
         if len(cRegList) <= 0:
-            raise Error.ArgumentError('Must have CReg in measure!', ModuleErrorCode, FileErrorCode, 12)
+            raise Error.ArgumentError('Must have CReg in measure!', ModuleErrorCode, FileErrorCode, 13)
 
         if len(cRegList) != len(set(cReg for cReg in cRegList)):
             raise Error.ArgumentError('CReg of measure in circuit are not repeatable!', ModuleErrorCode,
-                                      FileErrorCode, 13)
+                                      FileErrorCode, 14)
 
         for cReg in cRegList:  # Only in QEnv
             if cReg in env.measuredCRegSet:
-                raise Error.ArgumentError('Measure must be once on a CReg!', ModuleErrorCode, FileErrorCode, 14)
+                raise Error.ArgumentError('Measure must be once on a CReg!', ModuleErrorCode, FileErrorCode, 15)
             env.measuredCRegSet.add(cReg)
 
         circuitLine = CircuitLine()
@@ -146,7 +159,9 @@ class QOperation:
 
 
 Operation = Union[
-    'FixedGateOP', 'RotationGateOP', 'CompositeGateOP', 'CustomizedGateOP', 'QProcedureOP', 'BarrierOP', 'MeasureOP']
+    'FixedGateOP', 'RotationGateOP', 'CompositeGateOP', 'CustomizedGateOP', 'QProcedureOP', 'BarrierOP', 'MeasureOP',
+    'PhotonicGaussianGateOP', 'PhotonicGaussianMeasureOP', 'PhotonicFockGateOP', 'PhotonicFockMeasureOP'
+]
 
 
 class CircuitLine:

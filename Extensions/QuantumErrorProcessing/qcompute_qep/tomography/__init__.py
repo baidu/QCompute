@@ -23,11 +23,20 @@ from qcompute_qep.tomography.state_tomography import StateTomography
 from qcompute_qep.tomography.process_tomography import ProcessTomography
 from qcompute_qep.tomography.spectral_tomography import SpectralTomography
 from qcompute_qep.tomography.utils import plot_process_ptm, compare_process_ptm
-from qcompute_qep.tomography.gateset_tomography import GateSetTomography, GateSet
+from qcompute_qep.tomography.gateset import GateSet, STD1Q_GATESET_RXRY, STD1Q_GATESET_RXRYRX, \
+    STD1Q_GATESET_RXRYID, STD2Q_GATESET_RXRYCX, STD2Q_GATESET_RXRYCZ, STD2Q_GATESET_RXRYSWAP
+from qcompute_qep.tomography.gateset_optimizer import GSTOptimizer, \
+    LinearInversionOptimizer, MLEOptimizer, LinearApproximationOptimizer
+from qcompute_qep.tomography.gateset_tomography import GateSetTomography
+
 
 __all__ = [
     'Tomography', 'StateTomography', 'ProcessTomography', 'GateSetTomography',
     'PauliMeasBasis', 'MeasurementBasis', 'PreparationBasis', 'GateSet', 'SpectralTomography',
     'init_measurement_basis', 'init_preparation_basis',
-    'plot_process_ptm', 'compare_process_ptm'
+    'plot_process_ptm', 'compare_process_ptm',
+    'STD1Q_GATESET_RXRY', 'STD1Q_GATESET_RXRYRX', 'STD1Q_GATESET_RXRYID',
+    'STD2Q_GATESET_RXRYCX', 'STD2Q_GATESET_RXRYCZ', 'STD2Q_GATESET_RXRYSWAP',
+    'GSTOptimizer',
+    'LinearInversionOptimizer', 'MLEOptimizer', 'LinearApproximationOptimizer'
 ]

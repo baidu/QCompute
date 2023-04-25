@@ -36,8 +36,12 @@ if 'sphinx' not in sys.modules:
     # CUDA_DATA_TYPE = cuquantum.cudaDataType.CUDA_C_32F
     # DistEinsum.CUDA_COMPUTE_TYPE = cuquantum.ComputeType.COMPUTE_16F
 
+    # single precision (tensor-float)
+    # NP_DATA_TYPE = np.complex64  # todo: numpy do not support tf32. Fix it later.
+    # CUDA_DATA_TYPE = cuquantum.cudaDataType.CUDA_C_32F
+    # DistEinsum.CUDA_COMPUTE_TYPE = cuquantum.ComputeType.COMPUTE_TF32
 
-    # single precision
+    # single precision (normal float)
     NP_DATA_TYPE = np.complex64
     CUDA_DATA_TYPE = cuquantum.cudaDataType.CUDA_C_32F
     DistEinsum.CUDA_COMPUTE_TYPE = cuquantum.ComputeType.COMPUTE_32F

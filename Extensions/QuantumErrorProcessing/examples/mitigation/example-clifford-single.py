@@ -27,22 +27,15 @@ References:
             Nature 567.7749 (2019): 491-495.
 """
 import copy
-import qiskit
 from qiskit.providers.fake_provider import FakeSantiago
 import numpy as np
 
-import sys
-sys.path.append('../..')
-
 from QCompute import *
-from qcompute_qep.utils import expval_from_counts, decompose_yzy
+from qcompute_qep.utils import expval_from_counts
 from qcompute_qep.quantum import clifford
 from qcompute_qep.mitigation import ZNEMitigator
 from qcompute_qep.mitigation.utils import plot_zne_sequences
 from qcompute_qep.utils.circuit import execute
-
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 
 def calculator(qp: QEnv = None, qc: BackendName = None) -> float:
@@ -70,9 +63,14 @@ zne_richard = ZNEMitigator(folder="circuit", extrapolator='richardson')
 
 # Set the ideal quantum computer to `LocalBaiduSim2` and the noisy quantum computer to `CloudBaiduQPUQian`
 qc_ideal = BackendName.LocalBaiduSim2
+
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc_noisy = BackendName.CloudBaiduQPUQian
+
 # For numeric test on the noisy simulator, change qc_noisy to Qiskit's FakeSantiago
-qc_noisy = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+qc_noisy = FakeSantiago()
 
 expvals_ideal = []  # (num_seq, )
 expvals_noisy_linear = []  # (num_seq, num_scales)

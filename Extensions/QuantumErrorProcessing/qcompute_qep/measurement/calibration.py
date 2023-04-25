@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+# !/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
@@ -28,7 +28,7 @@ and performs a noisy measurement of each qubit, keeping the record of the measur
     >>> from QCompute import Define
     >>> from QCompute import BackendName
     >>>
-    >>> from qiskit.providers.fake_provider import FakeSantiago
+    >>> from qiskit.test.mock import FakeSantiago
     >>> from qcompute_qep.measurement.calibration import CompleteCalibrator
     >>> from qcompute_qep.measurement.calibration import TPCalibrator
     >>> from qcompute_qep.measurement.calibration import init_complete_cal_circuits
@@ -43,24 +43,25 @@ and performs a noisy measurement of each qubit, keeping the record of the measur
     >>> qc_noisy = BackendName.CloudBaiduQPUQian
     >>> qubits = [1, 2]
 """
-import os
 import abc
-import json
 from abc import ABC
+import networkx as nx
 from builtins import str
 import copy
 from typing import Any, Dict, List, Tuple
 import numpy as np
 from itertools import combinations
 from tqdm import tqdm
+from scipy.linalg import expm
 
 from QCompute import *
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement.utils import extract_substr, init_cal_data
-from qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
-from qcompute_qep.utils.linalg import tensor, normalize, partial_trace
+from qcompute_qep.measurement.utils import extract_substr, init_cal_data, special_log, get_qc_topo
+from qcompute_qep.utils.types import QProgram, QComputer
+from qcompute_qep.utils.linalg import tensor, normalize
 from qcompute_qep.utils.circuit import execute
+from qcompute_qep.utils.graph import connected_subgraphs
 
 
 class Calibrator(ABC):
@@ -77,6 +78,7 @@ class Calibrator(ABC):
         self._qubits: List[int] = None
         self._cal_matrix: np.ndarray = None
         self._noise_resist: float = None
+        self._k: int = 2
         self._sync: bool = True
 
     @property
@@ -199,6 +201,9 @@ class Calibrator(ABC):
                     self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync)
                 elif self.__class__.__name__ == 'TPCalibrator':
                     self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync, method='tp')
+                elif self.__class__.__name__ == 'CTMPCalibrator':
+                    self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync, method='ctmp',
+                                                   crosstak_order=self._k)
 
 
 class CompleteCalibrator(Calibrator):
@@ -447,6 +452,144 @@ class TPCalibrator(Calibrator):
         return list(zip(indices, self._cal_matrices))
 
 
+class CTMPCalibrator(Calibrator):
+    """
+    Calibrator based on CTMP model.
+    """
+
+    def __init__(self,
+                 qc: QComputer = None,
+                 cal_data: Dict[str, Dict[str, int]] = None,
+                 qubits: List[int] = None,
+                 k: int = 2,
+                 topo: nx.Graph = None,
+                 sync: bool = True):
+        """
+        The init function of the CTMP Calibrator.
+
+        :param qc: QComputer, the quantum computer whose measurement device is to be calibrated.
+        :param cal_data: Dict[str, Dict[str, int]], a dictionary of the calibration data
+        :param qubits: List[int], the qubits list, composed of integers.
+        :param k: int, the order of cross talk error, default to 2
+        :param topo: nx.Graph, the topology of the quantum computer
+        """
+        super(CTMPCalibrator, self).__init__()
+        self._G = None
+        self._qc = qc
+        self._cal_data = cal_data
+        self._qubits = qubits
+        self._sync = sync
+        self._k = k
+        self._topo = topo
+        self._cal_matrices = []
+
+        # Initialize the calibration matrix
+        self.calibrate(cal_data=self._cal_data, qubits=self._qubits)
+
+    def __str__(self):
+        return "CTMP Calibrator"
+
+    def calibrate(self, **kwargs: Any) -> Any:
+        r"""
+        The calibrate method of the CTMPCalibrator. Supported keywords in the list are:
+
+        + ``qc``: QComputer, the quantum computer whose measurement device is to be calibrated.
+        + ``cal_data``: Dict[str, Dict[str, int]], a dictionary of the calibration data.
+        + ``qubits``: List[int], the qubits list that are calibrated, composed of integers.
+
+        If these parameters are not set, use the default arguments set by the init function.
+
+        If @qc is set, load calibration data from file and update the @cal_data parameter.
+
+        If @qc is not set, use calibration data stored in @cal_data.
+
+        Usage:
+
+        .. code-block:: python
+            :linenos:
+
+            ctmp = CTMPCalibrator(qc=qc, cal_data=cal_data, qubits=qubits)
+            ctmp.calibrate()
+            ctmp.calibrate(cal_data=cal_data)
+            ctmp.calibrate(cal_data=cal_data, qubits=qubits)
+            ctmp.calibrate(qc=qc, qubits=qubits)
+            ctmp.calibrate(qc=qc, cal_data=cal_data, qubits=qubits)
+
+        **Examples**
+
+            >>> ctmp_ideal = CTMPCalibrator(qc=qc_ideal, qubits=qubits)
+            >>> ctmp_noisy = CTMPCalibrator(qc=qc_noisy, qubits=qubits)
+            >>> print('ctmp_ideal\n', ctmp_ideal.cal_matrix)
+            ctmp_ideal
+            [[1. 0. 0. 0.]
+             [0. 1. 0. 0.]
+             [0. 0. 1. 0.]
+             [0. 0. 0. 1.]]
+            >>> print('ctmp_noisy\n', ctmp_noisy.cal_matrix)
+            ctmp_noisy
+            [[9.76718748e-01 2.77204459e-02 2.09163347e-02 5.93630586e-04]
+             [1.13171442e-02 9.60315446e-01 2.42355515e-04 2.05650596e-02]
+             [1.18270686e-02 3.35666348e-04 9.67629482e-01 2.74624816e-02]
+             [1.37039082e-04 1.16284413e-02 1.12118278e-02 9.51378828e-01]]
+        """
+        # Parse the arguments. If not set, use the default arguments set by the init function.
+        self._qc = kwargs.get('qc', self._qc)
+        self._cal_data = kwargs.get('cal_data', self._cal_data)
+        self._qubits = kwargs.get('qubits', self._qubits)
+        self._k = kwargs.get('k', self._k)
+        self._topo = get_qc_topo(self._qc)
+        self._preprocess_inputs()
+        if self._topo is None:
+            print('User should prepare the topology of the quantum computer using the package networkx!')
+            raise ArgumentError("In CTMPCalibrator: must specify the topology of the quantum computer!")
+        sub_graphs = connected_subgraphs(self._topo, self._k)
+        target_index_list = []
+        for i in sub_graphs:
+            target_index_list.append(tuple(i.nodes))
+        error_rate = {}
+        n_qubit = len(self._qubits)
+        for i in range(n_qubit):
+            target_index_list.append([i])
+
+        dim = 2 ** n_qubit
+        self._G = np.zeros((dim, dim), dtype=float)
+        self._cal_matrix = np.zeros((dim, dim), dtype=float)
+        G = np.zeros((dim, dim), dtype=float)
+        pbar = tqdm(total=100, desc='Step 3/3: Constructing calibration matrix!', ncols=80)
+        for k in target_index_list:
+            pbar.update(100 / len(target_index_list))
+            n_cross = len(k)
+            # For example, consider index = [1, 2, 3], which corresponds to 3-order crosstalk noise,
+            # would have 8*8 dimension matrix.
+            local_A = np.zeros((2 ** n_cross, 2 ** n_cross), dtype=float)
+
+            for x, output_info in self._cal_data.items():  # iterate over input states
+                for y, cnt in output_info.items():  # iterate over output states
+                    x_e, x_r = extract_substr(x, indices=list(k))
+                    y_e, y_r = extract_substr(y, indices=list(k))
+                    if y_r == x_r:
+                        local_A[int(y_e, 2), int(x_e, 2)] += cnt
+
+            # Normalize along the row to make it column stochastic
+            local_A = normalize(local_A, axis=0)
+            local_A = special_log(local_A)
+
+            init_state = [bin(i).split('b')[1].zfill(n_cross) for i in range(2 ** n_cross)]
+            output_state = [bin(i).split('b')[1].zfill(n_cross) for i in range(2 ** n_cross)][::-1]
+
+            error_rate[str(k)] = {}
+            for element in zip(output_state, init_state):
+                r = local_A[int(element[0], 2), int(element[1], 2)]
+                error_rate[str(k)][str(element)] = r
+                G += r*generator_matrix(qubits=self._qubits, target_index=k, target_state=element)
+        self._G = G
+        self._cal_matrix = expm(G)
+        return self._cal_matrix
+
+    def generator_matrix(self):
+        return self._G
+
+
 def init_complete_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
     r"""
     Initialize the measurement calibration circuits for the complete calibration model.
@@ -611,6 +754,71 @@ def init_tp_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
     return result
 
 
+def hamming_weight(x):
+    c = 0
+    while x:
+        x &= x - 1
+        c += 1
+
+    return c
+
+
+def init_ctmp_cal_circuits(qubits: List[int] = None, order: int = None) -> Dict[str, QProgram]:
+    r"""
+    Initialize the measurement calibration circuits for the CTMP model.
+
+    :param order: int, specify the order of crosstalk noise
+    :param qubits: List[int], the qubits list, composed of integers.
+    :return: Dict[str: QProgram], state labels and the corresponded QProgram objects which are the calibration circuits.
+
+    **Examples**
+
+        >>> init_ctmp_cir = init_ctmp_cal_circuits(qubits=[0, 1, 2, 3], order=2)
+        >>> print(init_ctmp_cir)
+        >>> for key, value in init_ctmp_cir.items():
+        >>>    print_circuit(init_ctmp_cir[key].circuit)
+        {'0000': <QCompute.QPlatform.QEnv.QEnv object at 0x10caaebb0>,
+        '0001': <QCompute.QPlatform.QEnv.QEnv object at 0x12194e8e0>,
+        '0010': <QCompute.QPlatform.QEnv.QEnv object at 0x12197a430>,
+        '0100': <QCompute.QPlatform.QEnv.QEnv object at 0x12197a760>,
+        '1000': <QCompute.QPlatform.QEnv.QEnv object at 0x12197aa90>,
+        '1111': <QCompute.QPlatform.QEnv.QEnv object at 0x12197adc0>}
+    """
+    if order is None or qubits is None:
+        raise ArgumentError("in init_ctmp_cal_circuits(): the qubits and order are not given!")
+
+    n_qubit = max(qubits) + 1
+    if order > n_qubit:
+        raise ArgumentError("in init_ctmp_cal_circuits(): the order should not larger than number of qubits!")
+    index1 = [i for i in range(2 ** n_qubit)]
+    index_dict = {}
+    weight_list = [i for i in range(order)]
+    weight_list.append(n_qubit)
+    for i in index1:
+        key = bin(i).split('b')[1].zfill(n_qubit)
+        value = hamming_weight(i)
+        if value in weight_list:
+            index_dict[key] = value
+
+    result = {}
+    pbar = tqdm(total=100, desc='Step 1/3: Constructing calibration circuit!', ncols=80)
+    for state_str in index_dict.keys():
+        pbar.update(100 / len(index_dict))
+        # Step 1. Setup the calibration quantum circuit for the basis state @i
+        qp = QEnv()
+        qp.Q.createList(n_qubit)
+
+        for idx, val in enumerate(state_str[::-1]):
+            if val == '1':
+                X(qp.Q[idx])
+
+        MeasureZ(*qp.Q.toListPair())
+
+        result[state_str] = qp
+    pbar.close()
+    return result
+
+
 def extract_cal_data(raw_cal_data: Dict[str, Dict[str, int]], qubits: List[int] = None) -> Dict[str, Dict[str, int]]:
     """
     Extract calibration data of @qubits for the original calibration data.
@@ -641,7 +849,8 @@ def extract_cal_data(raw_cal_data: Dict[str, Dict[str, int]], qubits: List[int] 
 def load_cal_data(qc: QComputer = None,
                   qubits: List[int] = None,
                   sync: bool = True,
-                  method: str = 'complete') -> Dict[str, Dict[str, int]]:
+                  method: str = 'complete',
+                  crosstak_order: int = 2) -> Dict[str, Dict[str, int]]:
     """
     Load calibration data of @qubits for the Quantum Computer specified by @qc.
     By default **sync = True**, the program would generate and run calibration circuits to obtain calibration data.
@@ -655,6 +864,7 @@ def load_cal_data(qc: QComputer = None,
 
     If @qubits is None, load the calibration data for all qubits by default.
 
+    :param crosstak_order:
     :param qc: QComputer, the quantum computer whose measurement device is to be calibrated
     :param qubits: List[int], the qubits list whose calibration data is loaded, composed of integers
     :param method: string, decide which kind of calibration to be used, by default is complete model
@@ -676,13 +886,16 @@ def load_cal_data(qc: QComputer = None,
     if sync is True:
         if method == 'complete':
             cir = init_complete_cal_circuits(qubits=qubits)
-        else:
+        elif method == 'tp':
             cir = init_tp_cal_circuits(qubits=qubits)
+        else:
+            cir = init_ctmp_cal_circuits(qubits=qubits, order=crosstak_order)
         cal_data = {}
         pbar = tqdm(total=100, desc='Step 2/3: Collecting calibration data!', ncols=80)
         for key, value in cir.items():
             pbar.update(100 / len(cir))
-            cal_data[key] = execute(qp=value, qc=qc, shots=1024)
+            cal_data[key] = execute(qp=value, qc=qc)
+        pbar.close()
     else:
         qc_name = qc.name.lower()
         if qc_name.endswith('iopcas'):
@@ -698,3 +911,60 @@ def load_cal_data(qc: QComputer = None,
             raise ArgumentError("Invalid quantum machine!")
 
     return cal_data
+
+
+def manipulate_bits(bit1: Tuple[str, str], bit2: List[str], idx_list: List[int]):
+    r"""
+    Insert bit string to another bit string.
+
+    :param bit1: Tuple[str, str], bit string to be inserted.
+    :param bit2: List[str], bit string for inserting.
+    :param idx_list: List[int], indices for inserted bits.
+    :return:
+    """
+    final_bit_list = []
+    idx_bit = list(zip(idx_list, bit2))
+    bit_0 = list(bit1[0])
+    bit_1 = list(bit1[1])
+    for element in idx_bit:
+        bit_0.insert(element[0], element[1])
+        bit_1.insert(element[0], element[1])
+    final_bit = (''.join(bit_0)[::-1], ''.join(bit_1)[::-1])
+    final_bit_list.append(final_bit)
+
+    return final_bit_list
+
+
+def generator_matrix(qubits: List[int], target_index: Tuple[int, int], target_state: Tuple[str, str]) -> np.ndarray:
+    r"""
+    Calculate each local generator matrix corresponds to target index.
+
+    :param target_state:
+    :param qubits: List[int], the qubit list.
+    :param target_index: List[Tuple], list of index of qubits sharing the same cross talk noise.
+    :return: np.ndarray, the corresponding generator matrix.
+    """
+
+    # Obtain the remaining bits (non-crosstalk case)
+    remain_index = []
+    for j in qubits:
+        if j not in target_index:
+            remain_index.append(j)
+
+    # Generator matrix
+
+    remain_bit_len = len(remain_index)
+    n_qubit = len(qubits)
+    # Obtain the states for the remaining bits
+    remain_state = [bin(i).split('b')[1].zfill(remain_bit_len) for i in range(2**remain_bit_len)]
+
+    local_matrix_list = []
+    for remain_bit in remain_state:
+        b = manipulate_bits(target_state, list(remain_bit), idx_list=remain_index)
+        for i in b:
+            local_matrix = np.zeros((2**n_qubit, 2**n_qubit), dtype=float)
+            local_matrix[int(i[1], 2), int(i[1], 2)] = -1
+            local_matrix[int(i[0], 2), int(i[1], 2)] = 1
+            local_matrix_list.append(local_matrix)
+    final = sum(local_matrix_list)
+    return final

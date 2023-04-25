@@ -32,7 +32,7 @@ from qcompute_qep.exceptions.QEPError import ArgumentError
 from qcompute_qep.utils.linalg import tensor
 from qcompute_qep.quantum.pauli import complete_pauli_basis, QUBIT_PAULI_BASIS
 from qcompute_qep.quantum.gellmann import GELL_MANN_BASIS
-from qcompute_qep.utils.types import QProgram, number_of_qubits
+from qcompute_qep.utils.types import QProgram
 
 SUPPORTED_MEASUREMENT_BASIS = {'Pauli', 'GellMann'}
 SUPPORTED_PREPARATION_BASIS = {'Pauli', 'PauliOC'}
@@ -401,13 +401,12 @@ class GellMannMeasBasis(MeasurementBasis):
             meas_qp = deepcopy(qp)
             # Store the eigenvalues for each local measurement operator.
             # !WARNING! We cannot simply compute the eigenvalues for the global measurement operator
-            # using the `np.linalg.eig` function since the returned eigenvalues might be not well ordered.
+            # using the `np.linalg.eig` function since the returned eigenvalues might be not well sorted.
             # For example, the eigenvalues of the Pauli operator `YI` should be ordered as :math:`[1, 1, -1, -1]`.
             # However, `np.linalg.eig` evaluates the eigenvalues of `YI`
             # will return :math:`[1, -1, 1, -1]`, which is incorrect.
             eigs = []
             # Map each 2 qubit Pauli measurement to the Z basis measurement
-            gate_number = len(p_name)
 
             for i, ch in enumerate(p_name):
                 # Calculate the qubit index under the LSB mode assumption
@@ -567,7 +566,7 @@ class PauliMeasBasis(MeasurementBasis):
                 0: ---H---MEAS
 
         :param qp: QEnv, the original quantum program (without measurement)
-        :param qubits: List[int], the target qubit(s)
+        :param qubits: List[int], the target qubit(s) to be measured
         :return: Tuple[List[QEnv], List[np.ndarray]], a complete set of modified quantum programs
                 with the Pauli measurements appended to the end and its corresponding quantum observable
 
@@ -594,7 +593,7 @@ class PauliMeasBasis(MeasurementBasis):
             meas_qp = deepcopy(qp)
             # Store the eigenvalues for each local measurement operator.
             # !WARNING! We cannot simply compute the eigenvalues for the global measurement operator
-            # using the `np.linalg.eig` function since the returned eigenvalues might be not well ordered.
+            # using the `np.linalg.eig` function since the returned eigenvalues might be not well sorted.
             # For example, the eigenvalues of the Pauli operator `YI` should be ordered as :math:`[1, 1, -1, -1]`.
             # However, `np.linalg.eig` evaluates the eigenvalues of `YI`
             # will return :math:`[1, -1, 1, -1]`, which is incorrect.
@@ -681,7 +680,7 @@ class PauliPrepBasis(PreparationBasis):
 
         .. note::
 
-            We assume the LSB (least significant bit) mode, i.e., the right-most bit represents q[0]:
+            We assume the LSB (the least significant bit) mode, i.e., the right-most bit represents q[0]:
 
                 name:           `X      I     Y      X`
 
@@ -695,7 +694,7 @@ class PauliPrepBasis(PreparationBasis):
 
                 0: ---H---
 
-            then the six decorated quantum programs are:
+            then the four decorated quantum programs are:
 
                 0: ---H---              Prepare the `0` state :math:`\vert 0\rangle`
 

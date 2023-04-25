@@ -47,13 +47,13 @@ def preProcess(program: 'PBProgram', rerangeQReg: bool, strictUsingCReg: bool) -
 
     measured = False
     for circuitLine in program.body.circuit:
-        op = circuitLine.WhichOneof('op')
-        if measured and op != 'measure':
+        op: str = circuitLine.WhichOneof('op')
+        if measured and 'measure' not in op.lower():
             raise Error.ArgumentError('Measure must be the last operation!', ModuleErrorCode, FileErrorCode, 1)
 
         circuitLine.qRegList[:] = [compactedQRegDict[qReg] for qReg in circuitLine.qRegList]
 
-        if op == 'measure':
+        if 'measure' in op.lower():
             measured = True
             for index, cReg in enumerate(circuitLine.measure.cRegList):
                 qReg = circuitLine.qRegList[index]

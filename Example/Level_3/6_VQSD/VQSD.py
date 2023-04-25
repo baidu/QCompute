@@ -29,7 +29,7 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.0')
+matchSdkVersion('Python 3.3.1')
 
 shots = 100000
 n = 2  # n-qubit

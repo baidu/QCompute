@@ -18,60 +18,47 @@
 """
 Example to demonstrate quantum state tomography on the Bell state.
 """
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago
-
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 import qcompute_qep.tomography as tomography
 
 
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
-
-##########################################################################################
-# Step 1. Setup the quantum program for preparing the Bell state
-#         We aim to investigate how well the Bell state is prepared.
-##########################################################################################
-
-# Create Bell state in qubit [1, 2]
-qp = QEnv()  # qp is short for "quantum program", instance of QProgram
+# Step 1. Set up the quantum program for preparing the Bell state
+# We aim to investigate how well the Bell state is prepared.
+qp = QEnv()
 qp.Q.createList(2)
 H(qp.Q[0])
 CX(qp.Q[0], qp.Q[1])
 
-##########################################################################################
 # Step 2. Set the quantum computer (instance of QComputer).
-#         The QuantumComputer can be a simulator or a hardware interface.
-##########################################################################################
+# The QuantumComputer can be a simulator or a hardware interface.
+
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
 qc = BackendName.LocalBaiduSim2
 
-# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
 
-# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+# from qiskit.providers.fake_provider import FakeSantiago
+# qc = FakeSantiago()
 
-##########################################################################################
-# Step 3. Perform State Tomography, check how well the Bell state
-#         is implemented in the QuantumComputer.
-##########################################################################################
-# Initialize a StateTomography instance
+# Step 3. Execute quantum state tomography,
+# check how well the Bell state is implemented in the QuantumComputer.
 st = tomography.StateTomography()
-# Alternatively, you may initialize the StateTomography instance as follows:
-# st = StateTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-noisy_state = st.fit(qp, qc, qubits=[0, 1], method='lstsq', shots=4096, ptm=False)
-# Compute the fidelity
-print('Fidelity between the ideal and noisy states is: F = {:.5f}'.format(st.fidelity))
+qubits = [0, 1]
+st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
+print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
 
-# Please note the difference between the above tomography and the following:
-# noisy_state_2 = st.fit(qp, qc, method='lstsq', shots=4096, ptm=False)
-# print('Fidelity between the ideal and noisy states is: F = {:.5f}'.format(st.fidelity))
-# The main difference lies in that the former specifies the list of target qubits while the latter
-# will tomography the full list of qubits (which are three qubits in total).
-# You can tell the difference comparing `noisy_state` and `noisy_state_2`.
+# You can also perform quantum state tomography on other qubits, for example [q1, q2]
+qubits = [1, 2]
+st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
+print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
+
+# You can also perform quantum state tomography on other qubits, for example [q0, q2]
+qubits = [0, 2]
+st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
+print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))

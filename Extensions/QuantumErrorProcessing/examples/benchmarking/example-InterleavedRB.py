@@ -18,22 +18,10 @@
 """
 An example to demonstrate the Interleaved Randomized Benchmarking protocol.
 """
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago, FakeParis
-from qiskit.providers.aer import AerSimulator
-from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
-
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 import qcompute_qep.benchmarking as rb
 import qcompute_qep.utils.types as types
 import qcompute_qep.quantum.clifford as clifford
-
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).
@@ -42,35 +30,57 @@ Define.hubToken = "Token"
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
 qc = BackendName.LocalBaiduSim2
 
-# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
 
-# For numeric test on the noisy simulator, change qc to Qiskit's FakeParis
-# qc = AerSimulator.from_backend(FakeParis())
-
-# You can also use Qiskit's AerSimulator to customize noise
-# noise_model = NoiseModel.from_backend(FakeSantiago())
-# p1Q = 0.002
-# p2Q = 0.02
-# noise_model.add_all_qubit_quantum_error(depolarizing_error(p1Q, 1), ['s', 'h', 'sdg', ])
-# noise_model.add_all_qubit_quantum_error(depolarizing_error(p2Q, 2), ['cz'])
-# qc = AerSimulator(noise_model=noise_model)
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+# from qiskit.providers.fake_provider import FakeSantiago
+# qc = FakeSantiago()
 
 ##########################################################################################
 # Step 2. Perform the randomized benchmarking protocol on the fourth-qubit
 ##########################################################################################
-
 # Initialize a RandomizedBenchmarking instance
 irb = rb.InterleavedRB()
-qubits = [4]
-n = len(qubits)
-target_gate = clifford.Clifford(n)
+# Obtain a random Clifford gate as target
+target_gate = clifford.Clifford(1)
+
+# Call the randomized benchmarking procedure and obtain estimated error rate
+qubits = [0]
 irb.benchmark(target_gate=target_gate,
               qc=qc,
               qubits=qubits,
-              seq_lengths=[1, 3, 5, 7, 10, 15, 20],
-              repeats=10)
-
+              seq_lengths=[1, 2, 3, 4, 5],
+              repeats=5)
+print("*******************************************************************************")
+print("* Interleaved RB on qubits: {}".format(qubits))
+print("* Estimated interleaved gate fidelity parameter: {}".format(irb.results['InterleavedRB']['f']))
+print("* Standard deviation error of interleaved estimation: {}".format(irb.results['InterleavedRB']['f_err']))
+print("* Estimated average gate fidelity parameter: {}".format(irb.results['StandardRB']['f']))
+print("* Standard deviation error of average estimation: {}".format(irb.results['StandardRB']['f_err']))
+fname = "InterleavedRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
+print("* InterleavedRB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results
-fname = "InterleavedRB-{}.png".format(types.get_qc_name(qc))
 irb.plot_results(show=True, fname=fname)
+print("*******************************************************************************")
+
+# You can also perform the randomized benchmarking procedure on other qubits, for example [q2]
+qubits = [2]
+irb.benchmark(target_gate=target_gate,
+              qc=qc,
+              qubits=qubits,
+              seq_lengths=[1, 2, 3, 4, 5],
+              repeats=5)
+print("*******************************************************************************")
+print("* Interleaved RB on qubits: {}".format(qubits))
+print("* Estimated interleaved gate fidelity parameter: {}".format(irb.results['InterleavedRB']['f']))
+print("* Standard deviation error of interleaved estimation: {}".format(irb.results['InterleavedRB']['f_err']))
+print("* Estimated average gate fidelity parameter: {}".format(irb.results['StandardRB']['f']))
+print("* Standard deviation error of average estimation: {}".format(irb.results['StandardRB']['f_err']))
+fname = "InterleavedRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
+print("* InterleavedRB data is visualized in figure '{}'.".format(fname))
+# Plot the randomized benchmarking results
+irb.plot_results(show=True, fname=fname)
+print("*******************************************************************************")

@@ -1,0 +1,93 @@
+\indexentry{module@\spxentry{module}!qcompute\_qapp.algorithm@\spxentry{qcompute\_qapp.algorithm}|hyperpage}{1}
+\indexentry{qcompute\_qapp.algorithm@\spxentry{qcompute\_qapp.algorithm}!module@\spxentry{module}|hyperpage}{1}
+\indexentry{VQE (class in qcompute\_qapp.algorithm)@\spxentry{VQE}\spxextra{class in qcompute\_qapp.algorithm}|hyperpage}{1}
+\indexentry{get\_measure() (qcompute\_qapp.algorithm.VQE method)@\spxentry{get\_measure()}\spxextra{qcompute\_qapp.algorithm.VQE method}|hyperpage}{1}
+\indexentry{get\_gradient() (qcompute\_qapp.algorithm.VQE method)@\spxentry{get\_gradient()}\spxextra{qcompute\_qapp.algorithm.VQE method}|hyperpage}{1}
+\indexentry{get\_loss() (qcompute\_qapp.algorithm.VQE method)@\spxentry{get\_loss()}\spxextra{qcompute\_qapp.algorithm.VQE method}|hyperpage}{2}
+\indexentry{run() (qcompute\_qapp.algorithm.VQE method)@\spxentry{run()}\spxextra{qcompute\_qapp.algorithm.VQE method}|hyperpage}{2}
+\indexentry{minimum\_eigenvalue (qcompute\_qapp.algorithm.VQE property)@\spxentry{minimum\_eigenvalue}\spxextra{qcompute\_qapp.algorithm.VQE property}|hyperpage}{2}
+\indexentry{set\_backend() (qcompute\_qapp.algorithm.VQE method)@\spxentry{set\_backend()}\spxextra{qcompute\_qapp.algorithm.VQE method}|hyperpage}{2}
+\indexentry{SSVQE (class in qcompute\_qapp.algorithm)@\spxentry{SSVQE}\spxextra{class in qcompute\_qapp.algorithm}|hyperpage}{2}
+\indexentry{get\_gradient() (qcompute\_qapp.algorithm.SSVQE method)@\spxentry{get\_gradient()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}|hyperpage}{3}
+\indexentry{get\_loss() (qcompute\_qapp.algorithm.SSVQE method)@\spxentry{get\_loss()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}|hyperpage}{3}
+\indexentry{run() (qcompute\_qapp.algorithm.SSVQE method)@\spxentry{run()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}|hyperpage}{3}
+\indexentry{minimum\_eigenvalues (qcompute\_qapp.algorithm.SSVQE property)@\spxentry{minimum\_eigenvalues}\spxextra{qcompute\_qapp.algorithm.SSVQE property}|hyperpage}{3}
+\indexentry{set\_backend() (qcompute\_qapp.algorithm.SSVQE method)@\spxentry{set\_backend()}\spxextra{qcompute\_qapp.algorithm.SSVQE method}|hyperpage}{3}
+\indexentry{QAOA (class in qcompute\_qapp.algorithm)@\spxentry{QAOA}\spxextra{class in qcompute\_qapp.algorithm}|hyperpage}{3}
+\indexentry{get\_measure() (qcompute\_qapp.algorithm.QAOA method)@\spxentry{get\_measure()}\spxextra{qcompute\_qapp.algorithm.QAOA method}|hyperpage}{4}
+\indexentry{get\_gradient() (qcompute\_qapp.algorithm.QAOA method)@\spxentry{get\_gradient()}\spxextra{qcompute\_qapp.algorithm.QAOA method}|hyperpage}{4}
+\indexentry{get\_loss() (qcompute\_qapp.algorithm.QAOA method)@\spxentry{get\_loss()}\spxextra{qcompute\_qapp.algorithm.QAOA method}|hyperpage}{4}
+\indexentry{run() (qcompute\_qapp.algorithm.QAOA method)@\spxentry{run()}\spxextra{qcompute\_qapp.algorithm.QAOA method}|hyperpage}{4}
+\indexentry{maximum\_eigenvalue (qcompute\_qapp.algorithm.QAOA property)@\spxentry{maximum\_eigenvalue}\spxextra{qcompute\_qapp.algorithm.QAOA property}|hyperpage}{4}
+\indexentry{set\_backend() (qcompute\_qapp.algorithm.QAOA method)@\spxentry{set\_backend()}\spxextra{qcompute\_qapp.algorithm.QAOA method}|hyperpage}{5}
+\indexentry{KernelClassifier (class in qcompute\_qapp.algorithm)@\spxentry{KernelClassifier}\spxextra{class in qcompute\_qapp.algorithm}|hyperpage}{5}
+\indexentry{fit() (qcompute\_qapp.algorithm.KernelClassifier method)@\spxentry{fit()}\spxextra{qcompute\_qapp.algorithm.KernelClassifier method}|hyperpage}{5}
+\indexentry{predict() (qcompute\_qapp.algorithm.KernelClassifier method)@\spxentry{predict()}\spxextra{qcompute\_qapp.algorithm.KernelClassifier method}|hyperpage}{5}
+\indexentry{module@\spxentry{module}!qcompute\_qapp.application.chemistry@\spxentry{qcompute\_qapp.application.chemistry}|hyperpage}{5}
+\indexentry{qcompute\_qapp.application.chemistry@\spxentry{qcompute\_qapp.application.chemistry}!module@\spxentry{module}|hyperpage}{5}
+\indexentry{MolecularGroundStateEnergy (class in qcompute\_qapp.application.chemistry)@\spxentry{MolecularGroundStateEnergy}\spxextra{class in qcompute\_qapp.application.chemistry}|hyperpage}{5}
+\indexentry{num\_qubits (qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy property)@\spxentry{num\_qubits}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy property}|hyperpage}{6}
+\indexentry{hamiltonian (qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy property)@\spxentry{hamiltonian}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy property}|hyperpage}{6}
+\indexentry{compute\_ground\_state\_energy() (qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy method)@\spxentry{compute\_ground\_state\_energy()}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy method}|hyperpage}{6}
+\indexentry{load\_hamiltonian\_from\_file() (qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy method)@\spxentry{load\_hamiltonian\_from\_file()}\spxextra{qcompute\_qapp.application.chemistry.MolecularGroundStateEnergy method}|hyperpage}{6}
+\indexentry{module@\spxentry{module}!qcompute\_qapp.application.optimization@\spxentry{qcompute\_qapp.application.optimization}|hyperpage}{6}
+\indexentry{qcompute\_qapp.application.optimization@\spxentry{qcompute\_qapp.application.optimization}!module@\spxentry{module}|hyperpage}{6}
+\indexentry{MaxCut (class in qcompute\_qapp.application.optimization)@\spxentry{MaxCut}\spxextra{class in qcompute\_qapp.application.optimization}|hyperpage}{6}
+\indexentry{num\_qubits (qcompute\_qapp.application.optimization.MaxCut property)@\spxentry{num\_qubits}\spxextra{qcompute\_qapp.application.optimization.MaxCut property}|hyperpage}{7}
+\indexentry{hamiltonian (qcompute\_qapp.application.optimization.MaxCut property)@\spxentry{hamiltonian}\spxextra{qcompute\_qapp.application.optimization.MaxCut property}|hyperpage}{7}
+\indexentry{graph\_to\_hamiltonian() (qcompute\_qapp.application.optimization.MaxCut method)@\spxentry{graph\_to\_hamiltonian()}\spxextra{qcompute\_qapp.application.optimization.MaxCut method}|hyperpage}{7}
+\indexentry{decode\_bitstring() (qcompute\_qapp.application.optimization.MaxCut method)@\spxentry{decode\_bitstring()}\spxextra{qcompute\_qapp.application.optimization.MaxCut method}|hyperpage}{7}
+\indexentry{module@\spxentry{module}!qcompute\_qapp.circuit@\spxentry{qcompute\_qapp.circuit}|hyperpage}{7}
+\indexentry{qcompute\_qapp.circuit@\spxentry{qcompute\_qapp.circuit}!module@\spxentry{module}|hyperpage}{7}
+\indexentry{BasicCircuit (class in qcompute\_qapp.circuit)@\spxentry{BasicCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{7}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.BasicCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.BasicCircuit method}|hyperpage}{7}
+\indexentry{IQPEncodingCircuit (class in qcompute\_qapp.circuit)@\spxentry{IQPEncodingCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{7}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.IQPEncodingCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.IQPEncodingCircuit method}|hyperpage}{8}
+\indexentry{BasisEncodingCircuit (class in qcompute\_qapp.circuit)@\spxentry{BasisEncodingCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{8}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.BasisEncodingCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.BasisEncodingCircuit method}|hyperpage}{8}
+\indexentry{KernelEstimationCircuit (class in qcompute\_qapp.circuit)@\spxentry{KernelEstimationCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{8}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.KernelEstimationCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.KernelEstimationCircuit method}|hyperpage}{8}
+\indexentry{ParameterizedCircuit (class in qcompute\_qapp.circuit)@\spxentry{ParameterizedCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{8}
+\indexentry{parameters (qcompute\_qapp.circuit.ParameterizedCircuit property)@\spxentry{parameters}\spxextra{qcompute\_qapp.circuit.ParameterizedCircuit property}|hyperpage}{9}
+\indexentry{set\_parameters() (qcompute\_qapp.circuit.ParameterizedCircuit method)@\spxentry{set\_parameters()}\spxextra{qcompute\_qapp.circuit.ParameterizedCircuit method}|hyperpage}{9}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.ParameterizedCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.ParameterizedCircuit method}|hyperpage}{9}
+\indexentry{PauliMeasurementCircuit (class in qcompute\_qapp.circuit)@\spxentry{PauliMeasurementCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{9}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.PauliMeasurementCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuit method}|hyperpage}{9}
+\indexentry{get\_expectation() (qcompute\_qapp.circuit.PauliMeasurementCircuit method)@\spxentry{get\_expectation()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuit method}|hyperpage}{9}
+\indexentry{PauliMeasurementCircuitWithAncilla (class in qcompute\_qapp.circuit)@\spxentry{PauliMeasurementCircuitWithAncilla}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{10}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.PauliMeasurementCircuitWithAncilla method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuitWithAncilla method}|hyperpage}{10}
+\indexentry{get\_expectation() (qcompute\_qapp.circuit.PauliMeasurementCircuitWithAncilla method)@\spxentry{get\_expectation()}\spxextra{qcompute\_qapp.circuit.PauliMeasurementCircuitWithAncilla method}|hyperpage}{10}
+\indexentry{SimultaneousPauliMeasurementCircuit (class in qcompute\_qapp.circuit)@\spxentry{SimultaneousPauliMeasurementCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{10}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.SimultaneousPauliMeasurementCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.SimultaneousPauliMeasurementCircuit method}|hyperpage}{10}
+\indexentry{get\_expectation() (qcompute\_qapp.circuit.SimultaneousPauliMeasurementCircuit method)@\spxentry{get\_expectation()}\spxextra{qcompute\_qapp.circuit.SimultaneousPauliMeasurementCircuit method}|hyperpage}{11}
+\indexentry{QAOAAnsatz (class in qcompute\_qapp.circuit)@\spxentry{QAOAAnsatz}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{11}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.QAOAAnsatz method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.QAOAAnsatz method}|hyperpage}{11}
+\indexentry{UniversalCircuit (class in qcompute\_qapp.circuit)@\spxentry{UniversalCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{11}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.UniversalCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.UniversalCircuit method}|hyperpage}{11}
+\indexentry{RealEntangledCircuit (class in qcompute\_qapp.circuit)@\spxentry{RealEntangledCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{11}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.RealEntangledCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.RealEntangledCircuit method}|hyperpage}{12}
+\indexentry{ComplexEntangledCircuit (class in qcompute\_qapp.circuit)@\spxentry{ComplexEntangledCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{12}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.ComplexEntangledCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.ComplexEntangledCircuit method}|hyperpage}{12}
+\indexentry{RealAlternatingLayeredCircuit (class in qcompute\_qapp.circuit)@\spxentry{RealAlternatingLayeredCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{12}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.RealAlternatingLayeredCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.RealAlternatingLayeredCircuit method}|hyperpage}{12}
+\indexentry{ComplexAlternatingLayeredCircuit (class in qcompute\_qapp.circuit)@\spxentry{ComplexAlternatingLayeredCircuit}\spxextra{class in qcompute\_qapp.circuit}|hyperpage}{13}
+\indexentry{add\_circuit() (qcompute\_qapp.circuit.ComplexAlternatingLayeredCircuit method)@\spxentry{add\_circuit()}\spxextra{qcompute\_qapp.circuit.ComplexAlternatingLayeredCircuit method}|hyperpage}{13}
+\indexentry{module@\spxentry{module}!qcompute\_qapp.optimizer@\spxentry{qcompute\_qapp.optimizer}|hyperpage}{13}
+\indexentry{qcompute\_qapp.optimizer@\spxentry{qcompute\_qapp.optimizer}!module@\spxentry{module}|hyperpage}{13}
+\indexentry{BasicOptimizer (class in qcompute\_qapp.optimizer)@\spxentry{BasicOptimizer}\spxextra{class in qcompute\_qapp.optimizer}|hyperpage}{13}
+\indexentry{set\_circuit() (qcompute\_qapp.optimizer.BasicOptimizer method)@\spxentry{set\_circuit()}\spxextra{qcompute\_qapp.optimizer.BasicOptimizer method}|hyperpage}{13}
+\indexentry{minimize() (qcompute\_qapp.optimizer.BasicOptimizer method)@\spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.BasicOptimizer method}|hyperpage}{13}
+\indexentry{SGD (class in qcompute\_qapp.optimizer)@\spxentry{SGD}\spxextra{class in qcompute\_qapp.optimizer}|hyperpage}{13}
+\indexentry{minimize() (qcompute\_qapp.optimizer.SGD method)@\spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SGD method}|hyperpage}{14}
+\indexentry{SLSQP (class in qcompute\_qapp.optimizer)@\spxentry{SLSQP}\spxextra{class in qcompute\_qapp.optimizer}|hyperpage}{14}
+\indexentry{minimize() (qcompute\_qapp.optimizer.SLSQP method)@\spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SLSQP method}|hyperpage}{14}
+\indexentry{SPSA (class in qcompute\_qapp.optimizer)@\spxentry{SPSA}\spxextra{class in qcompute\_qapp.optimizer}|hyperpage}{14}
+\indexentry{minimize() (qcompute\_qapp.optimizer.SPSA method)@\spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SPSA method}|hyperpage}{15}
+\indexentry{SMO (class in qcompute\_qapp.optimizer)@\spxentry{SMO}\spxextra{class in qcompute\_qapp.optimizer}|hyperpage}{15}
+\indexentry{minimize() (qcompute\_qapp.optimizer.SMO method)@\spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.SMO method}|hyperpage}{15}
+\indexentry{Powell (class in qcompute\_qapp.optimizer)@\spxentry{Powell}\spxextra{class in qcompute\_qapp.optimizer}|hyperpage}{15}
+\indexentry{minimize() (qcompute\_qapp.optimizer.Powell method)@\spxentry{minimize()}\spxextra{qcompute\_qapp.optimizer.Powell method}|hyperpage}{15}
+\indexentry{module@\spxentry{module}!qcompute\_qapp.utils@\spxentry{qcompute\_qapp.utils}|hyperpage}{16}
+\indexentry{qcompute\_qapp.utils@\spxentry{qcompute\_qapp.utils}!module@\spxentry{module}|hyperpage}{16}
+\indexentry{grouping\_hamiltonian() (in module qcompute\_qapp.utils)@\spxentry{grouping\_hamiltonian()}\spxextra{in module qcompute\_qapp.utils}|hyperpage}{16}
+\indexentry{pauli\_terms\_to\_matrix() (in module qcompute\_qapp.utils)@\spxentry{pauli\_terms\_to\_matrix()}\spxextra{in module qcompute\_qapp.utils}|hyperpage}{16}

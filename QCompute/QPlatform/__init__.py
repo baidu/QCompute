@@ -72,9 +72,26 @@ class BackendName(Enum):
     env.backend(BackendName.LocalCuQuantum)
     """
 
+    LocalBaiduSimPhotonic = 'local_baidu_sim_photonic'
+    """
+    Local Baidu Sim Photonic Gaussian And Fock
+
+    Example: 
+
+    env = QEnv()
+
+    env.backend(BackendName.LocalBaiduSimPhotonic)
+    """
+
     LocalBaiduSim2WithNoise = 'local_baidu_sim2'
     """
-    Local Baidu Sim2 With Noise
+    Local Baidu Sim2 With Noise (Deprecated, should use LocalBaiduSim2)
+
+    Example: 
+
+    env = QEnv()
+
+    env.backend(BackendName.LocalBaiduSim2WithNoise)
     """
 
     

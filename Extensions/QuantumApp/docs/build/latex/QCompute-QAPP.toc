@@ -1,0 +1,11 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{\numberline {1}QCompute\sphinxhyphen {}QAPP Package}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.algorithm}}}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.application}}}{5}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.application.chemistry}}}{5}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.application.optimization}}}{6}{subsection.1.2.2}%
+\contentsline {section}{\numberline {1.3}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.circuit}}}{7}{section.1.3}%
+\contentsline {section}{\numberline {1.4}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.optimizer}}}{13}{section.1.4}%
+\contentsline {section}{\numberline {1.5}\sphinxstyleliteralintitle {\sphinxupquote {qcompute\_qapp.utils}}}{16}{section.1.5}%
+\contentsline {chapter}{Python Module Index}{17}{section*.84}%
+\contentsline {chapter}{Index}{19}{section*.85}%

@@ -15,38 +15,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Cross Entropy Benchmarking."""
+"""
+In this script, we implement the cross entropy benchmarking method described in [LOB+21]_,
+which showed that random circuit sampling (RCS) is a powerful benchmarking primitive that can be used to
+efficiently extract the total amount of quantum noise of a many qubit system
+by creating an exponential decay of fidelity.
+
+References:
+
+.. [LOB+21] Liu, Yunchao, et al.
+            "Benchmarking near-term quantum computers via random circuit sampling."
+            arXiv preprint arXiv:2105.05232 (2021).
+"""
 from scipy.optimize import curve_fit
 from typing import List
 import numpy as np
 from tqdm import tqdm
 from matplotlib.ticker import MaxNLocator
 import scipy.stats as st
+import itertools
 import warnings
+
+from qcompute_qep.utils.types import QComputer, get_qc_name
+import qcompute_qep.utils.circuit as circuit
+import qcompute_qep.exceptions.QEPError as QEPError
+import qcompute_qep.benchmarking as rb
 
 warnings.filterwarnings('ignore')
 
 try:
     from matplotlib import pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
-    import pylab
-
-    HAS_MATPLOTLIB = True
 except ImportError:
-    HAS_MATPLOTLIB = False
-
-from qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
-import qcompute_qep.utils.circuit as circuit
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
+    raise ImportError('XEB requires matplotlib to visualize results. Run "pip install matplotlib" first.')
 
 
 class XEB(rb.RandomizedBenchmarking):
     """The Cross Entropy Benchmarking class.
 
-    Aim to benchmark the quantum device by using cross entropy method.
+    Cross Entropy Benchmarking aims to benchmark the set of quantum gates
+    by a single parameter called ENR (Effective Noise Rate).
     """
-
     def __init__(self, qc: QComputer = None, qubits: List[int] = None, **kwargs):
         r"""init function of the Cross Entropy Benchmarking class.
 
@@ -55,18 +64,13 @@ class XEB(rb.RandomizedBenchmarking):
         + ``seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, a list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
         + ``shots``: int, default to :math:`4096`, the number of shots each measurement carries out to estimate value
-        + ``entropy_type``: default to `linear`, the entropy type of XEB `linear` or `log`.
-        + ``prep_circuit``: default to `default_prep_circuit`, prepares the initial
-                            quantum state :math:`\vert 0\cdots 0 \rangle`
-        + ``meas_circuit``: default to `default_meas_circuit`, add the Z basis measurement
-                            to the end of the XEB circuits and set the quantum observable to
-                            :math:`\vert 0\cdots 0\rangle\!\langle 0\cdots 0\vert`
-
-        for `prep_circuit` and `meas_circuit`, see more details in benchmarking.utils.default_prep_circuit
-                        and benchmarking.utils.default_meas_circuit.
+        + ``entropy_type``: string, default to `linear`, the entropy estimator applied in XEB. Options are:
+                            + `linear`: the linear entropy estimator will be applied;
+                            + `log`: the log entropy estimator will be applied; and
+                            + `unbiased`: the unbiased linear entropy estimator will be applied.
 
         :param qc: QComputer, the quantum computer on which the XEB carries out
-        :param qubits: List[int], the qubits who will be benchmarked
+        :param qubits: List[int], the list of qubits that will be benchmarked
         """
         # Initialize the XEB parameters. If not set, use the default parameters
         super().__init__(**kwargs)
@@ -75,17 +79,15 @@ class XEB(rb.RandomizedBenchmarking):
         self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100, 125, 150, 175, 200])
         self._repeats = kwargs.get('repeats', 6)
         self._shots = kwargs.get('shots', 4096)
-        self._entropy_type = kwargs.get('entropy_type', 'linear')
+        self._entropy_type = kwargs.get('entropy_type', 'unbiased')
 
         # Store the cross entropy benchmarking results. Initialize to an empty dictionary
         self._results = dict()
-
-        # Store the cross entropy benchmarking parameters. Initialize to an empty dictionary
         self._params = dict()
 
     @property
     def results(self) -> dict:
-        """Return the cross entropy benchmarking results in a dictionary.
+        r"""Cross entropy benchmarking results in a dictionary.
 
         **Usage**
 
@@ -104,8 +106,8 @@ class XEB(rb.RandomizedBenchmarking):
 
     @property
     def params(self) -> dict:
-        """Return the used parameters in cross entropy benchmarking in a
-        dictionary."""
+        r"""Parameters used in cross entropy benchmarking in a dictionary.
+        """
         if not self._params:
             xeb_params = dict()
             xeb_params['qc'] = get_qc_name(self._qc)
@@ -119,7 +121,7 @@ class XEB(rb.RandomizedBenchmarking):
         return self._params
 
     def _fit_func(self, d: int, lam: float, A: float) -> np.ndarray:
-        r"""The fit function used in the standard cross entropy benchmarking.
+        r"""The fit function used in cross entropy benchmarking.
 
         The used fit function is an exponential function in the input and is defined as follows:
 
@@ -127,63 +129,67 @@ class XEB(rb.RandomizedBenchmarking):
 
         where
 
-        + :math:`\lambda` is the Effective Foise Rate (ENR),
-        + :math:`d` is the sequence length, i.e., the number of cycles,
-        + :math:`A` absorb the state preparation and measurement errors (SPAM).
+        + :math:`\lambda` is the Effective Noise Rate (ENR),
+        + :math:`d` is the sequence length, i.e., the number of cycles, and
+        + :math:`A` absorbs the state preparation and measurement errors (SPAM).
 
-        :param lam: int, corresponds to the effective noise rate
         :param d: int, corresponds to the sequence length
+        :param lam: int, corresponds to the effective noise rate
         :param A: float, a parameter that absorbs the State Preparation and Measurement errors
-
         :return: np.ndarray, the estimated expectation value
         """
         return A * np.exp(-lam * d)
 
     def cross_entropy(self, prob: float) -> float:
+        r"""Compute the cross entropy of the given probability.
 
-        if self._entropy_type == 'linear':
+        Optional entropy estimators are:
+
+        + `linear`: the linear entropy estimator will be applied;
+        + `unbiased`: the unbiased linear entropy estimator will be applied; and
+        + `log`: the log entropy estimator will be applied.
+
+        :param prob: float, a float value describes the probability
+        :return: float, the cross entropy of the corresponding probability
+        """
+        if self._entropy_type == 'linear' or self._entropy_type == 'unbiased':
             return prob
         elif self._entropy_type == 'log':
             return - np.log2(prob)
         else:
             raise QEPError.ArgumentError("XEB: the cross entropy type {} is invalid!".format(self._entropy_type))
 
-    def fidelity(self, average_entropy: float) -> float:
-        # Number of qubits
-        n = len(self._qubits)
-        if self._entropy_type == 'linear':
-            return 2 ** n * average_entropy - 1
-        elif self._entropy_type == 'log':
-            return n + np.euler_gamma - average_entropy
-        else:
-            raise QEPError.ArgumentError("XEB: the cross entropy type {} is invalid!".format(self._entropy_type))
-
-    def benchmark(self, qc: QComputer = None, qubits: List[int] = None, single_gates: List[str] = None,
-                  multi_gates: List[str] = None, **kwargs) -> dict:
+    def benchmark(self, qc: QComputer = None, qubits: List[int] = None,
+                  single_gates: List[str] = None, multi_gates: List[str] = None, **kwargs) -> dict:
         r"""Execute the cross entropy benchmarking procedure on the quantum computer.
 
         The parameters `qc` and `qubits` must be set either by the init() function or here,
-        otherwise the cross entropy benchmarking procedure will not carry out.
+        otherwise the cross entropy benchmarking procedure will fail.
 
         Optional keywords list are:
 
         + ``_seq_lengths``: List[int], default to :math:`[1, 10, 20, 50, 75, 100]`, the list of sequence lengths
         + ``repeats``: int, default to :math:`6`, the number of repetitions of each sequence length
         + ``shots``: int, default to :math:`4096`, the number of shots each measurement should carry out
-        + ``single_gates``: List[str], default to None, while construct the random circuit by using `U3` gates
-                            for single-qubit gates.
-        + ``multi_gates``: List[str], default to None, while construct the random circuit by using `CNOT` gates
-                            for multi-qubit gates.
+        + ``single_gates``: List[str], default to None, will be randomly selected to construct the random circuit
+                            for single-qubit gates. If None, random `U3` gates will be selected by default.
+        + ``multi_gates``: List[str], default to None, will be randomly selected to construct the random circuit
+                            for multi-qubit gates. If None, the `CNOT` gate will be used by default.
+        + ``entropy_type``: string, default to `linear`, the entropy estimator applied in XEB. Options are:
+                            + `linear`: the linear entropy estimator will be applied;
+                            + `log`: the log entropy estimator will be applied; and
+                            + `unbiased`: the unbiased linear entropy estimator will be applied.
+        + ``neighboring``: bool, default to True, indicating that only neighbor qubits can perform two-qubit gates.
 
         **Usage**
 
         .. code-block:: python
             :linenos:
 
-            xeb_results = xeb.benchmark(qubits=[1], qc=qc,_seq_lengths=[1,10,50,100])
-            xeb_results = xeb.benchmark(qubits=[1], qc=qc,_seq_lengths=[1,10,50,100], repeats=10, shots=1024)
-            xeb_results = xeb.benchmark(qubits=[1], qc=qc,_seq_lengths=[1,10,50,100],
-                                                    single_gates=['X','H','S','U'],multi_gates=['CZ'])
+            xeb_results = xeb.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100])
+            xeb_results = xeb.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100], repeats=10, shots=1024)
+            xeb_results = xeb.benchmark(qubits=[1], qc=qc, seq_lengths=[1,10,50,100],
+                                                           single_gates=['X','H','S','U'], multi_gates=['CZ'])
 
         :return: dict, the cross entropy benchmarking results
 
@@ -204,6 +210,7 @@ class XEB(rb.RandomizedBenchmarking):
         self._seq_lengths = kwargs.get('seq_lengths', self._seq_lengths)
         self._repeats = kwargs.get('repeats', self._repeats)
         self._shots = kwargs.get('shots', self._shots)
+        self._entropy_type = kwargs.get('entropy_type', self._entropy_type)
 
         if self._qc is None:
             raise QEPError.ArgumentError("XEB: the quantum computer for benchmarking is not specified!")
@@ -211,42 +218,67 @@ class XEB(rb.RandomizedBenchmarking):
             raise QEPError.ArgumentError("XEB: the qubits for benchmarking are not specified!")
 
         ###############################################################################################################
-        # Step 1. Data Collection Phase.
-        #   First construct the list of benchmarking quantum circuits.
-        #   Then for each XEB quantum circuit, evaluate its expectation value.
+        # Step 1. Construct a list of benchmarking quantum circuits.
         ###############################################################################################################
-        # Store the estimated average fidelities, which is a :math:`M`-dimensional array,
-        # where :math:`M` is the number of sequences
+        pbar = tqdm(total=100, desc='XEB Step 1/4: Constructing benchmarking quantum circuits ...')
+        pbar.update(0)
+        # A list of benchmarking quantum circuits
+        xeb_qp_list = []
+        seq_lengths = list(itertools.chain.from_iterable(itertools.repeat(seq, self._repeats)
+                                                         for seq in self._seq_lengths))
+        for cyc_m in seq_lengths:
+            # Generate an n-qubit random quantum circuit with number of cycles cyc_m
+            xeb_qp = circuit.random_circuit(self._qubits, cyc_m,
+                                            single=single_gates, multi=multi_gates,
+                                            neighboring=kwargs.get('neighboring', True))
+            xeb_qp_list.append(xeb_qp)
+        ###############################################################################################################
+        # Step 2. Run the quantum circuits in batch.
+        ###############################################################################################################
+        pbar.desc = "XEB Step 2/4: Running quantum circuits, which might be very time consuming ..."
+        pbar.update(100 / 4)
+        counts_list = circuit.execute(qp=xeb_qp_list, qc=self._qc, **kwargs)
+
+        ###############################################################################################################
+        # Step 3. Estimate the fidelities from the measurement outcomes.
+        ###############################################################################################################
+        pbar.desc = "XEB Step 3/4: Estimating fidelities from the measurement outcomes ..."
+        pbar.update(100 / 4)
+
+        # Store the estimated fidelities, which is a :math:`M\times R`-dimensional array,
+        # where :math:`M` is the number of sequences and :math:`R` is the number of repeats of each sequence.
         fids = np.zeros((len(self._seq_lengths), self._repeats), dtype=float)
-        pbar = tqdm(total=100, desc='Step 1/1 : Implement the XEB...', ncols=100)
         # Estimate the average cycle fidelity for each quantum circuit cycle
-        for m, cyc_m in enumerate(self._seq_lengths):
-            for r in range(self._repeats):
-                # Generate a n-qubit random quantum circuit with number of cycles cyc_m
-                xeb_qp = circuit.random_circuit(self._qubits, cyc_m, single=single_gates, multi=multi_gates)
-                # circuit.print_circuit(xeb_qp.circuit)
-                # Calculate the non-noise entropy
-                ideal_entropy = np.sum((np.abs(circuit.circuit_to_state(xeb_qp, vector=True)) ** 2) ** 2)
-
-                # Run the noisy XEB quantum circuit and record the measurement outcomes
-                counts = circuit.execute(qp=xeb_qp, qc=self._qc, **kwargs)
-                # Estimate the empirical average entropy from the measurement outcomes
-                average_entropy = 0.0
-                for bitstring, cnt in counts.items():
-                    average_entropy += self.cross_entropy(_ideal_probability(xeb_qp, bitstring)) * cnt / self._shots
-
-                # Compute the average unbiased XEB fidelity (F_uXEB) of current cycle
-                fids[m][r] = self.fidelity(average_entropy) / self.fidelity(ideal_entropy)
-                pbar.update((100 / (self._repeats * len(self._seq_lengths))))
-        pbar.close()
+        for k, xeb_qp in enumerate(xeb_qp_list):
+            # Compute the ideal probability
+            ideal_prob = np.abs(circuit.circuit_to_state(xeb_qp, vector=True, qubits=self._qubits)) ** 2
+            # Compute the entropy for the noisy probability
+            average_entropy = 0.0
+            for bitstring, cnt in counts_list[k].items():
+                average_entropy += self.cross_entropy(ideal_prob[int(bitstring, 2)]) * cnt / self._shots
+            # Compute the XEB fidelity of current cycle from the estimated entropies
+            D = 2 ** len(self._qubits)  # the dimension of the quantum system
+            m, r = divmod(k, self._repeats)
+            if self._entropy_type == 'linear':
+                fids[m][r] = D * average_entropy - 1
+            elif self._entropy_type == 'unbiased':
+                ideal_entropy = np.sum(ideal_prob ** 2)
+                fids[m][r] = (D * average_entropy - 1) / (D * ideal_entropy - 1)
+            elif self._entropy_type == 'log':
+                fids[m][r] = np.log2(D) + np.euler_gamma - average_entropy
+            else:
+                raise QEPError.ArgumentError("XEB: cross entropy type {} is invalid!".format(self._entropy_type))
 
         ###############################################################################################################
-        # Step 2. Data Processing Phase.
-        #   Fit the list of averaged expectation values to the exponential model and extract the fitting results.
+        # Step 4. Fit the fidelities to the exponential model.
         ###############################################################################################################
+        pbar.desc = "XEB Step 4/4: Fitting expectation values to the exponential model ..."
+        pbar.update(100 / 4)
+        # Set the bounds for the parameters tuple: :math:`(\lambda, A)`
         bounds = ([0, 0], [1, 1])
         # Use scipy's non-linear least squares to fit the data
         xdata = self._seq_lengths
+        # Compute the average fidelity and variance for each sequence
         ydata = np.mean(fids, axis=1)
         sigma = np.std(fids, axis=1)
         if len(sigma) - np.count_nonzero(sigma) > 0:
@@ -276,9 +308,10 @@ class XEB(rb.RandomizedBenchmarking):
         if 0 < tmp < 1.0:
             p0[1] = tmp
 
-        popt, pcov = curve_fit(self._fit_func, xdata, ydata,
-                               p0=p0, sigma=sigma, maxfev=500000,
-                               bounds=bounds, method='dogbox')
+        # Must call `curve_fit` with `*_` to avoid the error "ValueError: too many values to unpack"
+        popt, pcov, *_ = curve_fit(self._fit_func, xdata, ydata,
+                                   p0=p0, sigma=sigma,
+                                   maxfev=500000, bounds=bounds, method='dogbox')
 
         # Store the cross entropy benchmarking results
         params_err = np.sqrt(np.diag(pcov))
@@ -287,6 +320,10 @@ class XEB(rb.RandomizedBenchmarking):
         self._results['A'] = popt[1]
         self._results['lambda_err'] = params_err[0]
         self._results['std'] = sigma
+
+        pbar.desc = "XEB successfully finished!"
+        pbar.update(100 - pbar.n)
+        pbar.close()
 
         return self._results
 
@@ -299,9 +336,6 @@ class XEB(rb.RandomizedBenchmarking):
         :param show: bool, default to True, show the plot figure or not
         :param fname: figure name for saving. If fname is None, do not save the figure
         """
-        if not HAS_MATPLOTLIB:
-            raise ImportError('Function "plot_xeb_results" requires matplotlib. Run "pip install matplotlib" first.')
-
         fig, ax = plt.subplots(figsize=(12, 8))
 
         xdata = self._seq_lengths
@@ -326,17 +360,26 @@ class XEB(rb.RandomizedBenchmarking):
 
         # Set the labels
         ax.set_xlabel('Random Circuit Cycle', fontsize='large')
-        ax.set_ylabel('Estimated Fidelity', fontsize='large')
+        if self._entropy_type == 'linear':
+            ylabel = 'Estimated Linear Fidelity'
+        elif self._entropy_type == 'unbiased':
+            ylabel = 'Estimated Unbiased Fidelity'
+        elif self._entropy_type == 'log':
+            ylabel = 'Estimated Log Fidelity'
+        else:
+            raise QEPError.ArgumentError("XEB: cross entropy type {} is invalid!".format(self._entropy_type))
+        ax.set_ylabel(ylabel, fontsize='large')
         ax.grid(True)
 
         # Show the legend
-        plt.legend(loc='lower left', fontsize=16)
+        plt.legend(loc='lower left', fontsize='large')
 
-        # Add the estimated fidelity and EPC parameters
+        # Add the estimated fidelity and ENR parameters
         bbox_props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.5)
-        ax.text(0.85, 0.9,
-                r"$\lambda$: {:.3f}({:.1e})".format(self.results['lambda'], self.results['lambda_err']),
-                ha="center", va="center", fontsize=12, bbox=bbox_props, transform=ax.transAxes)
+        ax.text(0.8, 0.9,
+                r"Effective Noise Rate: {:.3f}({:.1e})".format(self.results['lambda'],
+                                                               self.results['lambda_err']),
+                ha="center", va="center", fontsize='large', bbox=bbox_props, transform=ax.transAxes)
 
         # Set the x-axis locator always be integer
         plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -344,27 +387,6 @@ class XEB(rb.RandomizedBenchmarking):
         # Save the figure if `fname` is set
         if fname is not None:
             plt.savefig(fname, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
-        # Show the figure if `show==True`
+        # Show the figure if `show` is True
         if show:
             plt.show()
-
-
-def _ideal_probability(qp: QProgram, bitstring: str) -> float:
-    r"""Compute the theoretical output probability of quantum circuit.
-
-    We aim to compute theoretically the probability of measuring bitstring
-    when evolving from the computational basis state :math:`\vert 0\cdots 0\rangle` by the quantum program.
-    Let :math:`U` be the quantum program and let :math:`x` be the bitstring,
-    then the theoretical probability of obtaining :math:`x` is given by
-
-    .. math:: P(x) = \vert \langle x \vert U \vert 0\cdots 0\rangle\vert^2.
-
-    :param qp: QProgram, describes the quantum program
-    :param bitstring: str, specifies the outcome bitstring
-    :return: float, the ideal probability of obtaining the given outcome bitstring
-    """
-    prob = np.abs(circuit.circuit_to_state(qp, vector=True)) ** 2
-    index = int(bitstring, 2)
-    if index >= len(prob):
-        raise QEPError.ArgumentError("the given bitstring {} is wrong.".format(bitstring))
-    return prob[index]

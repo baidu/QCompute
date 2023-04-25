@@ -47,7 +47,8 @@ except ImportError:
 def plot_process_ptm(ptm: np.ndarray,
                      show_labels: bool = False,
                      title: str = None,
-                     fig_name: str = None) -> None:
+                     fig_name: str = None,
+                     show: str = False) -> None:
     r"""
     Visualize the Pauli transfer matrix of the quantum process.
 
@@ -56,6 +57,7 @@ def plot_process_ptm(ptm: np.ndarray,
         Notice that if ptm is very large (more than 5 qubits), then it is meaningless to add the labels.
     :param title: str, default to None, a string that describes the data in @ptm
     :param fig_name: str, default to None, the file name for saving
+    :param show: bool, default to ``False``, indicates whether the plotted figure should be shown or not
 
     **Examples**
 
@@ -113,14 +115,15 @@ def plot_process_ptm(ptm: np.ndarray,
         ax.set_title(title, fontsize='medium')
     if fig_name is not None:  # save figure
         plt.savefig(fig_name, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
-
-    plt.show()
+    if show:
+        plt.show()
 
 
 def compare_process_ptm(ptms: List[np.ndarray],
                         titles: List[str] = None,
                         show_labels: bool = False,
-                        fig_name: str = None) -> None:
+                        fig_name: str = None,
+                        show: str = False) -> None:
     r"""
     Compare the Pauli transfer matrices of the quantum process, maybe obtained via different methods.
 
@@ -129,19 +132,20 @@ def compare_process_ptm(ptms: List[np.ndarray],
     :param show_labels: bool, default to None, indicator for adding labels to the x and y axes or not.
             Notice that if ptm is very large (more than 5 qubits), then it is meaningless to add the labels.
     :param fig_name: str, default to None, the file name for saving
+    :param show: bool, default to ``False``, indicates whether the plotted figure should be shown or not
 
     **Examples**
 
         >>> import QCompute
         >>> import qcompute_qep.tomography as tomography
         >>> from qcompute_qep.utils.circuit import circuit_to_unitary
-        >>> import qcompute_qep.quantum.pauli as pauli
+        >>> import qcompute_qep.quantum.channel as channel
         >>> import qcompute_qep.utils.types as typing
         >>> qp = QCompute.QEnv()
         >>> qp.Q.createList(2)
         >>> QCompute.CZ(qp.Q[1], qp.Q[0])
         >>> ideal_cnot = circuit_to_unitary(qp)
-        >>> ideal_ptm = pauli.unitary_to_ptm(ideal_cnot).data
+        >>> ideal_ptm = channel.unitary_to_ptm(ideal_cnot).data
         >>> qc = QCompute.BackendName.LocalBaiduSim2
         >>> qc_name = typing.get_qc_name(qc)
         >>> st = tomography.ProcessTomography()
@@ -203,5 +207,5 @@ def compare_process_ptm(ptms: List[np.ndarray],
     # Save the figure if needed
     if fig_name is not None:
         plt.savefig(fig_name, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
-
-    plt.show()
+    if show:
+        plt.show()

@@ -23,24 +23,18 @@ We use the gate error mitigation technique to improve the performance. Reference
         "14-qubit entanglement: Creation and coherence."
         Physical Review Letters 106.13 (2011): 130506.
 """
-
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago
-from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
-from qiskit.providers.aer.noise import NoiseModel
 import copy
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib import rc
 import pylab
-
-import sys
-sys.path.append('../..')
+from qiskit.providers.fake_provider import FakeSantiago
+from qiskit_aer.noise import NoiseModel, depolarizing_error
 
 from QCompute import *
 from QCompute.QPlatform.QOperation import RotationGate
+
 from qcompute_qep.exceptions.QEPError import ArgumentError
 from qcompute_qep.mitigation import Mitigator
 from qcompute_qep.mitigation import ZNEMitigator
@@ -48,8 +42,6 @@ from qcompute_qep.utils import expval_z_from_counts
 from qcompute_qep.utils.types import QComputer, QProgram, get_qc_name
 from qcompute_qep.utils.circuit import execute
 
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096
 
@@ -63,7 +55,7 @@ def calculator(qp: QEnv = None, qc: BackendName = None) -> float:
     :param qc: QComputer, specifies the quantum computer on which the quantum program runs
     :return: float, the evaluated expectation value
     """
-    # Setup the noise model
+    # Set up the noise model
     noise_model = NoiseModel()
     noise_model.add_all_qubit_quantum_error(depolarizing_error(0.1, 2), ['cx'])
     # Obtain the output raw counts
@@ -92,7 +84,7 @@ def rotation_gate(phi: float) -> RotationGate.RotationGateOP:
 def setup_po_circuit(n: int, phi: float) -> QProgram:
     """
     Given the number of qubits of the GHZ state and the rotation angle,
-    setup a quantum program that creates the target GHZ state, with rotations added to the end.
+    set up a quantum program that creates the target GHZ state, with rotations added to the end.
 
     :param n: int, the number of qubits of the GHZ state
     :param phi: float, the parity oscillation angle
@@ -100,7 +92,7 @@ def setup_po_circuit(n: int, phi: float) -> QProgram:
     """
     qp = QEnv()
     qp.Q.createList(n)
-    # Setup the GHZ state generating quantum circuit
+    # Set up the GHZ state generating quantum circuit
     H(qp.Q[0])
     for i in range(0, n - 1):
         CX(qp.Q[i], qp.Q[i + 1])
@@ -182,17 +174,19 @@ if __name__ == '__main__':
     STOP = 2 * math.pi / n
     phi_list = np.linspace(start=START, stop=STOP, num=100, endpoint=True, dtype=float)
 
-    #######################################################################################################################
+    ###############################################################################################
     # Set the quantum hardware for estimating the parity oscillation.
-    #######################################################################################################################
+    ###############################################################################################
     # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
-    qc = BackendName.LocalBaiduSim2
+    # qc = BackendName.LocalBaiduSim2
 
     # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
-    # qc = BackendName.CloudBaiduQPUQian
+    # You must set your VIP token first in order to access the Baidu hardware.
+    # Define.hubToken = "Token"
+    # qc_noisy = BackendName.CloudBaiduQPUQian
 
-    # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-    qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    # For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+    qc = FakeSantiago()
     qc_name = get_qc_name(qc)
 
     # Compute the theoretical parity oscillation values
@@ -217,9 +211,10 @@ if __name__ == '__main__':
     zne_mitigator_names = ['Circuit+Linear', 'Layer+Linear', 'Gate+Linear',
                            'Circuit+Richard', 'Layer+Richard', 'Gate+Richard',
                            'Circuit+Exp', 'Layer+Exp', 'Gate+Exp']
-    ###################################################################################################################
+
+    ###############################################################################################
     # The following plot visualizes the ideal, noisy, and corrected expectation values
-    ###################################################################################################################
+    ###############################################################################################
     plt.figure()
     ax = plt.gca()
 
@@ -248,7 +243,6 @@ if __name__ == '__main__':
         plt.scatter(phi_list, mitigated_values[i],
                     marker=next(markers),
                     color=cm(i + 1),
-                    edgecolors='none',
                     alpha=0.9,
                     label=zne_mitigator_names[i],
                     s=16,

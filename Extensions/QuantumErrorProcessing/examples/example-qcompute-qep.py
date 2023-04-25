@@ -19,15 +19,9 @@
 This is a simple example to test if you have successfully installed the QEP module.
 """
 
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.circuit as circuit
 
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 # Step 1. Initialize the quantum program for preparing the Bell state
 qp = QEnv()  # qp is short for "quantum program", instance of QProgram
@@ -35,29 +29,34 @@ qp.Q.createList(2)
 H(qp.Q[0])
 CX(qp.Q[0], qp.Q[1])
 
-# Compute numerically the ideal target state for reference
-ideal_state = circuit.circuit_to_state(qp, vector=False)
-
 # Step 2. Set the quantum computer (instance of QComputer).
-# For debugging, change qc to BackendName.LocalBaiduSim2
+# For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
 qc = BackendName.LocalBaiduSim2
-# For test on real quantum hardware, change qc to BackendName.CloudBaiduQPUQian
+
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
+
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+# from qiskit.providers.fake_provider import FakeSantiago
+# qc = FakeSantiago()
 
 # Step 3. Perform State Tomography, check how well the Bell state
 # Initialize a StateTomography instance
 st = tomography.StateTomography()
+
 # Alternatively, you may initialize the StateTomography instance as follows:
 # st = StateTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-noisy_state = st.fit(qp, qc, method='inverse', shots=4096)
+st.fit(qp, qc, method='inverse', shots=4096)
 
 print("***********************************************************************")
 print("Testing whether 'qcompute-qep' is successfully installed or not now ...\n")
 
-print('Fidelity between the ideal and noisy Bell states is: F = {:.5f}'.format(st.fidelity))
-print("Please change 'qc' to other quantum computer names for more tests.\n")
+print('Fidelity of the Bell state is: F = {:.5f}'.format(st.fidelity))
+print("Please change 'qc' to other quantum computers for more tests.\n")
 
 print("Package 'qcompute-qep' is successfully installed! Please enjoy!")
 print("***********************************************************************")

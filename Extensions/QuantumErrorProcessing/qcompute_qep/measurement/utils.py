@@ -27,7 +27,12 @@ Utility functions used in the `qcompute_qep.measurement` package.
 import copy
 import json
 import math
-from typing import List, Dict, Union, Iterable, Tuple
+import itertools
+from typing import List, Dict, Union, Iterable, Tuple, Any
+from qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
+from scipy.linalg import logm
+import networkx as nx
+
 
 import numpy as np
 from collections import OrderedDict
@@ -419,3 +424,67 @@ def plot_histograms(counts: Union[np.ndarray, List[List[float]]],
         plt.savefig(fig_name, dpi=400)
 
     plt.show()
+
+
+def special_log(raw_cal_matrix: np.ndarray) -> np.ndarray:
+    r"""
+    Compute :math:`G=log(A)` and set all negative off-diagonal elements to zero.
+
+    :param raw_cal_matrix: np.ndarray, calibration matrix.
+    :return: np.ndarray, log of input calibration matrix.
+    """
+    branch = np.all(np.equal(raw_cal_matrix, np.identity(len(raw_cal_matrix))))
+    if branch:
+        new_matrix = np.zeros(raw_cal_matrix.shape)
+    else:
+        new_matrix = logm(raw_cal_matrix)
+
+    for i, j in itertools.permutations(range(len(new_matrix)), r=2):
+        if new_matrix[i][j] < 0:
+            new_matrix[i][j] = 0
+
+    return new_matrix
+
+
+def get_qc_topo(qc: Any) -> nx.Graph:
+    """
+    Obtain the topology of specified quantum computer.
+    :param qc: QComputer, the quantum computer.
+    :return: Topology, nx.graph
+    """
+
+    # Get qc name
+    try:
+        # IBMQ
+        qc_name = qc.name()
+    except TypeError:
+        # Baidu
+        qc_name = qc.name
+
+    G = None
+    qc_dict = {}
+    qc_dict['class1'] = ['lima', 'quito', 'belem']
+    qc_dict['class2'] = ['oslo', 'nairobi', 'jakarta', 'lagos', 'perth', ]
+    qc_dict['Baidu'] = ['BaiduQian']
+    a = None
+    for key, value in qc_dict.items():
+        for i in value:
+            if qc_name.__contains__(i):
+                a = key
+
+    if a == 'class1':
+        G = nx.Graph()
+        G.add_nodes_from([0, 1, 2, 3, 4])
+        G.add_edges_from([(0, 1), (1, 2), (1, 3), (3, 4)])
+    elif a == 'class2':
+        G = nx.Graph()
+        G.add_nodes_from([0, 1, 2, 3, 4, 5, 6])
+        G.add_edges_from([(0, 1), (1, 2), (1, 3), (3, 5), (4, 5), (5, 6)])
+    elif a == 'Baidu':
+        G = nx.Graph()
+        G.add_nodes_from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        G.add_edges_from([(0, 1), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)])
+    else:
+        return nx.complete_graph(10)
+
+    return G

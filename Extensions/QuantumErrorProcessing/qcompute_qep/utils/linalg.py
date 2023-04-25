@@ -22,7 +22,7 @@ import functools
 import itertools
 from collections.abc import Iterable
 import numpy as np
-from functools import reduce
+import scipy.linalg as la
 
 from qcompute_qep.exceptions.QEPError import ArgumentError
 
@@ -306,11 +306,127 @@ def is_psd(A: np.ndarray) -> bool:
     r"""Check if the given operator is positive semidefinite.
 
     Let :math:`A` be a square linear operator.
-    :math:`A` is positive semidefinite if it holds that :math:`\langle\psi\vert A \vert\psi\rangle \geq 0`
-    for all non-zero vectors :math:`\vert\psi\rangle`. Equivalently,
-    :math:`A` is positive semidefinite if all its eigenvalues are non-negative.
+    :math:`A` is positive semidefinite if and only if it holds that
+    :math:`\langle\psi\vert A \vert\psi\rangle \geq 0`
+    for all non-zero vectors :math:`\vert\psi\rangle`.
+    Equivalently, :math:`A` is positive semidefinite if and only if all its eigenvalues are non-negative.
 
     :param A: np.ndarray, a square linear operator
     :return: bool, if A is positive semidefinite, return True; otherwise return False
     """
     return np.all(np.linalg.eigvals(A) >= 0)
+
+
+def cholesky_matrix_to_vec(mat: np.ndarray) -> np.array:
+    r"""Convert a Cholesky matrix into its vector form.
+
+    We assume `a priori` that the input matrix is indeed a Cholesky matrix.
+    A Cholesky matrix is a lower triangular matrix with real diagonal elements,
+    it has :math:`4^n` free real parameters and can be expressed as follows:
+
+    .. math::
+
+            T(\vec{x}) = \begin{bmatrix}
+                            x_0         & 0     & \cdots & 0 \\
+                            x_1 + ix_2 & x_3 & \cdots & 0 \\
+                            \vdots & \vdots & \ddots & \vdots \\
+                            x_{4^n-2^{n+1}+1} + ix_{4^n-2^{n+1}+2} & x_{4^n-2^{n+1}+3}
+                            + ix_{4^n-2^{n+1}+4} & \cdots & x_{4^n-1}
+                        \end{bmatrix}.
+
+    We represent its vector form as follows:
+
+    .. math::
+
+        \vec{x} = [x_0, \cdots, x_{4^n-1}].
+
+    :param mat: np.ndarray, the Cholesky matrix
+    :return: np.array, a 1-D array recording the matrix variables
+    """
+    d = mat.shape[0]  # dimension of the Cholesky matrix
+    vec = np.zeros((d**2, ), dtype=float)
+    for i in range(d):
+        for j in range(i+1):
+            idx = i**2 + 2*j
+            if i == j:
+                vec[idx] = np.real(mat[i][j])
+            else:
+                vec[idx] = np.real(mat[i][j])
+                vec[idx+1] = np.imag(mat[i][j])
+
+    return vec
+
+
+def vec_to_cholesky_matrix(vec: np.array) -> np.array:
+    r"""Convert a vector to a lower triangular Cholesky matrix with real diagonal elements.
+
+    A Cholesky matrix is a lower triangular matrix with real diagonal elements,
+    it has :math:`4^n` free real parameters
+
+    .. math::
+
+        \vec{x} = [x_0, \cdots, x_{4^n-1}].
+
+    The corresponding Cholesky matrix is expressed as follows:
+
+    .. math::
+
+            T(\vec{x}) = \begin{bmatrix}
+                            x_0         & 0     & \cdots & 0 \\
+                            x_1 + ix_2 & x_3 & \cdots & 0 \\
+                            \vdots & \vdots & \ddots & \vdots \\
+                            x_{4^n-2^{n+1}+1} + ix_{4^n-2^{n+1}+2} & x_{4^n-2^{n+1}+3}
+                            + ix_{4^n-2^{n+1}+4} & \cdots & x_{4^n-1}
+                        \end{bmatrix}.
+
+    :param: vec: np.array, a 1-D array with shape (n,) recording the matrix variables
+    :return: mat: np.ndarray, the constructed lower triangular Cholesky matrix with real diagonal elements
+    """
+    d = int(np.sqrt(vec.size))  # dimension of the Cholesky matrix
+    vec = np.reshape(vec, (vec.size, -1))
+    mat = np.zeros((d, d), dtype=complex)
+    for i in range(d):
+        for j in range(i+1):
+            idx = i**2 + 2*j
+            if i == j:
+                mat[i][j] = vec[idx]
+            else:
+                mat[i][j] = vec[idx] + 1j*vec[idx+1]
+    return mat
+
+
+def cholesky_decomposition(A: np.ndarray) -> np.ndarray:
+    r"""Cholesky decomposition of a positive semidefinite matrix A.
+
+    We look for a lower triangular matrix :math:`T` such that :math:`A\approx TT^\dagger`.
+    Notice that we cannot use `scipy.linalg.cholesky()` directly since it only works for
+    positive definite matrices. Instead, we can use `scipy.linalg.ldl()` for the factorization of indefinite matrices:
+
+    .. math::
+
+        A = LDL^\dagger \rightarrow A = L\sqrt{D}(L\sqrt{D})^\dagger \rightarrow T = L\sqrt{D}.
+
+    Reference:
+
+    https://stackoverflow.com/questions/46100441/cholesky-ldl-decomposition-for-semidefinite-matrices-in-python
+
+
+    :param A: np.ndarray, the target square matrix :math:`A`
+    :return: np.ndarray, a lower triangular matrix :math:`T` such that :math:`A\approx TT^\dagger`
+    """
+    L, D, _ = la.ldl(A, lower=True)  # D is potentially block diagonal of size at most 2x2
+    eigvals = np.array(D.diagonal())
+    # Remove negative eigenvalues if exists
+    eigvals[eigvals < 0] = 0
+    sqrtD = np.diag(np.sqrt(eigvals))
+    return L @ sqrtD
+
+
+def complex_matrix_to_vec(mat: np.ndarray) -> np.array:
+    r"""Convert a matrix into its vector form.
+
+    :param mat: np.ndarray, the target matrix
+    :return: np.array, a 1-D array recording the matrix variables
+    """
+    mat = mat.reshape(mat.size, )
+    return list(np.concatenate([mat.real, mat.imag]))

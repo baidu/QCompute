@@ -20,9 +20,6 @@ This is a simple case of using calibration data
 """
 import json
 
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 

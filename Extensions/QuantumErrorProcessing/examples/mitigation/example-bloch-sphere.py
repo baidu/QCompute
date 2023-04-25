@@ -34,12 +34,7 @@ import numpy as np
 import qutip
 import matplotlib.pyplot as plt
 from matplotlib import pylab
-
-import qiskit
 from qiskit.providers.fake_provider import FakeSantiago
-
-import sys
-sys.path.append('../..')
 
 from QCompute import *
 from QCompute.QPlatform.QOperation.RotationGate import RX, RZ
@@ -49,8 +44,6 @@ from qcompute_qep.utils import execute, expval_z_from_counts
 from qcompute_qep.utils.circuit import remove_measurement
 from qcompute_qep.utils.types import QProgram, QComputer
 
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 # Define the Pauli operators
 __PAULI_OPERATORS__ = ['X', 'Y', 'Z']
@@ -149,9 +142,16 @@ if __name__ == '__main__':
     qp = QEnv()
     qp.Q.createList(1)
 
-    # Setup noisy and ideal quantum computers
-    qc_noisy = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    # Set the ideal quantum computer to `LocalBaiduSim2`
     qc_ideal = BackendName.LocalBaiduSim2
+
+    # For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+    # You must set your VIP token first in order to access the Baidu hardware.
+    # Define.hubToken = "Token"
+    # qc_noisy = BackendName.CloudBaiduQPUQian
+
+    # For numeric test on the noisy simulator, change qc_noisy to Qiskit's FakeSantiago
+    qc_noisy = FakeSantiago()
 
     # Initialize the ZNE mitigator
     zne = ZNEMitigator(folder="circuit", extrapolator='richardson')
@@ -190,7 +190,7 @@ if __name__ == '__main__':
                 pauli_noisy[k][i][j] = calculator(qp_rescaled, qc_noisy)
 
             # Extrapolate to obtain the mitigated expectation value of the Pauli operator
-            pauli_mitig[k][i] = zne.extrapolator.extrapolate(xdata=scale_factors, ydata=pauli_noisy[k][i].tolist())
+            pauli_mitig[k][i] = zne.extrapolator.extrapolate(xdata=scale_factors, ydata=pauli_noisy[k][i][:].tolist())
 
     # Visualize the ideal, noisy, and mitigated expectation values in the Bloch sphere
     fig = plt.figure(figsize=(8, 8))

@@ -47,7 +47,6 @@ Different kinds of correction procedures will be implemented:
     >>> from QCompute import MeasureZ
     >>> from QCompute import H
     >>> from QCompute import CX
-    >>>
     >>> from qiskit.providers.fake_provider import FakeSantiago
     >>> from qcompute_qep.measurement.correction import InverseCorrector
     >>> from qcompute_qep.measurement.correction import LeastSquareCorrector
@@ -58,7 +57,7 @@ Different kinds of correction procedures will be implemented:
     >>> from qcompute_qep.utils import expval_from_counts
     >>>
     >>> qc_ideal = BackendName.LocalBaiduSim2
-    >>> qc_noisy = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    >>> qc_noisy = FakeSantiago()
     >>> #######################################################################################################
     >>> # Setup the quantum program for preparing the GHZ state and set the quantum observable.
     >>> #######################################################################################################
@@ -72,7 +71,7 @@ Different kinds of correction procedures will be implemented:
     >>> # Set the ideal quantum computer (simulator)
     >>> ideal_qc = BackendName.LocalBaiduSim2
     >>> # Set the noisy quantum computer
-    >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+    >>> qc = FakeSantiago()
     >>> noisy_qc_name = get_qc_name(qc)
     >>>
     >>> # Set the quantum observable: :math:`O = |0\cdots 0><0\cdots 0| + |1\cdots 1><1\cdots 1|`
@@ -105,9 +104,11 @@ from scipy.optimize import minimize
 from scipy.special import binom
 import math
 import warnings
+import networkx as nx
+
 
 from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement.calibration import Calibrator, CompleteCalibrator, TPCalibrator
+from qcompute_qep.measurement.calibration import Calibrator, CompleteCalibrator, TPCalibrator, CTMPCalibrator
 from qcompute_qep.measurement.utils import dict2vector, vector2dict
 from qcompute_qep.utils.types import QComputer
 from qcompute_qep.utils.linalg import normalize
@@ -124,6 +125,8 @@ class Corrector(ABC):
                  qc: QComputer = None,
                  calibrator: Union[Calibrator, str] = 'complete',
                  qubits: List[int] = None,
+                 k: int = 2,
+                 topo: nx.Graph = None,
                  **kwargs):
         """The init function of the Corrector.
 
@@ -134,19 +137,30 @@ class Corrector(ABC):
         super(Corrector, self).__init__()
         self._qc = qc
         self._qubits = qubits
+        self._k = k
+        self._topo = topo
 
         # Parse the input calibrator type.
         # The calibrator can be initialized via string or Calibrator instance.
         if isinstance(calibrator, str):
             cal_data = kwargs.get('cal_data', None)
-            if calibrator.lower() == 'complete':  # Case insensitive
+            if calibrator.lower() == 'complete':  # Case-insensitive
                 self._calibrator = CompleteCalibrator(qc=qc, cal_data=cal_data, qubits=self._qubits)
-            elif calibrator.lower() == 'tp':  # Case insensitive
+            elif calibrator.lower() == 'tp':  # Case-insensitive
                 self._calibrator = TPCalibrator(qc=qc, cal_data=cal_data, qubits=self._qubits)
+            elif calibrator.lower() == 'ctmp':  # Case-insensitive
+                if self._topo is None:
+                    self._topo = nx.complete_graph(len(self._qubits))
+                self._calibrator = CTMPCalibrator(qc=qc, cal_data=cal_data, qubits=self._qubits, topo=self._topo,
+                                                  k=self._k)
             else:
                 raise ArgumentError("Calibrator with name {} is not defined!".format(calibrator))
         else:
             self._calibrator = calibrator
+
+        if self.__class__.__name__ == 'CTMPCorrector':
+            if calibrator.lower() != 'ctmp':
+                raise ArgumentError("CTMPCorrector should combine with CTMPCalibrator!")
 
     @property
     def calibrator(self):
@@ -535,6 +549,101 @@ class NeumannCorrector(Corrector):
 
         # Correct data
         corrected_data = np.matmul(cal_matrix_inv, raw_data)
+
+        # Convert the data back to its input format
+        if issubclass(type_mark, dict):
+            return vector2dict(corrected_data)
+        else:
+            return corrected_data
+
+
+class CTMPCorrector(Corrector):
+    """Corrector based on CTMP model."""
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        self._tol = kwargs.get('tol', 1e-6)
+        self._topo = kwargs.get('topo', None)
+        super().__init__(*args, **kwargs)
+
+    def __str__(self):
+        return "CTMP Corrector"
+
+    def correct(self, raw_data: Union[dict, np.ndarray], **kwargs: Any) -> Union[dict, np.ndarray]:
+        r"""
+        Use the CTMP method to correct raw data.
+
+        Supported `(key, value)` pairs in the keyworded variable is:
+
+            'tol' = 1e-6: set the optimization error tolerance.
+
+
+        :param raw_data: Optional[dict, np.ndarray], the input raw data, can be a dictionary
+            or a (unnormalized) probability vector.
+        :return: The corrected data, same type as the input noisy data.
+
+        Usage:
+
+        .. code-block:: python
+            :linenos:
+
+            ctmp = CTMPCorrector(qcomputer, calibrator='ctmp', qubits=qubits, k=3)
+            ctmp = CTMPCorrector(qc=qc, qubits=qubits)
+            ctmp = CTMPCorrector(calibrator='ctmp')
+            ctmp = CTMPCorrector(calibrator='ctmp', cal_data=cal_data, qubits=qubits)
+            ctmp.correct(raw_data)
+
+        **Examples**
+
+        >>> # CTMP calibration
+        >>> corr_ctmp = CTMPCorrector(qc=qc, calibrator='ctmp', qubits=range(n))
+        >>> counts_ctmp = corr_ctmp.correct(counts_noisy)
+        >>> # Compute the expectation value from corrected counts
+        >>> val_ctmp = expval_from_counts(O, counts_ctmp)
+        >>>
+        >>> print("The 'CTMP Calibrator + CTMP Corrector' "
+        >>> "mitigated expectation value is: {}".format(val_ctmp))
+        The 'CTMP Calibrator + CTMP Corrector' mitigated expectation value is:
+        0.992090581402768
+        """
+
+        # Check and record the input data format
+        type_mark = type(raw_data)
+        if isinstance(raw_data, dict):
+            raw_data = dict2vector(raw_data)
+
+        # Initialize the inverse calibration matrix
+        noise_strength = max(-np.diagonal(self._calibrator.generator_matrix()))
+        T = 4*self._tol**(-2)*math.exp(4*noise_strength)
+        B = np.identity(self.calibrator.cal_matrix.shape[0]) + noise_strength**(-1)*self._calibrator.generator_matrix()
+
+        # Method 1.
+        # a = []
+        # total_counts = int(sum(raw_data))
+        # pbar = tqdm(total=100, desc='Mitigating raw data!', ncols=80)
+        # for t in range(int(np.ceil(T))):
+        #     pbar.update(100 / int(np.ceil(T)))
+        #     alphas = np.random.default_rng().poisson(lam=noise_strength, size=1000)
+        #     S_alphas = [np.linalg.matrix_power(B, alpha) for alpha in alphas]
+        #     for S_alpha in S_alphas:
+        #         a.append(np.matmul(S_alpha, raw_data))
+        # pbar.close()
+        # corrected_data = np.sum(np.array(a), axis=0)
+
+        # Method 2.
+        init = [0]*self.calibrator.cal_matrix.shape[0]
+        corrected_data = np.array(init, dtype=float)
+        gap = 1
+        nit = 0
+        while gap > self._tol:
+            corrected_data_before = corrected_data.copy()
+            corrected_data += math.exp(noise_strength) * (-noise_strength) ** nit / math.factorial(nit) * np.matmul(
+                np.linalg.matrix_power(B, nit), raw_data)
+            nit += 1
+            gap = np.linalg.norm(corrected_data - corrected_data_before)
+
+        # Method 3.
+        # cal_matrix_inv = expm(-self._calibrator.generator_matrix())
+        # corrected_data = np.matmul(cal_matrix_inv, raw_data)
 
         # Convert the data back to its input format
         if issubclass(type_mark, dict):

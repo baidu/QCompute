@@ -37,6 +37,8 @@ from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
 from QCompute.OpenModule.ReverseCircuitModule import ReverseCircuitModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
 from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
+from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
+from QCompute.OpenModule.CompressNoiseModule import CompressNoiseModule
 
 
 
@@ -88,6 +90,32 @@ from QCompute.QPlatform.QOperation.RotationGate import (
     CRY,
     CRZ,
 )
+from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianGate import (
+    PhotonicDX as GaussianDX,
+    PhotonicDP as GaussianDP,
+    PhotonicPHA as GaussianPHA,
+    PhotonicBS as GaussianBS,
+    PhotonicCZ as GaussianCZ,
+    PhotonicCX as GaussianCX,
+    PhotonicDIS as GaussianDIS,
+    PhotonicSQU as GaussianSQU,
+    PhotonicTSQU as GaussianTSQU,
+    PhotonicMZ as GaussianMZ,  # CompositeGate
+)
+from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianMeasure import (
+    MeasureHomodyne as GaussianMeasureHomodyne,
+    MeasureHeterodyne as GaussianMeasureHeterodyne,
+    MeasurePhotonCount as GaussianMeasurePhotonCount,
+)
+from QCompute.QPlatform.QOperation.Photonic.PhotonicFockGate import (
+    PhotonicAP as FockAP,
+    PhotonicPHA as FockPHA,
+    PhotonicBS as FockBS,
+    PhotonicMZ as FockMZ,  # CompositeGate
+)
+from QCompute.QPlatform.QOperation.Photonic.PhotonicFockMeasure import (
+    MeasurePhotonCount as FockMeasurePhotonCount,
+)
 from QCompute.OpenConvertor.CircuitToDrawConsole import (
     CircuitToDrawConsole
 )
@@ -125,9 +153,7 @@ from QCompute.QPlatform import QStatus
 from QCompute.QPlatform import Utilities
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 
-if True:  # prevent scrambling
-    
-    pass
+
 
 from QCompute.QPlatform.QNoise.AmplitudeDamping import AmplitudeDamping
 from QCompute.QPlatform.QNoise.BitFlip import BitFlip

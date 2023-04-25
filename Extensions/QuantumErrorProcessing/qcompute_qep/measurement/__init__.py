@@ -21,7 +21,7 @@ __init__ file of the `qcompute_qep.measurement` module.
 
 from qcompute_qep.measurement.calibration import Calibrator, CompleteCalibrator, TPCalibrator
 from qcompute_qep.measurement.correction import Corrector, InverseCorrector, \
-                                                LeastSquareCorrector, IBUCorrector, NeumannCorrector
+    LeastSquareCorrector, IBUCorrector, NeumannCorrector
 __all__ = [
     'Calibrator',
     'CompleteCalibrator', 'TPCalibrator',

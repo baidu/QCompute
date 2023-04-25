@@ -28,7 +28,7 @@ from QCompute import Define
 from QCompute.Define import Settings
 from QCompute.Define.Utils import filterConsoleOutput, findUniError
 from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
-from QCompute.OpenSimulator import QImplement, ModuleErrorCode, withNoise
+from QCompute.OpenSimulator import QImplement, ModuleErrorCode, withNoise, QResult
 from QCompute.OpenSimulator.local_baidu_sim2.Simulator import runSimulator
 from QCompute.QPlatform import Error
 
@@ -135,8 +135,9 @@ class Backend(QImplement):
         # call the simulator
         completedProcess = subprocess.run(
             # Compatible with Python3.6, in Python3.7 and above, the more understandable alias of 'universal_newlines' is 'text'.
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf-8')
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8')
 
+        self.result = QResult()
         self.result.log = filterConsoleOutput(completedProcess.stdout)
         # collect the result to simulator for the subsequent invoking
         self.result.code = completedProcess.returncode

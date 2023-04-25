@@ -32,7 +32,7 @@ from QCompute.Define.Utils import loadPythonModule, clearOutputDir
 from QCompute.OpenConvertor.CircuitToDrawConsole import CircuitToDrawConsole
 from QCompute.OpenModule import ModuleImplement
 from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
-from QCompute.OpenSimulator import QResult, QImplement
+from QCompute.OpenSimulator import QResult, QImplement, QPhotonicResult
 from QCompute.QPlatform import Error, ModuleErrorCode, BackendName, getBackendFromName
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.InteractiveModule import InteractiveModule
@@ -242,7 +242,7 @@ class QEnv:
 
         if applyModule:
             # filter the circuit by Modules
-            usedModuleList = filterModule(self.backendName, self.usingModuleList)
+            usedModuleList = filterModule(program, self.backendName, self.usingModuleList)
             for module in usedModuleList:
                 moduleStep += 1
                 self.program = module(self.program)
@@ -299,10 +299,6 @@ class QEnv:
 
         ret: Dict[str, Union[str, Dict[str, int]]] = None
         if self.backendName.value.startswith('local_'):
-            if len(self.noiseDefineMap) > 0:
-                self.usingModuleList.clear()
-                self.module(UnrollProcedureModule())
-                self.module(UnrollNoiseModule())
             usedModuleList = self.publish()  # circuit in Protobuf format
             moduleList = [{
                 'module': module.__class__.__name__,
@@ -311,8 +307,6 @@ class QEnv:
             ret = self._localCommit(fetchMeasure, moduleList)
         elif self.backendName.value.startswith('cloud_'):
             self.publish(False)  # circuit in Protobuf format
-
-            
             moduleList = [(module.__class__.__name__, module.arguments) for module in self.usingModuleList]
             moduleList.extend(self.usedServerModuleList)
 
@@ -377,56 +371,102 @@ class QEnv:
                     file.write(backend.result.log)
             return {"status": "error", "reason": backend.result.log}
 
-        if backend.result.counts is not None or backend.result.state is not None:
-            cRegCount = max(self.program.head.usingCRegList) + 1
+        if 'photonic' not in self.backendName.value:
+            if backend.result.counts is not None or backend.result.state is not None:
+                cRegCount = max(self.program.head.usingCRegList) + 1
+                if backend.result.counts is not None:
+                    backend.result.counts = formatMeasure(backend.result.counts, cRegCount)
 
-            if backend.result.counts is not None:
-                backend.result.counts = formatMeasure(backend.result.counts, cRegCount)
+                try:
+                    ret = QResult()
+                    ret.fromJson(backend.result.output)
+                    ret.moduleList = moduleList
+                    backend.result.output = ret.toJson()
+                except Exception as ex:
+                    print(ex)
 
-            try:
-                ret = QResult()
-                ret.fromJson(backend.result.output)
-                ret.moduleList = moduleList
-                backend.result.output = ret.toJson()
-            except Exception as ex:
-                print(ex)
+                originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir=Define.outputDirPath)
+                rsplitedFn = originFn.rsplit('.', 4)
+                taskResult = {'taskId': rsplitedFn[-3], 'status': 'success'}
+                if backend.result.output != '':
+                    with os.fdopen(originFd, "wt") as fObj:
+                        fObj.write(backend.result.output)
+                    taskResult["origin"] = originFn
+                else:
+                    os.close(originFd)
 
-            originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir=Define.outputDirPath)
-            rsplitedFn = originFn.rsplit('.', 4)
-            taskResult = {'taskId': rsplitedFn[-3], 'status': 'success'}
-            if backend.result.output != '':
-                with os.fdopen(originFd, "wt") as fObj:
-                    fObj.write(backend.result.output)
-                taskResult["origin"] = originFn
-            else:
-                os.close(originFd)
+                if backend.result.counts is not None:
+                    measureFn = Path(originFn[:-12] + '.measure.json')
+                    measureFn.write_text(json.dumps(backend.result.counts), encoding='utf-8')
+                elif backend.result.state is not None:
+                    measureFn = Path(originFn[:-12] + '.measure.txt')
+                    measureFn.write_text(str(backend.result.state), encoding='utf-8')
+                taskResult["measure"] = str(measureFn)
 
-            if backend.result.counts is not None:
-                measureFn = Path(originFn[:-12] + '.measure.json')
-                measureFn.write_text(json.dumps(backend.result.counts), encoding='utf-8')
-            elif backend.result.state is not None:
-                measureFn = Path(originFn[:-12] + '.measure.txt')
-                measureFn.write_text(str(backend.result.state), encoding='utf-8')
-            taskResult["measure"] = str(measureFn)
+                if backend.result.log != '':
+                    logFn = Path(originFn[:-12] + '.log')
+                    logFn.write_text(backend.result.log, encoding='utf-8')
+                    taskResult["log"] = str(logFn)
 
-            if backend.result.log != '':
-                logFn = Path(originFn[:-12] + '.log')
-                logFn.write_text(backend.result.log, encoding='utf-8')
-                taskResult["log"] = str(logFn)
+                taskResult["moduleList"] = moduleList
 
-            taskResult["moduleList"] = moduleList
+                if fetchMeasure:
+                    taskResult['ancilla'] = {}
+                    taskResult['ancilla']['usedQRegList'] = backend.result.ancilla.usedQRegList
+                    taskResult['ancilla']['usedCRegList'] = backend.result.ancilla.usedCRegList
+                    taskResult['ancilla']['compactedQRegDict'] = backend.result.ancilla.compactedQRegDict
+                    taskResult['ancilla']['compactedCRegDict'] = backend.result.ancilla.compactedCRegDict
+                    taskResult['shots'] = backend.result.shots
+                    taskResult['counts'] = backend.result.counts
+                    taskResult['state'] = backend.result.state
 
-            if fetchMeasure:
-                taskResult['ancilla'] = {}
-                taskResult['ancilla']['usedQRegList'] = backend.result.ancilla.usedQRegList
-                taskResult['ancilla']['usedCRegList'] = backend.result.ancilla.usedCRegList
-                taskResult['ancilla']['compactedQRegDict'] = backend.result.ancilla.compactedQRegDict
-                taskResult['ancilla']['compactedCRegDict'] = backend.result.ancilla.compactedCRegDict
-                taskResult['shots'] = backend.result.shots
-                taskResult['counts'] = backend.result.counts
-                taskResult['state'] = backend.result.state
+                return taskResult
+        else:
+            if backend.result.value is not None or backend.result.counts is not None:
+                try:
+                    ret = QPhotonicResult()
+                    ret.fromJson(backend.result.output)
+                    ret.moduleList = moduleList
+                    backend.result.output = ret.toJson()
+                except Exception as ex:
+                    print(ex)
 
-            return taskResult
+                originFd, originFn = tempfile.mkstemp(prefix="local.", suffix=".origin.json", dir=Define.outputDirPath)
+                rsplitedFn = originFn.rsplit('.', 4)
+                taskResult = {'taskId': rsplitedFn[-3], 'status': 'success'}
+                if backend.result.output != '':
+                    with os.fdopen(originFd, "wt") as fObj:
+                        fObj.write(backend.result.output)
+                    taskResult["origin"] = originFn
+                else:
+                    os.close(originFd)
+
+                if backend.result.value is not None:
+                    measureFn = Path(originFn[:-12] + '.measure.json')
+                    measureFn.write_text(json.dumps(backend.result.value), encoding='utf-8')
+                elif backend.result.state is not None:
+                    measureFn = Path(originFn[:-12] + '.measure.txt')
+                    measureFn.write_text(str(backend.result.state), encoding='utf-8')
+                taskResult["measure"] = str(measureFn)
+
+                if backend.result.log != '':
+                    logFn = Path(originFn[:-12] + '.log')
+                    logFn.write_text(backend.result.log, encoding='utf-8')
+                    taskResult["log"] = str(logFn)
+
+                taskResult["moduleList"] = moduleList
+
+                if fetchMeasure:
+                    taskResult['ancilla'] = {}
+                    taskResult['ancilla']['usedQRegList'] = backend.result.ancilla.usedQRegList
+                    taskResult['ancilla']['usedCRegList'] = backend.result.ancilla.usedCRegList
+                    taskResult['ancilla']['compactedQRegDict'] = backend.result.ancilla.compactedQRegDict
+                    taskResult['ancilla']['compactedCRegDict'] = backend.result.ancilla.compactedCRegDict
+                    taskResult['shots'] = backend.result.shots
+                    taskResult['value'] = backend.result.value
+                    taskResult['state'] = backend.result.state
+
+                return taskResult
 
         return {"status": "failed", "reason": backend.result.log}
 

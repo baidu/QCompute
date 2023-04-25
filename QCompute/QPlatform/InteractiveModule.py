@@ -58,6 +58,7 @@ _AerSimulatorModuleList = [
 BackendModuleDict = {
     BackendName.LocalBaiduSim2: _SimulatorModuleList,
     BackendName.LocalCuQuantum: _SimulatorModuleList,
+    BackendName.LocalBaiduSimPhotonic: [[], []],
     
     BackendName.CloudBaiduSim2Water: _SimulatorModuleList,
     BackendName.CloudBaiduSim2Earth: _SimulatorModuleList,
@@ -134,7 +135,7 @@ class InteractiveModule:
                 print(ex)
 
     def refurbishStatus(self):
-        usingModuleList = filterModule(self.backendName, self.usingModuleList)
+        usingModuleList = filterModule(self.originProgram, self.backendName, self.usingModuleList)
         usingModuleNameList: List[str] = []
         reorderUsingModuleList: List[ModuleImplement] = []
         for module in usingModuleList:

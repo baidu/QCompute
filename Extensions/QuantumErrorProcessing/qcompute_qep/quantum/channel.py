@@ -35,12 +35,15 @@ References:
 
 .. [G15] Greenbaum, Daniel. "Introduction to quantum gate set tomography." arXiv preprint arXiv:1509.02921 (2015).
 """
+from __future__ import annotations
 
 import abc
 from typing import Union, List, Tuple
 import numpy as np
 import copy
 from qcompute_qep.exceptions.QEPError import ArgumentError
+from qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
+import qcompute_qep.utils.linalg as la
 
 # define the abstract quantum channel data type
 QChannel = Union[np.ndarray, List[np.ndarray], List[Tuple[np.ndarray, np.ndarray]]]
@@ -402,8 +405,7 @@ def _to_ptm(data: QChannel, rep_type: str) -> np.array:
 ###############################################################################
 def _ptm_to_natural(data: np.ndarray = None) -> np.ndarray:
     """Convert PTM representation to Natural representation."""
-    num_qubits = int(np.log2(np.sqrt(data.shape[1])))
-    return _transform_from_pauli(data, num_qubits)
+    pass
 
 
 def _natural_to_choi(data: np.ndarray = None) -> np.ndarray:
@@ -411,11 +413,7 @@ def _natural_to_choi(data: np.ndarray = None) -> np.ndarray:
 
     .. math:: \\mathcal{N}_{vn,um} = \\Lambda_{mn,uv}
     """
-    idim, odim = data.shape
-    input_dim = int(np.sqrt(idim))
-    output_dim = int(np.sqrt(odim))
-    shape = (output_dim, output_dim, input_dim, input_dim)
-    return _reshuffle(data, shape)
+    pass
 
 
 ###############################################################################
@@ -428,23 +426,7 @@ def _transform_from_pauli(data: QChannel = None, num_qubits: int = 0) -> QChanne
     :param num_qubits: the number of qubits
     :return:
     """
-    # Change basis: sum_{i=0}^3 =|\sigma_i>><i|
-    basis_mat = np.array(
-        [[1, 0, 0, 1], [0, 1, 1j, 0], [0, 1, -1j, 0], [1, 0j, 0, -1]], dtype=complex
-    )
-    # Note that we manually renormalized after change of basis
-    # to avoid rounding errors from square-roots of 2.
-    cob = basis_mat
-    for _ in range(num_qubits - 1):
-        dim = int(np.sqrt(len(cob)))
-        cob = np.reshape(
-            np.transpose(
-                np.reshape(np.kron(basis_mat, cob), (2, 2, dim, dim, 4, dim * dim)),
-                (0, 2, 1, 3, 4, 5),
-            ),
-            (4 * dim * dim, 4 * dim * dim),
-        )
-    return np.dot(np.dot(cob, data), cob.conj().T) / 2 ** num_qubits
+    pass
 
 
 def _transform_to_pauli(data: QChannel = None, num_qubits: int = 0):
@@ -454,22 +436,7 @@ def _transform_to_pauli(data: QChannel = None, num_qubits: int = 0):
     :param num_qubits: the number of qubits
     :return:
     """
-    basis_mat = np.array(
-        [[1, 0, 0, 1], [0, 1, 1, 0], [0, -1j, 1j, 0], [1, 0j, 0, -1]], dtype=complex
-    )
-    # Note that we manually renormalized after change of basis
-    # to avoid rounding errors from square-roots of 2.
-    cob = basis_mat
-    for _ in range(num_qubits - 1):
-        dim = int(np.sqrt(len(cob)))
-        cob = np.reshape(
-            np.transpose(
-                np.reshape(np.kron(basis_mat, cob), (4, dim * dim, 2, 2, dim, dim)),
-                (0, 1, 2, 4, 3, 5),
-            ),
-            (4 * dim * dim, 4 * dim * dim),
-        )
-    return np.dot(np.dot(cob, data), cob.conj().T) / 2 ** num_qubits
+    pass
 
 
 def _reshuffle(mat, shape):
@@ -478,3 +445,54 @@ def _reshuffle(mat, shape):
         np.transpose(np.reshape(mat, shape), (3, 1, 2, 0)),
         (shape[3] * shape[1], shape[0] * shape[2]),
     )
+
+
+def unitary_to_ptm(unitary: np.ndarray) -> QuantumChannel:
+    r"""From a process unitary to its Pauli transfer matrix.
+
+    Convert a process unitary in the matrix representation to the Pauli transfer matrix (PTM) representation.
+    Assume the unitary has :math:`n` qubits, then the corresponding PTM is of size :math:`4^n\times 4^n`.
+
+    **Examples**
+
+        In the following, we compute the PTM of the :math:`X` gate.
+
+        >>> X = np.array([[0, 1], [1, 0]]).astype(complex) / np.sqrt(2)
+        >>> ptm = unitary_to_ptm(X)
+        >>> print(ptm.data)
+        [[ 1.+0.j  0.+0.j  0.+0.j  0.+0.j]
+         [ 0.+0.j  1.+0.j  0.+0.j  0.+0.j]
+         [ 0.+0.j  0.+0.j -1.+0.j  0.+0.j]
+         [ 0.+0.j  0.+0.j  0.+0.j -1.+0.j]]
+
+    :param unitary: np.ndarray, the matrix representation of the quantum process unitary
+    :return: np.ndarray, the Pauli transfer matrix representation of the unitary
+    """
+    if not np.log2(unitary.shape[0]).is_integer():
+        raise ArgumentError("in unitary_to_ptm(): the dimensions of the unitary must be the power of 2!")
+    # Number of qubits
+    n = int(np.log2(unitary.shape[0]))
+    cpb = complete_pauli_basis(n)
+    ptm = np.zeros((len(cpb), len(cpb)), dtype=float)
+    for j, pauli_j in enumerate(cpb):
+        for k, pauli_k in enumerate(cpb):
+            ptm[j, k] = np.real(np.trace(pauli_j.matrix @ unitary @ pauli_k.matrix @ la.dagger(unitary)))
+    return PTM(ptm)
+
+
+def ptm_to_process(ptm: QuantumChannel, type: str = 'kraus') -> QuantumChannel:
+    r"""From the Pauli transfer matrix of a quantum process to the given representation.
+
+    Convert a quantum process in the Pauli transfer matrix representation to the target representation.
+    Candidate target representations are:
+
+    + str = ``superoperator``, the superoperator representation, also known as the natural representation;
+    + str = ``choi``, the Choi representation;
+    + str = ``kraus``, the Kraus operator representation, also known as the operator-sum representation;
+    + str = ``chi``, the chi matrix representation, aka. the process matrix representation.
+
+    :param ptm: np.ndarray, the Pauli transfer matrix representation of the quantum process
+    :param type: str, default to 'kraus', type: str = 'kraus'
+    :return: QuantumChannel, a quantum channel class instance
+    """
+    return qc_convert(ptm, type)

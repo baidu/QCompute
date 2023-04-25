@@ -18,19 +18,10 @@
 """
 An example to demonstrate the Standard Randomized Benchmarking protocol.
 """
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago, FakeParis
-
-import sys
-sys.path.append('../..')
-
 from QCompute import *
+
 import qcompute_qep.benchmarking as rb
 import qcompute_qep.utils.types as types
-
-
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).
@@ -39,13 +30,19 @@ Define.hubToken = "Token"
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
 qc = BackendName.LocalBaiduSim2
 
-# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
 
-# For numeric test on the noisy simulator, change qc to Qiskit's FakeParis
-# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+# from qiskit.providers.fake_provider import FakeSantiago
+# qc = FakeSantiago()
 
 # You can also use Qiskit's AerSimulator to customize noise
+# from qiskit.providers.fake_provider import FakeSantiago
+# from qiskit_aer import AerSimulator
+# from qiskit_aer.noise import NoiseModel, depolarizing_error
 # noise_model = NoiseModel.from_backend(FakeSantiago())
 # p1Q = 0.002
 # p2Q = 0.02
@@ -56,14 +53,39 @@ qc = BackendName.LocalBaiduSim2
 ##########################################################################################
 # Step 2. Perform the randomized benchmarking protocol.
 ##########################################################################################
-
 # Initialize a RandomizedBenchmarking instance
 srb = rb.StandardRB()
-srb.benchmark(qc=qc,
-              qubits=[1, 2],
-              seq_lengths=[1, 3, 5, 7, 10],
-              repeats=5)
 
+# Call the randomized benchmarking procedure and obtain estimated error rate
+qubits = [0, 1]
+srb.benchmark(qc=qc,
+              qubits=qubits,
+              seq_lengths=[1, 2, 3, 4, 5],
+              repeats=5)
+print("*******************************************************************************")
+print("* Standard RB on qubits: {}".format(qubits))
+print("* Estimated fidelity parameter: {}".format(srb.results['f']))
+print("* Estimated EPC parameter: {}".format(srb.results['epc']))
+print("* Standard deviation error of estimation: {}".format(srb.results['f_err']))
+fname = "StandardRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
+print("* RB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results
-fname = "StandardRB-{}.png".format(types.get_qc_name(qc))
 srb.plot_results(show=True, fname=fname)
+print("*******************************************************************************")
+
+# You can also perform the randomized benchmarking procedure on other qubits, for example [q1, q3]
+qubits = [1, 3]
+srb.benchmark(qc=qc,
+              qubits=qubits,
+              seq_lengths=[1, 2, 3, 4, 5],
+              repeats=5)
+print("*******************************************************************************")
+print("* Standard RB on qubits: {}".format(qubits))
+print("* Estimated fidelity parameter: {}".format(srb.results['f']))
+print("* Estimated EPC parameter: {}".format(srb.results['epc']))
+print("* Standard deviation error of estimation: {}".format(srb.results['f_err']))
+fname = "StandardRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
+print("* RB data is visualized in figure '{}'.".format(fname))
+# Plot the randomized benchmarking results
+srb.plot_results(show=True, fname=fname)
+print("*******************************************************************************")

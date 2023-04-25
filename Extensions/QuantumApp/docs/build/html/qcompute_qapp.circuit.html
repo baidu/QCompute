@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qcompute_qapp.circuit &mdash; QCompute-QAPP 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qcompute_qapp.optimizer" href="qcompute_qapp.optimizer.html" />
+    <link rel="prev" title="qcompute_qapp.application.optimization" href="qcompute_qapp.application.optimization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> QCompute-QAPP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Docs</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qcompute_qapp.html">QCompute-QAPP Package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.algorithm.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.algorithm</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.application.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.application</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.circuit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit"><code class="docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">BasicCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.IQPEncodingCircuit"><code class="docutils literal notranslate"><span class="pre">IQPEncodingCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.IQPEncodingCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">IQPEncodingCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.BasisEncodingCircuit"><code class="docutils literal notranslate"><span class="pre">BasisEncodingCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.BasisEncodingCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">BasisEncodingCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.KernelEstimationCircuit"><code class="docutils literal notranslate"><span class="pre">KernelEstimationCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.KernelEstimationCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">KernelEstimationCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit"><code class="docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit.parameters"><code class="docutils literal notranslate"><span class="pre">ParameterizedCircuit.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit.set_parameters"><code class="docutils literal notranslate"><span class="pre">ParameterizedCircuit.set_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">ParameterizedCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.PauliMeasurementCircuit"><code class="docutils literal notranslate"><span class="pre">PauliMeasurementCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.PauliMeasurementCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">PauliMeasurementCircuit.add_circuit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.PauliMeasurementCircuit.get_expectation"><code class="docutils literal notranslate"><span class="pre">PauliMeasurementCircuit.get_expectation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla"><code class="docutils literal notranslate"><span class="pre">PauliMeasurementCircuitWithAncilla</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla.add_circuit"><code class="docutils literal notranslate"><span class="pre">PauliMeasurementCircuitWithAncilla.add_circuit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla.get_expectation"><code class="docutils literal notranslate"><span class="pre">PauliMeasurementCircuitWithAncilla.get_expectation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit"><code class="docutils literal notranslate"><span class="pre">SimultaneousPauliMeasurementCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">SimultaneousPauliMeasurementCircuit.add_circuit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit.get_expectation"><code class="docutils literal notranslate"><span class="pre">SimultaneousPauliMeasurementCircuit.get_expectation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.QAOAAnsatz"><code class="docutils literal notranslate"><span class="pre">QAOAAnsatz</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.QAOAAnsatz.add_circuit"><code class="docutils literal notranslate"><span class="pre">QAOAAnsatz.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.UniversalCircuit"><code class="docutils literal notranslate"><span class="pre">UniversalCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.UniversalCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">UniversalCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.RealEntangledCircuit"><code class="docutils literal notranslate"><span class="pre">RealEntangledCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.RealEntangledCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">RealEntangledCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.ComplexEntangledCircuit"><code class="docutils literal notranslate"><span class="pre">ComplexEntangledCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.ComplexEntangledCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">ComplexEntangledCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.RealAlternatingLayeredCircuit"><code class="docutils literal notranslate"><span class="pre">RealAlternatingLayeredCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.RealAlternatingLayeredCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">RealAlternatingLayeredCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.circuit.ComplexAlternatingLayeredCircuit"><code class="docutils literal notranslate"><span class="pre">ComplexAlternatingLayeredCircuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcompute_qapp.circuit.ComplexAlternatingLayeredCircuit.add_circuit"><code class="docutils literal notranslate"><span class="pre">ComplexAlternatingLayeredCircuit.add_circuit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.optimizer.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.optimizer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.utils.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.utils</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QCompute-QAPP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="qcompute_qapp.html">QCompute-QAPP Package</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.circuit</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qcompute_qapp.circuit.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-qcompute_qapp.circuit">
+<span id="qcompute-qapp-circuit"></span><h1><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.circuit</span></code><a class="headerlink" href="#module-qcompute_qapp.circuit" title="Permalink to this heading"></a></h1>
+<p>The pre-defined quantum circuit</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.BasicCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">BasicCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.BasicCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Basic Circuit class</p>
+<p>The constructor of the BasicCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.BasicCircuit.add_circuit">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.BasicCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds circuit to the register.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.IQPEncodingCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">IQPEncodingCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.IQPEncodingCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>IQP Encoding Circuit class</p>
+<p>The constructor of the IQPEncodingCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+inverse (bool): Whether the encoding circuit will be inverted, i.e. U^dagger(x) if True, defaults to False</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.IQPEncodingCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.IQPEncodingCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the encoding circuit used to map a classical data vector into its quantum feature state</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added
+x (np.ndarray): Classical data vector to be encoded</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.BasisEncodingCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">BasisEncodingCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.BasisEncodingCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>Basis Encoding Circuit class</p>
+<p>The constructor of the BasisEncodingCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+bit_string (str): Bit string to be encoded as a quantum state</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.BasisEncodingCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.BasisEncodingCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the basis encoding circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.KernelEstimationCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">KernelEstimationCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.KernelEstimationCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>Kernel Estimation Circuit class</p>
+<p>The constructor of the KernelEstimationCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+encoding_style (str): Encoding circuit, only accepts <code class="docutils literal notranslate"><span class="pre">'IQP'</span></code> for now</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.KernelEstimationCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.KernelEstimationCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the kernel estimation circuit used to evaluate the kernel entry value between
+two classical data vectors</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added
+x1 (np.ndarray): First classical vector
+x2 (np.ndarray): Second classical vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ParameterizedCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">ParameterizedCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>Parameterized Circuit class</p>
+<p>The constructor of the BasicCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+parameters (np.ndarray): Parameters of parameterized gates</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ParameterizedCircuit.parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#qcompute_qapp.circuit.ParameterizedCircuit.parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Parameters of the circuit</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>np.ndarray: Parameters of the circuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ParameterizedCircuit.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.ParameterizedCircuit.set_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets parameters of the circuit</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>parameters (np.ndarray): New parameters of the circuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ParameterizedCircuit.add_circuit">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.ParameterizedCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.PauliMeasurementCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">PauliMeasurementCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.PauliMeasurementCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>Pauli Measurement Circuit class</p>
+<p>The constructor of the PauliMeasurementCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+pauli_terms (str): Pauli terms to be measured</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.PauliMeasurementCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.PauliMeasurementCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the pauli measurement circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added
+pauli_str (str): Pauli string to be measured</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.PauliMeasurementCircuit.get_expectation">
+<span class="sig-name descname"><span class="pre">get_expectation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preceding_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><span class="pre">BasicCircuit</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.PauliMeasurementCircuit.get_expectation" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the expectation value of the Pauli terms</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>preceding_circuits (List[BasicCircuit]): Circuit precedes the measurement circuit
+shots (int): Number of measurement shots
+backend (str): Backend to be used in this task</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Expectation value of the Pauli terms</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">PauliMeasurementCircuitWithAncilla</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>Pauli Measurement Circuit with Ancilla class</p>
+<p>The constructor of the PauliMeasurementCircuitWithAncilla class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+pauli_terms (str): Pauli terms to be measured</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the pauli measurement circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added
+pauli_str (str): Pauli string to be measured</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla.get_expectation">
+<span class="sig-name descname"><span class="pre">get_expectation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preceding_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><span class="pre">BasicCircuit</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.PauliMeasurementCircuitWithAncilla.get_expectation" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the expectation value of the Pauli terms</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>preceding_circuits (List[BasicCircuit]): Circuit precedes the measurement circuit
+shots (int): Number of measurement shots
+backend (str): Backend to be used in this task</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Expectation value of the Pauli terms</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">SimultaneousPauliMeasurementCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicCircuit</span></code></a></p>
+<p>Simultaneous Pauli Measurement Circuit for Qubitwise Commute Pauli Terms</p>
+<p>The constructor of the SimultaneousPauliMeasurementCircuit class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits
+pauli_terms (list): Pauli terms to be measured</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the simultaneous pauli measurement circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added
+clique (list): Clique of Pauli terms to be measured together</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit.get_expectation">
+<span class="sig-name descname"><span class="pre">get_expectation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preceding_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qcompute_qapp.circuit.BasicCircuit" title="qcompute_qapp.circuit.basic_circuit.BasicCircuit"><span class="pre">BasicCircuit</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.SimultaneousPauliMeasurementCircuit.get_expectation" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the expectation value of the Pauli terms</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>preceding_circuits (List[BasicCircuit]): Circuit precedes the measurement circuit
+shots (int): Number of measurement shots
+backend (str): Backend to be used in this task</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Expectation value of the Pauli terms</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.QAOAAnsatz">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">QAOAAnsatz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamiltonian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.QAOAAnsatz" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a></p>
+<p>QAOA Ansatz class</p>
+<p>The constructor of the QAOAAnsatz class</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num (int): Number of qubits in this ansatz
+parameters (np.ndarray): Parameters of parameterized gates in this ansatz
+hamiltonian (list): Hamiltonian used to construct the QAOA ansatz
+layer (int): Number of layers for this Ansatz</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.QAOAAnsatz.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.QAOAAnsatz.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds circuit to the register according to the given hamiltonian</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.UniversalCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">UniversalCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.UniversalCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a></p>
+<p>Universal Circuit class</p>
+<p>The constructor of the UniversalCircuit class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits in this ansatz
+parameters (np.ndarray): Parameters of parameterized gates in this circuit, whose shape should be <code class="docutils literal notranslate"><span class="pre">(3,)</span></code></p>
+<blockquote>
+<div><p>for single-qubit cases and should be <code class="docutils literal notranslate"><span class="pre">(15,)</span></code> for 2-qubit cases</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.UniversalCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.UniversalCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the universal circuit to the register. Only support single-qubit and 2-qubit cases</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.RealEntangledCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">RealEntangledCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.RealEntangledCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a></p>
+<p>Real Entangled Circuit class</p>
+<p>The constructor of the RealEntangledCircuit class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits in this ansatz
+layer (int): Number of layers for this ansatz
+parameters (np.ndarray): Parameters of parameterized gates in this circuit, whose shape</p>
+<blockquote>
+<div><p>should be <code class="docutils literal notranslate"><span class="pre">(num</span> <span class="pre">*</span> <span class="pre">layer,)</span></code></p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.RealEntangledCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.RealEntangledCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the real entangled circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ComplexEntangledCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">ComplexEntangledCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.ComplexEntangledCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a></p>
+<p>Complex Entangled Circuit class</p>
+<p>The constructor of the ComplexEntangledCircuit class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits in this Ansatz
+layer (int): Number of layer for this Ansatz
+parameters (np.ndarray): Parameters of parameterized gates in this circuit, whose shape</p>
+<blockquote>
+<div><p>should be <code class="docutils literal notranslate"><span class="pre">(num</span> <span class="pre">*</span> <span class="pre">layer</span> <span class="pre">*</span> <span class="pre">2,)</span></code></p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ComplexEntangledCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.ComplexEntangledCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the complex entangled circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.RealAlternatingLayeredCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">RealAlternatingLayeredCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.RealAlternatingLayeredCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a></p>
+<p>Real Alternating Layered Circuit class</p>
+<p>The constructor of the RealAlternatingLayeredCircuit class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits in this Ansatz
+layer (int): Number of layer for this Ansatz
+parameters (np.ndarray): Parameters of parameterized gates in this circuit, whose shape</p>
+<blockquote>
+<div><p>should be <code class="docutils literal notranslate"><span class="pre">((2</span> <span class="pre">*</span> <span class="pre">num</span> <span class="pre">-</span> <span class="pre">2)</span> <span class="pre">*</span> <span class="pre">layer,)</span></code></p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.RealAlternatingLayeredCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.RealAlternatingLayeredCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the real alternating layered circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ComplexAlternatingLayeredCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qcompute_qapp.circuit.</span></span><span class="sig-name descname"><span class="pre">ComplexAlternatingLayeredCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcompute_qapp.circuit.ComplexAlternatingLayeredCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qcompute_qapp.circuit.ParameterizedCircuit" title="qcompute_qapp.circuit.parameterized_circuit.ParameterizedCircuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterizedCircuit</span></code></a></p>
+<p>Complex Alternating Layered Circuit class</p>
+<p>The constructor of the ComplexAlternatingLayeredCircuit class</p>
+<dl>
+<dt>Args:</dt><dd><p>num (int): Number of qubits in this Ansatz
+layer (int): Number of layer for this Ansatz
+parameters (np.ndarray): Parameters of parameterized gates in this circuit, whose shape</p>
+<blockquote>
+<div><p>should be <code class="docutils literal notranslate"><span class="pre">((4</span> <span class="pre">*</span> <span class="pre">num</span> <span class="pre">-</span> <span class="pre">4)</span> <span class="pre">*</span> <span class="pre">layer,)</span></code></p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qcompute_qapp.circuit.ComplexAlternatingLayeredCircuit.add_circuit">
+<span class="sig-name descname"><span class="pre">add_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QRegPool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcompute_qapp.circuit.ComplexAlternatingLayeredCircuit.add_circuit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the complex alternating layered circuit to the register</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>q (QRegPool): Quantum register to which this circuit is added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qcompute_qapp.application.optimization.html" class="btn btn-neutral float-left" title="qcompute_qapp.application.optimization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qcompute_qapp.optimizer.html" class="btn btn-neutral float-right" title="qcompute_qapp.optimizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Institute for Quantum Computing, Baidu Inc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

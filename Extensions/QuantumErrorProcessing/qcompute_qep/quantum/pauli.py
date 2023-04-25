@@ -31,8 +31,7 @@ import functools
 from QCompute import *
 from qcompute_qep.utils.types import QProgram
 from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.channel import QuantumChannel, qc_convert, PTM
-from qcompute_qep.utils.linalg import tensor, is_hermitian, dagger
+from qcompute_qep.utils.linalg import tensor
 from copy import deepcopy
 from QCompute.QPlatform.QOperation import CircuitLine
 
@@ -275,8 +274,9 @@ def from_name_to_matrix(name: str, sparse: bool = False) -> Union[np.ndarray, sc
 
     As so, the matrix of the Pauli string ``IX`` is given by
 
-    .. math:: \sigma_X\otimes\sigma_I = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}\otimes\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
-                                      = \begin{bmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix}.
+    .. math:: \sigma_X\otimes\sigma_I
+        = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}\otimes\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+        = \begin{bmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix}.
 
     :param name: str, the name of the Pauli operator, must be the form 'XXYX'/"XXYI"/"xxxy"/"XyxyZ".
                 We convert all lower cases to the upper cases.
@@ -379,14 +379,15 @@ def ptm_to_operator(coes: Union[List[float], np.ndarray]) -> np.ndarray:
         in the following, we compute the pure state :math:`\vert 0\rangle\!\langle0\vert` given its PTM.
 
         >>> coes = [0.7071067811865475, 0.0, 0.0, 0.7071067811865475]
-        >>> rho = operator_to_ptm(coes)
+        >>> rho = ptm_to_operator(coes)
         >>> print(rho)
         [[1.+0.j 0.+0.j]
          [0.+0.j 0.+0.j]]
     """
     if isinstance(coes, List):
         coes = np.asarray(coes)
-
+    # Reshape to column vector
+    coes = coes.reshape((coes.size, ))
     # Number of qubits
     n = int(log(coes.size, 4))
     pauli_basis = complete_pauli_basis(n)
@@ -398,74 +399,195 @@ def ptm_to_operator(coes: Union[List[float], np.ndarray]) -> np.ndarray:
     return op
 
 
-def unitary_to_ptm(unitary: np.ndarray) -> QuantumChannel:
-    r"""From a process unitary to its Pauli transfer matrix.
+def bsp(a: np.ndarray, b: np.ndarray) -> Union[int, np.array]:
+    r"""Compute the binary symplectic product of :math:`a` and :math:`b`.
 
-    Convert a process unitary in the matrix representation to the Pauli transfer matrix (PTM) representation.
-    Assume the unitary has :math:`n` qubits, then the corresponding PTM is of size :math:`4^n\times 4^n`.
+    The binary symplectic product :math:`\odot` of two 1d vectors :math:`a` and :math:`b` is defined as:
 
-    **Examples**
-
-        In the following, we compute the PTM of the :math:`X` gate.
-
-        >>> X = np.array([[0, 1], [1, 0]]).astype(complex) / np.sqrt(2)
-        >>> ptm = unitary_to_ptm(X)
-        >>> print(ptm.data)
-        [[ 1.+0.j  0.+0.j  0.+0.j  0.+0.j]
-         [ 0.+0.j  1.+0.j  0.+0.j  0.+0.j]
-         [ 0.+0.j  0.+0.j -1.+0.j  0.+0.j]
-         [ 0.+0.j  0.+0.j  0.+0.j -1.+0.j]]
-
-    :param unitary: np.ndarray, the matrix representation of the quantum process unitary
-    :return: np.ndarray, the Pauli transfer matrix representation of the unitary
-    """
-    if not np.log2(unitary.shape[0]).is_integer():
-        raise ArgumentError("in unitary_to_ptm(): the dimensions of the unitary must be the power of 2!")
-    # Number of qubits
-    n = int(np.log2(unitary.shape[0]))
-    cpb = complete_pauli_basis(n)
-    ptm = np.zeros((len(cpb), len(cpb)), dtype=float)
-    for j, pauli_j in enumerate(cpb):
-        for k, pauli_k in enumerate(cpb):
-            ptm[j, k] = np.real(np.trace(pauli_j.matrix @ unitary @ pauli_k.matrix @ dagger(unitary)))
-
-    return PTM(ptm)
-
-
-def ptm_to_process(ptm: QuantumChannel, type: str = 'kraus') -> QuantumChannel:
-    r"""From the Pauli transfer matrix of a quantum process to the given representation.
-
-    Convert a quantum process in the Pauli transfer matrix representation to the target representation.
-    Candidate target representations are:
-
-    + str = ``superoperator``, the superoperator representation, also known as the natural representation;
-    + str = ``choi``, the Choi representation;
-    + str = ``kraus``, the Kraus operator representation, also known as the operator-sum representation;
-    + str = ``chi``, the chi matrix representation, aka. the process matrix representation.
-
-    :param ptm: np.ndarray, the Pauli transfer matrix representation of the quantum process
-    :param type: str, default to 'kraus', type: str = 'kraus'
-    :return: QuantumChannel, a quantum channel class instance
-    """
-    return qc_convert(ptm, type)
-
-
-def bsp(a: np.ndarray, b: np.ndarray) -> int:
-    r"""The binary symplectic product of two matrices.
-
-    The binary symplectic product :math:`\odot` is defined as
-
-    .. math::   A \odot B \equiv A \Lambda B \bmod 2,
+    .. math::   a \odot b := a \Lambda b \bmod 2,
 
     where
 
     .. math::  \Lambda = \left[\begin{matrix} 0 & I \\ I & 0 \end{matrix}\right].
 
-    :param a: np.ndarray, LHS binary symplectic vector
-    :param b: np.ndarray, RHS binary symplectic vector or matrix
-    :return: int, the binary symplectic product of A with B (0 or 1)
+    If :math:`a` and :math:`b` are 2d matrices, then the binary symplectic product is defined
+    to be the standard dot product between :math:`a\Lambda` and :math:`b`.
+
+    :param a: np.ndarray, a 1d or 2d binary symplectic vector
+    :param b: np.ndarray, a 1d or 2d binary symplectic vector
+    :return: Union[int, np.array], the binary symplectic product of a with b.
+                If a and b are 1d, the return value type is ``int``;
+                If a and b are 2d, the return value type is ``np.array``.
     """
     assert np.array_equal(a % 2, a), 'BSF {} is not in binary form'.format(a)
     assert np.array_equal(b % 2, b), 'BSF {} is not in binary form'.format(b)
     a1, a2 = np.hsplit(a, 2)
-    return np.hstack((a2, a1)).dot(b) % 2
+    return (np.hstack((a2, a1)).dot(b) % 2).astype('int')
+
+
+def bsf2pauli(bsf: np.ndarray) -> Union[str, List[str]]:
+    r"""Convert a list of Pauli operators in binary symplectic form to string form.
+
+    In the single-qubit case, there exists a one-one mapping between bsf and string forms:
+
+    .. math::
+
+            [0, 0] \equiv 0 \leftrightarrow \text{'I'},
+            [1, 0] \equiv 1 \leftrightarrow \text{'X'},
+            [0, 1] \equiv 2 \leftrightarrow \text{'Z'},
+            [1, 1] \equiv 3 \leftrightarrow \text{'Y'}.
+
+    where :math:`\equiv` means that we define the left binary vectors with a unique integer in decimal.
+
+    :param bsf: np.array, the binary symplectic form of the list of Pauli operators
+    :return: Union[str, List[str]], a Pauli or a list of Pauli operators in the string form
+
+    Examples:
+
+        >>> # Case 1: single Pauli operator
+        >>> bsf = np.asarray([1, 0, 0, 0, 1, 0, 0, 1, 0, 1], dtype=int)
+        >>> print(bsf2pauli(bsf))
+        XIZIY
+        >>> # Case 2: a list of Pauli operator
+        >>> bsf = np.asarray([[1 0 0 1], [0 1 0 1]], dtype=int)
+        >>> print(bsf2pauli(bsf))
+        ['XZ', 'IY']
+    """
+    assert np.array_equal(bsf % 2, bsf), 'BSF {} is not in binary form'.format(bsf)
+
+    def _2pauli(bsf_single):
+        xs, zs = np.hsplit(bsf_single, 2)
+        ps = (xs + zs * 2).astype(str)
+        return ''.join(ps).translate(str.maketrans('0123', 'IXZY'))
+
+    if bsf.ndim == 1:
+        return _2pauli(bsf)
+    else:
+        return [_2pauli(b) for b in bsf]
+
+
+def pauli2bsf(paulis: Union[str, List[str]]) -> np.array:
+    r"""Convert a list of Pauli operators in string form to binary symplectic form.
+
+    In the single-qubit case, there exists a one-one mapping between bsf and string forms:
+
+    .. math::
+
+            [0, 0] \leftrightarrow \text{'I'},
+            [1, 0] \leftrightarrow \text{'X'},
+            [0, 1] \leftrightarrow \text{'Z'},
+            [1, 1] \leftrightarrow \text{'Y'}.
+
+    :param paulis: Union[str, List[str]], a Pauli or a list of Pauli operators in the string form
+    :return: np.array, the binary symplectic form of the list of Pauli operator
+
+    Examples:
+
+        >>> # Case 1: single Pauli operator
+        >>> print(pauli.pauli2bsf('XIZIY'))
+        [1 0 0 0 1 0 0 1 0 1]
+        >>> # Case 2: a list of Pauli operator
+        >>> print(pauli.pauli2bsf(['XZ', 'IY']))
+        [[1 0 0 1]
+         [0 1 0 1]]
+    """
+    def _2bsf(pauli):
+        ps = np.array(list(pauli))
+        xs = (ps == 'X') + (ps == 'Y')
+        zs = (ps == 'Z') + (ps == 'Y')
+        return np.hstack((xs, zs)).astype(int)
+
+    if isinstance(paulis, str):
+        return _2bsf(paulis)
+    elif isinstance(paulis, List):
+        return np.vstack([_2bsf(p) for p in paulis])
+    else:
+        raise ArgumentError("in pauli2bsf(): undefined Pauli operator type: {}".format(type(paulis)))
+
+
+def mutually_commute(paulis: Union[List[str], np.ndarray]) -> bool:
+    r"""Check if a list of Pauli operators mutually commute.
+
+    Let :math:`A,B` be two :math:`n`-qubit Pauli operators. A and B *commute* if it holds that
+
+    .. math:: [A,B]=AB-BA=0.
+
+    A list of Pauli operators :math:`\mathcal{S}` *mutually commute*, if any two of them commute, i.e.,
+
+    .. math:: \forall A, B\in\mathcal{S},\; [A,B]=0.
+
+    :param paulis: Union[List[str], np.ndarray], the list of Pauli operators, either in Pauli string from
+                                                or in binary symplectic form (bsf).
+    :return: bool, *True* if the given list of Pauli operators mutually commute, otherwise *False*.
+
+    **Examples**
+
+        >>> # Use the [[4, 2, 2]] code as test: Its stabilizers mutually commute, while its logical operators do not.
+        >>> import qcompute_qep.correction
+        >>> qec_code = qcompute_qep.correction.FourTwoTwoCode()
+        >>> print("The stabilizers are: {}".format(qec_code.stabilizers))
+        The stabilizers are: ['XXXX', 'ZZZZ']
+        >>> print("The stabilizers mutually commute? {}".format(mutually_commute(qec_code.stabilizers)))
+        The stabilizers mutually commute? True
+        >>> logical_operators = qec_code.logical_xs(form='str') + qec_code.logical_zs(form='str')
+        >>> print("The logical operators are: {}".format(logical_operators))
+        The logical operators are: ['IXXI', 'IXIX', 'ZIZI', 'ZIIZ']
+        >>> print("The logical operators mutually commute? {}".format(mutually_commute(logical_operators)))
+        The logical operators mutually commute? False
+    """
+    # Convert the list of Pauli operators the bsf form
+    if isinstance(paulis, List):
+        paulis = pauli2bsf(paulis)
+    elif isinstance(paulis, np.ndarray):
+        pass
+    else:
+        raise ArgumentError("in mutually_commute(): undefined Pauli operator type: {}".format(type(paulis)))
+
+    if not np.all(bsp(paulis, paulis.T) == 0):
+        return False
+    else:
+        return True
+
+
+def mutually_anticommute(paulis: Union[List[str], np.ndarray]) -> bool:
+    r"""Check if a list of Pauli operators mutually anticommute.
+
+    Let :math:`A,B` be two :math:`n`-qubit Pauli operators. A and B *anticommute* if it holds that
+
+    .. math:: \{A,B\}=AB+BA=0.
+
+    A list of Pauli operators :math:`\mathcal{S}` *mutually anticommute*,
+    if any two of them anticommute (excluding itself), i.e.,
+
+    .. math:: \forall A\neq B\in\mathcal{S},\; \{A,B\}=0.
+
+    :param paulis: Union[List[str], np.ndarray], the list of Pauli operators, either in Pauli string from
+                                                or in binary symplectic form (bsf).
+    :return: bool, *True* if the given list of Pauli operators mutually anticommute, otherwise *False*.
+
+    **Examples**
+
+        >>> # Use the five qubit code as test: Its logical operators mutually anticommute.
+        >>> import qcompute_qep.correction
+        >>> qec_code = qcompute_qep.correction.FiveQubitCode()
+        >>> logical_operators = qec_code.logical_xs(form='str') + qec_code.logical_zs(form='str')
+        >>> print("The logical operators are: {}".format(logical_operators))
+        The logical operators are: ['ZIIZX', 'ZZZZZ']
+        >>> print("The logical operators mutually anticommute? {}".format(mutually_commute(logical_operators)))
+        The logical operators mutually anticommute? True
+    """
+    # Convert the list of Pauli operators the bsf form
+    if isinstance(paulis, List):
+        paulis = pauli2bsf(paulis)
+    elif isinstance(paulis, np.ndarray):
+        pass
+    else:
+        raise ArgumentError("in mutually_anticommute(): undefined Pauli operator type: {}".format(type(paulis)))
+
+    # Force all diagonal elements to be :math:`1` since a Pauli operator commutes with itself
+    val = bsp(paulis, paulis.T)
+    np.fill_diagonal(val, 1)
+    if not np.all(val == 1):
+        return False
+    else:
+        return True

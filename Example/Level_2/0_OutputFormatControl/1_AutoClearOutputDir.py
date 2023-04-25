@@ -25,10 +25,10 @@ sys.path.append('../..')
 from QCompute import *
 from QCompute.Define import Settings
 
-matchSdkVersion('Python 3.3.0')
+matchSdkVersion('Python 3.3.1')
 
 # Your token:
-Define.hubToken = ''
+# Define.hubToken = ''
 
 # Create environment
 env = QEnv()

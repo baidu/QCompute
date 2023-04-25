@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qcompute_qapp.utils &mdash; QCompute-QAPP 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="qcompute_qapp.optimizer" href="qcompute_qapp.optimizer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> QCompute-QAPP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Docs</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qcompute_qapp.html">QCompute-QAPP Package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.algorithm.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.algorithm</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.application.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.application</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.circuit.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.circuit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcompute_qapp.optimizer.html"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.optimizer</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.utils</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.utils.grouping_hamiltonian"><code class="docutils literal notranslate"><span class="pre">grouping_hamiltonian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qcompute_qapp.utils.pauli_terms_to_matrix"><code class="docutils literal notranslate"><span class="pre">pauli_terms_to_matrix()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QCompute-QAPP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="qcompute_qapp.html">QCompute-QAPP Package</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.utils</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qcompute_qapp.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-qcompute_qapp.utils">
+<span id="qcompute-qapp-utils"></span><h1><code class="docutils literal notranslate"><span class="pre">qcompute_qapp.utils</span></code><a class="headerlink" href="#module-qcompute_qapp.utils" title="Permalink to this heading"></a></h1>
+<p>Some auxiliary functions</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="qcompute_qapp.utils.grouping_hamiltonian">
+<span class="sig-prename descclassname"><span class="pre">qcompute_qapp.utils.</span></span><span class="sig-name descname"><span class="pre">grouping_hamiltonian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hamiltonian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coloring_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'largest_first'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qcompute_qapp.utils.grouping_hamiltonian" title="Permalink to this definition"></a></dt>
+<dd><p>Finds the minimum clique cover of the Hamiltonian graph, which is used for simultaneous Pauli measurement</p>
+<dl>
+<dt>Args:</dt><dd><p>hamiltonian (list): Hamiltonian of the target system
+coloring_strategy (str): Graph coloring strategy chosen from the following: ‘largest_first’, ‘random_sequential’,</p>
+<blockquote>
+<div><p>‘smallest_last’, ‘independent_set’, ‘connected_sequential_bfs’, ‘connected_sequential_dfs’, ‘connected_sequential’,
+‘saturation_largest_first’, and ‘DSATUR’; defaults to ‘largest_first’</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>List[List[str]]: List of cliques consisting of Pauli strings to be measured together</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcompute_qapp.utils.pauli_terms_to_matrix">
+<span class="sig-prename descclassname"><span class="pre">qcompute_qapp.utils.</span></span><span class="sig-name descname"><span class="pre">pauli_terms_to_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pauli_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#qcompute_qapp.utils.pauli_terms_to_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Converts Pauli terms to a matrix</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pauli_terms (list): Pauli terms whose matrix is to be computed</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Matrix form of the Pauli terms</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qcompute_qapp.optimizer.html" class="btn btn-neutral float-left" title="qcompute_qapp.optimizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Institute for Quantum Computing, Baidu Inc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

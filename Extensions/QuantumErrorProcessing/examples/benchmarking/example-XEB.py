@@ -18,19 +18,10 @@
 """
 An example to demonstrate the Cross Entropy Randomized Benchmarking protocol.
 """
-import qiskit
-from qiskit.providers.fake_provider import FakeSantiago
-
-import sys
-sys.path.append('../..')
-
 from QCompute import *
 import qcompute_qep.benchmarking as rb
 import qcompute_qep.utils.types as types
 
-
-# Set the token. You must set your VIP token in order to access the hardware.
-Define.hubToken = "Token"
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).
@@ -39,24 +30,62 @@ Define.hubToken = "Token"
 # For numeric test on the ideal simulator, change qc to BackendName.LocalBaiduSim2
 qc = BackendName.LocalBaiduSim2
 
-# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian
+# For experiment on the real quantum device, change qc to BackendName.CloudBaiduQPUQian.
+# You must set your VIP token first in order to access the Baidu hardware.
+# Define.hubToken = "Token"
 # qc = BackendName.CloudBaiduQPUQian
 
-# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago
-# qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
+# For numeric test on the noisy simulator, change qc to Qiskit's FakeSantiago simulator
+# from qiskit.providers.fake_provider import FakeSantiago
+# qc = FakeSantiago()
+
+# You can also use Qiskit's AerSimulator to customize noise
+# from qiskit.providers.fake_provider import FakeSantiago
+# from qiskit_aer import AerSimulator
+# from qiskit_aer.noise import NoiseModel, depolarizing_error
+# noise_model = NoiseModel.from_backend(FakeSantiago())
+# p1Q = 0.002
+# p2Q = 0.02
+# noise_model.add_all_qubit_quantum_error(depolarizing_error(p1Q, 1), ['s', 'h', 'sdg', ])
+# noise_model.add_all_qubit_quantum_error(depolarizing_error(p2Q, 2), ['cz'])
+# qc = AerSimulator(noise_model=noise_model)
 
 ##########################################################################################
-# Step 2. Perform the randomized benchmarking protocol.
+# Step 2. Perform the cross entropy randomized benchmarking protocol.
 ##########################################################################################
-
 # Initialize a XEB instance
 xeb = rb.XEB()
+
+# Call the cross entropy randomized benchmarking procedure and obtain estimated error rate
+qubits = [0, 1]
 xeb.benchmark(qc=qc,
-              qubits=[0],
+              qubits=qubits,
               shots=4096,
               seq_lengths=[1, 5, 10, 15, 20],
               repeats=5)
-
-# Plot the cross-entropy benchmarking results
-fname = "XEB-{}.png".format(types.get_qc_name(qc))
+print("*******************************************************************************")
+print("* XEB on qubits: {}".format(qubits))
+print("* Estimated noise rate (ENR): {}".format(xeb.results['lambda']))
+print("* Standard deviation error of estimation: {}".format(xeb.results['lambda_err']))
+fname = "XEB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
+print("* XEB data is visualized in figure '{}'.".format(fname))
+# Plot the cross entropy benchmarking results
 xeb.plot_results(show=True, fname=fname)
+print("*******************************************************************************")
+
+# You can also perform the cross entropy randomized benchmarking procedure on other qubits, for example [q1, q3]
+qubits = [1, 3]
+xeb.benchmark(qc=qc,
+              qubits=qubits,
+              shots=4096,
+              seq_lengths=[1, 5, 10, 15, 20],
+              repeats=5)
+print("*******************************************************************************")
+print("* XEB on qubits: {}".format(qubits))
+print("* Estimated noise rate (ENR): {}".format(xeb.results['lambda']))
+print("* Standard deviation error of estimation: {}".format(xeb.results['lambda_err']))
+fname = "XEB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
+print("* XEB data is visualized in figure '{}'.".format(fname))
+# Plot the cross entropy benchmarking results
+xeb.plot_results(show=True, fname=fname)
+print("*******************************************************************************")

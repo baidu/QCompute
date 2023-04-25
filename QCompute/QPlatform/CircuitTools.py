@@ -37,10 +37,15 @@ from QCompute.QPlatform.QOperation.CompositeGate import CompositeGateOP
 from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
 from QCompute.QPlatform.QOperation.FixedGate import FixedGateOP
 from QCompute.QPlatform.QOperation.Measure import MeasureOP
+from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianGate import PhotonicGaussianGateOP
+from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianMeasure import PhotonicGaussianMeasureOP
+from QCompute.QPlatform.QOperation.Photonic.PhotonicFockGate import PhotonicFockGateOP
+from QCompute.QPlatform.QOperation.Photonic.PhotonicFockMeasure import PhotonicFockMeasureOP
 from QCompute.QPlatform.QOperation.QProcedure import QProcedureOP
 from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP
 from QCompute.QPlatform.Utilities import numpyMatrixToProtobufMatrix
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, \
+    PBPhotonicGaussianGate, PBPhotonicGaussianMeasure, PBPhotonicFockGate, PBPhotonicFockMeasure, \
     PBMeasure, PBQNoise, PBQNoiseDefine
 
 if TYPE_CHECKING:
@@ -98,6 +103,24 @@ def circuitLineToProtobuf(circuitLine: 'CircuitLine') -> 'PBCircuitLine':
         pbCircuitLine.measure.cRegList[:] = circuitLine.cRegList
     elif isinstance(circuitLine.data, BarrierOP):
         pbCircuitLine.barrier = True
+    elif isinstance(circuitLine.data, PhotonicGaussianGateOP):
+        pbCircuitLine.photonicGaussianGate = PBPhotonicGaussianGate.Value(circuitLine.data.name)
+        pbCircuitLine.argumentValueList[:] = circuitLine.data.argumentList
+    elif isinstance(circuitLine.data, PhotonicGaussianMeasureOP):
+        pbCircuitLine.photonicGaussianMeasure.type = PBPhotonicGaussianMeasure.Type.Value(circuitLine.data.name)
+        pbCircuitLine.photonicGaussianMeasure.cRegList[:] = circuitLine.cRegList
+        if pbCircuitLine.photonicGaussianMeasure.type == PBPhotonicGaussianMeasure.Type.Heterodyne:
+            for argument in circuitLine.data.heterodyneArgument:
+                arg = pbCircuitLine.photonicGaussianMeasure.heterodyne.add()
+                arg.r = argument[0]
+                arg.phi = argument[1]
+        elif pbCircuitLine.photonicGaussianMeasure.type == PBPhotonicGaussianMeasure.Type.PhotonCount:
+            pbCircuitLine.photonicGaussianMeasure.photonCount.cutoff = circuitLine.data.cutoff
+    elif isinstance(circuitLine.data, PhotonicFockGateOP):
+        pbCircuitLine.photonicFockGate = PBPhotonicFockGate.Value(circuitLine.data.name)
+        pbCircuitLine.argumentValueList[:] = circuitLine.data.argumentList
+    elif isinstance(circuitLine.data, PhotonicFockMeasureOP):
+        pbCircuitLine.photonicFockMeasure.cutoff = circuitLine.data.cutoff
 
     pbCircuitLine.qRegList[:] = circuitLine.qRegList
     return pbCircuitLine

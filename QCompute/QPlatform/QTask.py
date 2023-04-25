@@ -385,7 +385,7 @@ class QTask:
                                 originResult = self.originJson
 
                             result["moduleList"] = originResult["moduleList"]
-                            result["batchID"] = originResult["batchID"]
+                            result["batchID"] = originResult.get("batchID")
 
                             if fetchMeasure:
                                 if not Settings.cloudTaskDoNotWriteFile:

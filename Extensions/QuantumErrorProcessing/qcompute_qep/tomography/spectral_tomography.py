@@ -23,10 +23,11 @@ from copy import deepcopy
 from tqdm import tqdm
 
 from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, ProcessTomography
+from qcompute_qep.tomography import Tomography
 from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
 from qcompute_qep.utils.circuit import execute
-from qcompute_qep.quantum.pauli import complete_pauli_basis, unitary_to_ptm
+from qcompute_qep.quantum.pauli import complete_pauli_basis
+from qcompute_qep.quantum.channel import unitary_to_ptm
 from typing import List, Union, Tuple
 from qcompute_qep.utils.utils import expval_from_counts
 from qcompute_qep.utils.linalg import permute_systems, expand
