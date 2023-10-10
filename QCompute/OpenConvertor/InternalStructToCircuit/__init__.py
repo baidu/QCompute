@@ -18,6 +18,8 @@
 """
 Convert the internal struct to circuit
 """
+FileErrorCode = 9
+
 from typing import List
 
 from QCompute.OpenConvertor import ConvertorImplement

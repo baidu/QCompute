@@ -21,6 +21,7 @@ The simulator uses statevector (a rank-n tensor representing an n-qubit state) t
 Basically, the core of the algorithm is tensor contraction with one-way calculation.
 The initial state and gates are converted to tensors and gate implementation is simulated as contraction of tensors.
 """
+FileErrorCode = 9
 
 import argparse
 from pathlib import Path
@@ -42,10 +43,7 @@ from QCompute.QPlatform import Error
 from QCompute.QProtobuf import PBProgram
 
 
-FileErrorCode = 5
-
-
-def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> 'QResult':
+def runSimulator(args: List[str], program: 'PBProgram') -> 'QResult':
     """
     Initialization process
     """
@@ -68,20 +66,21 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     inputFile: str = args.inputFile
 
     if shots < 1 or shots > Define.maxShots:
-        raise Error.ArgumentError(f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode,
-                                  FileErrorCode, 1)
+        raise Error.ArgumentError(
+            f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode, FileErrorCode, 1)
+
     if seed is not None:
         if seed < 0 or seed > Define.maxSeed:
-            raise Error.ArgumentError(f'Invalid seed {seed}, should in [0, {Define.maxSeed}]', ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(f'Invalid random seed {seed}, should in [0, {Define.maxSeed}]',
+            ModuleErrorCode, FileErrorCode, 2)
 
     matrixTypeValue: Optional[MatrixType] = None
     if matrixType == 'dense':
         matrixTypeValue = MatrixType.Dense
     
     else:
-        raise Error.ArgumentError(
-            f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 2)
+        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 3)
+
 
     algorithmValue: Optional[Algorithm] = None
     if algorithm == 'matmul':
@@ -89,8 +88,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     elif algorithm == 'einsum':
         algorithmValue = Algorithm.Einsum
     else:
-        raise Error.ArgumentError(
-            f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 4)
+        raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 4)
 
     measureMethodValue: Optional[MeasureMethod] = None
     if measureMethod == 'probability':
@@ -102,8 +100,7 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     elif measureMethod == 'accumulation':
         measureMethodValue = MeasureMethod.Accumulation
     else:
-        raise Error.ArgumentError(
-            f'Invalid MeasureMethod {measureMethodValue}', ModuleErrorCode, FileErrorCode, 5)
+        raise Error.ArgumentError(f'Invalid MeasureMethod {measureMethodValue}', ModuleErrorCode, FileErrorCode, 5)
 
     if inputFile is not None:
         jsonStr = Path(inputFile).read_text()

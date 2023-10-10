@@ -18,33 +18,52 @@
 """
 This is a simple case of photonic.
 """
+import math
 import sys
 from pprint import pprint
 
 sys.path.append('../..')
-from QCompute.QPlatform.QOperation.Photonic.PhotonicFockGate import PhotonicAP, PhotonicBS
+from QCompute.QPlatform.QOperation.Photonic.PhotonicFockGate import PhotonicAP, PhotonicBS, PhotonicMZ, PhotonicPHA
 from QCompute.QPlatform.QOperation.Photonic.PhotonicFockMeasure import MeasurePhotonCount
 from QCompute import *
 from QCompute.Define import Settings
 
 Settings.outputInfo = True
 
-matchSdkVersion('Python 3.3.3')
+matchSdkVersion('Python 3.3.5')
 
 # Create environment
 env = QEnv()
 # Choose backend Baidu local simulator
 env.backend(BackendName.LocalBaiduSimPhotonic)
-
+num_mode = 12
+cutoff = 5
+depth = 10
 # Initialize the three-qubit circuit
-q = env.Q.createList(3)
+q = env.Q.createList(num_mode)
 
-PhotonicAP(1)(q[0])
-PhotonicAP(2)(q[1])
-PhotonicAP(1)(q[2])
-PhotonicBS(0.5)(q[0], q[1])
-PhotonicBS(0.5)(q[1], q[2])
-MeasurePhotonCount(2)(*env.Q.toListPair())
+for index in range(num_mode):
+    PhotonicAP(12)(q[index])
+
+for _ in range(depth):
+    for index in range(num_mode - 1):
+        PhotonicBS(0.5)(q[index], q[index + 1])
+
+MeasurePhotonCount(cutoff)(*env.Q.toListPair())
+
+# q = env.Q.createList(2)
+# PhotonicAP(1)(q[0])
+# PhotonicPHA(math.pi / 3)(q[1])
+# PhotonicBS(0.5)(q[0], q[1])
+# PhotonicMZ(math.pi / 4, math.pi / 7)(q[0], q[1])
+# MeasurePhotonCount(1)(*env.Q.toListPair())
+
+# PhotonicAP(1)(q[0])
+# PhotonicAP(2)(q[1])
+# PhotonicAP(1)(q[2])
+# PhotonicBS(0.5)(q[0], q[1])
+# PhotonicBS(0.5)(q[1], q[2])
+# MeasurePhotonCount(2)(*env.Q.toListPair())
 # We can also remove the 'import paths' of gates and measurements,
 # and type the following code to run the quantum circuit.
 # FockAP(1)(q[0])
@@ -54,5 +73,5 @@ MeasurePhotonCount(2)(*env.Q.toListPair())
 # FockBS(0.5)(q[1], q[2])
 # FockMeasurePhotonCount(2)(*env.Q.toListPair())
 
-taskResult = env.commit(1024, fetchMeasure=True)
+taskResult = env.commit(1000, fetchMeasure=True)
 pprint(taskResult)

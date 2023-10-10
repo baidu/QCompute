@@ -24,7 +24,8 @@ from numpy import pi
 from QCompute import X, H, S, SDG, RY, CZ, QEnv, BackendName, MeasureZ
 from QCompute.Define import Settings as QC_Settings
 
-from qcompute_qsvt.Application.HamiltonianSimulation import circ_HS_QSVT, func_HS_QSVT
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation import \
+    circ_HS_QSVT, func_HS_QSVT
 
 # not to draw the quantum circuit locally
 QC_Settings.drawCircuitControl = []
@@ -171,6 +172,6 @@ if __name__ == "__main__":
     func_MS_test_QSVT()
     func_HH_test_QSVT()
     print(func_HS_QSVT(list_str_Pauli_rep=[(1, 'X0X1'), (1, 'X0Z1'), (1, 'Z0X1'), (1, 'Z0Z1')],
-          num_qubit_sys=2, float_tau=-pi / 8, float_epsilon=1e-6, circ_output=False))
+                       num_qubit_sys=2, float_tau=-pi / 8, float_epsilon=1e-6, circ_output=False))
     func_HS_QSVT(list_str_Pauli_rep=[(1, 'X0X1'), (1, 'X0Z1'), (1, 'Z0X1'), (1, 'Z0Z1')],
                  num_qubit_sys=2, float_tau=-pi / 8, float_epsilon=1e-6, circ_output="HH_HS_Circuit.c")

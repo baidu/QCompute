@@ -18,6 +18,8 @@
 """
 Several auxiliary functions for the quantum circuit based on fock states
 """
+FileErrorCode = 14
+
 import numpy
 from typing import List
 
@@ -71,30 +73,16 @@ def RyserFormula(num_coincidence: int, U_st: numpy.ndarray) -> complex:
 
 def CreateSubMatrix(U: numpy.ndarray, input_state: numpy.ndarray, output_state: numpy.ndarray) -> numpy.ndarray:
     r"""
-    Generate the submatrix for a given matrix
+    Get the submatrix based on the unitary :math:`U`, input state, and output state.
 
-    :param U: an :math:`N \times N` square matrix
-    :param input_state: input state for given number of photons
-    :param output_state: output state for given number of photons
-    :return U_st: submatrix of interferometer :math:`U`
+    :param U: the overall unitary :math:`U` of interferometer.
+    :return U_st: the submatrix :math:`U_{\mathbf{st}}` of unitary :math:`U`
     """
 
     in_eff_mode = numpy.nonzero(input_state)[0]
     out_eff_mode = numpy.nonzero(output_state)[0]
-
-    row_submatrix = col_submatrix = []
-    for coor_eff_mode in in_eff_mode:
-        row_submatrix = numpy.append(row_submatrix, int(input_state[coor_eff_mode]) * [coor_eff_mode], axis=0)
-
-    for coor_eff_mode in out_eff_mode:
-        col_submatrix = numpy.append(col_submatrix, int(output_state[coor_eff_mode]) * [coor_eff_mode], axis=0)
-
-    dim_U_st = len(row_submatrix)
-    U_st = numpy.zeros((dim_U_st, dim_U_st), dtype=complex)
-    for i in range(dim_U_st):
-        for j in range(dim_U_st):
-            coor_row = int(row_submatrix[i])
-            coor_col = int(col_submatrix[j])
-            U_st[i, j] = U[coor_col, coor_row]
+    row_submatrix = numpy.hstack([numpy.repeat(i, input_state[i]) for i in in_eff_mode])
+    col_submatrix = numpy.hstack([numpy.repeat(i, output_state[i]) for i in out_eff_mode])
+    U_st = U[row_submatrix.reshape(-1, 1), col_submatrix]
 
     return U_st

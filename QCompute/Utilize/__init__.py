@@ -19,3 +19,4 @@
 Export the entire directory as a library
 """
 ModuleErrorCode = 11
+FileErrorCode = 1

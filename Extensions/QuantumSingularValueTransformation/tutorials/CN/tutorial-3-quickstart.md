@@ -13,7 +13,7 @@
 ```python{.line-numbers}
 import numpy as np
 from QCompute import QEnv, BackendName, MeasureZ
-from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import circ_HS_QSVT
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import circ_HS_QSVT
 ```
 
 在实现哈密顿量模拟之前，我们要输入想要模拟的哈密顿量。我们采用哈密顿量的泡利基表示，即将哈密顿量表示成多比特泡利矩阵的线性组合的形式。线性组合中的每一项用一个浮点数和字符串构成的二元组给出，其中浮点数表述这一项的系数，字符串编码了泡利矩阵的信息。如哈密顿量 
@@ -101,7 +101,7 @@ $$
 
 ```python{.line-numbers}
 import numpy as np
-from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import func_HS_QSVT
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import func_HS_QSVT
 print(func_HS_QSVT(list_str_Pauli_rep=[(0.5, 'X0X1'), (0.5, 'X0Z1'), (0.5, 'Z0X1'), (0.5, 'Z0Z1')], 
       num_qubit_sys=2, float_tau=np.pi / 4, float_epsilon = 1e-5, circ_output=False)['counts'])
 ```

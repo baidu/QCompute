@@ -193,6 +193,7 @@ for _ in range(1):
 def Grover(num_qubit, int_target=None):
     """
     :param num_qubit: n, the number of qubits which will encode the database to search
+    
     :param int_target: t, the index of the search target, defaulted to be generated randomly
     """
     # create environment

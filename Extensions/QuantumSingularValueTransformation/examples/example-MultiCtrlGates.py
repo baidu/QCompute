@@ -22,7 +22,7 @@ This script contains a simple example for showing the implement for CnX remains 
 from QCompute import QEnv, H, CX, BackendName, MeasureZ
 from QCompute.Define import Settings as QC_Settings
 
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
 
 # not to draw the quantum circuit locally
 QC_Settings.drawCircuitControl = []

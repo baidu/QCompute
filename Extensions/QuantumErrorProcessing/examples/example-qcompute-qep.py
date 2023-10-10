@@ -20,7 +20,7 @@ This is a simple example to test if you have successfully installed the QEP modu
 """
 
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 # Step 1. Initialize the quantum program for preparing the Bell state

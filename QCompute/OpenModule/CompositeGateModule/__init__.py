@@ -18,6 +18,8 @@
 """
 Composite Gate
 """
+FileErrorCode = 1
+
 from copy import deepcopy
 from typing import List, Optional, Union, Dict
 
@@ -27,8 +29,6 @@ from QCompute.QPlatform.CircuitTools import gateToProtobuf
 from QCompute.QPlatform.QOperation.FixedGate import H, CZ, S
 from QCompute.QPlatform.QOperation.RotationGate import CRX, RX, CU
 from QCompute.QProtobuf import PBCircuitLine, PBProgram, PBCompositeGate
-
-FileErrorCode = 5
 
 
 class CompositeGateModule(ModuleImplement):
@@ -51,11 +51,8 @@ class CompositeGateModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
+        super().__init__(arguments)
         if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
-
             if 'compositeGateList' in arguments:
                 self.compositeGateList = arguments['compositeGateList']
 
@@ -66,6 +63,8 @@ class CompositeGateModule(ModuleImplement):
         :param program: the program
         :return: decomposed circuit
         """
+        if self.disable:
+            return program
 
         ret = deepcopy(program)
 
@@ -84,7 +83,7 @@ class CompositeGateModule(ModuleImplement):
         :param circuitIn: CircuitLine list
         """
 
-        for index, circuitLine in enumerate(circuitIn):
+        for circuitLine in circuitIn:
             compositeGate: 'PBCompositeGate' = circuitLine.compositeGate
             if circuitLine.HasField('compositeGate') and (
                     self.compositeGateList is None or PBCompositeGate.Name(compositeGate) in self.compositeGateList):
@@ -97,8 +96,8 @@ class CompositeGateModule(ModuleImplement):
                     circuitOut.append(_CK(circuitLine))
                     continue
                 else:
-                    raise Error.ArgumentError(f'Unsupported composite gate {compositeGate.name}!', ModuleErrorCode,
-                                              FileErrorCode, 1)
+                    raise Error.ArgumentError(
+                        f'Unsupported composite gate {compositeGate.name}!', ModuleErrorCode, FileErrorCode, 1)
 
             circuitOut.append(circuitLine)
 
@@ -109,8 +108,9 @@ def _MS(msGate: PBCircuitLine) -> List[PBCircuitLine]:
     MS(theta)(Q0, Q1)
     """
     if len(msGate.argumentIdList) > 0:
-        raise Error.ArgumentError('MS gate in procedure, must unroll procedure first!', ModuleErrorCode,
-                                  FileErrorCode, 2)
+        raise Error.ArgumentError(
+            'MS gate in procedure, must unroll procedure first!', ModuleErrorCode, FileErrorCode, 2)
+
     ret: List['PBCircuitLine'] = []
     if len(msGate.argumentValueList) > 0:
         # CRX

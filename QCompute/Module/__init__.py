@@ -18,4 +18,5 @@
 """
 Export the entire directory as a library
 """
-ModuleErrorCode = 2
+ModuleErrorCode = 4
+FileErrorCode = 1

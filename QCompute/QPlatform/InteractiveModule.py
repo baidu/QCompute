@@ -18,6 +18,8 @@
 """
 Interactive Module
 """
+FileErrorCode = 4
+
 import copy
 import json
 import sys

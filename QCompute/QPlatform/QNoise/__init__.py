@@ -18,16 +18,14 @@
 """
 Quantum Noise
 """
+FileErrorCode = 32
+
 from typing import Optional, List
 import numpy as np
 
 from itertools import product
 
 from QCompute.QPlatform.QNoise.Utilities import noiseTensor, numpyMatrixToTensorMatrix
-
-# A random FileErrorCode, need to be changed
-FileErrorCode = 15
-
 
 class QNoise:
     """

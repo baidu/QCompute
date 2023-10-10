@@ -18,6 +18,9 @@
 """
 Calibration service
 """
+ModuleErrorCode = 1
+FileErrorCode = 1
+
 import json
 import os
 import re
@@ -34,9 +37,6 @@ from baidubce.services.bos.bos_client import BosClient
 from QCompute import Define
 from QCompute.QPlatform import Error
 
-ModuleErrorCode = 10
-FileErrorCode = 1
-
 
 def CalibrationUpdate(device: str):
     """
@@ -50,8 +50,7 @@ def CalibrationUpdate(device: str):
     # exception handling
     content = res.json()
     if content['error'] != 0:
-        raise Error.RuntimeError(f'Server error {content["error"]}: {content["message"]} {content["vendor"]}',
-                                 ModuleErrorCode, FileErrorCode, 1)
+        raise Error.RuntimeError(f"Server error {content['error']}: {content['message']} {content['vendor']}", ModuleErrorCode, FileErrorCode, 1)
 
     # extract content
     config = content['data']
@@ -153,8 +152,7 @@ def CalibrationReadData(device: str) -> List[CalibrationData]:
 
     # check keys.json exists
     if not localKeysFilePath.exists():
-        raise Error.RuntimeError(f'Local keys file {str(localKeysFilePath)} not exists!', ModuleErrorCode,
-                                 FileErrorCode, 2)
+        raise Error.RuntimeError(f'Local keys file {str(localKeysFilePath)} not exists!', ModuleErrorCode, FileErrorCode, 2)
 
     # load keys.json
     localKeysStr = localKeysFilePath.read_text('utf-8')

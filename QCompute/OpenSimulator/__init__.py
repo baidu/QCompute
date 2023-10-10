@@ -18,6 +18,9 @@
 """
 Quantum executor interface definition
 """
+ModuleErrorCode = 8
+FileErrorCode = 1
+
 import json
 from typing import TYPE_CHECKING, Dict, Union, List, Any
 
@@ -25,8 +28,6 @@ import numpy
 
 from QCompute import Define
 from QCompute.QPlatform.Utilities import numpyMatrixToDictMatrix, dictMatrixToNumpyMatrix
-
-ModuleErrorCode = 7
 
 if TYPE_CHECKING:
     pass
@@ -213,7 +214,8 @@ class QResult:
         if 'moduleList' in data:
             self.moduleList = data['moduleList']
         self.shots = data['shots']
-        self.counts = data['counts']
+        if 'counts' in data:
+            self.counts = data['counts']
         if 'state' in data and data['state'] is not None:
             self.state = dictMatrixToNumpyMatrix(data['state'], complex)
         self.seed = data['seed']

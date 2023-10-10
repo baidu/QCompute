@@ -18,16 +18,15 @@
 """
 Homodyne measurement
 """
-
+FileErrorCode = 20
 
 from typing import Union, Tuple, List, Dict
-
 import numpy
+import math
+import copy
 
 
 from QCompute.OpenSimulator.local_baidu_sim_photonic.InitGaussState import MatrixType
-from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussTransfer import Algorithm
-from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussAuxiliaryCalculation import TraceOneMode, TensorProduct
 
 
 class HomodyneMeasure:
@@ -35,13 +34,10 @@ class HomodyneMeasure:
     Perform homodyne measurement
     """
 
-    def __init__(self, matrixType: MatrixType, algorithm: Algorithm) -> None:
+    def __init__(self, matrixType: MatrixType) -> None:
 
         if matrixType == MatrixType.Dense:
-            if algorithm == Algorithm.Matmul:
-                self.proc = self.RunMultiDenseHomoByMatmul
-            else:
-                assert False
+            self.proc = self.RunMultiDenseHomoByMatmul
         else:
             assert False
 
@@ -53,8 +49,8 @@ class HomodyneMeasure:
 
         return self.proc(state_list, modes_array, shots)
 
-    def RunSingleDenseHomoByMatmul(self, state_list: List[numpy.ndarray], mode: int, shots=1) \
-            -> Tuple[float, List[numpy.ndarray]]:
+    def RunSingleDenseHomoByMatmul(self, inputParam: Tuple[int, List[numpy.ndarray], int]) \
+            -> Tuple[int, float, List[numpy.ndarray]]:
         """
         Simulate the sampling process for measuring single-qumode state
 
@@ -63,51 +59,57 @@ class HomodyneMeasure:
         :param shots: 'shots' must be set to 1
         :return: sampling results, as well as the first and second moment of rest state.
         """
+        (index, state_list, mode) = inputParam
 
-        state_fir_mom, state_sec_mom = state_list
+        fir_mom, sec_mom = state_list
 
-        # Get the vector and the block second moment of traced and rest qumodes
-        (list_vector, list_matrix) = TraceOneMode(state_fir_mom, state_sec_mom, mode)
-        vector_a, vector_b = list_vector
-        matrix_A, matrix_B, matrix_C = list_matrix
+        xcoor = 2 * mode
+        xrow = numpy.reshape(copy.copy(sec_mom[:, xcoor]), (len(fir_mom), 1))
+        b11 = xrow[xcoor, 0]
 
-        # Pseudo inverse matrix is a 2 by 2 matrix in which the top-left entry is matrix_B[0, 0]
-        B_one_one = matrix_B[0, 0]
+        # Update the second moment
+        sec_mom -= numpy.matmul(xrow, numpy.transpose(xrow)) / b11
+        sec_mom[xcoor: xcoor + 2, :] = sec_mom[:, xcoor: xcoor + 2] = 0
+        sec_mom[xcoor, xcoor] = sec_mom[xcoor + 1, xcoor + 1] = 1
 
-        # Obtain the results of homodyne measurement
-        x_value = numpy.random.normal(vector_b[0], numpy.sqrt(B_one_one), size=shots)[0]
+        # Get the random value of x according to its covariance
+        central_x = copy.copy(fir_mom[xcoor, 0])
+        random_x = numpy.random.normal(central_x, math.sqrt(b11), size=1)[0]
 
-        inverse_matrix = numpy.array([[1 / B_one_one, 0],
-                                      [0, 0]])
-        vector_u = numpy.array([[x_value],
-                                [0]])
-        matrix_C_T = numpy.transpose(matrix_C)
+        # Update the first moment
+        x_minus_rx = fir_mom[xcoor, 0] - random_x
+        fir_mom -= x_minus_rx * xrow
+        fir_mom[xcoor: xcoor + 2] = 0
 
-        # We need to update the first and second-moment
-        fir_mom_rest = vector_a - numpy.matmul(numpy.matmul(matrix_C, inverse_matrix), vector_b - vector_u)
-        sec_mom_rest = matrix_A - numpy.matmul(numpy.matmul(matrix_C, inverse_matrix), matrix_C_T)
-        state_fir_mom, state_sec_mom = TensorProduct(fir_mom_rest, sec_mom_rest, mode)
-        state_list = [state_fir_mom, state_sec_mom]
+        state_list = [fir_mom, sec_mom]
 
-        return x_value, state_list
+        return index, random_x, state_list
 
-    def RunMultiDenseHomoByMatmul(self, state_list: List[numpy.ndarray], modes_array: numpy.ndarray, shots=1) \
+    def RunMultiDenseHomoByMatmul(self, state_list: List[numpy.ndarray], modes_array: numpy.ndarray, shots: int) \
             -> Dict[str, float]:
         """
         Simulate the sampling process for measuring multi-qumode state
 
         :param state_list: the first and second moments
         :param modes_array: measured qumodes
-        :param shots: 'shots' must be set to 1
+        :param shots: 'shots'
         :return dictionary_results: sampling results
         """
+        random_x_array = numpy.zeros(len(modes_array), dtype=float)
+
+        for _ in range(shots):
+            updated_state_list = copy.deepcopy(state_list)
+            for index in range(len(modes_array)):
+                mode = modes_array[index]
+                index, x_value, updated_state_list = \
+                    self.RunSingleDenseHomoByMatmul((index, updated_state_list, mode))
+                random_x_array[index] = random_x_array[index] + x_value
+
+        random_x_array /= shots
 
         dictionary_results = dict()
         for index in range(len(modes_array)):
-            mode = modes_array[index]
-            x_value, updated_state_list = self.RunSingleDenseHomoByMatmul(state_list, mode, shots)
-            mode_str = str(mode)
-            dictionary_results[mode_str] = x_value
-            state_list = updated_state_list
+            mode_str = str(modes_array[index])
+            dictionary_results[mode_str] = random_x_array[index]
 
         return dictionary_results

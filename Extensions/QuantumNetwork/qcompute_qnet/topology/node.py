@@ -21,11 +21,11 @@ Module for nodes in a network.
 
 from abc import ABC
 from typing import Any
-from qcompute_qnet.core.des import Entity
-from qcompute_qnet.functionalities.mobility import Mobility
-from qcompute_qnet.protocols.protocol import ProtocolStack
-from qcompute_qnet.protocols.routing import Routing
-from qcompute_qnet.messages.message import ClassicalMessage, QuantumMessage
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.functionalities.mobility import Mobility
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import ProtocolStack
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.routing import Routing
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import ClassicalMessage, QuantumMessage
 
 __all__ = [
     "Node",
@@ -84,7 +84,7 @@ class Node(Entity):
         """
         self.functionalities.append(functionality)
 
-        from qcompute_qnet.functionalities.mobility import Mobility
+        from Extensions.QuantumNetwork.qcompute_qnet.functionalities.mobility import Mobility
         if isinstance(functionality, Mobility):
             self.is_mobile = True
 

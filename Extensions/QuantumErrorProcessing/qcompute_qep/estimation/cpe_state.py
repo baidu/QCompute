@@ -41,11 +41,11 @@ import json
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-import qcompute_qep.estimation as estimation
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.utils import decompose_yzy
-from qcompute_qep.utils.circuit import print_circuit, execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import decompose_yzy
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit, execute
 
 
 class QuantumSnapshot(abc.ABC):
@@ -202,7 +202,7 @@ class CPEState(estimation.Estimation):
         **Examples**
 
             >>> import QCompute
-            >>> from qcompute_qep.estimation.cpe_state import QuantumSnapshot, CPEState
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.estimation.cpe_state import QuantumSnapshot, CPEState
             >>> ideal_baidu1 = QuantumSnapshot(qc_name='Baidu ideal1',
             >>>                                 qc=QCompute.BackendName.LocalBaiduSim2,
             >>>                                 qubits=[0])

@@ -21,10 +21,10 @@ Module for the QKD application protocol.
 
 from typing import Tuple
 
-from qcompute_qnet.core.des import EventHandler
-from qcompute_qnet.protocols.protocol import Protocol
-from qcompute_qnet.models.qkd.routing import QKDRouting
-from qcompute_qnet.models.qkd.message import QKDMessage
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.routing import QKDRouting
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.message import QKDMessage
 
 __all__ = [
     "QKDApp"

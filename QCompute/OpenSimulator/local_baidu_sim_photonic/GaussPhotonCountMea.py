@@ -18,6 +18,7 @@
 """
 Photon-count measurement
 """
+FileErrorCode = 21
 
 from typing import Union, Tuple, List, Dict
 import numpy
@@ -25,8 +26,8 @@ import math
 
 
 from QCompute.OpenSimulator.local_baidu_sim_photonic.InitGaussState import MatrixType
-from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussTransfer import Algorithm
 from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussAuxiliaryCalculation import CalculateP0_and_H
+from QCompute.QProtobuf import PBPhotonicGaussianMeasure
 
 
 class PhotonCountMeasure:
@@ -34,18 +35,15 @@ class PhotonCountMeasure:
     Perform photon-count measurement
     """
 
-    def __init__(self, matrixType: MatrixType, algorithm: Algorithm) -> None:
+    def __init__(self, matrixType: MatrixType) -> None:
 
         if matrixType == MatrixType.Dense:
-            if algorithm == Algorithm.Matmul:
-                self.proc = self.RunDensePhotonCountSampling
-            else:
-                assert False
+            self.proc = self.RunDensePhotonCountSampling
         else:
             assert False
 
-    def __call__(self, state_list: Union[List[numpy.ndarray], List['COO']], num_cutoff: list, shots: int) \
-            -> Dict[str, int]:
+    def __call__(self, state_list: Union[List[numpy.ndarray], List['COO']],
+                 num_cutoff: PBPhotonicGaussianMeasure.PhotonCountArgument, shots: int) -> Dict[str, int]:
         """
         To enable the object callable
         """
@@ -87,8 +85,9 @@ class PhotonCountMeasure:
 
         return probability_array, final_state_list
 
-    def RunDensePhotonCountSampling(self, state_list: List[numpy.ndarray], cutoff_list: list, shots: int) \
-            -> Dict[str, int]:
+    def RunDensePhotonCountSampling(self, state_list: List[numpy.ndarray],
+                                    cutoff_list: PBPhotonicGaussianMeasure.PhotonCountArgument,
+                                    shots: int) -> Dict[str, int]:
         """
         Simulate the sampling results according to calculated probability.
 

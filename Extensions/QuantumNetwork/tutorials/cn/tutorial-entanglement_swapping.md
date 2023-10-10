@@ -238,7 +238,7 @@ class EntanglementSwapping(Protocol):
 首先，创建一个仿真环境 ``QuantumEnv``。
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # 创建一个仿真环境
 env = QuantumEnv("Repeater", default=True)
@@ -247,9 +247,9 @@ env = QuantumEnv("Repeater", default=True)
 随后，分别创建协议中四种角色所对应的量子节点，设定这些节点的协议栈中预装的协议为 ``EntanglementSwapping``，并配置这些节点之间必要的通信链路。
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import EntanglementSwapping
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import EntanglementSwapping
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # 创建装有量子寄存器的量子节点并指定其中预装的协议类型
 alice = QuantumNode("Alice", qreg_size=1, protocol=EntanglementSwapping)
@@ -270,7 +270,7 @@ link_repeater_source_br = Link("Link_repeater_source_br", ends=(repeater, source
 然后，创建一个量子网络，并将配置好的节点和通信链路装入量子网络中。
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # 创建一个量子网络并将各节点和各链路装入量子网络中
 network = Network("Repeater network")
@@ -293,7 +293,7 @@ repeater.start(role="Repeater", ent_sources=[source_ar, source_br])
 最后，对仿真环境进行初始化并运行，并查看输出结果。
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # 初始化仿真环境并运行仿真
 env.init()

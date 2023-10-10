@@ -39,12 +39,12 @@ from scipy.stats import unitary_group
 import QCompute
 from QCompute.QPlatform import QOperation
 from QCompute.QPlatform.QOperation import CircuitLine, RotationGate, FixedGate
-from qcompute_qep.interface import conversion
-from qcompute_qep.utils.types import QProgram, QComputer, number_of_qubits
-from qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
-from qcompute_qep.utils.utils import limit_angle, decompose_yzy, COLOR_TABLE
-from qcompute_qep.utils.gate import CPauliOP, decompose_CPauli
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.interface import conversion
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import limit_angle, decompose_yzy, COLOR_TABLE
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.gate import CPauliOP, decompose_CPauli
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 
 def inv_opr(ops: List[QOperation.QOperation]) -> RotationGate.RotationGateOP:
@@ -874,7 +874,7 @@ def random_circuit(qubits: List[int],
 
     **Examples**
 
-        >>> from qcompute_qep.utils import circuit
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils import circuit
         >>> qubits = [0, 1]
         >>> qp = circuit.random_circuit(qubits=qubits, cycle=2)
         >>> circuit.print_circuit(qp.circuit)

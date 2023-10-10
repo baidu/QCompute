@@ -20,7 +20,7 @@ Example to demonstrate quantum detector tomography.
 """
 
 from QCompute import *
-import qcompute_qep.tomography.detector_tomography as detector_tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography.detector_tomography as detector_tomography
 
 
 ##########################################################################################

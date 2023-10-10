@@ -20,7 +20,7 @@ An example to demonstrate the Direct Fidelity Estimation protocol on the CX gate
 """
 import time
 import QCompute
-import qcompute_qep.estimation as estimation
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
 
 
 # Step 1. Set the quantum program for the CX gate.

@@ -22,8 +22,8 @@ import math
 
 import numpy as np
 import scipy.linalg as la
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.linalg import vec_to_operator
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import vec_to_operator
 
 
 def state_fidelity(rho: np.ndarray, sigma: np.ndarray) -> float:

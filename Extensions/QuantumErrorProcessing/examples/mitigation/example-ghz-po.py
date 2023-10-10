@@ -35,12 +35,12 @@ from qiskit_aer.noise import NoiseModel, depolarizing_error
 from QCompute import *
 from QCompute.QPlatform.QOperation import RotationGate
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.mitigation import Mitigator
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils import expval_z_from_counts
-from qcompute_qep.utils.types import QComputer, QProgram, get_qc_name
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import Mitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_z_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, get_qc_name
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096

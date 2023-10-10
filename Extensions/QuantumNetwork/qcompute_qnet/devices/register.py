@@ -22,9 +22,9 @@ Module for quantum registers.
 from typing import List, Union, Optional, Any
 import numpy
 
-from qcompute_qnet.core.des import Entity, EventHandler
-from qcompute_qnet.quantum.circuit import Circuit
-from qcompute_qnet.quantum.state import QuantumState
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import QuantumState
 
 __all__ = [
     "QuantumRegister"

@@ -70,8 +70,8 @@ from typing import List, Optional, Tuple
 from QCompute import X, Z, RZ, CZ, CRZ
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.Oracle.BlockEncoding import circ_block_encoding
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.BlockEncoding import circ_block_encoding
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
 
 
 def circ_Pi_double_ctrl_rot(qubit_target: QRegStorage, reg_ctrlling: List[QRegStorage], qubit_ctrlling: QRegStorage,
@@ -107,7 +107,7 @@ def circ_Pi_double_ctrl_rot(qubit_target: QRegStorage, reg_ctrlling: List[QRegSt
 
         >>> from numpy import pi
         >>> from QCompute import QEnv
-        >>> from qcompute_qsvt.QSVT.QSVT import circ_Pi_double_ctrl_rot
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.QSVT.QSVT import circ_Pi_double_ctrl_rot
         >>> env = QEnv()
         >>> qubit_c = env.Q[0]
         >>> reg_c = [env.Q[1], env.Q[2]]

@@ -16,13 +16,13 @@
 """
 Unroll Circuit To IOPCAS
 """
+FileErrorCode = 16
+
 from QCompute.OpenModule import ModuleImplement
 from typing import List, Dict, Optional, Union
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate
 
 
-
-FileErrorCode = 1
 
 
 class UnrollCircuitToIoPCASModule(ModuleImplement):
@@ -47,7 +47,7 @@ class UnrollCircuitToIoPCASModule(ModuleImplement):
 
     env.module(UnrollCircuitToIoPCASModule({'errorOnUnsupported': False, 'targetGates': ['RY', 'RZ', 'CZ'], 'sourceGates': ['CH', 'CSWAP']}))
 
-    env.serverModule(ServerModule.UnrollCircuitToIoPCASModule, {"disable": True})
+    env.serverModule(ServerModule.UnrollCircuitToIoPCAS, {"disable": True})
     """
     
 
@@ -57,7 +57,7 @@ class UnrollCircuitToIoPCASModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
+        super().__init__(arguments)
         
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
@@ -65,6 +65,7 @@ class UnrollCircuitToIoPCASModule(ModuleImplement):
         Process the Module
 
         :param program: the program
+
         :return: unrolled circuit
         """
         from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented at local sdk')

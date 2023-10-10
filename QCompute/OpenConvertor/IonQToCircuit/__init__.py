@@ -18,14 +18,14 @@
 """
 Convert the json to circuit
 """
+FileErrorCode = 10
+
 import json
 from typing import Dict, Set, List
 
 from QCompute.OpenConvertor import ConvertorImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate
-
-FileErrorCode = 7
 
 
 class IonQToCircuit(ConvertorImplement):

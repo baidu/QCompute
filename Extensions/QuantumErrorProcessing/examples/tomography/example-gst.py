@@ -17,8 +17,8 @@
 from typing import List
 
 import QCompute
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 def gateset_tomography(qc: types.QComputer, gate_set: tomography.GateSet, qubits: List[int]):

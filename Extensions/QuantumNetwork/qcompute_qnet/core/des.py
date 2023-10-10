@@ -27,7 +27,7 @@ from enum import Enum, unique
 from heapq import heappush, heappop
 import numpy as np
 import pandas as pd
-from qcompute_qnet.core.log import log_init
+from Extensions.QuantumNetwork.qcompute_qnet.core.log import log_init
 
 __all__ = [
     "Entity",
@@ -483,7 +483,7 @@ class DESEnv:
         Returns:
             Node: node entity to return
         """
-        from qcompute_qnet.topology.node import Node
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
         for entity in self.entities:
             if isinstance(entity, Node) and entity.name == name:
                 return entity
@@ -495,7 +495,7 @@ class DESEnv:
         Returns:
             Network: network in the discrete-event simulation environment
         """
-        from qcompute_qnet.topology.network import Network
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
         for entity in self.entities:
             if isinstance(entity, Network):
                 return entity

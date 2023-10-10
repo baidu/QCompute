@@ -18,6 +18,8 @@
 """
 Utils Functions
 """
+FileErrorCode = 2
+
 import importlib
 import os
 import re
@@ -48,6 +50,7 @@ def filterConsoleOutput(text: str):
     '\tbaidu.com 127.0.0.1'
 
     :param text: To be filtered string
+
     :return: Clear string, which doesn't have control characters.
     """
 
@@ -58,7 +61,8 @@ def findUniError(*texts: List[str]) -> Union[str, None]:
     """
     Find Any UniError Code from Inputs
 
-    :param *texts: String array to be find
+    :param texts: String array to be find
+
     :return: The founded code string or None
     """
 
@@ -75,6 +79,7 @@ def loadPythonModule(moduleName: str):
     Load module from file system.
 
     :param moduleName: Module name
+
     :return: Module object
     """
 

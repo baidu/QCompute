@@ -19,8 +19,8 @@
 An example to demonstrate the Cross Entropy Randomized Benchmarking protocol.
 """
 from QCompute import *
-import qcompute_qep.benchmarking as rb
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 ##########################################################################################

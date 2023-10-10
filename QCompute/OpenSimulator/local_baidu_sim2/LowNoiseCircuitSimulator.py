@@ -18,6 +18,7 @@
 """
 LowNoiseCircuitSimulator
 """
+FileErrorCode = 5
 
 from cmath import isclose
 from datetime import datetime
@@ -41,8 +42,6 @@ from QCompute.QPlatform.Utilities import protobufQNoiseToQNoise
 from QCompute.QProtobuf import PBProgram, PBMeasure
 
 
-
-FileErrorCode = 5
 
 
 class LowNoiseCircuitSimulator(BaseSimulator):
@@ -348,15 +347,18 @@ class LowNoiseCircuitSimulator(BaseSimulator):
                     matrix = self.getGateMatrix(circuitLine, self.matrixType, self.operationDict)
                     transferBatchNoisyGate(matrix, num)
                 elif op == 'proceduresName':  # procedure
-                    raise Error.ArgumentError('Unsupported operation procedure, please flatten by '
-                                              'UnrollProcedureModule!', ModuleErrorCode, FileErrorCode, 12)
+                    raise Error.ArgumentError(
+                        'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                        ModuleErrorCode, FileErrorCode, 2)
+
                     # it is not implemented, flattened by UnrollProcedureModule
                 elif op == 'measure':  # measure
                     measure: PBMeasure = circuitLine.measure
                     if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                         raise Error.ArgumentError(
-                            f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
-                            FileErrorCode, 13)
+                            f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!',
+                            ModuleErrorCode, FileErrorCode, 3)
+
                     if not measured:
                         # measure a batch of states
                         counts = batchMeasure(stateDict, measurer, self.shots)
@@ -366,7 +368,7 @@ class LowNoiseCircuitSimulator(BaseSimulator):
                     # unimplemented operation
                 else:  # unsupported operation
                     raise Error.ArgumentError(
-                        f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 14)
+                        f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 4)
 
         if self.measureMethod in [MeasureMethod.Probability, MeasureMethod.Accumulation]:
             counts = filterMeasure(counts, self.compactedCRegDict)

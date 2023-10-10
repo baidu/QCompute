@@ -18,6 +18,8 @@
 """
 Convert the qasm text to protobuf circuit
 """
+FileErrorCode = 8
+
 import json
 import re
 from enum import IntEnum
@@ -35,8 +37,6 @@ from QCompute.QPlatform import Error
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, \
     PBMeasure
 
-FileErrorCode = 5
-
 
 class CircuitLine:
     def __init__(self):
@@ -53,7 +53,7 @@ class QasmToCircuit(ConvertorImplement):
     Qasm To Circuit
     """
 
-    def convert(self, qasmText):
+    def convert(self, qasmText) -> PBProgram:
         """
         QASM->Protobuf Circuit
 
@@ -121,12 +121,11 @@ class _Visitor(QASMVisitor):
         # Predefine list of three argument operations.
         self.threeArgumentsOp = {'CCX', 'CSWAP'}
 
-        
         self.containMeasure = False
         self.scopeStack: List[ScopeLevel] = []
         self.qRegVarMap: Dict[str, int] = {}
         self.cRegVarMap: Dict[str, int] = {}
-        
+
         self.procedureVarSet = set()
         self.procedureMap = {}
         self.procedureArgumentMap = {}
@@ -163,12 +162,10 @@ class _Visitor(QASMVisitor):
         argumentList = arguments.split(',')
         return [float(argument) for argument in argumentList]
 
-    
     def prepareArguments(self, arguments: str) -> List[str]:
         argumentList = arguments.split(',')
         return argumentList
 
-    
     def getArguments(self, ctx) -> Tuple[str, List[int]]:
         """
         Check arguments.
@@ -182,7 +179,7 @@ class _Visitor(QASMVisitor):
         """
         arguments = ''
         argumentIdList: List[int] = []
-        
+
         explist = ctx.explist()
         if explist:
             arguments = self.visitExplist(explist)
@@ -193,7 +190,6 @@ class _Visitor(QASMVisitor):
 
         return arguments, argumentIdList
 
-    
     def getRealArgumentList(self, procArguments: str, pendingArgumentList: List[str], argumentMap) -> List[float]:
         """
         Get real values of arguments.
@@ -220,7 +216,7 @@ class _Visitor(QASMVisitor):
                 for key, val in argumentMap.items():
                     callVal = argumentArray[val]
                     realVal = re.sub(f'\\b{key}\\b', callVal, realVal)
-                
+
                 # Real-valued calculation.
                 try:
                     parser = Parser()
@@ -232,7 +228,6 @@ class _Visitor(QASMVisitor):
 
         return realArgumentList
 
-    
     def strMapToObj(strMap: Dict[str, Any]):
         obj = object()
         for k, v in strMap:
@@ -243,7 +238,6 @@ class _Visitor(QASMVisitor):
         scopeLen = len(self.scopeStack)
         scope = self.scopeStack[scopeLen - 1]
         del scope.argumentExprList[:]
-
 
     def cleanArgumentIdAndValue(self, cleanIdList: bool, cleanArgumentList: bool):
         """
@@ -260,7 +254,6 @@ class _Visitor(QASMVisitor):
         if cleanArgumentList:
             del scope.argumentValueList[:]
 
-
     def getScopeData(self):
         """
         Get the top element of scopeStack.
@@ -269,7 +262,6 @@ class _Visitor(QASMVisitor):
         scope = self.scopeStack[scopeLen - 1]
         return scope
 
-    
     def getRegOrderNumber(self, regName: str, line: int, position: int) -> int:
         """
         Get the order number of regName at this scope.
@@ -312,7 +304,6 @@ class _Visitor(QASMVisitor):
                                       ModuleErrorCode, FileErrorCode, 7)
         return True
 
-    
     def checkRegSizeInner(self, regVar: str, regSize: int, reqSize: int, line: int, position: int) -> bool:
         """
         Check if the access is out-of-bounds.
@@ -332,7 +323,6 @@ class _Visitor(QASMVisitor):
                                       ModuleErrorCode, FileErrorCode, 9)
         return True
 
-    
     def checkQregSize(self, qRegVar: str, reqSize: int, line: int, position: int) -> bool:
         """
         Check size of quantum register.
@@ -349,7 +339,6 @@ class _Visitor(QASMVisitor):
         regSize = qReg[qRegVar]
         return self.checkRegSizeInner(qRegVar, regSize, reqSize, line, position)
 
-    
     def checkCregSize(self, cRegVar: str, reqSize: int, line: int, position: int) -> bool:
         """
         Check size of classic register.
@@ -366,7 +355,6 @@ class _Visitor(QASMVisitor):
         regSize = cReg[cRegVar]
         return self.checkRegSizeInner(cRegVar, regSize, reqSize, line, position)
 
-    
     def checkQregLimit(self, qRegVal: str, line: int, position: int) -> bool:
         """
         Check limit of quantum register.
@@ -384,7 +372,6 @@ class _Visitor(QASMVisitor):
                 ModuleErrorCode, FileErrorCode, 10)
         return True
 
-    
     def checkCregLimit(self, qRegVal: str, line: int, position: int) -> bool:
         """
         Check limit of classic register.
@@ -402,7 +389,6 @@ class _Visitor(QASMVisitor):
                 ModuleErrorCode, FileErrorCode, 11)
         return True
 
-    
     def checkUOpArgumentIdList(self, idArgumentList: List, line: int, position: int) -> bool:
         """
         Check if idlist has been declared.
@@ -424,7 +410,6 @@ class _Visitor(QASMVisitor):
             checkIds.append(rId)
         return True
 
-    
     def checkBarrierIdList(self, idArgumentList: List, line: int, position: int) -> bool:
         """
         Check params in barrier operation.
@@ -435,7 +420,7 @@ class _Visitor(QASMVisitor):
 
         :return: type: bool. If True. Barrier operation is valid. 
         """
-        
+
         if len(idArgumentList):
             raise Error.ArgumentError(
                 f'Illegal barrier operation on multiple register. line: {line}, position: {position}.', ModuleErrorCode,
@@ -443,7 +428,6 @@ class _Visitor(QASMVisitor):
         rId = idArgumentList[0].getText()
         # Check if quantum register is defined.
         return self.checkQregVar(rId, line, position)
-
 
     def checkMeasureSize(self, qregId: str, cregId: str, line: int, position: int) -> bool:
         """
@@ -469,7 +453,6 @@ class _Visitor(QASMVisitor):
                 ModuleErrorCode, FileErrorCode, 14)
         return True
 
-    
     def checkArgumentsCount(self, opId: str, argumentCount: int, line: int, position: int) -> bool:
         """
         Check the count of arguments.
@@ -495,12 +478,11 @@ class _Visitor(QASMVisitor):
         elif checkOp in self.threeArgumentsOp and argumentCount != 3:
             if argumentCount != 3:
                 error = True
-        
+
         if error:
             raise Error.ArgumentError(f'Illegal operation on gate. line: {line}, position: {position}.',
                                       ModuleErrorCode, FileErrorCode, 15)
         return True
-
 
     def checkProcName(self, procName: str, gateName: str, line: int, position: int) -> bool:
         """
@@ -520,7 +502,6 @@ class _Visitor(QASMVisitor):
                 ModuleErrorCode, FileErrorCode, 16)
         return True
 
-    
     def checkProcArgumentsCount(self, procName: str, arguments: str, line: int, position: int) -> bool:
         """
         Check the count of argument(s) in procedure. The count 
@@ -541,7 +522,6 @@ class _Visitor(QASMVisitor):
                                       ModuleErrorCode, FileErrorCode, 17)
         return True
 
-    
     def checkArgumentDeclared(self, argumentVal: str) -> bool:
         """
         Check if the argument is declared.
@@ -551,7 +531,6 @@ class _Visitor(QASMVisitor):
         argumentMap = self.getScopeData().argumentMap
         return argumentVal in argumentMap
 
-    
     def checkMeasureCommand(self, line: int, position: int) -> bool:
         """
         Check if measurement instruction exists. The measurement instruction must be the last instruction.
@@ -568,7 +547,6 @@ class _Visitor(QASMVisitor):
 
     def genSequenceArray(self, size: int):
         return [i for i in range(size)]
-
 
     def getProcCircuitList(self, procName: str, procArguments: str, regIdList: List[int]):
         """
@@ -593,13 +571,13 @@ class _Visitor(QASMVisitor):
         """
         circuitList: List[CircuitLine] = []
         procedureCircuitList = self.procedureMap[procName].circuitList
-        
+
         argumentMap = self.procedureArgumentMap[procName]
 
         for circuit in procedureCircuitList:
             procedureName = circuit.pbCircuitLine.procedureName
             pendingArgumentList = circuit.pendingArgumentList
-            
+
             newQRegList: List[int] = []
             for i in circuit.pbCircuitLine.qRegList:
                 q = regIdList[i]
@@ -639,10 +617,9 @@ class _Visitor(QASMVisitor):
 
         if argumentIdField:
             circuit.pbCircuitLine.argumentIdList[:] = argumentIdList
-            
+
         circuitList.append(circuit)
 
-    
     def createProcCircuit(self, circuitList: List[CircuitLine], arguments: str, argumentIdList: List[int],
                           argumentIdField: bool, gateType: str, gateName: Union[str, int], regIdList: List[int]):
         """
@@ -664,10 +641,10 @@ class _Visitor(QASMVisitor):
 
         if arguments:
             circuit.pendingArgumentList = self.prepareArguments(arguments)
-        
+
         if argumentIdField:
             circuit.pbCircuitLine.argumentIdList[:] = argumentIdList
-        
+
         circuitList.append(circuit)
 
     def expandCircuitList(self, circuitList: List[CircuitLine], arguments: str, argumentIdList: List[int],
@@ -682,9 +659,9 @@ class _Visitor(QASMVisitor):
 
         :return: None.
         """
-        
+
         procCircuits = self.getProcCircuitList(gateName, arguments, regIdList);
-        
+
         for sub in procCircuits:
             circuitList.append(sub)
 
@@ -752,7 +729,6 @@ class _Visitor(QASMVisitor):
 
         return ''
 
-
     def getOpName(self, ctx) -> str:
         """
         Get the name of operation instruction.
@@ -772,7 +748,6 @@ class _Visitor(QASMVisitor):
                                       ModuleErrorCode, FileErrorCode, 21)
 
         return opId
-
 
     def getGateNameType(self, ctx, opId: str) -> Tuple[str, Union[str, int], bool]:
         """
@@ -814,7 +789,6 @@ class _Visitor(QASMVisitor):
                 ModuleErrorCode, FileErrorCode, 22)
         return gateType, gateName, argumentIdField
 
-    
     def getCurrentCircuitsContainer(self) -> List[CircuitLine]:
         """
         Get the current circuitList. If state is procedure, skip to the circuitList in procedureMap.
@@ -827,7 +801,6 @@ class _Visitor(QASMVisitor):
             circuitList = self.procedureMap[procName].circuitList
         return circuitList
 
-    
     def idListOperation(self, ctx, opId: str, idList, circuitList: List[CircuitLine]):
         """
         Registers without index, such as h q;
@@ -860,11 +833,11 @@ class _Visitor(QASMVisitor):
             # command of procedure. Call registers declared in multiple procedures. 
             # Get list of registers according to their positions.
             regList: List[int] = [regMap[id.getText()] for id in idArguments]
-            
+
             if gateType == 'procedureName':
                 self.checkProcName(procName, gateName, line, position)
                 self.checkProcArgumentsCount(gateName, arguments, line, position)
-            
+
             self.createProcCircuit(circuitList, arguments, argumentIdList, argumentIdField, gateType, gateName, regList)
         else:
             # Since some operations require external data, creates objects for return.
@@ -878,7 +851,6 @@ class _Visitor(QASMVisitor):
                 for i in range(size):
                     self.createCircuit(circuitList, arguments, argumentIdList, argumentIdField, gateType, gateName, [i])
 
-    
     def mixListOperation(self, ctx, opId: str, mixList, circuitList):
         """
         Operation registers with index, such as h q[1];
@@ -918,7 +890,7 @@ class _Visitor(QASMVisitor):
             rIndex = int(p.getText())
             self.checkQregSize(regName, rIndex, line, position)
             usageIds.append(rIndex)
-        
+
         # to pb has two situations,
         # 1. Procedure calls other procedures;
         # 2. Directly calls procedure.
@@ -1017,7 +989,7 @@ class _Visitor(QASMVisitor):
             # Check the sizes of qReg and cReg. The size of 
             # qReg must be less than or equal to that of cReg.
             self.checkMeasureSize(qRegId, cRegId, line, position)
-        
+
             qRegSize = self.qRegVarMap.get(qRegId)
             for i in range(qRegSize):
                 self.createMeasureCircuit(self.circuitList, i, i)
@@ -1034,7 +1006,7 @@ class _Visitor(QASMVisitor):
             self.checkCregSize(cRegId, cInt, line, position)
 
             self.createMeasureCircuit(self.circuitList, qInt, cInt)
-            
+
             # Measurement instruction exists.
             self.containMeasure = True
 
@@ -1062,7 +1034,7 @@ class _Visitor(QASMVisitor):
 
         # Get current circuit list. Check if procedure needs to be turn. 
         circuitList = self.getCurrentCircuitsContainer()
-        
+
         idList = anyList.idlist()
         mixList = anyList.mixedlist()
 
@@ -1183,9 +1155,9 @@ class _Visitor(QASMVisitor):
         calcList = []
 
         count = ctx.getChildCount()
-        
+
         calcArgumentList = []
-        
+
         checkItem: List[bool] = []
         for i in range(count):
             item = ctx.getChild(i)
@@ -1233,12 +1205,12 @@ class _Visitor(QASMVisitor):
 
             parser = Parser()
             reVal = parser.parse(exprText).evaluate({})
-    
+
         except Exception as ex:
             raise Error.ArgumentError(
                 f'Calculation expression {calcText} parsing error: {ex}. line: {line}, position: {position}.',
                 ModuleErrorCode, FileErrorCode, 26)
-        
+
         return json.dumps({
             'flag': -1,
             'text': calcText,
@@ -1321,11 +1293,11 @@ class _Visitor(QASMVisitor):
                 state=QasmParseState.Procedure,
                 regMap=regMap,
                 argumentMap=argumentMap,
-                
+
                 argumentExprList=[],
                 argumentIdList=[],
                 argumentValueList=[],
-                
+
                 procName=gateId,
                 circuitCounter=0,
             )

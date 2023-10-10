@@ -18,23 +18,23 @@
 """
 Module Filter
 """
+FileErrorCode = 18
+
 from typing import List, Optional
 
 from QCompute.Define import Settings
 from QCompute.QProtobuf import PBProgram
 from QCompute.OpenModule import ModuleImplement
-from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
-from QCompute.OpenModule.CompressGateModule import CompressGateModule
+from QCompute.OpenModule.ReverseCircuitModule import ReverseCircuitModule
 from QCompute.OpenModule.InverseCircuitModule import InverseCircuitModule
+from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
+from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
 from QCompute.OpenModule.UnrollCircuitModule import UnrollCircuitModule
+from QCompute.OpenModule.CompressGateModule import CompressGateModule
 from QCompute.OpenModule.CompressNoiseModule import CompressNoiseModule
 from QCompute.OpenModule.UnrollNoiseModule import UnrollNoiseModule
-from QCompute.OpenModule.UnrollProcedureModule import UnrollProcedureModule
 from QCompute.QPlatform import BackendName, Error, ModuleErrorCode
 
-
-
-FileErrorCode = 15
 
 
 def filterModule(programe: PBProgram, backendName: Optional['BackendName'], moduleList: List['ModuleImplement']) \
@@ -63,13 +63,16 @@ def filterModule(programe: PBProgram, backendName: Optional['BackendName'], modu
 
 def _filterSimulator(programe: PBProgram, backendName: BackendName, moduleList: List['ModuleImplement']) -> List[
     'ModuleImplement']:
-    unrollNoiseModule: Optional[UnrollNoiseModule] = None
-    compressNoiseModule: Optional[CompressNoiseModule] = None
-    unrollProcedureModule: Optional[UnrollProcedureModule] = None
-    compositeGateModule: Optional[CompositeGateModule] = None
+    reverseCircuitModule: Optional[ReverseCircuitModule] = None
     inverseCircuitModule: Optional[InverseCircuitModule] = None
+    compositeGateModule: Optional[CompositeGateModule] = None
+    unrollProcedureModule: Optional[UnrollProcedureModule] = None
+
     unrollCircuitModule: Optional[UnrollCircuitModule] = None
     compressGateModule: Optional[CompressGateModule] = None
+
+    unrollNoiseModule: Optional[UnrollNoiseModule] = None
+    compressNoiseModule: Optional[CompressNoiseModule] = None
     ret: List['ModuleImplement'] = []
     for module in moduleList:
         
@@ -77,23 +80,31 @@ def _filterSimulator(programe: PBProgram, backendName: BackendName, moduleList: 
             
         ] and module.__class__.__name__ == 'CompressGateModule' \
                 and not module.disable:
-            raise Error.ArgumentError(f'Unsupported {module.__class__.__name__} in {backendName.name}',
-                                      ModuleErrorCode,
-                                      FileErrorCode, 2)
-        elif module.__class__.__name__ == 'UnrollProcedureModule':
-            unrollProcedureModule = module
-        elif module.__class__.__name__ == 'CompositeGateModule':
-            compositeGateModule = module
+            raise Error.ArgumentError(f'Unsupported {module.__class__.__name__} in {backendName.name}', ModuleErrorCode, FileErrorCode, 2)
+
+        elif module.__class__.__name__ == 'ReverseCircuitModule':
+            reverseCircuitModule = module
+            ret.append(module)
         elif module.__class__.__name__ == 'InverseCircuitModule':
             inverseCircuitModule = module
+            ret.append(module)
+        elif module.__class__.__name__ == 'CompositeGateModule':
+            compositeGateModule = module
+            ret.append(module)
+        elif module.__class__.__name__ == 'UnrollProcedureModule':
+            unrollProcedureModule = module
+            ret.append(module)
+
         elif module.__class__.__name__ == 'UnrollCircuitModule':
             unrollCircuitModule = module
         elif module.__class__.__name__ == 'CompressGateModule':
             compressGateModule = module
-        if module.__class__.__name__ == 'UnrollNoiseModule':
+
+        elif module.__class__.__name__ == 'UnrollNoiseModule':
             unrollNoiseModule = module
-        if module.__class__.__name__ == 'CompressNoiseModule':
+        elif module.__class__.__name__ == 'CompressNoiseModule':
             compressNoiseModule = module
+
         elif not module.disable:
             ret.append(module)
 
@@ -121,21 +132,11 @@ def _filterSimulator(programe: PBProgram, backendName: BackendName, moduleList: 
 
         return ret
 
-    if unrollProcedureModule is not None:
-        if not unrollProcedureModule.disable:
-            ret.append(unrollProcedureModule)
-    else:
-        ret.append(UnrollProcedureModule())
-
-    if compositeGateModule is not None:
-        if not compositeGateModule.disable:
-            ret.append(compositeGateModule)
-    else:
+    if compositeGateModule is None:
         ret.append(CompositeGateModule())
 
-    if inverseCircuitModule is not None:
-        if not inverseCircuitModule.disable:
-            ret.append(inverseCircuitModule)
+    if unrollProcedureModule is None:
+        ret.append(UnrollProcedureModule())
 
     if unrollCircuitModule is not None:
         if not unrollCircuitModule.disable:

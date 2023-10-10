@@ -45,14 +45,14 @@ from typing import Any, List, Union, Callable
 import numpy as np
 from QCompute import *
 
-from qcompute_qep.exceptions import ArgumentError
-from qcompute_qep.utils.types import QProgram, number_of_qubits
-from qcompute_qep.utils.gate import CPauli
-from qcompute_qep.utils.circuit import enlarge_circuit, print_circuit
-from qcompute_qep.quantum.pauli import pauli2bsf, bsf2pauli, bsp, mutually_commute
-from qcompute_qep.correction.stabilizer import StabilizerCode
-from qcompute_qep.correction.utils import pauli_list_to_check_matrix, check_matrix_to_standard_form
-from qcompute_qep.utils.utils import COLOR_TABLE
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.gate import CPauli
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import enlarge_circuit, print_circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import pauli2bsf, bsf2pauli, bsp, mutually_commute
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.stabilizer import StabilizerCode
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.utils import pauli_list_to_check_matrix, check_matrix_to_standard_form
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import COLOR_TABLE
 
 
 class BasicCode(StabilizerCode):

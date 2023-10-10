@@ -27,12 +27,12 @@ from networkx import Graph, spring_layout, draw_networkx
 import numpy
 from numpy import reshape, pi, conj, real, random, sqrt
 from qcompute_qnet import EPSILON
-from qcompute_qnet.quantum.basis import Basis
-from qcompute_qnet.quantum.gate import Gate
-from qcompute_qnet.quantum.mcalculus import transpile_to_pattern
-from qcompute_qnet.quantum.pattern import Pattern
-from qcompute_qnet.quantum.state import PureState, Plus
-from qcompute_qnet.quantum.utils import kron, print_progress
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.basis import Basis
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.mcalculus import transpile_to_pattern
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.pattern import Pattern
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import PureState, Plus
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.utils import kron, print_progress
 
 __all__ = [
     "MBQC",

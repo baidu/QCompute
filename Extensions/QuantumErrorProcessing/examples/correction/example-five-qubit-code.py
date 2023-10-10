@@ -29,8 +29,8 @@ We will illustrate how to construct and simulate this code in QEP.
 import copy
 
 import QCompute
-from qcompute_qep.correction import FiveQubitCode, ColorTable
-from qcompute_qep.utils import circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction import FiveQubitCode, ColorTable
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import circuit
 
 
 def print_counts(counts: dict, n: int, k: int):

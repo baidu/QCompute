@@ -30,7 +30,7 @@ import qiskit
 from typing import Union, Any, get_args, Type, Callable
 import QCompute
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 QProgram: Type[Union[QCompute.QEnv, qiskit.QuantumCircuit]] = Union[QCompute.QEnv, qiskit.QuantumCircuit]
 r"""The Quantum Program data type in ``qcompute_qep``.

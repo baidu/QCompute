@@ -20,10 +20,10 @@ This is the init file for the "Quantum Estimation" module.
 We import all classes and functions within this module here,
 so that we can use `qcompute_qep.estimation.xxx` to call the class or function `xxx` directly.
 """
-from qcompute_qep.estimation.estimation import Estimation
-from qcompute_qep.estimation.dfe_state import DFEState
-from qcompute_qep.estimation.dfe_process import DFEProcess
-from qcompute_qep.estimation.cpe_state import CPEState
+from Extensions.QuantumErrorProcessing.qcompute_qep.estimation.estimation import Estimation
+from Extensions.QuantumErrorProcessing.qcompute_qep.estimation.dfe_state import DFEState
+from Extensions.QuantumErrorProcessing.qcompute_qep.estimation.dfe_process import DFEProcess
+from Extensions.QuantumErrorProcessing.qcompute_qep.estimation.cpe_state import CPEState
 
 __all__ = [
     'Estimation',

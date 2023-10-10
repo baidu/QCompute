@@ -18,6 +18,8 @@
 """
 Fixed Gate Operation
 """
+FileErrorCode = 36
+
 import importlib
 from typing import TYPE_CHECKING
 
@@ -224,9 +226,11 @@ CY = FixedGateOP('CY', 2,
 r"""
 CY gate, or control-Y gate. It's similar to CNOT gate.
 
-On the simulator mode (use inside the simulator): Matrix form:
+On the simulator mode (use inside the simulator): 
 
-:math:`CY = \begin{bmatrix} 1 & 0  &0 & 0 \\ 0 & 0  & 0& -i \\ 0 & 0  & 1& 0 \\ 0 & i  & 0& 0 \end{bmatrix}`
+Matrix form:
+
+:math:`CY = \begin{bmatrix} 1 & 0  & 0 & 0 \\ 0 & 0  & 0 & -i \\ 0 & 0  & 1 & 0 \\ 0 & i  & 0 & 0 \end{bmatrix}`
 """
 
 CZ = FixedGateOP('CZ', 2,
@@ -243,9 +247,11 @@ CZ = FixedGateOP('CZ', 2,
 r"""
 CZ gate, or control-Z gate. It's similar to CNOT gate.
 
-On the simulator mode (use inside the simulator): Matrix form:
+On the simulator mode (use inside the simulator):
 
-:math:`CZ = \begin{bmatrix} 1 & 0  &0 & 0 \\ 0 & 1  & 0& 0 \\ 0 & 0  & 1& 0 \\ 0 & 0  & 0& -1 \end{bmatrix}`
+Matrix form:
+
+:math:`CZ = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1  & 0 & 0 \\ 0 & 0  & 1 & 0 \\ 0 & 0  & 0 & -1 \end{bmatrix}`
 """
 
 CH = FixedGateOP('CH', 2,
@@ -262,7 +268,9 @@ CH = FixedGateOP('CH', 2,
 r"""
 CH gate, or control-Hadamard gate. It's similar to CNOT gate.
 
-On the simulator mode (use inside the simulator): Matrix form:
+On the simulator mode (use inside the simulator):
+
+Matrix form:
 
 :math:`CH = \begin{bmatrix} 1 & 0  &0 & 0 \\ 0 & \frac{1}{\sqrt{2}}  & 0& \frac{1}{\sqrt{2}} \\ 0 & 0  & 1& 0 \\ 0 & \frac{1}{\sqrt{2}}  & 0& -\frac{1}{\sqrt{2}} \end{bmatrix}`
 """
@@ -280,9 +288,11 @@ It swaps the contents of the first qubit and the second qubit, i.e.,
 
 :math:`SWAP |x,y\rangle =|y,x\rangle` 
 
-On the simulator mode (use inside the simulator): Matrix form:
+On the simulator mode (use inside the simulator): 
 
-:math:`SWAP = \begin{bmatrix} 1 & 0  &0 & 0 \\ 0 & 0  & 1& 0 \\ 0 & 1 & 0& 0 \\ 0 & 0 & 0& 1 \end{bmatrix}`
+Matrix form:
+
+:math:`SWAP = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 0  & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}`
 """
 
 CCX = FixedGateOP('CCX', 3,
@@ -339,7 +349,8 @@ def getFixedGateInstance(name: str) -> 'FixedGateOP':
     Get a gate according to name.
 
     :param name: fixed gate name
-    :return: gate
+
+    :return: gate.
     """
 
     currentModule = importlib.import_module(__name__)

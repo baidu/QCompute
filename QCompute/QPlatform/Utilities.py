@@ -18,6 +18,8 @@
 """
 Utilities
 """
+FileErrorCode = 13
+
 
 import functools
 from typing import Dict, TYPE_CHECKING, Optional, Tuple, Union, Type, List
@@ -41,8 +43,6 @@ from QCompute.QProtobuf import PBMatrix, PBQNoise, PBFixedGate, PBRotationGate
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBCircuitLine, PBCustomizedGate
-
-FileErrorCode = 6
 
 
 def destoryObject(obj: object) -> None:
@@ -149,8 +149,11 @@ def nKron(AMatrix: numpy.ndarray, BMatrix: numpy.ndarray, *args) -> numpy.ndarra
     Recursively execute kron n times. This function has at least two matrices.
 
     :param AMatrix: First matrix
+
     :param BMatrix: Second matrix
+
     :param args: If have more matrix, they are delivered by this matrix
+
     :return: The result of their tensor product
     """
     return functools.reduce(
@@ -190,9 +193,8 @@ def protobufQNoiseToQNoise(protobufQNoise: PBQNoise) -> QNoise:
         quantumNoise = ResetNoise(
             protobufQNoise.resetNoise.probability1, protobufQNoise.resetNoise.probability2)
     else:
-        raise Error.ArgumentError(
-            f'Unsupported protobufQNoise type {noiseType}!', ModuleErrorCode, FileErrorCode, 9)
-    
+        raise Error.ArgumentError(f'Unsupported protobufQNoise type {noiseType}!', ModuleErrorCode, FileErrorCode, 3)
+
     return quantumNoise
 
 def contract1_1(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray) -> numpy.ndarray:
@@ -202,9 +204,9 @@ def contract1_1(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray) -> 
     just like writing matrix vector multiplication, :math:`U |0\rangle`
     """
     if matrixFloating.shape != (2, 2):
-        raise Error.ArgumentError("Floating gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 3)
+        raise Error.ArgumentError('Floating gate not a 1-qubit gate', ModuleErrorCode, FileErrorCode, 4)
     if matrixParking.shape != (2, 2):
-        raise Error.ArgumentError("Parking gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 4)
+        raise Error.ArgumentError('Parking gate not a 1-qubit gate', ModuleErrorCode, FileErrorCode, 5)
     newArray = numpy.einsum('ab,bc->ac', matrixParking,
                             matrixFloating)  # v is a vector, A B is a matrix, we must count ABv, here we count AB
     return newArray
@@ -218,11 +220,11 @@ def contract1_2(matrixParking: numpy.ndarray, matrixFloating: numpy.ndarray, upO
     and the second half are inputs.
     """
     if matrixFloating.shape != (2, 2):
-        raise Error.ArgumentError("Floating gate not a 1-qubit gate", ModuleErrorCode, FileErrorCode, 5)
+        raise Error.ArgumentError('Floating gate not a 1-qubit gate', ModuleErrorCode, FileErrorCode, 6)
     if matrixParking.shape == (4, 4):
         matrixParking = numpy.reshape(matrixParking, [2, 2, 2, 2])
     elif matrixParking.shape != (2, 2, 2, 2):
-        raise Error.ArgumentError("Parking gate not a 2-qubit gate", ModuleErrorCode, FileErrorCode, 6)
+        raise Error.ArgumentError('Parking gate not a 2-qubit gate', ModuleErrorCode, FileErrorCode, 7)
     newArray: Optional[numpy.ndarray] = None
     if leftOrRight == 0:
         if upOrDown == 0:
@@ -244,10 +246,14 @@ def contract_in_3(matrixPre: numpy.ndarray,
     """
     Contract two matrices on at most 3 qubits.
 
-    :param matrixPre: a matrix 
+    :param matrixPre: a matrix
+
     :param qRegsPre: the qubits that matrixPre is applied on
-    :param matrixPost: a matrix 
+
+    :param matrixPost: a matrix
+
     :param qRegsPost: the qubits that matrixPost is applied on
+
     :return: the multiplication of matrices and corresponding qRegs
     """   
     # Calculate maximum qRegs
@@ -281,7 +287,8 @@ def toTensorMatrix(matrix: numpy.ndarray) -> numpy.ndarray:
     Transform a matrix into a tensor matrix.
     If it already is, do nothing
 
-    :param matrix: a matrix 
+    :param matrix: a matrix
+
     :return: a tensor matrix
     """
     bits = int(numpy.log2(numpy.sqrt(numpy.prod(matrix.shape))) + 0.5)
@@ -301,7 +308,8 @@ def toSquareMatrix(matrix: numpy.ndarray) -> numpy.ndarray:
     Transform a matrix into a square matrix.
     If it already is, do nothing
 
-    :param matrix: a matrix 
+    :param matrix: a matrix
+
     :return: a square matrix
     """
     bits = int(numpy.log2(numpy.sqrt(numpy.prod(matrix.shape))) + 0.5)
@@ -321,8 +329,11 @@ def shuffleMatrix(gateMatrix: numpy.ndarray,  qRegs: List[int]) -> numpy.ndarray
     shuffle a matrix to in ascent order of qubits
 
     :param gate: a matrix
+
     :param qReg: the bits that the gate is applied on
-    :param target_qRegs: the bits that gate are supposed to reshuffle. If default, 
+
+    :param target_qRegs: the bits that gate are supposed to reshuffle. If default,
+
     :return: reordered gate by ascent order of qRegs
     """
     bits = len(qRegs)
@@ -350,9 +361,12 @@ def expandMatrix(matrix: numpy.ndarray,
     Expand a matrix to a larger space.
     If a matrix 
 
-    :param matrix: a matrix 
+    :param matrix: a matrix
+
     :param qRegs: the qubits that matrixPre is applied on
+
     :param qRegsTarget: the qubits that matrixPre is expanded to
+
     :return: a expanded matrix and corresponding qRegs
     """   
 
@@ -381,6 +395,7 @@ def getProtobufCicuitLineMatrix(pbCircuitLine: 'PBCircuitLine') -> numpy.ndarray
     get the pbCircuitLine matrix.
 
     :param pbCircuitLine: Protobuf format of the circuitLine
+
     :return: the matrix of the circuitLine
     """
 
@@ -397,5 +412,5 @@ def getProtobufCicuitLineMatrix(pbCircuitLine: 'PBCircuitLine') -> numpy.ndarray
         customizedGate: PBCustomizedGate = pbCircuitLine.customizedGate
         matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
     else:
-        raise Error.ArgumentError(f'InternalStruct Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 1)
+        raise Error.ArgumentError(f'InternalStruct Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 8)
     return matrix

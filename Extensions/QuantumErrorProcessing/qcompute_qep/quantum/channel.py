@@ -41,9 +41,9 @@ import abc
 from typing import Union, List, Tuple
 import numpy as np
 import copy
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
-import qcompute_qep.utils.linalg as la
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg as la
 
 # define the abstract quantum channel data type
 QChannel = Union[np.ndarray, List[np.ndarray], List[Tuple[np.ndarray, np.ndarray]]]

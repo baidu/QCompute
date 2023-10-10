@@ -19,9 +19,9 @@ r"""
 Module for communication links in a network.
 """
 
-from qcompute_qnet.core.des import Entity
-from qcompute_qnet.devices.channel import ClassicalChannel, QuantumChannel, DuplexClassicalFiberChannel
-from qcompute_qnet.devices.channel import DuplexQuantumFiberChannel, ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalChannel, QuantumChannel, DuplexClassicalFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import DuplexQuantumFiberChannel, ClassicalFiberChannel, QuantumFiberChannel
 
 __all__ = [
     "Link"

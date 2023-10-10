@@ -18,6 +18,9 @@
 """
 Compress Noisy Gate to Accelerate Simulator Process
 """
+FileErrorCode = 3
+
+
 from copy import deepcopy
 from typing import List, Dict, Optional, Union
 
@@ -27,9 +30,6 @@ from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.Utilities import contract1_1, contract1_2
 from QCompute.QPlatform.Utilities import numpyMatrixToProtobufMatrix, getProtobufCicuitLineMatrix
 from QCompute.QProtobuf import PBProgram, PBCircuitLine
-
-FileErrorCode = 26  
-
 
 class CompressNoiseModule(ModuleImplement):
     """
@@ -48,11 +48,7 @@ class CompressNoiseModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-
-        self.arguments = arguments
-        if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -61,6 +57,9 @@ class CompressNoiseModule(ModuleImplement):
         :param program: the program
         :return: compressed circuit
         """
+        if self.disable:
+            return program
+
         ret = deepcopy(program)
 
         del ret.body.circuit[:]
@@ -150,8 +149,8 @@ def _separateCircuit(circuitIn: List['PBCircuitLine'],
         elif op == 'barrier':
             pass
         else:
-            raise Error.ArgumentError(f'Unsupported operation {circuitLine} at compress!', ModuleErrorCode,
-                                      FileErrorCode, 1)
+            raise Error.ArgumentError(
+                f'Unsupported operation {circuitLine} at compress!', ModuleErrorCode, FileErrorCode, 1)
 
     for key, value in circuitMap.items():
         value.append("End")
@@ -348,6 +347,6 @@ def _compressGate(circuitIn_copy: List['PBCircuitLine'],
             elif isinstance(tag, (dict, set, tuple, str, list)):
                 pass
             else:
-                raise Error.ArgumentError('Wrong construction of circuitMap!', ModuleErrorCode, FileErrorCode, 4)
+                raise Error.ArgumentError('Wrong construction of circuitMap!', ModuleErrorCode, FileErrorCode, 3)
 
     return circuitIn_copy

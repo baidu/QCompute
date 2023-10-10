@@ -48,13 +48,13 @@ Different kinds of correction procedures will be implemented:
     >>> from QCompute import H
     >>> from QCompute import CX
     >>> from qiskit.providers.fake_provider import FakeSantiago
-    >>> from qcompute_qep.measurement.correction import InverseCorrector
-    >>> from qcompute_qep.measurement.correction import LeastSquareCorrector
-    >>> from qcompute_qep.measurement.correction import IBUCorrector
-    >>> from qcompute_qep.measurement.correction import NeumannCorrector
-    >>> from qcompute_qep.utils.types import get_qc_name
-    >>> from qcompute_qep.utils.circuit import execute
-    >>> from qcompute_qep.utils import expval_from_counts
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import InverseCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import LeastSquareCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import IBUCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import NeumannCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import get_qc_name
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
     >>>
     >>> qc_ideal = BackendName.LocalBaiduSim2
     >>> qc_noisy = FakeSantiago()
@@ -107,11 +107,11 @@ import warnings
 import networkx as nx
 
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement.calibration import Calibrator, CompleteCalibrator, TPCalibrator, CTMPCalibrator
-from qcompute_qep.measurement.utils import dict2vector, vector2dict
-from qcompute_qep.utils.types import QComputer
-from qcompute_qep.utils.linalg import normalize
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import Calibrator, CompleteCalibrator, TPCalibrator, CTMPCalibrator
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import dict2vector, vector2dict
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import normalize
 
 
 class Corrector(ABC):

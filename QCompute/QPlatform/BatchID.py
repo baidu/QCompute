@@ -18,6 +18,8 @@
 """
 Batch ID
 """
+FileErrorCode = 1
+
 import nanoid
 
 

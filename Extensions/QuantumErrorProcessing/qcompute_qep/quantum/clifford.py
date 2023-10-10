@@ -36,9 +36,9 @@ from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.QOperation import FixedGate
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-import qcompute_qep.utils.circuit as circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 import QCompute
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 
 class Clifford:
@@ -82,8 +82,8 @@ class Clifford:
 
     **Examples**
 
-        >>> from qcompute_qep.quantum.clifford import Clifford
-        >>> import qcompute_qep.utils.circuit as cir
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as cir
         >>> import QCompute
         >>> n = 1
         >>> env = QCompute.QEnv()
@@ -125,7 +125,7 @@ class Clifford:
 
         **Example**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
             >>> n = 2
             >>> c = Clifford(n)  # randomly generate a Clifford
             >>> print(c.matrix)
@@ -153,8 +153,8 @@ class Clifford:
 
         **Example**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
-            >>> from qcompute_qep.utils.circuit import print_circuit
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
             >>> n = 2
             >>> c = Clifford(n)  # randomly generate a Clifford
             >>> print_circuit(c.circuit)
@@ -185,7 +185,7 @@ class Clifford:
 
         **Examples**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
             >>> n = 2
             >>> c = Clifford(n)
             >>> print(c.normal_form)
@@ -235,8 +235,8 @@ class Clifford:
 
         **Examples**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
-            >>> from qcompute_qep.utils.circuit import print_circuit
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
             >>> n = 2
             >>> c = Clifford(n)
             >>> print_circuit(c.circuit)
@@ -429,7 +429,7 @@ def random_pattern(n: int) -> List[List[List[str]]]:
 
     **Examples**
 
-        >>> from qcompute_qep.quantum.clifford import random_pattern
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import random_pattern
         >>> n=2
         >>> pattern = random_pattern(n)
         >>> print(pattern)
@@ -474,8 +474,8 @@ def random_clifford(n: int, m: int = 1, **kwargs) -> List[Clifford]:
 
     **Examples**
 
-        >>> from qcompute_qep.quantum.clifford import random_clifford
-        >>> from qcompute_qep.utils.circuit import print_circuit
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import random_clifford
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
         >>> n = 2
         >>> m = 2
         >>> cliffords = random_clifford(n, m)

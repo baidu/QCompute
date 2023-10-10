@@ -18,6 +18,8 @@
 """
 This is a complex noisy circuit to test how well bulid-in multi-process works 
 """
+from multiprocessing import freeze_support
+
 from QCompute import *
 import sys
 import random
@@ -29,7 +31,7 @@ Settings.outputInfo = False
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.3')
+matchSdkVersion('Python 3.3.5')
 
 
 def self_defined_noisy_circuit() -> 'QEnv':
@@ -94,6 +96,11 @@ def main():
 
 
 if __name__ == '__main__':
+    # For multiprocess
+    # Must use `if __name__ == '__main__':`
+    # And use `freeze_support()` in it.
+    freeze_support()
+
     Settings.noiseMultiprocessingSimulator = False
     start = time.time()
     main()

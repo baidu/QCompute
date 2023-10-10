@@ -28,11 +28,11 @@ import itertools
 from QCompute import *
 from QCompute.QPlatform.QOperation import CircuitLine
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.linalg import tensor
-from qcompute_qep.quantum.pauli import complete_pauli_basis, QUBIT_PAULI_BASIS
-from qcompute_qep.quantum.gellmann import GELL_MANN_BASIS
-from qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis, QUBIT_PAULI_BASIS
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.gellmann import GELL_MANN_BASIS
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
 
 SUPPORTED_MEASUREMENT_BASIS = {'Pauli', 'GellMann'}
 SUPPORTED_PREPARATION_BASIS = {'Pauli', 'PauliOC'}

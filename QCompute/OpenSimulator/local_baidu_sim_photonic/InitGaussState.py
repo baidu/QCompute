@@ -18,12 +18,11 @@
 """
 Gaussian state initialization
 """
+FileErrorCode = 24
 
 from enum import unique, IntEnum
 from typing import List
 import numpy
-
-
 
 
 @unique

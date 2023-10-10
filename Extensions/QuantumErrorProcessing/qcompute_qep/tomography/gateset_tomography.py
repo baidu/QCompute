@@ -48,10 +48,10 @@ import itertools
 import warnings
 
 from QCompute import *
-from qcompute_qep.utils.types import QComputer
-from qcompute_qep.utils.circuit import execute, map_qubits
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, GateSet, STD1Q_GATESET_RXRY, STD2Q_GATESET_RXRYCZ, \
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import Tomography, GateSet, STD1Q_GATESET_RXRY, STD2Q_GATESET_RXRYCZ, \
     GSTOptimizer, LinearInversionOptimizer
 
 # Stop print warning information
@@ -170,7 +170,7 @@ class GateSetTomography(Tomography):
 
             >>> import QCompute
             >>> import numpy
-            >>> from qcompute_qep.tomography import GateSetTomography, GateSet, STD1Q_GATESET_RXRY
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import GateSetTomography, GateSet, STD1Q_GATESET_RXRY
             >>> from QCompute.QPlatform.QOperation import CircuitLine
             >>> gateset = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(numpy.pi / 2), [0]),
             >>>                          'G_ry90': CircuitLine(QCompute.RY(numpy.pi / 2), [0])},

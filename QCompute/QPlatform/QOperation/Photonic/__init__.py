@@ -18,3 +18,4 @@
 """
 Export the entire directory as a library
 """
+FileErrorCode = 45

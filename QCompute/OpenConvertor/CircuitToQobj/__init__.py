@@ -18,6 +18,7 @@
 """
 Convert the circuit to qobj
 """
+FileErrorCode = 7
 
 import uuid
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -31,8 +32,6 @@ from QCompute.QProtobuf import PBQObject, PBExperiment, PBInstruction, PBFixedGa
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBProgram, PBCircuitLine
-
-FileErrorCode = 3
 
 
 class CircuitToQobj(ConvertorImplement):
@@ -109,8 +108,10 @@ class CircuitToQobj(ConvertorImplement):
             elif op == 'compositeGate':  # composite gate
                 raise Error.ArgumentError('Unsupported operation compositeGate!', ModuleErrorCode, FileErrorCode, 3)
             elif op == 'procedureName':  # procedure
-                raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
-                                          ModuleErrorCode, FileErrorCode, 4)
+                raise Error.ArgumentError(
+                    'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                    ModuleErrorCode, FileErrorCode, 4)
+
                 # it is not implemented, flatten by UnrollProcedureModule
             elif op == 'measure':  # measure
                 measure: 'PBMeasure' = circuitLine.measure
@@ -119,6 +120,7 @@ class CircuitToQobj(ConvertorImplement):
                 else:  # unsupported measure types
                     raise Error.ArgumentError(
                         f'Unsupported operation measure {measure.type.name}!', ModuleErrorCode, FileErrorCode, 5)
+
                 instruction.name = 'measure'  # instruction name
                 instruction.memory[:] = measure.cRegList  # classical register lists
                 instruction.qubits[:] = [qRegMap[qReg] for qReg in circuitLine.qRegList]  # quantum register lists
@@ -133,5 +135,6 @@ class CircuitToQobj(ConvertorImplement):
                 instruction.name = 'barrier'  # instruction name
                 instruction.qubits[:] = [qRegMap[qReg] for qReg in circuitLine.qRegList]  # quantum register lists
             else:  # unsupported operation
-                raise Error.ArgumentError(f'Unsupported operation {circuitLine}!', ModuleErrorCode, FileErrorCode, 8)
+                raise Error.ArgumentError(
+                    f'Unsupported operation {circuitLine}!', ModuleErrorCode, FileErrorCode, 8)
             self._instructions.append(instruction)

@@ -17,6 +17,8 @@
 """
 qobject
 """
+FileErrorCode = 5
+
 
 from typing import List
 from numpy import ndarray
@@ -35,8 +37,6 @@ __all__ = [
     "Pattern",
     "Circuit"
 ]
-
-FileErrorCode = 3
 
 
 class Pattern:
@@ -154,10 +154,7 @@ class Pattern:
                 domain_t (list): a list of vertices in 'domain_t' that have dependencies to this command
             """
             if not isinstance(angle, float) and not isinstance(angle, int):
-                raise Error.ArgumentError(f"Invalid measurement angle ({angle}) with the type: `{type(angle)}`!\n"
-                                          "Only `float` and `int` are supported as the type of measurement angle.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 1)
+                raise Error.ArgumentError(f'Invalid measurement angle ({angle}) with the type: `{type(angle)}`!\nOnly `float` and `int` are supported as the type of measurement angle.', ModuleErrorCode, FileErrorCode, 1)
 
             self.name = 'M'
             self.which_qubit = which_qubit
@@ -429,10 +426,7 @@ class Circuit:
             width (int): circuit width (qubit number)
         """
         if not isinstance(width, int):
-            raise Error.ArgumentError(f"Invalid circuit width {width} with the type: `{type(width)}`!\n"
-                                      "Only 'int' is supported as the type of circuit width.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(f"Invalid circuit width {width} with the type: `{type(width)}`!\nOnly 'int' is supported as the type of circuit width.", ModuleErrorCode, FileErrorCode, 2)
 
         self.__history = []  # a list to record the circuit information
         self.__measured_qubits = []  # a list to record the measurement indices in the circuit
@@ -461,20 +455,13 @@ class Circuit:
             params (any): gate parameters. Set as 'None' if there are no parameters
         """
         if not isinstance(which_qubit, int):
-            raise Error.ArgumentError(f"Invalid qubit index {which_qubit} with the type: `{type(which_qubit)}`!\n"
-                                      "Only 'int' is supported as the type of qubit index.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 3)
+            raise Error.ArgumentError(f"Invalid qubit index {which_qubit} with the type: `{type(which_qubit)}`!\nOnly 'int' is supported as the type of qubit index.", ModuleErrorCode, FileErrorCode, 3)
+
         if not (0 <= which_qubit < self.__width):
-            raise Error.ArgumentError(f"Invalid qubit index: {which_qubit}!\n"
-                                      "Qubit index must be smaller than the circuit width.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 4)
+            raise Error.ArgumentError(f'Invalid qubit index: {which_qubit}!\nQubit index must be smaller than the circuit width.', ModuleErrorCode, FileErrorCode, 4)
+
         if which_qubit in self.__measured_qubits:
-            raise Error.ArgumentError(f"Invalid qubit index: {which_qubit}!\n"
-                                      "This qubit has already been measured.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 5)
+            raise Error.ArgumentError(f'Invalid qubit index: {which_qubit}!\nThis qubit has already been measured.', ModuleErrorCode, FileErrorCode, 5)
 
         self.__history.append([name, [which_qubit], params])
 
@@ -496,42 +483,25 @@ class Circuit:
         tar = which_qubits[1]
 
         if not isinstance(ctrl, int):
-            raise Error.ArgumentError(f"Invalid qubit index {ctrl} with the type: `{type(ctrl)}`!\n"
-                                      "Only 'int' is supported as the type of qubit index.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 6)
+            raise Error.ArgumentError(f"Invalid qubit index {ctrl} with the type: `{type(ctrl)}`!\nOnly 'int' is supported as the type of qubit index.", ModuleErrorCode, FileErrorCode, 6)
+
         if not (0 <= ctrl < self.__width):
-            raise Error.ArgumentError(f"Invalid qubit index: {ctrl}!\n"
-                                      "Qubit index must be smaller than the circuit width.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 7)
+            raise Error.ArgumentError(f'Invalid qubit index: {ctrl}!\nQubit index must be smaller than the circuit width.', ModuleErrorCode, FileErrorCode, 7)
+
         if ctrl in self.__measured_qubits:
-            raise Error.ArgumentError(f"Invalid qubit index: {ctrl}!\n"
-                                      "This qubit has already been measured.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 8)
+            raise Error.ArgumentError(f'Invalid qubit index: {ctrl}!\nThis qubit has already been measured.', ModuleErrorCode, FileErrorCode, 8)
 
         if not isinstance(tar, int):
-            raise Error.ArgumentError(f"Invalid qubit index {tar} with the type: `{type(tar)}`!\n"
-                                      "Only 'int' is supported as the type of qubit index.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 9)
+            raise Error.ArgumentError(f"Invalid qubit index {tar} with the type: `{type(tar)}`!\nOnly 'int' is supported as the type of qubit index.", ModuleErrorCode, FileErrorCode, 9)
+
         if not (0 <= tar < self.__width):
-            raise Error.ArgumentError(f"Invalid qubit index: {tar}!\n"
-                                      "Qubit index must be smaller than the circuit width.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 10)
+            raise Error.ArgumentError(f'Invalid qubit index: {tar}!\nQubit index must be smaller than the circuit width.', ModuleErrorCode, FileErrorCode, 10)
+
         if tar in self.__measured_qubits:
-            raise Error.ArgumentError(f"Invalid qubit index: {tar}!\n"
-                                      "This qubit has already been measured.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 11)
+            raise Error.ArgumentError(f'Invalid qubit index: {tar}!\nThis qubit has already been measured.', ModuleErrorCode, FileErrorCode, 11)
 
         if ctrl == tar:
-            raise Error.ArgumentError(f"Invalid qubit indexes: {ctrl} and {tar}!\n"
-                                      "Control qubit must not be the same as target qubit.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 12)
+            raise Error.ArgumentError(f'Invalid qubit indexes: {ctrl} and {tar}!\nControl qubit must not be the same as target qubit.', ModuleErrorCode, FileErrorCode, 12)
 
         self.__history.append([name, which_qubits, params])
 
@@ -748,10 +718,7 @@ class Circuit:
             [['rx', [0], 1.0]]
         """
         if not isinstance(theta, float) and not isinstance(theta, int):
-            raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                      "Only `float` and `int` are supported as the type of rotation angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 13)
+            raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 13)
 
         self.__add_a_single_qubit_gate('rx', which_qubit, theta)
 
@@ -789,10 +756,7 @@ class Circuit:
             [['ry', [0], 1.0]]
         """
         if not isinstance(theta, float) and not isinstance(theta, int):
-            raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                      "Only `float` and `int` are supported as the type of rotation angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 14)
+            raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 14)
 
         self.__add_a_single_qubit_gate('ry', which_qubit, theta)
 
@@ -830,10 +794,8 @@ class Circuit:
             [['rz', [0], 1.0]]
         """
         if not isinstance(theta, float) and not isinstance(theta, int):
-            raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                      "Only `float` and `int` are supported as the type of rotation angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 15)
+            raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 15)
+
         self.__add_a_single_qubit_gate('rz', which_qubit, theta)
 
     def u(self, theta: float, phi: float, lamda: float, which_qubit: int):
@@ -880,17 +842,14 @@ class Circuit:
             [['u', [0], [1.57079633, 3.14159265, -1.57079633]]
        """
         if not isinstance(theta, float) and not isinstance(theta, int):
-            raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                      "Only `float` and `int` are supported as the type of rotation angle.",
-                                      ModuleErrorCode, FileErrorCode, 17)
+            raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 16)
+
         if not isinstance(phi, float) and not isinstance(phi, int):
-            raise Error.ArgumentError(f"Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\n"
-                                      "Only `float` and `int` are supported as the type of rotation angle.",
-                                      ModuleErrorCode, FileErrorCode, 18)
+            raise Error.ArgumentError(f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 17)
+
         if not isinstance(lamda, float) and not isinstance(lamda, int):
-            raise Error.ArgumentError(f"Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\n"
-                                      "Only `float` and `int` are supported as the type of rotation angle.",
-                                      ModuleErrorCode, FileErrorCode, 19)
+            raise Error.ArgumentError(f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 18)
+
         params = [theta, phi, lamda]
         self.__add_a_single_qubit_gate('u', which_qubit, params)
 
@@ -1001,37 +960,25 @@ class Circuit:
         # Set a customized measurement to the 'which_qubit'
         elif which_qubit is not None and basis_list is not None:
             if not isinstance(basis_list, list):
-                raise Error.ArgumentError(
-                    f"Invalid measurement basis list ({basis_list}) with the type: `{type(basis_list)}`!\n"
-                    "Only `List` is supported as the type of measurement basis list.",
-                    ModuleErrorCode, FileErrorCode, 20)
+                raise Error.ArgumentError(f'Invalid measurement basis list: ({basis_list}) with the type: `{type(basis_list)}`!\nOnly `List` is supported as the type of measurement basis list.', ModuleErrorCode, FileErrorCode, 19)
+
             else:
                 if not len(basis_list) == 4:
-                    raise Error.ArgumentError(f"Invalid measurement basis list: ({basis_list})!\n"
-                                              "Measurement basis list must have four elements in total.",
-                                              ModuleErrorCode, FileErrorCode, 21)
+                    raise Error.ArgumentError(f'Invalid measurement basis list: ({basis_list})!\nMeasurement basis list must have four elements in total.', ModuleErrorCode, FileErrorCode, 20)
 
                 measurement_angle = basis_list[0]
                 if not isinstance(measurement_angle, float) and not isinstance(measurement_angle, int):
-                    raise Error.ArgumentError(f"Invalid measurement basis list: ({basis_list})!\n"
-                                              "Only 'float' and 'int' are supported as the type of measurement angle.",
-                                              ModuleErrorCode, FileErrorCode, 22)
+                    raise Error.ArgumentError(f"Invalid measurement basis list: ({basis_list})!\nOnly 'float' and 'int' are supported as the type of measurement angle.", ModuleErrorCode, FileErrorCode, 21)
 
                 measurement_plane = basis_list[1]
                 if not {measurement_plane}.issubset(['XY', 'YZ']):
-                    raise Error.ArgumentError(f"Invalid measurement basis list: ({basis_list})!\n"
-                                              "Only 'XY' and 'YZ' are supported as the measurement plane "
-                                              "in UBQC in this version.",
-                                              ModuleErrorCode, FileErrorCode, 23)
+                    raise Error.ArgumentError(f"Invalid measurement basis list: ({basis_list})!\nOnly 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version.", ModuleErrorCode, FileErrorCode, 22)
 
             self.__add_a_single_qubit_gate('m', which_qubit, basis_list)
             self.__measured_qubits.append(which_qubit)
 
         else:
-            raise Error.ArgumentError(f"Invalid input: ({which_qubit}) and ({basis_list})!\n"
-                                      "Such input is not supported in this version. "
-                                      "Please choose another way to call the method.",
-                                      ModuleErrorCode, FileErrorCode, 24)
+            raise Error.ArgumentError(f'Invalid input: ({which_qubit}) and ({basis_list})!\nSuch input is not supported in this version. Please choose another way to call the method.', ModuleErrorCode, FileErrorCode, 23)
 
     def is_valid(self):
         r"""Check the validity of the quantum circuit.
@@ -1231,9 +1178,7 @@ class Circuit:
             else:
                 return pauli_gate('I')
         else:
-            raise Error.ArgumentError(f"Invalid gate: ({name})!\n"
-                                      "This gate is not supported in this version.", ModuleErrorCode,
-                                      FileErrorCode, 25)
+            raise Error.ArgumentError(f'Invalid gate: ({name})!\nThis gate is not supported in this version.', ModuleErrorCode, FileErrorCode, 24)
 
     def __merge_single_qubit_gates(self, gates):
         r"""Merge those sequential single qubit gates to form a new unitary gate.
@@ -1438,9 +1383,7 @@ class Circuit:
                 cor_row = idx + 1
                 self.__update_double_column(idx, cor_row, idx)
             else:
-                raise Error.ArgumentError("Invalid brickwork mould!\n"
-                                          "This brickwork mould is not supported in UBQC.", ModuleErrorCode,
-                                          FileErrorCode, 26)
+                raise Error.ArgumentError('Invalid brickwork mould!\nThis brickwork mould is not supported in UBQC.', ModuleErrorCode, FileErrorCode, 25)
 
         # If the index of a single qubit gate is not the index of a double qubit gate
         else:
@@ -1448,9 +1391,7 @@ class Circuit:
                 cor_row = idx - 1
                 self.__update_double_column(idx, cor_row, cor_row)
             else:
-                raise Error.ArgumentError("Invalid brickwork mould!\n"
-                                          "This brickwork mould is not supported in UBQC.", ModuleErrorCode,
-                                          FileErrorCode, 27)
+                raise Error.ArgumentError('Invalid brickwork mould!\nThis brickwork mould is not supported in UBQC.', ModuleErrorCode, FileErrorCode, 26)
 
     def __fill_a_double_qubit_gate(self, idx: int):
         r"""Fill in a double qubit gate to the brickwork mould and update the valid columns.
@@ -1496,11 +1437,7 @@ class Circuit:
             pos = [(row_list[0], col), (row_list[1], col)]
 
         else:
-            raise Error.ArgumentError(f"Invalid gate type: ({gate_type})!\n"
-                                      "Only single qubit gates and double qubit gates are supported "
-                                      "in UBQC in this version.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 28)
+            raise Error.ArgumentError(f'Invalid gate type: ({gate_type})!\nOnly single qubit gates and double qubit gates are supported in UBQC in this version.', ModuleErrorCode, FileErrorCode, 27)
 
         return pos
 

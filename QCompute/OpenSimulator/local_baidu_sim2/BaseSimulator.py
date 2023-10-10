@@ -18,6 +18,7 @@
 """
 BaseSimulator
 """
+FileErrorCode = 2
 
 from typing import Union, Dict
 
@@ -34,8 +35,6 @@ from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCustomizedGate
 
 
-
-FileErrorCode = 5
 
 
 class BaseSimulator:
@@ -126,8 +125,9 @@ class BaseSimulator:
             # matrix = operationDict.get(fixedGate)
             matrix = BaseSimulator.__loadGates(matrixType).get(fixedGate)
             if matrix is None:
-                raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
-                                          FileErrorCode, 10)
+                raise Error.ArgumentError(
+                    f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode, FileErrorCode, 1)
+
         elif op == 'rotationGate':  # rotation gate
             uGate: PBRotationGate = BaseSimulator.__getRotationGate(circuitLine)
 
@@ -167,8 +167,8 @@ class BaseSimulator:
             ugate = CRZ(*circuitLine.argumentValueList)
         else:
             raise Error.ArgumentError(
-                f'Unsupported operation {PBRotationGate.Name(rotationGate)}!', ModuleErrorCode,
-                FileErrorCode, 11)
+                f'Unsupported operation {PBRotationGate.Name(rotationGate)}!',
+                ModuleErrorCode, FileErrorCode, 2)
 
         return ugate
 

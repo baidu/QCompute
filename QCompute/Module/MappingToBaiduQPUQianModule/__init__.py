@@ -18,14 +18,13 @@
 """
 Mapping To BaiduQPUQian
 """
+FileErrorCode = 3
+
 from typing import Dict, List, Optional
 
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBMeasure
 
-
-
-FileErrorCode = 8
 
 
 class MappingToBaiduQPUQianModule(ModuleImplement):
@@ -36,7 +35,7 @@ class MappingToBaiduQPUQianModule(ModuleImplement):
 
     env.module(MappingToBaiduQPUQianModule())
 
-    env.serverModule(ServerModule.MappingToBaiduQPUQianModule, {"disable": True})
+    env.serverModule(ServerModule.MappingToBaiduQPUQian, {"disable": True})
     """
 
     
@@ -47,14 +46,14 @@ class MappingToBaiduQPUQianModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
-        
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
         Process the Module
 
         :param program: the program
+
         :return: mapped procedure
         """
         from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented at local sdk')

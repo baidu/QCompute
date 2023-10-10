@@ -24,13 +24,13 @@ sys.path.append('..')
 
 import numpy
 
-from qcompute_qnet.models.qpu.env import QuantumEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import Teleportation
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.quantum.circuit import Circuit
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import Teleportation
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 
 # Create an environment for simulation

@@ -23,8 +23,8 @@ This greatly saves the running time and the quantum computer resource.
 
 from typing import List, Optional
 
-from qcompute_qep.utils import execute
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 from QCompute import *
 

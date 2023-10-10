@@ -32,13 +32,13 @@ import matplotlib.pyplot as plt
 from matplotlib import rc, pylab
 
 from QCompute import *
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement import InverseCorrector, LeastSquareCorrector, IBUCorrector, NeumannCorrector
-from qcompute_qep.measurement.correction import vector2dict, dict2vector
-from qcompute_qep.measurement.utils import plot_histograms
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits, get_qc_name
-from qcompute_qep.utils.circuit import execute, circuit_to_state
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement import InverseCorrector, LeastSquareCorrector, IBUCorrector, NeumannCorrector
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import vector2dict, dict2vector
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import plot_histograms
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits, get_qc_name
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, circuit_to_state
 
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096

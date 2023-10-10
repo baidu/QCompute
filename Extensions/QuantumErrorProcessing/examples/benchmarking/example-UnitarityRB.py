@@ -19,8 +19,8 @@
 An example to demonstrate the Unitarity Randomized Benchmarking protocol.
 """
 from QCompute import *
-import qcompute_qep.benchmarking.unitarityrb as unitarityrb
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.unitarityrb as unitarityrb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 ##########################################################################################

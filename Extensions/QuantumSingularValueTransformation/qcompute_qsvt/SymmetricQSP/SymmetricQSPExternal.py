@@ -27,16 +27,6 @@ Reader may refer to following references for more insights.
 .. [DMW+21] Dong, Yulong, et al. "Efficient phase-factor evaluation in quantum signal processing."
     Physical Review A 103.4 (2021): 042419.
 
-Here cpp version for **SymmetricQSPInternalPy** is supplied, and used defaultly. If users want to use python
-version, please introduce following codes
-
-.. code-block:: python
-
-    from　qcompute_qsvt.SymmetricQSP import Settings as SQSPSettings
-    SQSPSettings.INTERNAL = "python"
-
-before using this module.
-
 .. note::
 
     In module `SymmetricQSP`, Variables with the same meaning will be named uniformly:
@@ -72,12 +62,7 @@ from typing import List, Tuple, Union
 import numpy as np
 from scipy import optimize as opt
 
-from qcompute_qsvt.SymmetricQSP import Settings as SQSP_Settings
-
-if SQSP_Settings.INTERNAL == "cpp":
-    import qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalCpp as SymmetricQSPInternal
-else:
-    import qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalPy as SymmetricQSPInternal
+import Extensions.QuantumSingularValueTransformation.qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalPy as SymmetricQSPInternal
 
 
 def __func_Wx_map(vec_x: Union[List[float], np.ndarray]) -> np.ndarray:

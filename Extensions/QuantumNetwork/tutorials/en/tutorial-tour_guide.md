@@ -26,7 +26,7 @@ Moreover, we need to set the simulation environment to default (i.e., set the pa
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
 
 env = DESEnv("Simulation Env", default=True)
 ```
@@ -60,7 +60,7 @@ Next, we need to construct a network (`Network`) to manage nodes and links.
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 network = Network("Simple Network")  # create a quantum network
 ```
@@ -103,7 +103,7 @@ We can call the `install` method of the class `Network` to add nodes to the netw
 
 
 ```python
-from qcompute_qnet.topology.node import Node
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
 
 alice = Node("Alice")  # create a node
 network.install(alice)  # add it to the network
@@ -125,8 +125,8 @@ After creating nodes for the network, users can add relevant physical devices. F
 
 
 ```python
-from qcompute_qnet.devices.source import PhotonSource
-from qcompute_qnet.devices.detector import PolarizationDetector
+from Extensions.QuantumNetwork.qcompute_qnet.devices.source import PhotonSource
+from Extensions.QuantumNetwork.qcompute_qnet.devices.detector import PolarizationDetector
 
 source = PhotonSource("Photon source")  # create a photon source
 detector = PolarizationDetector("Polarization detector")  # create a photon detector
@@ -146,9 +146,9 @@ We can customize a protocol stack by splicing different protocols. `ProtocolStac
 
 
 ```python
-from qcompute_qnet.models.qkd.key_generation import BB84
-from qcompute_qnet.models.qkd.routing import QKDRouting
-from qcompute_qnet.protocols.protocol import ProtocolStack
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import BB84
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.routing import QKDRouting
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import ProtocolStack
 
 bb84 = BB84("BB84")
 routing = QKDRouting("QKD Routing")
@@ -178,7 +178,7 @@ Next, we will briefly explain how to use and configure the node template. Since 
 
 
 ```python
-from qcompute_qnet.models.qkd.node import QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDNode
 
 # Create QKD nodes
 alice = QKDNode("Alice")
@@ -206,7 +206,7 @@ Besides, we need to call the `connect` method of the class `Link` to realize the
 
 
 ```python
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 link_ab = Link("A_B")  # create a link
 network.install(link_ab)  # add the link to the network
@@ -217,7 +217,7 @@ Alternatively, we can set the `ends` parameter at the instantiation to connect w
 
 
 ```python
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 link_ab = Link("A_B", ends=(alice, bob))  # create a link with given ends
 network.install(link_ab)  # add the link to the network
@@ -235,7 +235,7 @@ In addition to the unidirectional channels, QNET also provides duplex channels (
 
 
 ```python
-from qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
 
 # Create channels and then connect to the nodes
 c1 = ClassicalFiberChannel("c_A2B", distance=1e3)
@@ -272,12 +272,12 @@ Here is a complete code implementation.
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qkd.node import QKDNode
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
 
 # 1. Create the simulation environment and set as default
 env = DESEnv("BB84", default=True)

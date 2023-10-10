@@ -30,9 +30,9 @@ We verify the decompositions for {CNOT, Toffoli, SWAP, CSWAP} in the auxiliary f
 import typing
 
 from QCompute import *
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.types as types
-import qcompute_qep.exceptions as exceptions
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions as exceptions
 
 
 def process_tomography(qp: types.QProgram, qc: types.QComputer, gate_name: str):

@@ -18,6 +18,9 @@
 """
 Compress Gate to Accelerate Simulator Process
 """
+FileErrorCode = 2
+
+
 from copy import deepcopy
 from typing import List, Dict, Optional
 
@@ -31,9 +34,6 @@ from QCompute.QPlatform.QOperation.Measure import MeasureOP
 from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP
 from QCompute.QPlatform.Utilities import contract1_1, contract1_2
 from QCompute.QProtobuf import PBProgram
-
-FileErrorCode = 1
-
 
 class CompressGateModule(ModuleImplement):
     """
@@ -52,11 +52,7 @@ class CompressGateModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-
-        self.arguments = arguments
-        if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -65,6 +61,9 @@ class CompressGateModule(ModuleImplement):
         :param program: the program
         :return: compressed circuit
         """
+        if self.disable:
+            return program
+
         from QCompute.OpenConvertor.CircuitToInternalStruct import CircuitToInternalStruct
         from QCompute.OpenConvertor.InternalStructToCircuit import InternalStructToCircuit
 
@@ -112,7 +111,8 @@ def _compress(circuitIn: List[CircuitLine], qRegs: List[int]) -> List[CircuitLin
         elif isinstance(circuitLine.data, BarrierOP):
             pass
         else:
-            raise Error.ArgumentError(f'Unsupported operation {circuitLine} at compress!', ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(
+                f'Unsupported operation {circuitLine} at compress!', ModuleErrorCode, FileErrorCode, 1)
 
     for key, value in circuitMap.items():
         value.append("End")

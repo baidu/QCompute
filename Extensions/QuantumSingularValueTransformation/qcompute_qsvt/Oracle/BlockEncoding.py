@@ -73,8 +73,8 @@ from typing import List, Optional, Tuple
 from QCompute import X
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_Z, circ_multictrl_Pauli
-from qcompute_qsvt.Oracle.StatePreparation import circ_state_pre, circ_state_pre_inverse
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_Z, circ_multictrl_Pauli
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.StatePreparation import circ_state_pre, circ_state_pre_inverse
 
 
 def circ_j_ctrl_multiPauli(reg_target: List[QRegStorage], reg_ctrlling: List[QRegStorage], int_j: int,
@@ -122,7 +122,7 @@ def circ_j_ctrl_multiPauli(reg_target: List[QRegStorage], reg_ctrlling: List[QRe
         The quantum gate :math:`C_5(X\otimes I\otimes Y\otimes Z)\in\mathbb C^{2^7\times 2^7}` could be called by
 
         >>> from QCompute import QEnv
-        >>> from qcompute_qsvt.Oracle.BlockEncoding import circ_j_ctrl_multiPauli
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.BlockEncoding import circ_j_ctrl_multiPauli
         >>> env = QEnv()
         >>> reg_c = [env.Q[0], env.Q[1], env.Q[2]]
         >>> reg_t = [env.Q[3], env.Q[4], env.Q[5], env.Q[6]]

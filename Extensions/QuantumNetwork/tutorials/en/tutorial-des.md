@@ -41,7 +41,7 @@ First, we need to import necessary modules from `qcompute_qnet.core`.
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv, EventHandler, Entity
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv, EventHandler, Entity
 ```
 
 Then we define a class ``Customer`` with attributes of its service number and arrival time to simulate the role of a customer.

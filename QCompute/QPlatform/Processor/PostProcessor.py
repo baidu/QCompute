@@ -18,6 +18,8 @@
 """
 PostProcess
 """
+FileErrorCode = 19
+
 from typing import Dict, Union
 
 from QCompute.Define import MeasureFormat

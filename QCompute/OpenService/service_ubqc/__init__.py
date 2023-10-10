@@ -18,20 +18,19 @@
 """
 Universal blind quantum computation service
 """
+FileErrorCode = 2
 
 from datetime import datetime
 from typing import Dict
 
 from QCompute.Define import MeasureFormat
 from QCompute.OpenService.service_ubqc.client.client import PlatformClient
-from QCompute.OpenSimulator import QImplement
+from QCompute.OpenSimulator import QImplement, QResult
 from QCompute.QPlatform.Processor.PostProcessor import formatMeasure
 from QCompute.OpenService import ModuleErrorCode
 from QCompute.QPlatform import Error
 
 __all__ = ["Backend"]
-
-FileErrorCode = 10
 
 
 class Backend(QImplement):
@@ -49,15 +48,16 @@ class Backend(QImplement):
             env.backend(BackendName.ServiceUbqc)
         """
         # Collect the result to simulator for subsequent invoking
+        self.result = QResult()
         self.result.startTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
 
-        ret: Dict[str,int] = {}
+        ret: Dict[str, int] = {}
         width = 0
 
         client = PlatformClient(self.shots, self.program)
 
         if client.failed:
-            raise Error.ArgumentError("Computing Failed!", ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError('Computing Failed!', ModuleErrorCode, FileErrorCode, 1)
         else:
             self.result.endTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
             self.result.counts = formatMeasure(client.ret, width, MeasureFormat.Bin)

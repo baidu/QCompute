@@ -21,9 +21,9 @@ Module for photon sources.
 
 from typing import List
 from numpy import random
-from qcompute_qnet.core.des import Entity, EventHandler
-from qcompute_qnet.devices.photon import Photon
-from qcompute_qnet.quantum.state import MixedState
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.devices.photon import Photon
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import MixedState
 
 __all__ = [
     "PhotonSource"

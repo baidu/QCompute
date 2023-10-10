@@ -20,7 +20,7 @@ An example to demonstrate the Cross-Platform Estimation of Quantum States protoc
 """
 
 import QCompute
-import qcompute_qep.estimation.cpe_state as cp
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation.cpe_state as cp
 
 # Step 1:Read the data of sampled unitaries and measurement results collected from
 # different quantum devices

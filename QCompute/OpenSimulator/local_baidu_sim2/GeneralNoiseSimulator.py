@@ -18,6 +18,7 @@
 """
 GeneralNoiseSimulator
 """
+FileErrorCode = 3
 
 from datetime import datetime
 from typing import List, Union, Dict
@@ -41,8 +42,6 @@ from QCompute.QProtobuf import PBProgram, PBMeasure
 
 
 
-FileErrorCode = 5
-
 
 class GeneralNoiseSimulator(BaseSimulator):
     def core(self) -> 'QResult':
@@ -61,6 +60,9 @@ class GeneralNoiseSimulator(BaseSimulator):
         result = QResult()
         result.startTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
 
+        # For multiprocess
+        # Must use `if __name__ == '__main__':`
+        # And use `freeze_support()` in it.
         pool = multiprocess.Pool()
 
         maxRunNum = self.maxRunNum
@@ -150,8 +152,7 @@ class GeneralNoiseSimulator(BaseSimulator):
             if len(set(qRegListCache)|set(qRegList)) <= 3: 
                 matrixCache, qRegListCache = contract_in_3(matrixCache, qRegListCache, matrix, qRegList)
             else:
-                if self.matrixType == MatrixType.Sparse:
-                    matrixCache = sparse.COO(matrixCache)
+                
                 state = transfer(state, matrixCache, qRegListCache)
                 matrixCache = matrix
                 qRegListCache = qRegList
@@ -161,22 +162,18 @@ class GeneralNoiseSimulator(BaseSimulator):
                 noise_instance = protobufQNoiseToQNoise(noise)
 
                 # calc noise matrix
-                if noise_instance.noiseClass == 'non_mixed_unitary_noise': 
-                    if self.matrixType == MatrixType.Sparse:
-                        matrixCache = sparse.COO(matrixCache)
+                if noise_instance.noiseClass == 'non_mixed_unitary_noise':
+                    
                     state = transfer(state, matrixCache, qRegListCache)
  
                 noise_matrix = noise_instance.calc_noise_matrix(
                     transfer, state, qRegList)
                 
                 if len(qRegList) == 1 and noise_matrix.shape != (2, 2):
-                    raise Error.ArgumentError(
-                        f'Single-qubit noise {noise_type} must be applied after single-qubit gate!',
-                        ModuleErrorCode, FileErrorCode, 7)
+                    raise Error.ArgumentError(f'Single-qubit noise {noise_type} must be applied after single-qubit gate!', ModuleErrorCode, FileErrorCode, 2)
+
                 if len(qRegList) == 2 and noise_matrix.shape != (2, 2, 2, 2):
-                    raise Error.ArgumentError(
-                        f'Double-qubit noise {noise_type} must be applied after double-qubit gate!',
-                        ModuleErrorCode, FileErrorCode, 8)
+                    raise Error.ArgumentError(f'Double-qubit noise {noise_type} must be applied after double-qubit gate!', ModuleErrorCode, FileErrorCode, 3)
 
                 # update cache matrix and qRegList
                 if noise_instance.noiseClass == 'non_mixed_unitary_noise': 
@@ -199,20 +196,22 @@ class GeneralNoiseSimulator(BaseSimulator):
                 matrix = self.getGateMatrix(circuitLine, MatrixType.Dense, self.operationDict)
                 transferNoiseList()
             elif op == 'procedureName':  # procedure
-                raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
-                                          ModuleErrorCode, FileErrorCode, 12)
+                raise Error.ArgumentError(
+                    'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                    ModuleErrorCode, FileErrorCode, 4)
+
                 # it is not implemented, flattened by UnrollProcedureModule
             elif op == 'measure':  # measure
                 # transfer cache matrix
-                if self.matrixType == MatrixType.Sparse:
-                    matrixCache = sparse.COO(matrixCache)
+                
                 state = transfer(state, matrixCache, qRegListCache)
 
                 measure: PBMeasure = circuitLine.measure
                 if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                     raise Error.ArgumentError(
-                        f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
-                        FileErrorCode, 13)
+                        f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!',
+                        ModuleErrorCode, FileErrorCode, 5)
+
                 if not measured:
                     counts = measurer(state, self.shots)
                     measured = True
@@ -220,7 +219,7 @@ class GeneralNoiseSimulator(BaseSimulator):
                 pass
             else:  # unsupported operation
                 raise Error.ArgumentError(
-                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 14)
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 6)
 
         if self.measureMethod in [MeasureMethod.Probability, MeasureMethod.Accumulation]:
             counts = filterMeasure(counts, self.compactedCRegDict)

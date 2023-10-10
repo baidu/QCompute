@@ -18,6 +18,8 @@
 """
 Convert the circuit to internal struct
 """
+FileErrorCode = 3
+
 from typing import List, TYPE_CHECKING
 
 from QCompute import CustomizedGateOP, BarrierOP
@@ -32,8 +34,6 @@ from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBMeasure
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBCircuitLine, PBCustomizedGate
-
-FileErrorCode = 1
 
 
 class CircuitToInternalStruct(ConvertorImplement):

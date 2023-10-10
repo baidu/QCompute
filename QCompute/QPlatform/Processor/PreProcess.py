@@ -18,14 +18,14 @@
 """
 PreProcess
 """
+FileErrorCode = 20
+
 from typing import TYPE_CHECKING, Tuple, Set, Dict
 
 from QCompute.QPlatform import Error, ModuleErrorCode
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBProgram
-
-FileErrorCode = 14
 
 
 def preProcess(program: 'PBProgram', rerangeQReg: bool, strictUsingCReg: bool) -> \
@@ -48,25 +48,26 @@ def preProcess(program: 'PBProgram', rerangeQReg: bool, strictUsingCReg: bool) -
     measured = False
     for circuitLine in program.body.circuit:
         op: str = circuitLine.WhichOneof('op')
-        if measured and 'measure' not in op.lower():
+        if measured and op not in ['measure', 'photonicGaussianMeasure', 'photonicFockMeasure']:
             raise Error.ArgumentError('Measure must be the last operation!', ModuleErrorCode, FileErrorCode, 1)
 
         circuitLine.qRegList[:] = [compactedQRegDict[qReg] for qReg in circuitLine.qRegList]
 
-        if 'measure' in op.lower():
+        if op in ['measure', 'photonicGaussianMeasure', 'photonicFockMeasure']:
             measured = True
-            for index, cReg in enumerate(circuitLine.measure.cRegList):
+            measure = getattr(circuitLine, op)
+            for index, cReg in enumerate(measure.cRegList):
                 qReg = circuitLine.qRegList[index]
                 if qReg in compactedCRegDict:
-                    raise Error.ArgumentError('Measure must be once on a QReg', ModuleErrorCode, FileErrorCode, 2)
+                    raise Error.ArgumentError('Measure must be once on a QReg!', ModuleErrorCode, FileErrorCode, 2)
                 if cReg in compactedCRegDict.values():
-                    raise Error.ArgumentError('Measure must be once on a CReg', ModuleErrorCode, FileErrorCode, 3)
+                    raise Error.ArgumentError('Measure must be once on a CReg!', ModuleErrorCode, FileErrorCode, 3)
                 compactedCRegDict[qReg] = cReg
-                circuitLine.measure.cRegList[index] = qReg
+                measure.cRegList[index] = qReg
 
     if measured is False:
-        raise Error.ArgumentError('At least one measurement operation is required in a quantum circuit.',
-                                  ModuleErrorCode, FileErrorCode, 4)
+        raise Error.ArgumentError(
+            'At least one measurement operation is required in a quantum circuit.', ModuleErrorCode, FileErrorCode, 4)
 
     program.head.usingQRegList[:] = sorted(compactedQRegDict.values())
     if strictUsingCReg:

@@ -18,6 +18,8 @@
 """
 Customized Gate Operation
 """
+FileErrorCode = 35
+
 from math import log2
 from typing import TYPE_CHECKING
 
@@ -28,9 +30,6 @@ from QCompute.QPlatform.QOperation import QOperation
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QRegPool import QRegStorage
-
-FileErrorCode = 11
-
 
 class CustomizedGateOP(QOperation):
     """

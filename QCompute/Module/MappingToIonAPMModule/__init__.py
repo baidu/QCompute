@@ -18,11 +18,12 @@
 """
 Mapping To IonAPM
 """
+FileErrorCode = 6
+
 from QCompute.OpenModule import ModuleImplement
 from typing import Dict, Optional
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBMeasure
 
-FileErrorCode = 12
 
 
 class MappingToIonAPMModule(ModuleImplement):
@@ -33,7 +34,7 @@ class MappingToIonAPMModule(ModuleImplement):
 
     env.module(MappingToIonAPMModule())
 
-    env.serverModule(ServerModule.MappingToIonAPMModule, {"disable": True})
+    env.serverModule(ServerModule.MappingToIonAPM, {"disable": True})
     """
 
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
@@ -42,14 +43,14 @@ class MappingToIonAPMModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
-        
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
         Process the Module
 
         :param program: the program
+
         :return: mapped procedure
         """
         from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented at local sdk')

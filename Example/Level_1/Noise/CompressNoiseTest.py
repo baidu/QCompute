@@ -19,6 +19,7 @@
 This is a simple case of using CompressNoiseModule.
 """
 import sys
+from multiprocessing import freeze_support
 
 sys.path.append('../..')
 from QCompute import *
@@ -34,7 +35,9 @@ def self_defined_noisy_circuit(qubits: int, gates: int) -> 'QEnv':
     A self defined noisy random H + CX + RX circuit
 
     :param qubits: the maximum qubits
+
     :param gates: the number of gates on each qubit
+
     :return: a QCompute environment
     """
 
@@ -86,8 +89,11 @@ def main(qubits: int, gates: int, compress_or_not: bool) -> None:
     main test.
 
     :param qubits: the maximum qubits
+
     :param gates: the number of gates on each qubit
+
     :param compress_or_not: use CompressNoiseModule or not
+
     :return: a QCompute environment
     """
 
@@ -103,6 +109,11 @@ def main(qubits: int, gates: int, compress_or_not: bool) -> None:
 
 
 if __name__ == '__main__':
+    # For multiprocess
+    # Must use `if __name__ == '__main__':`
+    # And use `freeze_support()` in it.
+    freeze_support()
+
     qubitsList = [12]
     gatesList = [100]
 

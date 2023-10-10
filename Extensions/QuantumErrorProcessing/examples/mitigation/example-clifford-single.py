@@ -31,11 +31,11 @@ from qiskit.providers.fake_provider import FakeSantiago
 import numpy as np
 
 from QCompute import *
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.quantum import clifford
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.mitigation.utils import plot_zne_sequences
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.utils import plot_zne_sequences
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 
 def calculator(qp: QEnv = None, qc: BackendName = None) -> float:

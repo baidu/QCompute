@@ -27,9 +27,9 @@ from scipy import sparse
 import itertools
 import random
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.channel import QuantumChannel
-from qcompute_qep.utils.linalg import tensor, dagger
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import QuantumChannel
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor, dagger
 
 # The normalized two-qubit Gell-Mann basis.
 GELL_MANN_BASIS = {"S12": np.array([[0, 1, 0, 0],

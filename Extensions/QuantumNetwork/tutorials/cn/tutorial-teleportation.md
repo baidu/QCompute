@@ -205,7 +205,7 @@ class Teleportation(Protocol):
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # 创建一个仿真环境
 env = QuantumEnv("Teleportation", default=True)
@@ -219,9 +219,9 @@ env = QuantumEnv("Teleportation", default=True)
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import Teleportation
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import Teleportation
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # 创建装有量子寄存器的量子节点并指定其中预装的协议类型为 Teleportation
 alice = QuantumNode("Alice", qreg_size=2, protocol=Teleportation)
@@ -238,7 +238,7 @@ link_bc = Link("Link_bc", ends=(bob, charlie), distance=1e3)
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # 创建一个量子网络并将各节点和链路装入量子网络中
 network = Network("Teleportation network")
@@ -268,7 +268,7 @@ charlie.start(role="Source")
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # 初始化仿真环境并运行仿真
 env.init()
@@ -295,7 +295,7 @@ Circuit results:
 为了查看最终接收方 Bob 所持量子比特的测量结果，可以调用 ``Circuit`` 的 ``reduce_results`` 方法，传入电路采样结果，并通过 ``indices`` 参数传入想要查看测量结果的量子比特在电路中的全局索引，来获取对应的返回结果。为了验证协议仿真的正确性，我们可以另行创建一个电路，输入与发送方 Alice 一致的量子态并进行测量，通过比对测量结果以验证本次协议仿真的正确性。
 
 ```python
-from qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
 
 # 查看接收方所持量子比特的测量结果
 reduced_indices = [2]

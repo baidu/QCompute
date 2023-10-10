@@ -18,14 +18,14 @@
 """
 Unroll Noise
 """
+FileErrorCode = 7
+
 from copy import deepcopy
 from typing import Dict, Optional, List, Any
 
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate
-
-FileErrorCode = 6
 
 
 class UnrollNoiseModule(ModuleImplement):
@@ -43,10 +43,7 @@ class UnrollNoiseModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
-        if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -55,6 +52,8 @@ class UnrollNoiseModule(ModuleImplement):
         :param program: the program
         :return: unrolled noise
         """
+        if self.disable:
+            return program
 
         ret = deepcopy(program)
 
@@ -96,9 +95,8 @@ class UnrollNoiseModule(ModuleImplement):
             for noiseDefine in noiseDefineList.noiseDefineList:
                 diff = set(noiseDefine.qRegList) - set(program.head.usingQRegList)
                 if len(diff) > 0:
-                    raise Error.ArgumentError(
-                        f'Unnecessary QBit{diff} in noise {noiseDefine.qRegList}/{program.head.usingQRegList}!',
-                        ModuleErrorCode, FileErrorCode, 1)
+                    raise Error.ArgumentError(f'Unnecessary QBit{diff} in noise {noiseDefine.qRegList}/{program.head.usingQRegList}!', ModuleErrorCode, FileErrorCode, 1)
+
                 if noiseDefine.qRegList:
                     qRegList = noiseDefine.qRegList
                 else:

@@ -19,7 +19,7 @@
 __init__ file of the `qcompute_qep.exceptions` module.
 """
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 __all__ = [
     'ArgumentError'

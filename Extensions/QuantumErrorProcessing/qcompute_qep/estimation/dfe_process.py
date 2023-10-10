@@ -37,16 +37,16 @@ from tqdm import tqdm
 import itertools
 
 
-import qcompute_qep.estimation as estimation
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.quantum.pauli import complete_pauli_basis
-from qcompute_qep.quantum.channel import unitary_to_ptm
-from qcompute_qep.utils.circuit import execute, circuit_to_unitary, map_qubits
-from qcompute_qep.utils.utils import expval_from_counts
-from qcompute_qep.exceptions.QEPError import ArgumentError
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import unitary_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, circuit_to_unitary, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 import QCompute
 from QCompute.QPlatform.Utilities import nKron
-from qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
 
 
 class DFEProcess(estimation.Estimation):

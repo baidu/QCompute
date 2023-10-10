@@ -1,0 +1,1019 @@
+[uselessMessage.fc9f58f07f9449fa93b0667ecd46d72e]
+Message = "f'Unimplemented combination {matrixType.name}-{algorithm.name}'"
+English = "Unimplemented combination"
+Chinese = "不支持的模拟器参数组合"
+
+[uselessMessage.a7b6365c6f8da0d97899a5a81148c2a8]
+Message = "'Wrong opreation type!'"
+English = "Wrong opreation type!"
+Chinese = "错误的操作类型"
+
+[uselessMessage.281395ed13c6c1a184dde146da32403c]
+Message = "f'Wrong bits count! bits value: {op.bits}.'"
+English = "Wrong bits count!"
+Chinese = "错误的比特数！"
+
+[uselessMessage.986321e56883a8eb66b4829b6f4fb29a]
+Message = "f'Wrong angles count! angles value: {op.argumentList}.'"
+English = "Wrong angles count!"
+Chinese = "错误的角度数量！"
+
+[uselessMessage.f517f24ec73d5119aa8f36196d9ba0e9]
+Message = "f'Can not inverse argument id! angles id: {argument.index}.'"
+English = "Can not inverse argument id!"
+Chinese = "不能反转参数id！"
+
+[usingMessage.00bb561ef2901b8d83cae7fd3df2d4f9]
+Message = "f'Invalid qubit index: {which_qubit}!\\nThis qubit has already been measured.'"
+English = "Invalid qubit index! This qubit has already been measured."
+Chinese = "无效的量子寄存器索引！此量子寄存器已经被测量过。"
+
+[usingMessage.433dadc9fdac47b3281c201184aa93a3]
+Message = "f'DrawConsole Unsupported operation {op}!'"
+English = "DrawConsole Unsupported operation!"
+Chinese = "控制台绘图不支持的操作！"
+
+[usingMessage.65d502fa7a79ff65f25c112434302901]
+Message = "f\"Invalid qubit index {which_qubit} with the type: `{type(which_qubit)}`!\\nOnly 'int' is supported as the type of qubit index.\""
+English = "Invalid qubit index with the type! Only 'int' is supported as the type of qubit index."
+Chinese = "无效的量子寄存器索引类型！只支持int类型。"
+
+[usingMessage.58146aa4e13f472c944d8caf42559e1c]
+Message = "f'Invalid edges ({edges}) with the type: `{type(edges)}`!\\nOnly `List` is supported as the type of the edges.'"
+English = "Invalid edges with the type! Only `List` is supported as the type of the edges."
+Chinese = "无效的edges类型，只支持list类型。"
+
+[usingMessage.4a16630d2f8c20db57accbb0ed410a77]
+Message = "f'Invalid MeasureMethod {measureMethodValue}'"
+English = "Invalid MeasureMethod"
+Chinese = "无效的测量方法"
+
+[usingMessage.caf50a0ebab1338b9a5a48e788dbd5de]
+Message = "f'Invalid row indexes: {row1} and {row2}!\\nOnly the adjacent qubits are supported as indexes of the quantum gates in UBQC in this version.'"
+English = "Invalid row indexes! Only the adjacent qubits are supported as indexes of the quantum gates in UBQC in this version."
+Chinese = "无效的行索引！当前盲计算版本，只有相邻的量子寄存器被支持索引量子操作。"
+
+[usingMessage.e759e6a1ead1211c3d378499fd4b00ea]
+Message = "f\"{op.__class__.__name__} {op.name} can't be controlled in procedure!\""
+English = "Op can't be controlled in procedure!"
+Chinese = "操作不能在子程序中受控！"
+
+[usingMessage.476f50a3d828e6aedd902d35fba16b3c]
+Message = "f\"Invalid rotation encryption angle: ({angle})!\\nOnly '0', 'pi/4', 'pi/2', '3pi/4', 'pi', '5pi/4', '3pi/2' and '7pi/4' are supported as the rotation encryption angle.\""
+English = "Invalid rotation encryption angle! Only '0', 'pi/4', 'pi/2', '3pi/4', 'pi', '5pi/4', '3pi/2' and '7pi/4' are supported as the rotation encryption angle."
+Chinese = "无效的旋转加密角度！只有'0', 'pi/4', 'pi/2', '3pi/4', 'pi', '5pi/4', '3pi/2', '7pi/4'被支持"
+
+[usingMessage.4aa5cbf5a083d244eb33b80768629298]
+Message = "f'Unimplemented combination {matrixType.name}-{algorithm.name}-{measureMethod.name}'"
+English = "Unimplemented combination"
+Chinese = "不支持的模拟器参数组合"
+
+[usingMessage.87eaf1bf01e8a2551555bc9816e25f27]
+Message = "'Not enough QProcedure argument!'"
+English = "Not enough QProcedure argument!"
+Chinese = "子程序参数不足！"
+
+[usingMessage.b4692176242b3d9c1b14979d90e63773]
+Message = "f'Unsupported protobufQNoise type {noiseType}!'"
+English = "Unsupported protobufQNoise type!"
+Chinese = "不支持的protobuf噪声类型！"
+
+[usingMessage.3b3fb0870d8dd5856e3b23d9e59f9f54]
+Message = "f'Unsupported operation {op}!'"
+English = "Unsupported operation!"
+Chinese = "不支持的操作！"
+
+[usingMessage.a3f371edd2891325d147570182ad686d]
+Message = "f'Invalid bits({gateBits}/{noise.bits}) in noise {gateName}!'"
+English = "Invalid bits in noise!"
+Chinese = "噪声操作中无效的比特！"
+
+[usingMessage.d9eb66252d238b48ea0756bea18143c6]
+Message = "'`source` and `destination` arguments must have the same number of elements'"
+English = "`source` and `destination` arguments must have the same number of elements"
+Chinese = "源和目标参数必须有同样的数量"
+
+[usingMessage.426ac782c3e3c3eddf41c53880446eed]
+Message = "'Please unroll procedures first!'"
+English = "Please unroll procedures first!"
+Chinese = "请先分解子程序！"
+
+[usingMessage.e3b3b92ca3d7ec3de1302947a8418a5f]
+Message = "f'Unsupported operation {circuitLine} at compress!'"
+English = "Unsupported operation at compress!"
+Chinese = "在压缩中不支持的操作！"
+
+[usingMessage.1c6643eee0a8cd3f7fb29a564f04f4ac]
+Message = "f'Invalid backendName => {self.backendName.value}'"
+English = "Invalid backendName"
+Chinese = "不支持的后端名称"
+
+[usingMessage.f0c9bf16ace83099e6bf0bab340d9b2e]
+Message = "'Wrong QProcedure argument!'"
+English = "Wrong QProcedure argument!"
+Chinese = "错误的子程序参数！"
+
+[usingMessage.bb49eaa8d9a8a7f0f3f851102c267b7c]
+Message = "'repeated axis in `{}` argument'.format(argname)"
+English = "repeated axis in argument"
+Chinese = "参数中重复的轴"
+
+[usingMessage.a0e8aec9dd97ae6e10d2a1c241e61267]
+Message = "f'{self.__class__.__name__} only support photonic gate!'"
+English = "Only support photonic gate!"
+Chinese = "只支持光学门！"
+
+[usingMessage.2aa197b9accd2b19490b19d3a34cec9d]
+Message = "f'Unsupported operation {PBRotationGate.Name(rotationGate)}!'"
+English = "Unsupported operation!"
+Chinese = "不支持的操作！"
+
+[usingMessage.d61741ae0c377aee1a9ab7a86e37cce9]
+Message = "f'Only {self.PHYSICAL_QUBITS} qubits are supported!'"
+English = "Unsupported qubits count!"
+Chinese = "不支持的量子寄存器数量！"
+
+[usingMessage.a2144cbba0ad28608129d6ea8d37685a]
+Message = "f\"Invalid measurement basis list: ({basis_list})!\\nOnly 'float' and 'int' are supported as the type of measurement angle.\""
+English = "Invalid measurement basis list! Only 'float' and 'int' are supported as the type of measurement angle."
+Chinese = "无效的测量基准列表！只支持float和int类型作为测量角度。"
+
+[usingMessage.d12374a6dfb4b7fe4aa5647a5fb85a29]
+Message = "'QProcedure must not be measured!'"
+English = "QProcedure must not be measured!"
+Chinese = "子程序不可以被测量！"
+
+[usingMessage.b48585e4b51a912844b93b076789a3ce]
+Message = "f'Duplicate procedure name: {name}!'"
+English = "Duplicate procedure name!"
+Chinese = "重复的子程序名称！"
+
+[usingMessage.64c856f3a6303455f39ac9ab80bd1345]
+Message = "f'Strategy {self.STRATEGY} not exist!'"
+English = "Strategy not exist!"
+Chinese = "策略不存在！"
+
+[usingMessage.f0481034dde40f38a4a79765f6457209]
+Message = "f'Invalid qubits: ({which_qubits})!\\nControl qubit must not be the same as target qubit.'"
+English = "Invalid qubits! Control qubit must not be the same as target qubit."
+Chinese = "无效的量子寄存器！控制比特必须不同于目标比特。"
+
+[usingMessage.b8cc5e3ce28bd29503cd40d0adfe702e]
+Message = "f\"Server error {content['error']}: {content['message']} {content['vendor']}\""
+English = "Server error"
+Chinese = "服务端错误"
+
+[usingMessage.a2c8b75c972cbbbf16417c82eb29d12e]
+Message = "f'Mapping Module Unsupported operation {op}!'"
+English = "Mapping Module Unsupported operation!"
+Chinese = "映射模块不支持操作！"
+
+[usingMessage.c78a03ac40a7b04f33096b76e9022784]
+Message = "f'Unsupported {module.__class__.__name__} in Hardware'"
+English = "Unsupported module in Hardware"
+Chinese = "硬件不支持的模块"
+
+[usingMessage.c98804c12e64d0a4b63af6ecd7f81bc2]
+Message = "f'Unsupported simulator type {Settings.linuxDirectSim2CppType}'"
+English = "Unsupported simulator type"
+Chinese = "不支持的模拟器类型"
+
+[usingMessage.94258183c22fddafbda1651cc5afde34]
+Message = "f'InternalStruct Unsupported operation {op}!'"
+English = "InternalStruct Unsupported operation!"
+Chinese = "内部结构不支持的操作！"
+
+[usingMessage.7a7342548002705635a62e4f875c2a33]
+Message = "'QReg must belong to the same env!'"
+English = "QReg must belong to the same env!"
+Chinese = "量子寄存器必须属于同一量子环境！"
+
+[usingMessage.7364c2215e2b09bb687ab6905536e70e]
+Message = "f'Unexpected Error: ({error})!'"
+English = "Unexpected Error"
+Chinese = "未知异常！"
+
+[usingMessage.76f1447f194d8dd4d3140f8f208879d2]
+Message = "'Please provide a valid token'"
+English = "Please provide a valid token"
+Chinese = "请提供一个有效的凭证"
+
+[usingMessage.c0fdbf0d5123382ab52da8954090874b]
+Message = "'Computing Failed!'"
+English = "Computing Failed!"
+Chinese = "计算失败！"
+
+[usingMessage.06166e13a049be0c9c9ec42678dad14c]
+Message = "f'{self.__class__.__name__} do not have matrix!'"
+English = "Do not have matrix!"
+Chinese = "不包含矩阵！"
+
+[usingMessage.cc613215501fbea2603c6561bd1d3852]
+Message = "f'Single-qubit noise {noise_type} must be applied after single-qubit gate!'"
+English = "Single-qubit noise must be applied after single-qubit gate!"
+Chinese = "单比特噪声必须在单比特操作之后！"
+
+[usingMessage.5585910ffae6f851efbcf580363d39b5]
+Message = "'Measure must be the last operation'"
+English = "Measure must be the last operation"
+Chinese = "测量必须是最后一个操作"
+
+[usingMessage.f428a27d58cc2618c108aeaea298df55]
+Message = "f'Invalid MatrixType {matrixTypeValue}'"
+English = "Invalid MatrixType"
+Chinese = "无效的矩阵类型"
+
+[usingMessage.ebd8af28a753926743553380129632e0]
+Message = "'Must have QReg in measure!'"
+English = "Must have QReg in measure!"
+Chinese = "测量中必须包含量子寄存器！"
+
+[usingMessage.bfc9d9257cd8a23f14aef2a312699dc4]
+Message = "f'Wrong angles count. angles value: {self.argumentList}!'"
+English = "Wrong angles count."
+Chinese = "错误的角度数量。"
+
+[usingMessage.a66eb4244d022890a757f265b1ed8a9f]
+Message = "'repeated axis'"
+English = "repeated axis"
+Chinese = "重复的轴"
+
+[usingMessage.bbf4c44e7230f7b3ef5a2246089b828e]
+Message = "'Parking gate not a 2-qubit gate'"
+English = "Parking gate not a 2-qubit gate"
+Chinese = "要打包的门不是两比特门"
+
+[usingMessage.9b744ed23103323adf925add2cfd7add]
+Message = "f'Unsupported operation measure {measure.type.name}!'"
+English = "Unsupported operation measure!"
+Chinese = "不支持的测量！"
+
+[usingMessage.0214b8634a17a7d0fafe331d708f53f1]
+Message = "f'allowArgumentCounts is not len(angleList)!'"
+English = "allowArgumentCounts is wrong!"
+Chinese = "错误的参数数量！"
+
+[usingMessage.cf7e5782bf567049216e215e00e61d45]
+Message = "f'Unsupporte gate {gateName} at IonQ!'"
+English = "Unsupporte gate at IonQ!"
+Chinese = "IonQ不支持的操作！"
+
+[usingMessage.8b246fba861f5577c68ba395b13c588b]
+Message = "f'Invalid qubit index: {tar}!\\nThis qubit has already been measured.'"
+English = "Invalid qubit index! This qubit has already been measured."
+Chinese = "不持之的量子寄存器索引！这个寄存器已经被测量过。"
+
+[usingMessage.99bf2b831772134eec23b189184f6fd6]
+Message = "f'photonicArgument is invalid!'"
+English = "photonicArgument is invalid!"
+Chinese = "无效的光学门！"
+
+[usingMessage.020fba0ce483c3630504e66fddf0c280]
+Message = "f'allowArgumentCounts is not len(aargumentList)!'"
+English = "allowArgumentCounts is wrong!"
+Chinese = "错误的参数数量！"
+
+[usingMessage.4373ee68623bb41241bbedc8b3b9d43b]
+Message = "'QProcedure should not be operated!'"
+English = "QProcedure should not be operated!"
+Chinese = "子程序不能被操作！"
+
+[usingMessage.47b4918faee1d99ab84ab7fd5a763c51]
+Message = "'Unsupported operation customizedGate!'"
+English = "Unsupported operation customizedGate!"
+Chinese = "不支持自定义门！"
+
+[usingMessage.e79e93682e30f46ac5edd88ded4e9921]
+Message = "f'Invalid shots {shots}, should in [0, {Define.maxShots}]'"
+English = "Invalid shots"
+Chinese = "无效的shots数量"
+
+[usingMessage.f915e97fb160c88f4cb76a59024e0720]
+Message = "f'Invalid vertices ({vertices}) with the type: `{type(vertices)}`!\\nOnly `List` is supported as the type of the vertices.'"
+English = "Invalid vertices with the type! Only `List` is supported as the type of the vertices."
+Chinese = "无效的顶点类型！只支持list类型。"
+
+[usingMessage.7898bb682b44af96b48de63c6e361c14]
+Message = "'CReg of measure in circuit are not repeatable!'"
+English = "CReg of measure in circuit are not repeatable!"
+Chinese = "在电路上测量经典寄存器不可以重复！"
+
+[usingMessage.48c55f752fbf7d4633b47104d94171c4]
+Message = "f\"Invalid vector ({vector}) and system ({system})!\\nPlease input 'vector' and 'system' together or input nothing.\""
+English = "Invalid vector and system! Please input 'vector' and 'system' together or input nothing."
+Chinese = "无效的向量和系统！请一起输入向量和系统，或不输入。"
+
+[usingMessage.3e09529e8c6f45a97072e971afe411e0]
+Message = "'bits must be an integer!'"
+English = "bits must be an integer!"
+Chinese = "比特值必须是整型！"
+
+[usingMessage.ab96877faf5d4c04e6dac73638de6932]
+Message = "f\"Invalid Pauli gate index: ({gate})!\\nOnly 'I', 'X', 'Y' and 'Z' are supported as the index of Pauli gate.\""
+English = "Invalid Pauli gate index! Only 'I', 'X', 'Y' and 'Z' are supported as the index of Pauli gate."
+Chinese = "无效的Pauli门索引！只支持'I', 'X', 'Y', 'Z'。"
+
+[usingMessage.f3558ec8a28b1206968d964476dd7431]
+Message = "f\"Invalid measurement basis index: ({index})!\\nOnly 'XY', 'YZ', 'X', 'Y' and 'Z' are supported as the index of measurement basis.\""
+English = "Invalid measurement basis index! Only 'XY', 'YZ', 'X', 'Y' and 'Z' are supported as the index of measurement basis."
+Chinese = "无效的测量基准索引，只支持'XY', 'YZ', 'X', 'Y', 'Z'。"
+
+[usingMessage.1c42b775faf21efb1e59f990bd8b6a38]
+Message = "f\"Invalid command name: ({name})!\\nOnly 'M', 'X', 'Z' and 'S' are supported as the names of operation commands on vertices, where 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command.\""
+English = "Invalid command name! Only 'M', 'X', 'Z' and 'S' are supported as the names of operation commands on vertices, where 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command."
+Chinese = "无效的命令名称！只支持'M', 'X', 'Z', 'S'。"
+
+[usingMessage.52c5b21e1d3c1c271451b6b5cc5d206e]
+Message = "f'Invalid state ({state}) with the type: `{type(state)}`!\\nOnly `State` is supported as the type of quantum state.'"
+English = "Invalid state with the type! Only `State` is supported as the type of quantum state."
+Chinese = "无效的量子态类型！只支持State类型。"
+
+[usingMessage.1b8a28561ebdf97ca90acc094e2b0bbe]
+Message = "f'Invalid qubit index: {ctrl}!\\nThis qubit has already been measured.'"
+English = "Invalid qubit index! This qubit has already been measured."
+Chinese = "无效的量子寄存器索引！此量子寄存器已经被测量过。"
+
+[usingMessage.7a51fd8462e894679448c2da27a3fad1]
+Message = "f'Unsupported {module.__class__.__name__} in {backendName.name}'"
+English = "Unsupported module in the backend"
+Chinese = "此后端不支持的模块"
+
+[usingMessage.aa9bfa5c86e19d1b047b53b43c722928]
+Message = "f'Invalid graph: ({graph})!\\nThe edges must link two vertices on the graph.'"
+English = "Invalid graph! The edges must link two vertices on the graph."
+Chinese = "无效的图！边缘必须连接两个顶点。"
+
+[usingMessage.04924ac1b15f3119790bbc13749a575f]
+Message = "f'Unsupported system {sys.platform}!'"
+English = "Unsupported system!"
+Chinese = "不支持的系统！"
+
+[usingMessage.5bd969af19a1196e0580352b128b10d8]
+Message = "'QReg argument is not in procedure!'"
+English = "QReg argument is not in procedure!"
+Chinese = "量子寄存器参数在子程序中不存在！"
+
+[usingMessage.6ca6a770265cc967cc5421243d112fd2]
+Message = "'QReg of measure in circuit are not repeatable!'"
+English = "QReg of measure in circuit are not repeatable!"
+Chinese = "在电路上测量量子寄存器不可以重复！"
+
+[usingMessage.6e9d3782942ecb5d99b1dab1e53a489a]
+Message = "'Must have CReg in measure!'"
+English = "Must have CReg in measure!"
+Chinese = "测量中必须包含经典寄存器！"
+
+[usingMessage.6b68ba6845aeb085ac475dc5f1e48bc8]
+Message = "f\"Invalid qubit index {tar} with the type: `{type(tar)}`!\\nOnly 'int' is supported as the type of qubit index.\""
+English = "Invalid qubit index with the type! Only 'int' is supported as the type of qubit index."
+Chinese = "无效的量子寄存器索引类型！只支持int类型。"
+
+[usingMessage.2c9671b4319f2859dbc1963e73d2a5e5]
+Message = "f'Invalid measurement angle ({theta}) with the type: `{type(theta)}`!\\nOnly `float` and `int` are supported as the type of measurement angle.'"
+English = "Invalid measurement angle with the type! Only `float` and `int` are supported as the type of measurement angle."
+Chinese = "无效的测量角度类型，只支持float和int类型。"
+
+[usingMessage.53eb28a35bd83bab9671018d5030a1b5]
+Message = "f\"Invalid gate list: ({gate_list})!\\nOnly 'u' and 'm' are supported as the single qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'm' is the 'measurement'.\""
+English = "Invalid gate list! Only 'u' and 'm' are supported as the single qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'm' is the 'measurement'."
+Chinese = "无效的门列表！当前盲计算版本，只支持u和m类型。"
+
+[usingMessage.61b9d7c5f0990ff20e3cf9838ecc453f]
+Message = "'QReg and CReg in measure must have same count!'"
+English = "QReg and CReg in measure must have same count!"
+Chinese = "量子寄存器和经典寄存器在测量中必须数量相同！"
+
+[usingMessage.f4ff9147499dffa9d089c59c1ed8cad4]
+Message = "f'Invalid matrix ({u_mat}) with the type: `{type(u_mat)}`!\\nOnly `ndarray` is supported as the type of the matrix.'"
+English = "Invalid matrix with the type! Only `ndarray` is supported as the type of the matrix."
+Chinese = "无效的矩阵类型！只支持ndarray类型。"
+
+[usingMessage.95319cf16c2217e93b8b087d9b7962dd]
+Message = "f'Unsupported composite gate {compositeGate.name}!'"
+English = "Unsupported composite gate!"
+Chinese = "不支持的组合门！"
+
+[usingMessage.b7c340efeabf17654dee38889f094bd2]
+Message = "'NVIDIA GPU dirver is not installed!\\nMake sure you have a mainstream NVIDIA GPU first.\\nThen, try to install the driver as well as CUDA Toolkit 11.\\nPlease see https://developer.nvidia.com/cuda-11-8-0-download-archive\\nThe runfile(local) installer is suggested.\\nOr, try to install the driver by \"Software & Updates\" tools -> \"Additional Drivers\" tab when you use a mainstream ubuntu operating system.\\nPlease confirm the compatibility among the GPU, OS, driver, cuda versions.'"
+English = "NVIDIA GPU dirver is not installed! Make sure you have a mainstream NVIDIA GPU first. Then, try to install the driver as well as CUDA Toolkit 11. Please see https://developer.nvidia.com/cuda-11-8-0-download-archive\\nThe runfile(local) installer is suggested. Or, try to install the driver by \"Software & Updates\" tools -> \"Additional Drivers\" tab when you use a mainstream ubuntu operating system. Please confirm the compatibility among the GPU, OS, driver, cuda versions."
+Chinese = "英伟达GPU驱动未安装！请先确保您拥有主流英伟达显卡。此后尝试安装好驱动CUDA Toolkit 11。"
+
+[usingMessage.ee3ecb8d1200073d55492c714ac1f9c3]
+Message = "f'Unsupported operation {PBPhotonicFockGate.Name(photonicFockGate)}!'"
+English = "Unsupported operation {PBPhotonicFockGate.Name(photonicFockGate)}!"
+Chinese = "不支持的操作！"
+
+[usingMessage.64c978df7ee0abab25c56c4cef28e5a6]
+Message = "'Measure must be once on a QReg!'"
+English = "Measure must be once on a QReg!"
+Chinese = "一个量子寄存器只能测量一次！"
+
+[usingMessage.2e6a1f811620f3067fa5138ba079bbd6]
+Message = "f'The dimension of ndarray does not support more than 32 qubits! Currently, QReg in the program counts {self.program.head.usingQRegList}.'"
+English = "The dimension of ndarray does not support more than 32 qubits!"
+Chinese = "ndarray不支持超过32量子比特的维度！"
+
+[usingMessage.0c616b391112c336f3c8b84aa5cfa639]
+Message = "f'Double-qubit noise {noise_type} must be applied after double-qubit gate!'"
+English = "Double-qubit noise must be applied after double-qubit gate!"
+Chinese = "双比特噪声必须在单比特操作之后！"
+
+[usingMessage.700254d31482d208491917dc430f336b]
+Message = "'Unsupported operation procedure, please flatten by UnrollProcedureModule!'"
+English = "Unsupported operation procedure, please flatten by UnrollProcedureModule!"
+Chinese = "不支持操作子程序，请先用UnrollProcedureModule展开！"
+
+[usingMessage.741aed2d29521b84a09cc36ff1d9f902]
+Message = "'createList is called when self.registerMap is not empty!'"
+English = "createList is called when self.registerMap is not empty!"
+Chinese = "self.registerMap不为空时调用createList！"
+
+[usingMessage.243252e769148008e098146d36c71fb4]
+Message = "f'Unsupported operation {op} at XanaduSF quarter!'"
+English = "Unsupported operation {op} at XanaduSF quarter!"
+Chinese = "XanaduSF quarter不支持的操作！"
+
+[usingMessage.5da82f25ef829e5052802c158e17c475]
+Message = "f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'"
+English = "Unsupported operation measure!"
+Chinese = "不支持的测量操作！"
+
+[usingMessage.6c397db293a89a97fb61fb07a14c2899]
+Message = "f'Unsupported operation measure {PBPhotonicGaussianMeasure.Type.Name(measure.type)}!'"
+English = "Unsupported operation measure!"
+Chinese = "不支持的测量操作！"
+
+[usingMessage.496dbfd56f5ec60e7aa9af781d895680]
+Message = "f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\\nOnly `float` and `int` are supported as the type of rotation angle.'"
+English = "Invalid rotation angle with the type! Only `float` and `int` are supported as the type of rotation angle."
+Chinese = "无效的旋转角度类型，只支持float和int。"
+
+[usingMessage.05f2cc6402e547886c162809ae7c5785]
+Message = "f'Invalid local backend => {self.backendName.value}!'"
+English = "Invalid local backend!"
+Chinese = "无效的本地后端！"
+
+[usingMessage.e1c3f7df4557b5e4bdf235ef8b511c50]
+Message = "f\"Invalid gate name ({name})!\\nOnly 'u', 'm' and 'd' are supported as the gate names in UBQC in this version, where 'u' is the 'unitary gate', 'm' is the 'measurement' and 'd' is the 'double qubit gate'.\""
+English = "Invalid gate name! Only 'u', 'm' and 'd' are supported as the gate names in UBQC in this version, where 'u' is the 'unitary gate', 'm' is the 'measurement' and 'd' is the 'double qubit gate'."
+Chinese = "无效的门名称！当前盲计算版本，只支持'u', 'm', 'd'。"
+
+[usingMessage.5f79ad3a776f53b9325f72a8ea45b138]
+Message = "f'Invalid gate: ({name})!\\nThis gate is not supported in this version.'"
+English = "Invalid gate! This gate is not supported in this version."
+Chinese = "无效的门！此版本不支持这个门。"
+
+[usingMessage.7609d3c9f9fc17cc35fdf517d714d81c]
+Message = "f\"Don't have procedure name: {name}!\""
+English = "Don't have procedure name!"
+Chinese = "缺少子程序名称！"
+
+[usingMessage.6974ba0089f80ceb97c2f9c4a7c33da4]
+Message = "f'Invalid flipping encryption angle ({angle}) with the type: `{type(angle)}`!\\nOnly `float` is supported as the type of flipping encryption angle.'"
+English = "Invalid flipping encryption angle with the type! Only `float` is supported as the type of flipping encryption angle."
+Chinese = "无效的翻转加密角度类型！只支持float。"
+
+[usingMessage.69470d5655094a50fd19c8f96ea06fd0]
+Message = "f'Invalid gate type: ({op})!\\nCustomized gates are not supported in UBQC in this version.'"
+English = "Invalid gate type! Customized gates are not supported in UBQC in this version."
+Chinese = "无效的门类型！当前盲计算版本，不支持自定义门。"
+
+[usingMessage.e058f9b60b944f79d8ac8f92ed25698f]
+Message = "f'Invalid measurement basis list: ({basis_list})!\\nMeasurement basis list must have four elements in total.'"
+English = "Invalid measurement basis list! Measurement basis list must have four elements in total."
+Chinese = "无效的测量基准列表！总共测量基准应该是四个元素。"
+
+[usingMessage.33aa51e517ce74b9ac2c5bbbf9347cda]
+Message = "f\"Invalid qubits: ({which_qubits})!\\nThe qubits in 'which_qubits_list' must be activated first.\""
+English = "Invalid qubits! The qubits in 'which_qubits_list' must be activated first."
+Chinese = "无效的量子寄存器！which_qubits_list中的量子寄存器必须先激活。"
+
+[usingMessage.de9585750b3b110c7e1e5177375892f9]
+Message = "f'Invalid qubit index: {which_qubit}!\\nQubit index must be smaller than the circuit width.'"
+English = "Invalid qubit index! Qubit index must be smaller than the circuit width."
+Chinese = "无效的量子寄存器索引！量子寄存器索引必须小于电路宽度。"
+
+[usingMessage.d67fafde8f93c7f19002404d90f11762]
+Message = "'Wrong compression of gate!'"
+English = "Wrong compression of gate!"
+Chinese = "对门错误的压缩！"
+
+[usingMessage.46451c5ae2ba109418da9238d8f2f6aa]
+Message = "f'allowArgumentCounts is not len(argumentList)!'"
+English = "allowArgumentCounts is wrong!"
+Chinese = "allowArgumentCounts长度错误！"
+
+[usingMessage.daacfc9d25b59507734d70b84dc7e2dd]
+Message = "f'Invalid service backend => {self.backendName.value}!'"
+English = "Invalid service backend!"
+Chinese = "无效的service后端！"
+
+[usingMessage.20065a725c196fbb60fe1603a8cc52fa]
+Message = "'Unsupported operation compositeGate!'"
+English = "Unsupported operation compositeGate!"
+Chinese = "不支持的组合门操作！"
+
+[usingMessage.f8e028fff810ec97a7a579241e4daae0]
+Message = "f'Invalid circuit: ({circuit})!\\nThis quantum circuit is not valid after the simplification! There is at least one qubit not operated by any effective quantum gates.'"
+English = "Invalid circuit! This quantum circuit is not valid after the simplification! There is at least one qubit not operated by any effective quantum gates."
+Chinese = "无效的电路！化简后的量子电路无效！至少有一个量子寄存器没有被有效的量子门操作。"
+
+[usingMessage.1560d11f8accd5587d9528671d36b206]
+Message = "f\"Invalid measurement basis list: ({basis_list})!\\nOnly 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version.\""
+English = "Invalid measurement basis list! Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version."
+Chinese = "无效的测量基准列表！当前盲计算版本，只支持'XY', 'YZ'。"
+
+[usingMessage.a9c6637fbf1e744e2672da22dfcf5cd0]
+Message = "f'Invalid graph ({graph}) with the type: `{type(graph)}`!\\nOnly `List` is supported as the type of the graph.'"
+English = "Invalid graph with the type! Only `List` is supported as the type of the graph."
+Chinese = "无效的图类型！只支持list类型。"
+
+[usingMessage.a013be3f1799844727811e9c9b9bf7a8]
+Message = "f'Invalid vector ({vector}) with the type: `{type(vector)}`!\\nOnly `List`, `Tuple` or `ndarray` are supported as the type of quantum state vector.'"
+English = "Invalid vector with the type! Only `List`, `Tuple` or `ndarray` are supported as the type of quantum state vector."
+Chinese = "无效的向量类型！只支持`List`, `Tuple`, `ndarray`类型。"
+
+[usingMessage.c3aa3cb4d3646f66e1b7a54a57526cda]
+Message = "f'Invalid Algorithm {algorithmValue}'"
+English = "Invalid Algorithm"
+Chinese = "无效的算法类型"
+
+[usingMessage.a69251dccb1269197f3e6f0955eb8513]
+Message = "f'Duplicate qubit {qRegList} at XanaduSF third!'"
+English = "Duplicate qubit at XanaduSF third!"
+Chinese = "XanaduSF third中重复的量子寄存器！"
+
+[usingMessage.592abb13d0112868bbcc7f530b83b392]
+Message = "errMsg"
+English = "errMsg"
+Chinese = "错误信息"
+
+[usingMessage.60ceb078d08029333bd0659913c47280]
+Message = "f'Unsupported rotationGate {PBRotationGate.Name(pbRotationGate)} at XanaduSF {type.value}!'"
+English = "Unsupported rotationGate at XanaduSF!"
+Chinese = "XanaduSF中不支持的旋转门。"
+
+[usingMessage.ec9f20e03a1f84af713ed292b6e815c1]
+Message = "f'Invalid qubit indexes: {ctrl} and {tar}!\\nControl qubit must not be the same as target qubit.'"
+English = "Invalid qubit indexes}! Control qubit must not be the same as target qubit."
+Chinese = "无效的量子寄存器索引！控制比特必须不同于目标比特。"
+
+[usingMessage.15be4718ede4c77e8957b8bf626f234b]
+Message = "f'Invalid qRegList({qRegList}) in noise {gateName}!'"
+English = "Invalid qRegList in noise!"
+Chinese = "噪声中无效的量子寄存器参数。"
+
+[usingMessage.57eb5a5e0cb25cf2ac5ceeac7a84e193]
+Message = "f'Invalid input: ({which_qubit}) and ({basis_list})!\\nSuch input is not supported in this version. Please choose another way to call the method.'"
+English = "Invalid input! Such input is not supported in this version. Please choose another way to call the method."
+Chinese = "无效的输入！此版本不支持。请选择其他方式调用此方法。"
+
+[usingMessage.8f03235fa328a55f7b4349fdb322b140]
+Message = "f'Unsupported operation {op} at XanaduSF kerr!'"
+English = "Unsupported operation at XanaduSF kerr!"
+Chinese = "XanaduSF kerr中不支持的操作！"
+
+[usingMessage.dfbbeece411288d5cf278bc651aa5808]
+Message = "f'Invalid position ({position}) with the type: `{type(position)}`!\\nOnly `Tuple` is supported as the type of vertex position.'"
+English = "Invalid position with the type! Only `Tuple` is supported as the type of vertex position."
+Chinese = "无效的位置类型！只支持Tuple类型。"
+
+[usingMessage.e85bb72e3b8a0be15358b8e41dc453ef]
+Message = "f\"Invalid flipping encryption angle: ({angle})!\\nOnly '0' and 'pi' are supported as the flipping encryption angle.\""
+English = "Invalid flipping encryption angle! Only '0' and 'pi' are supported as the flipping encryption angle."
+Chinese = "无效的翻转加密角度！只支持0和pi。"
+
+[usingMessage.eb5fd985aa502e867ad5439dd917f032]
+Message = "f'Invalid circuit ({program}) in the program!\\nThis circuit is empty and has no qubit.'"
+English = "Invalid circuit in the program! This circuit is empty and has no qubit."
+Chinese = "程序中无效的电路！电路是空的，且不包含量子寄存器。"
+
+[usingMessage.a11f82464a7a7e5ac23c4ea1d8045cf9]
+Message = "f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\\nOnly `float` and `int` are supported as the type of rotation angle.'"
+English = "Invalid rotation angle with the type! Only `float` and `int` are supported as the type of rotation angle."
+Chinese = "无效的旋转角度类型！只支持float和int类型。"
+
+[usingMessage.bd2e0f9513b8740456a85e9a1e664ad0]
+Message = "f\"Invalid qubit index {ctrl} with the type: `{type(ctrl)}`!\\nOnly 'int' is supported as the type of qubit index.\""
+English = "Invalid qubit index with the type! Only 'int' is supported as the type of qubit index."
+Chinese = "无效的量子寄存器索引类型！只支持int类型。"
+
+[usingMessage.ad59837b378e8524d966ba34529f8078]
+Message = "'MS gate in procedure, must unroll procedure first!'"
+English = "MS gate in procedure, must unroll procedure first!"
+Chinese = "子程序中有MS门，必须先展开子程序。"
+
+[usingMessage.0087ea78c7f1ac14c1084760c9c0be49]
+Message = "f'Invalid system ({system}) with the type: `{type(system)}`!\\nOnly `List` is supported as the type of quantum state system.'"
+English = "Invalid system with the type! Only `List` is supported as the type of quantum state system."
+Chinese = "无效的系统类型，只支持list类型。"
+
+[usingMessage.370273692a056f923b7e4882627234a3]
+Message = "f'Unnecessary QBit{diff} in noise {noiseDefine.qRegList}/{program.head.usingQRegList}!'"
+English = "Unnecessary QBit in noise!"
+Chinese = "噪声中不允许的量子寄存器。"
+
+[usingMessage.bba369edad01b4255b121ffe8245fad9]
+Message = "f'Invalid rotation encryption angle ({angle}) with the type: `{type(angle)}`!\\nOnly `float` is supported as the type of rotation encryption angle.'"
+English = "Invalid rotation encryption angle with the type! Only `float` is supported as the type of rotation encryption angle."
+Chinese = "无效的旋转加密角度类型！只支持float类型。"
+
+[usingMessage.c7960d624cf3e2b8a90ba797415c45fc]
+Message = "f'IonQ Unsupported rotationGate {gateName}!'"
+English = "IonQ Unsupported rotationGate!"
+Chinese = "IonQ不支持的旋转门！"
+
+[usingMessage.48139398ca8eec49b6b14b583b518753]
+Message = "f'Local keys file {str(localKeysFilePath)} not exists!'"
+English = "Local keys file not exists!"
+Chinese = "本地keys文件不存在！"
+
+[usingMessage.e9669d976006a502c95a9c01755a6cb2]
+Message = "'Mismatched qRegIndexList and cRegIndexList'"
+English = "Mismatched qRegIndexList and cRegIndexList"
+Chinese = "不匹配的量子寄存器索引列表和经典寄存器索引列表"
+
+[usingMessage.2ad29e86118ba98179cdcc382355a602]
+Message = "f'IonQ Unsupported operation {op}!'"
+English = "IonQ Unsupported operation!"
+Chinese = "IonQ不支持的操作！"
+
+[usingMessage.121aa00e3736d2b820d3fb5f0bd9e75e]
+Message = "\"QProcedureOP can't getInversed! Please use QEnv.inverseProcedure.\""
+English = "QProcedureOP can't getInversed! Please use QEnv.inverseProcedure."
+Chinese = "QProcedureOP不能getInversed！请使用QEnv.inverseProcedure。"
+
+[usingMessage.2fd4db0754680adba9ced4a434bc58cf]
+Message = "'Invalid brickwork mould!\\nThis brickwork mould is not supported in UBQC.'"
+English = "Invalid brickwork mould!\\nThis brickwork mould is not supported in UBQC."
+Chinese = "无效的结构模型。当前盲计算版本不支持。"
+
+[usingMessage.7c12e312dea5ac526d34700393637478]
+Message = "'Local tasks are not allowed in the online environment!'"
+English = "Local tasks are not allowed in the online environment!"
+Chinese = "在线环境不支持本地任务！"
+
+[usingMessage.d9086f787d8ad0bec5275f2585cc7463]
+Message = "'Matrix must be C-contiguous!'"
+English = "Matrix must be C-contiguous!"
+Chinese = "矩阵必须C-contiguous！"
+
+[usingMessage.b03bc56771c66c90f2eda9a7657796b0]
+Message = "f'Invalid vector ({vector}) and system ({system})!\\nThe vector and the system must have the same qubit number.'"
+English = "Invalid vector and system! The vector and the system must have the same qubit number."
+Chinese = "无效的向量和系统！向量和系统必须包含同样数量。"
+
+[usingMessage.82ccee2557dfa034b54544588623957b]
+Message = "'cuQuantum needs to run in Linux!\\nUbuntu 18-22 is suggested.'"
+English = "cuQuantum needs to run in Linux! Ubuntu 18-22 is suggested."
+Chinese = "cuQuantum需要运行在Linux！建议Ubuntu 18-22。"
+
+[usingMessage.7ec4852bf1b87dd26cc3963e2290c58c]
+Message = "f'Unsupported inverse {self.name}!'"
+English = "Unsupported inverse!"
+Chinese = "不支持inverse！"
+
+[usingMessage.58ee3244c00ffd75e8deccdf0b71bca1]
+Message = "'Floating gate not a 1-qubit gate'"
+English = "Floating gate not a 1-qubit gate"
+Chinese = "Floating gate不是单比特门"
+
+[usingMessage.79ceb4aee5742287c08e808ccd12f6fa]
+Message = "f'Invalid measurement angle ({angle}) with the type: `{type(angle)}`!\\nOnly `float` and `int` are supported as the type of measurement angle.'"
+English = "Invalid measurement angle with the type! Only `float` and `int` are supported as the type of measurement angle."
+Chinese = "无效的测量角度类型！只支持float和int类型。"
+
+[usingMessage.d726bbc2ee0f10d82aa69249e191f101]
+Message = "f'Invalid measurement qubits: ({measurement_qubits})!\\nAll qubits must be measured in UBQC in this version.'"
+English = "Invalid measurement qubits! All qubits must be measured in UBQC in this version."
+Chinese = "无效的测量量子寄存器！当前盲计算版本，必须测量所有量子寄存器。"
+
+[usingMessage.3b60ecd1fa80735c03758bd95253070b]
+Message = "f'Invalid vertex: ({vertex})!\\nThis vertex is not on the graph.'"
+English = "Invalid vertex! This vertex is not on the graph."
+Chinese = "无效的顶点！此顶点不包含在图中。"
+
+[usingMessage.48c68dce3b04627b0c0e6039563331fb]
+Message = "f\"Invalid circuit width {width} with the type: `{type(width)}`!\\nOnly 'int' is supported as the type of circuit width.\""
+English = "Invalid circuit width with the type! Only 'int' is supported as the type of circuit width."
+Chinese = "无效的电路宽度类型！只支持int。"
+
+[usingMessage.433267de9c13d74978c91bf714a36516]
+Message = "f'Invalid qubit index: {ctrl}!\\nQubit index must be smaller than the circuit width.'"
+English = "Invalid qubit index! Qubit index must be smaller than the circuit width."
+Chinese = "无效的量子寄存器索引！量子寄存器索引必须小于电路宽度。"
+
+[usingMessage.7cfc2157e03cee748d011e1c999beb77]
+Message = "f'Unsupported system {sysStr}'"
+English = "Unsupported system"
+Chinese = "不支持的系统"
+
+[usingMessage.7c17837ea5f7678fbb3bf2168b91a2a7]
+Message = "f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\\nOnly `float` and `int` are supported as the type of rotation angle.'"
+English = "Invalid rotation angle with the type! Only `float` and `int` are supported as the type of rotation angle."
+Chinese = "无效的旋转角度类型！只支持float和int类型。"
+
+[usingMessage.ad981797cf8325a94fe20e80926afe46]
+Message = "f'Invalid commands list ({cmds}) with the type: ({type(cmds)})!\\nOnly `List` is supported as the type of commands list.'"
+English = "Invalid commands list with the type! Only `List` is supported as the type of commands list."
+Chinese = "无效的命令列表类型！只支持list类型。"
+
+[usingMessage.2f1727ce3f438763cf0c2481acfd42c8]
+Message = "f'Invalid qubit index: {tar}!\\nQubit index must be smaller than the circuit width.'"
+English = "Invalid qubit index! Qubit index must be smaller than the circuit width."
+Chinese = "无效的量子比特索引！量子寄存器索引必须小于电路宽度。"
+
+[usingMessage.605bdcf8194a745ac2ff627022cbcbd5]
+Message = "'The number of QReg must match the setting!'"
+English = "The number of QReg must match the setting!"
+Chinese = "量子寄存器数量必须符合设置！"
+
+[usingMessage.7cfa2dba0f859359821c44282783416d]
+Message = "'Wrong construction of circuitMap!'"
+English = "Wrong construction of circuitMap!"
+Chinese = "错误的circuitMap结构。"
+
+[usingMessage.7ed460675faec1eb051b72e6672da863]
+Message = "f\"Invalid rotation axis: ({axis})!\\nOnly 'x', 'y' and 'z' are supported as the index of rotation axis.\""
+English = "Invalid rotation axis! Only 'x', 'y' and 'z' are supported as the index of rotation axis."
+Chinese = "无效的旋转轴！只支持'x', 'y', 'z'。"
+
+[usingMessage.0383079eaf8660ded93eecdca6547617]
+Message = "'Measure must be once on a CReg!'"
+English = "Measure must be once on a CReg!"
+Chinese = "一个经典寄存器只能测量一次！"
+
+[usingMessage.3645d25c922238757c9dd27b2b95fad3]
+Message = "'QReg of operators in circuit are not repeatable!'"
+English = "QReg of operators in circuit are not repeatable!"
+Chinese = "电路中的经典寄存器操作不允许重复！"
+
+[usingMessage.6d455aee0dfa6e148c82f293b7fe2eec]
+Message = "f'Invalid complex number: ({complex_number})!\\nThe length of a complex number must be larger than 0.'"
+English = "Invalid complex number! The length of a complex number must be larger than 0."
+Chinese = "无效的complex number。必须大于零。"
+
+[usingMessage.90aea5e7071b834094f91afc120d48a0]
+Message = "'Unknown backend name.'"
+English = "Unknown backend name."
+Chinese = "未知的后端名称。"
+
+[usingMessage.2f121516e60534f22530f154ce948b00]
+Message = "f'Unsupported operation {op} at XanaduSF third!'"
+English = "Unsupported operation at XanaduSF third!"
+Chinese = "XanaduSF third中不支持的操作！"
+
+[usingMessage.29db34b8c63ebd431149b8b7ac37b241]
+Message = "f'Unsupported {module.__class__.__name__} in Simulator'"
+English = "Unsupported module in Simulator"
+Chinese = "模拟器不支持的模块。"
+
+[usingMessage.0af21bb9bec50e3155e97a4fb7e582c5]
+Message = "f\"Invalid measurement type: ({typeName})!\\nOnly 'Z measurement' is supported as the measurement type in UBQC in this version.\""
+English = "Invalid measurement type! Only 'Z measurement' is supported as the measurement type in UBQC in this version."
+Chinese = "无效的测量类型！当前盲计算版本只支持Z测量。"
+
+[usingMessage.3145b78893f61938250e0a77b100d091]
+Message = "'Parking gate not a 1-qubit gate'"
+English = "Parking gate not a 1-qubit gate"
+Chinese = "Parking gate不是单比特门"
+
+[usingMessage.94a61af2767b4d0f27992c265fcdd471]
+Message = "'Remote job only support cloud backend.'"
+English = "Remote job only support cloud backend."
+Chinese = "远程任务只支持云后端。"
+
+[usingMessage.60f1abb0558cd6ef7be583327d53ff99]
+Message = "'libopenmpi is not installed!\\nPlease install it.\\nIf you are use ubuntu 18-22, you can try:\\nsudo apt install libopenmpi-dev.'"
+English = "libopenmpi is not installed! Please install it. If you are use ubuntu 18-22, you can try: sudo apt install libopenmpi-dev."
+Chinese = "未安装libopenmpi。"
+
+[usingMessage.7573a33c87b0b341c0e5b4aca208a605]
+Message = "'Measure must be the last operation!'"
+English = "Measure must be the last operation!"
+Chinese = "测量必须是最后的操作！"
+
+[usingMessage.d546e1d5f53e02cbb7421d518c37e38e]
+Message = "'At least one measurement operation is required in a quantum circuit.'"
+English = "At least one measurement operation is required in a quantum circuit."
+Chinese = "量子端路中需要至少一个测量操作。"
+
+[usingMessage.2ab00cef700aefd7f52a1ca2afa372dd]
+Message = "f'Invalid system: ({which_system})!\\nThe system to be permuted must one of the state systems.'"
+English = "Invalid system! The system to be permuted must one of the state systems."
+Chinese = "无效的系统！"
+
+[usingMessage.2ad95b8a501d1b4f18c84b2e5b6cf218]
+Message = "f'Unsupported operation {circuitLine}!'"
+English = "Unsupported operation!"
+Chinese = "不支持的操作！"
+
+[usingMessage.fbc68c9d8ddf96839a93bcc6c807ebc6]
+Message = "f'Unsupported operation {PBPhotonicGaussianGate.Name(photonicGaussianGate)}!'"
+English = "Unsupported operation!"
+Chinese = "不支持的操作！"
+
+[usingMessage.29bdbb0002b061910befae2efdf0f6f1]
+Message = "'CUDA 11 is not installed!\\nMake sure you have a mainstream NVIDIA GPU first.\\nThen, try to install the driver as well as CUDA Toolkit 11.\\nPlease see https://developer.nvidia.com/cuda-11-8-0-download-archive\\nThe runfile(local) installer is suggested.\\nPlease confirm the compatibility among the GPU, OS, driver, cuda versions.'"
+English = "CUDA 11 is not installed! Make sure you have a mainstream NVIDIA GPU first. Then, try to install the driver as well as CUDA Toolkit 11. Please see https://developer.nvidia.com/cuda-11-8-0-download-archive The runfile(local) installer is suggested. Please confirm the compatibility among the GPU, OS, driver, cuda versions."
+Chinese = "CUDA 11未安装！请先确保您拥有主流英伟达显卡。此后尝试安装好驱动CUDA Toolkit 11。"
+
+[usingMessage.91c12e4e13f995975f9b79df5d93aceb]
+Message = "f'Invalid matrix ({u_mat}) with the norm: {u_error}!\\nOnly unitary matrix is supported.'"
+English = "Invalid matrix with the norm! Only unitary matrix is supported."
+Chinese = "无效的矩阵！只支持酉矩阵。"
+
+[usingMessage.8027c63995aa0fff2723f0a377e1bede]
+Message = "f'Invalid circuit ({circuit}) with the type: ({type(circuit)})!\\nOnly `Circuit` is supported as the type of quantum circuit.'"
+English = "Invalid circuit with the type! Only `Circuit` is supported as the type of quantum circuit."
+Chinese = "无效的电路类型！只支持Circuit类型。"
+
+[usingMessage.c5a19b5b6ad2a12221cf80f4e0afc548]
+Message = "f\"Invalid gate list: ({gate_list})!\\nOnly 'u' and 'cnot' are supported as the double qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'cnot' is the 'CNOT gate'.\""
+English = "Invalid gate list! Only 'u' and 'cnot' are supported as the double qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'cnot' is the 'CNOT gate'."
+Chinese = "无效的门列表！当前盲计算版本，只支持u和cnot类型。"
+
+[usingMessage.33db3da273d5929cec42ec97fb7153c5]
+Message = "f'Unimplemented combination {self.matrixType.name}-{self.algorithm.name}-{self.measureMethod.name}'"
+English = "Unimplemented combination"
+Chinese = "未实现的参数组合。"
+
+[usingMessage.9b8611a76d371638fc88e3c4e41f01bd]
+Message = "f'Unexpected message: ({msg})!'"
+English = "Unexpected message:"
+Chinese = "异常信息："
+
+[usingMessage.fe6d4b97a03f3b97f8118e83eb5c2387]
+Message = "f'Invalid gate type: ({gate_type})!\\nOnly single qubit gates and double qubit gates are supported in UBQC in this version.'"
+English = "Invalid gate type! Only single qubit gates and double qubit gates are supported in UBQC in this version."
+Chinese = "无效的门类型！当前盲计算版本，只支持单比特和双比特门。"
+
+[usingMessage.777171931875b241d9ae5caf251bf39e]
+Message = "f\"Invalid gate: ({gateName})!\\nOnly 'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ' are supported as the fixed gates in UBQC in this version.\""
+English = "Invalid gate! Only 'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ' are supported as the fixed gates in UBQC in this version."
+Chinese = "无效的门！当前盲计算版本，只支持'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ'。"
+
+[usingMessage.1848dfa132a479912311a8a91ca80018]
+Message = "f'Unsupported operation {PBFixedGate.Name(fixedGate)}!'"
+English = "Unsupported operation {PBFixedGate.Name(fixedGate)}!"
+Chinese = "不支持的操作！"
+
+[usingMessage.9079508a4cba9ee888b0d06968ba7e97]
+Message = "f'Invalid operation: ({op})!\\nThis operation is not supported in UBQC in this version.'"
+English = "Invalid operation! This operation is not supported in UBQC in this version."
+Chinese = "不支持的操作！当前盲计算版本，不支持此操作。"
+
+[usingMessage.da4fe337eadd858c145f091844dc892a]
+Message = "f'Unsupported fixedGate {PBFixedGate.Name(pbFixedGate)} at XanaduSF {type.value}!'"
+English = "Unsupported fixedGate at XanaduSF!"
+Chinese = "XanaduSF中不支持的固定门。"
+
+[usingMessage.5e7443207f01d3e1ebe67b4fede4c233]
+Message = "f'Invalid matrix ({u_mat}) with the shape: {u_mat.shape}!\\nOnly (2, 2) is supported as the shape of the matrix.'"
+English = "Invalid matrix with the shape! Only (2, 2) is supported as the shape of the matrix."
+Chinese = "无效的矩阵形状！只支持(2, 2)。"
+
+[usingMessage.bb4a3553a365a52bcb46e3f930c8fcab]
+Message = "f'Unsupported noise in QEnv.join and concatEnv!'"
+English = "Unsupported noise in QEnv.join and concatEnv!"
+Chinese = "QEnv.join and concatEnv不支持噪声。"
+
+[usingMessage.60f32abc31280da87a78f446d5696ee7]
+Message = "f'Invalid qubit: ({which_qubit})!\\nThe qubit to be measured must be activated first.'"
+English = "Invalid qubit! The qubit to be measured must be activated first."
+Chinese = "无效的量子寄存器！量子寄存器测量前必须先激活。"
+
+[usingMessage.6822235bef316bff93137485fc85cb50]
+Message = "f'IonQ Unsupported fixedGate {gateName}!'"
+English = "IonQ Unsupported fixedGate!"
+Chinese = "IonQ不支持的固定门！"
+
+[usingMessage.d4acd6e02a5139952434298d683fd9e4]
+Message = "f'Invalid procedure name: {item}'"
+English = "Invalid procedure name"
+Chinese = "无效的子程序名称"
+
+[usingMessage.b11996ae4dc7e25b33d6cc62eb963a33]
+Message = "f'Invalid gate operation: {gate}'"
+English = "Invalid gate operation"
+Chinese = "无效的门操作"
+
+[usingMessage.52f1510e8b0683b7a93284d941a05592]
+Message = "'Invalid brickwork pattern! Brickwork pattern does not support quantum output in UBQC in this version.'"
+English = "Invalid brickwork pattern! Brickwork pattern does not support quantum output in UBQC in this version."
+Chinese = "无效的结构图！当前盲计算版本不支持。"
+
+[usingMessage.d7a3e21334d80e3748d2729ee06b3f86]
+Message = "'Invalid brickwork pattern! This brickwork pattern has not been standardized yet.'"
+English = "Invalid brickwork pattern! This brickwork pattern has not been standardized yet."
+Chinese = "无效的结构图！结构图尚未标准化。"
+
+[usingMessage.6a3020cdc0625728d3293b1657b89f25]
+Message = "f'Wrong angles count! angles: {angles}.'"
+English = "Wrong angles count!"
+Chinese = "错误的角度数量！"
+
+[usingMessage.38eea72537bda94e880f150ad98f216b]
+Message = "f'Wrong angles count! angles: {self.argumentList}.'"
+English = "Wrong angles count!"
+Chinese = "错误的角度数量！"
+
+[usingMessage.196b086957e8b39d732793d6e2486c28]
+Message = "'Please unroll composite gate first!'"
+English = "Please unroll composite gate first!"
+Chinese = "请先展开组合门！"
+
+[usingMessage.25ccb9ee50b14b48f0deaf01e6dab7ba]
+Message = "f'Wrong regs count! regs: {circuitLine.qRegList}.'"
+English = "Wrong regs count!"
+Chinese = "错误的量子寄存器数量！"
+
+[usingMessage.d4c92cae9633e550d9c72a88fd52cf66]
+Message = "f'Wrong angles count! angles value: {circuitLine.argumentValueList}.'"
+English = "Wrong angles count!"
+Chinese = "错误的角度数量！"
+
+[usingMessage.8cf44f030eb5571d3c5837a44bbba959]
+Message = "f'Wrong angles count! angles value: {self.argumentList}.'"
+English = "Wrong angles count!"
+Chinese = "错误的角度数量！"
+
+[usingMessage.8ba5046faacf4319827d952767d05019]
+Message = "f'Invalid measurement basis list: ({basis_list}) with the type: `{type(basis_list)}`!\\nOnly `List` is supported as the type of measurement basis list.'"
+English = "Invalid measurement basis list with the type! Only `List` is supported as the type of measurement basis list."
+Chinese = "无效的测量基准列表类型！只支持list类型。"
+
+[usingMessage.426c8f0ab2d74bb8d40a850cdf9ec17d]
+Message = "f\"Invalid measurement plane: ({measurement_plane})! Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version.\""
+English = "Invalid measurement plane! Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version."
+Chinese = "无效的测量平面！当前盲计算版本，只支持'XY', 'YZ'。"
+
+[usingMessage.bf5cce0cb50b7fdd47165ecacc0cef42]
+Message = "f'Invalid command names: ({name1}) and ({name2})! The measurement command must be executed after the entanglement command.'"
+English = "Invalid command names!"
+Chinese = "无效的命令名称！"
+
+[usingMessage.c4920b8fac9765b5c013237274874573]
+Message = "f\"Invalid command names: ({name1}) and ({name2})! Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command.\""
+English = "Invalid command names! Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command."
+Chinese = "无效的命令名称！只支持'E', 'M', 'X', 'Z', 'S'。"
+
+[usingMessage.62bb9367d0f3b83e430bc98b2309dba2]
+Message = "'allowArgumentCounts is invalid!'"
+English = "allowArgumentCounts is invalid!"
+Chinese = "无效的allowArgumentCounts！"
+
+[usingMessage.ad63dd26b7ecf1963e030f33f4ca9ebf]
+Message = "'Failed to acquire computing resource!'"
+English = "Failed to acquire computing resource!"
+Chinese = "获取计算资源失败！"
+
+[usingMessage.78363350b86b0ed7f75e1c7d4f4c536b]
+Message = "'Failed to receive the measurement outcome!'"
+English = "Failed to receive the measurement outcome!"
+Chinese = "错误的获取测量输出！"
+
+[usingMessage.aab7a734d8ca923c4bb85f673239b595]
+Message = "f\"Invalid command name: ({cmd_type}! Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command.\""
+English = "Invalid command name! Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command."
+Chinese = "无效的命令名称。只支持'E', 'M', 'X', 'Z', 'S'。"
+
+[usingMessage.a95dc991ef1f1a280da6e35bd3d4fa7d]
+Message = "f'Invalid random seed {seed}, should in [0, {Define.maxSeed}]'"
+English = "Invalid random seed."
+Chinese = "无效的随机数种子"
+
+[usingMessage.6b410a927d03babd2fee52f1b94a302b]
+Message = "f'Can not unroll argument id! angles id: {circuitLine.argumentIdList}.'"
+English = "Can not unroll argument id!"
+Chinese = "不能展开参数id。"
+
+[usingMessage.63fb1530df3f844330bfa40a669d33f4]
+Message = "'Wrong operation type!'"
+English = ""
+Chinese = ""
+
+[usingMessage.6af5b9568af8c4178f6e3f00a651dd18]
+Message = "f'Unsupported operation {circuitLine}'"
+English = ""
+Chinese = ""
+
+[usingMessage.f776f05ade564c1ba5c77e541978400e]
+Message = "f'Wrong angles count! {op.name} angles value: {op.argumentList}.'"
+English = ""
+Chinese = ""
+
+[usingMessage.a4dbf3453a65f53a8e88041578b178c0]
+Message = "f'Invalid gate: ({gateName}) for cuquantum simulator!'"
+English = ""
+Chinese = ""
+
+[usingMessage.46c30bb5debc09d425bcce2b31601989]
+Message = "f'Wrong bits count! {op.name} bits value: {op.bits}.'"
+English = ""
+Chinese = ""
+
+[usingMessage.fc06f8f2886eb057f0d4abd33bc829dd]
+Message = "f'Invalid gate: (customizedGate) for cuquantum simulator!'"
+English = ""
+Chinese = ""

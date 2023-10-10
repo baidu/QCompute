@@ -22,12 +22,12 @@ Module for building a quantum network.
 from typing import List
 import networkx
 import matplotlib.pyplot as plt
-from qcompute_qnet.core.des import DESEnv, Entity
-from qcompute_qnet.quantum.circuit import Circuit
-from qcompute_qnet.topology.node import Node
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import Channel, ClassicalChannel, QuantumChannel
-from qcompute_qnet.devices.channel import DuplexChannel, DuplexClassicalFiberChannel, DuplexQuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv, Entity
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import Channel, ClassicalChannel, QuantumChannel
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import DuplexChannel, DuplexClassicalFiberChannel, DuplexQuantumFiberChannel
 
 __all__ = [
     "Network"
@@ -119,7 +119,7 @@ class Network(Entity):
         nodes = []
         links = []
 
-        from qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode, BackboneNode
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode, BackboneNode
         for node in topo['nodes']:
             if node['type'] == "EndNode":
                 nodes.append(EndNode(node['name'], location=(node['longitude'], node['latitude'])))
@@ -202,7 +202,7 @@ class Network(Entity):
             The classical and quantum routing tables are computed separately.
             Both routing costs depend on the length of the communication channel.
         """
-        from qcompute_qnet.models.qkd.node import TrustedRepeaterNode
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import TrustedRepeaterNode
         for node in self.nodes:
             if isinstance(node, TrustedRepeaterNode):
                 for dst in self.nodes:
@@ -249,7 +249,7 @@ class Network(Entity):
             plt.rcParams['figure.figsize'] = (16, 12)  # set figure size
             nodes_pos = {node: node.location for node in self.nodes}
 
-            from qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode, BackboneNode
+            from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode, BackboneNode
             # End nodes
             end_nodes = [node for node in self.nodes if isinstance(node, EndNode)]
             ends_pos = {node: node.location for node in end_nodes}

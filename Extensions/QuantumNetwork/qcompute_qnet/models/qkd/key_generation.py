@@ -23,10 +23,10 @@ from abc import ABC, abstractmethod
 from enum import Enum, unique
 from typing import List, Dict, Tuple
 import numpy as np
-from qcompute_qnet.core.des import EventHandler
-from qcompute_qnet.protocols.protocol import Protocol
-from qcompute_qnet.messages.message import ClassicalMessage
-from qcompute_qnet.quantum.basis import Basis
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import ClassicalMessage
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.basis import Basis
 
 __all__ = [
     "KeyGeneration",
@@ -98,7 +98,7 @@ class KeyGeneration(Protocol, ABC):
     def finish(self) -> None:
         r"""Finish the key generation protocol.
         """
-        from qcompute_qnet.models.qkd.routing import QKDRouting
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.routing import QKDRouting
         self.node.env.logger.info(f"{self.node.name} finished key generation with {self.peer.name}")
         self.node.env.logger.info(f"{self.node.name}'s sifted keys (with {self.peer.name} in decimal): "
                                   f"{self.sifted_keys}")

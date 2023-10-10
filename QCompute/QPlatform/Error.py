@@ -18,6 +18,7 @@
 """
 Define Error
 """
+FileErrorCode = 3
 
 
 class Error(Exception):
@@ -70,7 +71,7 @@ class LogicError(Error):
     type = 0x04
 
 
-class TokenError(LogicError):
+class TokenError(Error):
     """
     Token related error
     """

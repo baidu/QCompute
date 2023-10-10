@@ -33,18 +33,36 @@ import scipy
 import scipy.linalg
 from matplotlib import pyplot as plt
 
+from QCompute.Define import Settings
 from QCompute.QPlatform.QRegPool import QRegStorage
 
 sys.path.append('../../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.3')
+# Define.hubToken = ""
+Settings.outputInfo = False
+Settings.alwaysRetryTask = True
+
+matchSdkVersion('Python 3.3.5')
+
+# Fast parameter setting
+# n = 2
+# L = 1
+# K = 1
+# iteration_num = 1
+# experiment_num = 1
+# shots = 1024
+# learning_rate = 0.3
+# delta = np.pi / 2
+# SEED = 36
+# N = 3 * n * L
+# random.seed(SEED)
 
 # Hyper-parameter setting
-shots = 1024
 n = 4  # n must be larger than or equal to 2; n is the size of our quantum system
-assert n >= 2
 L = 2  # L is the number of layers
+assert n >= 2
+shots = 1024
 iteration_num = 20
 experiment_num = 4  # That's the number of parallel experiments we will run;
 # it indicates the number of processes we will use.
@@ -87,9 +105,13 @@ Hamiltonian = random_H_generator(n, K)  # Our Hamiltonian H
 def NKron(AMatrix, BMatrix, *args):
     """
     Recursively execute kron n times. This function at least has two matrices.
+
     :param AMatrix: First matrix
+
     :param BMatrix: Second matrix
+
     :param args: If have more matrix, they are delivered by this matrix
+
     :return: The result of tensor product.
     """
 
@@ -236,6 +258,7 @@ def self_defined_circuit(para, hamiltonian):
     # Measurement result
     MeasureZ(*env.Q.toListPair())
     taskResult = env.commit(shots, fetchMeasure=True)
+    print(f"Task {taskResult['taskId']}, Batch {taskResult['batchID']}, Status {taskResult['status']}")
     return prob_calc(taskResult['counts'])
 
 
@@ -294,6 +317,7 @@ def main():
 
     pool = mp.Pool(experiment_num)
     pool.map(multi_process_fun, range(experiment_num))
+
     loss_list = []
 
     for _ in range(experiment_num):

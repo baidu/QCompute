@@ -16,19 +16,19 @@
 # limitations under the License.
 
 """init file for the tomography module."""
-from qcompute_qep.tomography.tomography import Tomography
-from qcompute_qep.tomography.basis import PauliMeasBasis, MeasurementBasis, PreparationBasis, \
-    init_measurement_basis, init_preparation_basis
-from qcompute_qep.tomography.state_tomography import StateTomography
-from qcompute_qep.tomography.process_tomography import ProcessTomography
-from qcompute_qep.tomography.spectral_tomography import SpectralTomography
-from qcompute_qep.tomography.utils import plot_process_ptm, compare_process_ptm
-from qcompute_qep.tomography.gateset import GateSet, STD1Q_GATESET_RXRY, STD1Q_GATESET_RXRYRX, \
-    STD1Q_GATESET_RXRYID, STD2Q_GATESET_RXRYCX, STD2Q_GATESET_RXRYCZ, STD2Q_GATESET_RXRYSWAP
-from qcompute_qep.tomography.gateset_optimizer import GSTOptimizer, \
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.tomography import Tomography
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.basis import \
+    PauliMeasBasis, MeasurementBasis, PreparationBasis, init_measurement_basis, init_preparation_basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.state_tomography import StateTomography
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.process_tomography import ProcessTomography
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.spectral_tomography import SpectralTomography
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.utils import plot_process_ptm, compare_process_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.gateset import \
+    GateSet, STD1Q_GATESET_RXRY, STD1Q_GATESET_RXRYRX, STD1Q_GATESET_RXRYID, \
+    STD2Q_GATESET_RXRYCX, STD2Q_GATESET_RXRYCZ, STD2Q_GATESET_RXRYSWAP
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.gateset_optimizer import GSTOptimizer, \
     LinearInversionOptimizer, MLEOptimizer, LinearApproximationOptimizer
-from qcompute_qep.tomography.gateset_tomography import GateSetTomography
-
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.gateset_tomography import GateSetTomography
 
 __all__ = [
     'Tomography', 'StateTomography', 'ProcessTomography', 'GateSetTomography',

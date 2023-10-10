@@ -20,13 +20,13 @@ Module for QKD node templates with different functionalities.
 """
 
 from typing import List
-from qcompute_qnet.topology.node import Node, Satellite
-from qcompute_qnet.devices.source import PhotonSource
-from qcompute_qnet.devices.detector import PolarizationDetector
-from qcompute_qnet.protocols.protocol import ProtocolStack
-from qcompute_qnet.models.qkd.application import QKDApp
-from qcompute_qnet.models.qkd.routing import QKDRouting
-from qcompute_qnet.models.qkd.key_generation import BB84, DecoyBB84, KeyGeneration
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node, Satellite
+from Extensions.QuantumNetwork.qcompute_qnet.devices.source import PhotonSource
+from Extensions.QuantumNetwork.qcompute_qnet.devices.detector import PolarizationDetector
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import ProtocolStack
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.application import QKDApp
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.routing import QKDRouting
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import BB84, DecoyBB84, KeyGeneration
 
 __all__ = [
     "QKDNode",

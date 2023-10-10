@@ -21,6 +21,7 @@ Two measurement methods (Meas_METHOD) are provided:
 1) (SINGLE) Single shot accumulation
 2) (PROB) Sampling based on probabilities
 """
+FileErrorCode = 6
 
 from collections import Counter
 from enum import IntEnum, unique

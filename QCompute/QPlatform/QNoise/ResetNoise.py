@@ -18,13 +18,15 @@
 """
 Reset Noise
 """
+FileErrorCode = 30
+
 import random
 import numpy as np
 from typing import TYPE_CHECKING, List, Dict
 
 from QCompute.QPlatform.QNoise import QNoise
 
-if TYPE_CHECKING:   
+if TYPE_CHECKING:
     from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
@@ -72,8 +74,11 @@ class ResetNoise(QNoise):
         Generate a batch of sampled random numbers for non-mixed-unitary noise.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param stateDict: Dict[str, np.ndarray], current state dict in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: List[int], a set of random numbers
         """
 
@@ -86,8 +91,11 @@ class ResetNoise(QNoise):
         Generate a sampled Kraus operator.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param state: np.ndarray, current state in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: np.ndarray, a sampled Kraus operator
         """
 
@@ -108,8 +116,11 @@ class ResetNoise(QNoise):
         Generate a sampled random number for non-mixed-unitary noise.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param state: np.ndarray, current state in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: int, a sampled random number
         """
 

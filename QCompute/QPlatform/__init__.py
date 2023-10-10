@@ -22,8 +22,8 @@ from enum import Enum, unique
 
 from QCompute.QPlatform import Error
 
-ModuleErrorCode = 1
-FileErrorCode = 1
+ModuleErrorCode = 9
+FileErrorCode = 14
 
 
 def getBackendFromName(name: str):
@@ -31,7 +31,6 @@ def getBackendFromName(name: str):
         if value.name == name or value.value == name:
             return value
     raise Error.ArgumentError('Unknown backend name.', ModuleErrorCode, FileErrorCode, 1)
-
 
 class BackendName(Enum):
     LocalBaiduSim2 = 'local_baidu_sim2'

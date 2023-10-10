@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf8 -*-
 
 # Copyright (c) 2022 Baidu, Inc. All Rights Reserved.
@@ -18,6 +17,9 @@
 """
 Global Definitions
 """
+ModuleErrorCode = 3
+FileErrorCode = 3
+
 
 import os
 import sys
@@ -45,7 +47,7 @@ if env == "prod":
 else:
     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
 
-sdkVersion = 'Python 3.3.3'
+sdkVersion = 'Python 3.3.5'
 """
 SDK Version
 
@@ -146,6 +148,9 @@ outputDirPath = os.environ.get('OUTPUTPATH', None)
 if outputDirPath is None:
     outputDirPath = Path('Output').absolute()
     
+else:
+    # it will caused a `str / str` error by lacking of this
+    outputDirPath = Path(outputDirPath).absolute()
 """
 Output Dir Path
 

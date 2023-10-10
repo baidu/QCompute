@@ -42,13 +42,13 @@ from copy import deepcopy
 import itertools
 
 import QCompute
-from qcompute_qep.utils.circuit import circuit_to_unitary, circuit_to_state
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm
-from qcompute_qep.quantum.channel import unitary_to_ptm
-from qcompute_qep.utils.linalg import basis, vec_to_operator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_unitary, circuit_to_state
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import unitary_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import basis, vec_to_operator
 from QCompute.QPlatform.QOperation import CircuitLine
-import qcompute_qep.quantum.metrics as metrics
+import Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics as metrics
 
 
 class GateSet(abc.ABC):
@@ -132,7 +132,7 @@ class GateSet(abc.ABC):
         **Examples**
 
             >>> import numpy
-            >>> from qcompute_qep.tomography import GateSet
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import GateSet
             >>> from QCompute.QPlatform.QOperation import CircuitLine
             >>> gate_set = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(numpy.pi / 2), [0]),
             >>>                           'G_ry90': CircuitLine(QCompute.RY(numpy.pi / 2), [0])},

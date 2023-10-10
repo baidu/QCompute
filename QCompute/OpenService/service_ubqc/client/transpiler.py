@@ -17,6 +17,8 @@
 """
 transpiler
 """
+FileErrorCode = 6
+
 
 from QCompute.OpenService import ModuleErrorCode
 from QCompute.QPlatform import Error
@@ -27,8 +29,6 @@ from QCompute.OpenService.service_ubqc.client.mcalculus import MCalculus
 __all__ = [
     "transpile_to_brickwork"
 ]
-
-FileErrorCode = 4
 
 
 def transpile_to_brickwork(circuit, to_xy_measurement=True):
@@ -47,10 +47,7 @@ def transpile_to_brickwork(circuit, to_xy_measurement=True):
         Pattern: a brickwork pattern equivalent to the original quantum circuit
     """
     if not isinstance(circuit, Circuit):
-        raise Error.ArgumentError(f"Invalid circuit ({circuit}) with the type: ({type(circuit)})!\n"
-                                  "Only `Circuit` is supported as the type of quantum circuit.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 1)
+        raise Error.ArgumentError(f'Invalid circuit ({circuit}) with the type: ({type(circuit)})!\nOnly `Circuit` is supported as the type of quantum circuit.', ModuleErrorCode, FileErrorCode, 1)
 
     mc = MCalculus()
     circuit.simplify_by_merging(to_xy_measurement)

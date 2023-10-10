@@ -31,25 +31,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='qcompute-qsvt',
-    version='0.1.1',
+    version='0.1.2',
     install_requires=[
-        'qcompute==3.2.0',
+        'qcompute',
     ],
-    python_requires='>=3.9, <3.10',
+    python_requires='>=3.10',
     packages=find_packages(),
-    package_data={
-        'qcompute_qsvt.SymmetricQSP.x64': [
-            'libiomp5md.dll',
-            'msvcp140.dll',
-            'vcruntime140.dll',
-            'SymmetricQSPInternalCpp.cp39-win_amd64.pyd',
-            'SymmetricQSPInternalCpp.cpython-39-darwin.so',
-            'SymmetricQSPInternalCpp.cpython-39-x86_64-linux-gnu.so',
-        ],
-        'qcompute_qsvt.SymmetricQSP.arm': [
-            'SymmetricQSPInternalCpp.cpython-39-darwin.so',
-        ],
-    },
+    package_data={},
     url='https://quantum.baidu.com',
     license='Apache License 2.0',
     author='Baidu Quantum',

@@ -53,7 +53,7 @@ from typing import List, Tuple
 import numpy as np
 from scipy.special import jv as BesselJ
 
-from qcompute_qsvt.SymmetricQSP.SymmetricQSPExternal import __func_Wx_map, __func_LBFGS_QSP
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.SymmetricQSP.SymmetricQSPExternal import __func_Wx_map, __func_LBFGS_QSP
 
 
 def __HS_approx_data(float_tau: float, int_deg: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:

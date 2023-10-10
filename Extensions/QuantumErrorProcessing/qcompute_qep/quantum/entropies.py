@@ -20,7 +20,7 @@ This script aims to supply a set of functions for computing various entropies qu
 """
 import numpy as np
 import math
-from qcompute_qep.exceptions import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
 
 
 def entropy(rho: np.ndarray, base: float = 2) -> float:

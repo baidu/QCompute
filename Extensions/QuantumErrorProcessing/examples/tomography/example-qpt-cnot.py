@@ -19,8 +19,8 @@
 Example to demonstrate quantum process tomography on the CNOT gate.
 """
 from QCompute import *
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 # Step 1. Set the quantum program for the CNOT gate.

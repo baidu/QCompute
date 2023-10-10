@@ -18,6 +18,7 @@
 """
 Convert the circuit to json
 """
+FileErrorCode = 5
 
 from google.protobuf.json_format import MessageToJson
 
@@ -44,4 +45,4 @@ class CircuitToJson(ConvertorImplement):
         :return: json str
         """
 
-        return MessageToJson(program, preserving_proto_field_name=True)
+        return MessageToJson(program, preserving_proto_field_name=True, including_default_value_fields=True)

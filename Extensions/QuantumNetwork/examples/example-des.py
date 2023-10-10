@@ -22,7 +22,7 @@ An example of discrete-event simulation.
 import sys
 sys.path.append('..')
 
-from qcompute_qnet.core.des import DESEnv, EventHandler, Entity
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv, EventHandler, Entity
 
 
 class Customer:

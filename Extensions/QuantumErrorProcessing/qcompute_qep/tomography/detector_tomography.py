@@ -26,14 +26,14 @@ import scipy.linalg as la
 import numpy as np
 from QCompute import *
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography
-from qcompute_qep.tomography.basis import PauliPrepBasis
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.circuit import execute
-from qcompute_qep.quantum.pauli import operator_to_ptm
-from qcompute_qep.quantum import pauli
-from qcompute_qep.measurement.utils import state_labels
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import Tomography
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.basis import PauliPrepBasis
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import operator_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import pauli
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import state_labels
 
 try:
     from matplotlib import pyplot as plt
@@ -118,7 +118,7 @@ class DetectorTomography(Tomography):
         **Examples**
 
             >>> import QCompute
-            >>> from qcompute_qep.tomography.detector_tomography import DetectorTomography
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.tomography.detector_tomography import DetectorTomography
             >>> qp = QCompute.QEnv()
             >>> qp.Q.createList(2)
             >>> qc = QCompute.BackendName.LocalBaiduSim2

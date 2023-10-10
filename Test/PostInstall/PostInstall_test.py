@@ -28,6 +28,9 @@ from Test.BaseSettings import inputHubToken
 from Test.PostInstall.CloudFullTest import cloudFullTest
 from Test.PostInstall.LocalGateTest import localGateTest
 from Test.PostInstall.LocalNoiseTest import localNoiseTest
+from Test.Photonic.GaussianFullTest import GaussianFullTest
+from Test.Photonic.FockFullTest import FockFullTest
+from QCompute import *
 
 inputHubToken()
 Settings.outputInfo = False
@@ -43,6 +46,9 @@ def test_local() -> None:
     localNoiseTest()
     print('Local noise test successed')
 
+    GaussianFullTest(BackendName.LocalBaiduSimPhotonic)
+    FockFullTest(BackendName.LocalBaiduSimPhotonic)
+    print('Local photonic quantum simulator test successed')
 
 def test_cloud() -> None:
     """
@@ -54,6 +60,8 @@ def test_cloud() -> None:
 
     try:
         cloudFullTest()
+        # GaussianFullTest(BackendName.CloudBaiduSim2Fire)
+        # FockFullTest(BackendName.CloudBaiduSim2Fire)
     except:
         [_, _, tb] = sys.exc_info()
         lastTb = traceback.extract_tb(tb)[-1]

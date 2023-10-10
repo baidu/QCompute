@@ -18,6 +18,8 @@
 """
 Convert the circuit to draw console
 """
+FileErrorCode = 2
+
 from hashlib import blake2b
 from io import StringIO
 from typing import List
@@ -28,8 +30,6 @@ from QCompute.QPlatform import Error
 from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate, PBMeasure, \
     PBPhotonicGaussianGate, PBPhotonicGaussianMeasure, PBPhotonicFockGate, PBPhotonicFockMeasure
-
-FileErrorCode = 2
 
 gapNode = '-'
 gap = gapNode * 2

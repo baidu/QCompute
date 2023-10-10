@@ -23,6 +23,7 @@ The initial state and gates are converted to tensors and gate implementation is 
 """
 
 import argparse
+import random
 from datetime import datetime
 from pathlib import Path
 from typing import List, TYPE_CHECKING, Union, Dict, Optional
@@ -35,18 +36,15 @@ from QCompute.OpenSimulator import QResult, ModuleErrorCode
 from QCompute.QPlatform import Error
 from QCompute.QPlatform.Processor.PostProcessor import filterMeasure
 from QCompute.QPlatform.Processor.PreProcess import preProcess
-from QCompute.QPlatform.QOperation.FixedGate import ID, X, Y, Z, H, S, SDG, T, TDG, CX, CY, CZ, CH, SWAP, CCX, CSWAP
-from QCompute.QPlatform.QOperation.RotationGate import U
-from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
 from QCompute.QProtobuf import PBFixedGate, PBRotationGate, PBCustomizedGate, PBMeasure
+
+FileErrorCode = 28
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBProgram
 
-FileErrorCode = 2
 
-
-def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> 'QResult':
+def runSimulator(args: List[str], program: 'PBProgram') -> 'QResult':
     """
     Initialization process
     """
@@ -62,12 +60,13 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
     inputFile: str = args.inputFile
 
     if shots < 1 or shots > Define.maxShots:
-        raise Error.ArgumentError(f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode,
-                                  FileErrorCode, 1)
+        raise Error.ArgumentError(
+            f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode, FileErrorCode, 1)
+
     if seed is not None:
         if seed < 0 or seed > Define.maxSeed:
-            raise Error.ArgumentError(f'Invalid seed {seed}, should in [0, {Define.maxSeed}]', ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(f'Invalid random seed {seed}, should in [0, {Define.maxSeed}]',
+            ModuleErrorCode, FileErrorCode, 2)
 
     if inputFile is not None:
         jsonStr = Path(inputFile).read_text()
@@ -82,95 +81,116 @@ def core(program: 'PBProgram', shots: int, seed: int) -> 'QResult':
     """
 
     # lazy import. These need to run on linux OS with GPU
-    import cupy
-    try:
-        from . import Kernel
-    except ImportError:
-        import Kernel
+    import cudaq
+    # cudaq.initialize_cudaq()
+    assert cudaq.num_available_gpus() >= 1
+    cudaq.set_target('nvidia')
 
     usedQRegSet, usedCRegSet, compactedQRegDict, compactedCRegDict = preProcess(program, True, True)
 
     qRegMap = {qReg: index for index, qReg in enumerate(program.head.usingQRegList)}
     qRegCount = len(qRegMap)
 
-    operationDict = loadGates()
-
     if seed is None:
-        seed = int(cupy.random.randint(0, 2147483647 + 1))
-    cupy.random.seed(seed)
+        seed = int(random.randint(0, 2147483647 + 1))
+    random.seed(seed)
+    numpy.random.seed(seed)
+    # cudaq.set_random_seed(seed)  # new API only valid in docker? not in pip wheel?
 
-    # init state
-    state = Kernel.init_state_10(qRegCount)
-
-    # make buffer
-    expr_buffer = []
-    gate_buffer = []
+    # init kernel + qubits = state
+    kernel = cudaq.make_kernel()
+    qubits = kernel.qalloc(qRegCount)
 
     result = QResult()
     result.startTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
     measured = False
     for circuitLine in program.body.circuit:  # Traverse the circuit
         op = circuitLine.WhichOneof('op')
-
         qRegList: List[int] = [qRegMap[qReg] for qReg in circuitLine.qRegList]
-
+        qRegList = list(map(lambda x: qubits[x], qRegList))
         if op == 'fixedGate':  # fixed gate
             fixedGate: PBFixedGate = circuitLine.fixedGate
-            matrix = operationDict.get(fixedGate)
-            matrix = Kernel.NP_DATA_TYPE(matrix)
-            if matrix is None:
-                raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
-                                          FileErrorCode, 3)
-            Kernel.transfer_state_in_buffer(qRegCount, cupy.array(matrix), qRegList,
-                                            expr_buffer, gate_buffer)
+            gateName = PBFixedGate.Name(fixedGate)
+            if fixedGate == PBFixedGate.X:
+                kernel.x(*qRegList)
+            elif fixedGate == PBFixedGate.CX:
+                kernel.cx(*qRegList)
+            elif fixedGate == PBFixedGate.Y:
+                kernel.y(*qRegList)
+            elif fixedGate == PBFixedGate.CY:
+                kernel.cy(*qRegList)
+            elif fixedGate == PBFixedGate.Z:
+                kernel.z(*qRegList)
+            elif fixedGate == PBFixedGate.CZ:
+                kernel.cz(*qRegList)
+            elif fixedGate == PBFixedGate.H:
+                kernel.h(*qRegList)
+            elif fixedGate == PBFixedGate.CH:
+                kernel.ch(*qRegList)
+            elif fixedGate == PBFixedGate.S:
+                kernel.s(*qRegList)
+            elif fixedGate == PBFixedGate.SDG:
+                kernel.sdg(*qRegList)
+            elif fixedGate == PBFixedGate.T:
+                kernel.t(*qRegList)
+            elif fixedGate == PBFixedGate.TDG:
+                kernel.tdg(*qRegList)
+            elif fixedGate == PBFixedGate.SWAP:
+                kernel.swap(*qRegList)
+            else:
+                raise Error.ArgumentError(
+                    f'Invalid gate: ({gateName}) for cuquantum simulator!', ModuleErrorCode, FileErrorCode, 3)
+
         elif op == 'rotationGate':  # rotation gate
             rotationGate: PBRotationGate = circuitLine.rotationGate
-            if rotationGate != PBRotationGate.U:
+            gateName = PBRotationGate.Name(rotationGate)
+            angles = circuitLine.argumentValueList
+            if rotationGate != PBRotationGate.RX:
+                assert len(angles) == 1
+                assert len(qRegList) == 1
+                kernel.rx(angles[0], qRegList[0])
+            elif rotationGate != PBRotationGate.RY:
+                assert len(angles) == 1
+                assert len(qRegList) == 1
+                kernel.ry(angles[0], qRegList[0])
+            elif rotationGate != PBRotationGate.RZ:
+                assert len(angles) == 1
+                assert len(qRegList) == 1
+                kernel.rz(angles[0], qRegList[0])
+            else:
                 raise Error.ArgumentError(
-                    f'Unsupported operation {PBRotationGate.Name(rotationGate)}!', ModuleErrorCode, FileErrorCode, 4)
-            uGate = U(*circuitLine.argumentValueList)
-            matrix = uGate.getMatrix()
-            matrix = Kernel.NP_DATA_TYPE(matrix)
-            if matrix.shape == (4, 4):
-                matrix = matrix.reshape((2, 2, 2, 2))
-            Kernel.transfer_state_in_buffer(qRegCount, cupy.array(matrix), qRegList,
-                                            expr_buffer, gate_buffer)
+                    f'Invalid gate: ({gateName}) for cuquantum simulator!', ModuleErrorCode, FileErrorCode, 4)
+
         elif op == 'customizedGate':  # customized gate
-            customizedGate: PBCustomizedGate = circuitLine.customizedGate
-            matrix = protobufMatrixToNumpyMatrix(customizedGate.matrix)
-            matrix = Kernel.NP_DATA_TYPE(matrix)
-            if matrix.shape == (4, 4):
-                matrix = matrix.reshape((2, 2, 2, 2))
-            Kernel.transfer_state_in_buffer(qRegCount, cupy.array(matrix), qRegList,
-                                            expr_buffer, gate_buffer)
+            raise Error.ArgumentError(
+                f'Invalid gate: (customizedGate) for cuquantum simulator!', ModuleErrorCode, FileErrorCode, 5)
+
         elif op == 'procedureName':  # procedure
-            raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
-                                      ModuleErrorCode, FileErrorCode, 5)
+            raise Error.ArgumentError(
+                'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                ModuleErrorCode, FileErrorCode, 6)
+
             # it is not implemented, flattened by UnrollProcedureModule
         elif op == 'measure':  # measure
             measure: PBMeasure = circuitLine.measure
             if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                 raise Error.ArgumentError(
-                    f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
-                    FileErrorCode, 6)
-            if not measured:
-                # flush buffer
-                state = Kernel.transfer_state_flush(state, expr_buffer, gate_buffer)
+                    f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!',
+                    ModuleErrorCode, FileErrorCode, 7)
 
+            if not measured:
                 # measure
                 # collect the result to simulator for the subsequent invoking
-                result.counts = {}
-                for i in range(shots):
-                    outs = Kernel.measure_all_2(qRegCount, state)
-                    if outs not in result.counts:
-                        result.counts[outs] = 0
-                    result.counts[outs] += 1
+                kernel.mz(qubits)
+                result.counts = cudaq.sample(kernel, shots_count=shots)
+                result.counts = dict(result.counts.items())
                 measured = True
         elif op == 'barrier':  # barrier
             pass
             # unimplemented operation
         else:  # unsupported operation
-            raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 7)
+            raise Error.ArgumentError(
+                f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 8)
 
     result.endTimeUtc = datetime.utcnow().isoformat()[:-3] + 'Z'
     result.shots = shots
@@ -182,39 +202,6 @@ def core(program: 'PBProgram', shots: int, seed: int) -> 'QResult':
     result.seed = int(seed)
 
     return result
-
-
-def loadGates() -> Dict['PBFixedGate', numpy.ndarray]:
-    """
-    Load the matrix of the gate
-    """
-    # lazy import. These need to run on linux OS with GPU
-    try:
-        from . import Kernel
-    except ImportError:
-        import Kernel
-
-    operationDict: Dict['PBFixedGate', Union[numpy.ndarray, 'COO']] = {
-        PBFixedGate.ID: ID.getMatrix(),
-        PBFixedGate.X: X.getMatrix(),
-        PBFixedGate.Y: Y.getMatrix(),
-        PBFixedGate.Z: Z.getMatrix(),
-        PBFixedGate.H: H.getMatrix(),
-        PBFixedGate.S: S.getMatrix(),
-        PBFixedGate.SDG: SDG.getMatrix(),
-        PBFixedGate.T: T.getMatrix(),
-        PBFixedGate.TDG: TDG.getMatrix(),
-        PBFixedGate.CX: CX.getMatrix().reshape(2, 2, 2, 2),
-        PBFixedGate.CY: CY.getMatrix().reshape(2, 2, 2, 2),
-        PBFixedGate.CZ: CZ.getMatrix().reshape(2, 2, 2, 2),
-        PBFixedGate.CH: CH.getMatrix().reshape(2, 2, 2, 2),
-        PBFixedGate.SWAP: SWAP.getMatrix(),
-        PBFixedGate.CCX: CCX.getMatrix(),
-        PBFixedGate.CSWAP: CSWAP.getMatrix()
-    }
-    for k, v in operationDict.items():
-        operationDict[k] = Kernel.NP_DATA_TYPE(v)
-    return operationDict
 
 
 if __name__ == '__main__':

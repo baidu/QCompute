@@ -38,11 +38,11 @@ from qiskit.providers.fake_provider import FakeSantiago
 
 from QCompute import *
 from QCompute.QPlatform.QOperation.RotationGate import RX, RZ
-from qcompute_qep.exceptions import ArgumentError
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils import execute, expval_z_from_counts
-from qcompute_qep.utils.circuit import remove_measurement
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import execute, expval_z_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import remove_measurement
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 # Define the Pauli operators

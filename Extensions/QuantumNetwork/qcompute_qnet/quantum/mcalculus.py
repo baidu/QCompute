@@ -24,8 +24,8 @@ This will be used to manipulate the measurement patterns in the measurement-base
 from argparse import ArgumentTypeError
 from typing import List, Any
 from numpy import pi
-from qcompute_qnet.quantum.pattern import Pattern
-from qcompute_qnet.quantum.utils import print_progress
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.pattern import Pattern
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.utils import print_progress
 
 __all__ = [
     "MCalculus",

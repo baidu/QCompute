@@ -467,8 +467,8 @@ First, we create the simulation environment, set it to default and build the qua
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a simulation environment
 env = DESEnv("QKD Network Architecture", default=True)  

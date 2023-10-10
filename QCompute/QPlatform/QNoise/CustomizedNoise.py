@@ -18,6 +18,8 @@
 """
 Customized Noise
 """
+FileErrorCode = 25
+
 from typing import TYPE_CHECKING, List, Dict
 import random
 import math
@@ -25,7 +27,7 @@ import numpy as np
 from QCompute.QPlatform.QNoise import QNoise
 from QCompute.QPlatform.QNoise.Utilities import isTracePreserving, numpyMatrixToTensorMatrix, calcKrausLowerBound
 
-if TYPE_CHECKING:   
+if TYPE_CHECKING:
     from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
@@ -61,8 +63,11 @@ class CustomizedNoise(QNoise):
         Generate a batch of sampled random numbers for non-mixed-unitary noise.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param stateDict: Dict[str, np.ndarray], current state dict in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: List[int], a set of random numbers
         """
         if self.bits > 1 and self.krauses[0].shape[0] > 2:
@@ -77,8 +82,11 @@ class CustomizedNoise(QNoise):
         Generate a sampled Kraus operator which is chosen from all Kraus operators.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param state: np.ndarray, current state in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: np.ndarray, a sampled Kraus operator
         """
 
@@ -111,8 +119,11 @@ class CustomizedNoise(QNoise):
         Generate a sampled random number for non-mixed-unitary noise.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param state: np.ndarray, current state in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: int, a sampled random number
         """
 

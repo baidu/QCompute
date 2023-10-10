@@ -18,6 +18,8 @@
 """
 Quantum Register Poll
 """
+FileErrorCode = 10
+
 from typing import Dict, Union, TYPE_CHECKING, List, Tuple
 
 from QCompute.QPlatform import Error, ModuleErrorCode
@@ -25,8 +27,6 @@ from QCompute.QPlatform import Error, ModuleErrorCode
 if TYPE_CHECKING:
     from QCompute.QPlatform.QEnv import QEnv
     from QCompute.QPlatform.QOperation.QProcedure import QProcedure
-
-FileErrorCode = 4
 
 
 class QRegStorage:
@@ -39,6 +39,7 @@ class QRegStorage:
         The quantum register object needs to know its index and related quantum environment.
 
         :param index: the quantum register index.
+
         :param env: the related quantum environment or procedure.
         """
 
@@ -76,6 +77,7 @@ class QRegPool:
         Create the register when it does not exists.
 
         :param index: the quantum register index.
+
         :return: QuantumRegisterStorage
         """
 
@@ -100,8 +102,8 @@ class QRegPool:
         Only can called when self.registerMap is empty.
         """
         if len(self.registerMap) > 0:
-            raise Error.ArgumentError('createList is called when self.registerMap is not empty!', ModuleErrorCode,
-                                      FileErrorCode, 1)
+            raise Error.ArgumentError('createList is called when self.registerMap is not empty!', ModuleErrorCode, FileErrorCode, 1)
+
         for i in range(num):
             self.registerMap[i] = QRegStorage(i, self.env)
         return list(self.registerMap.values())

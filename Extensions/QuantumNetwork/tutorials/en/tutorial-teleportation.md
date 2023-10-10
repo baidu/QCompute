@@ -204,7 +204,7 @@ First, we create a simulation environment ``QuantumEnv``. Compared to the freque
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # Create an environment for simulation
 env = QuantumEnv("Teleportation", default=True)
@@ -218,9 +218,9 @@ Here we use the node template ``QuantumNode``. A ``QuantumNode`` pre-installs a 
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import Teleportation
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import Teleportation
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # Create nodes with quantum registers and specify their pre-installed protocols
 alice = QuantumNode("Alice", qreg_size=2, protocol=Teleportation)
@@ -237,7 +237,7 @@ Next, we create a quantum network and install the configured nodes and links. Th
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a network, install the nodes and links
 network = Network("Teleportation network")
@@ -267,7 +267,7 @@ When the simulation is finished, ``QuantumEnv`` will call the ``print_circuit`` 
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # Initialize the environment and run simulation
 env.init()
@@ -294,7 +294,7 @@ Circuit results:
 To check the measurement outcome of the qubit held by the receiver, Bob, we can call the ``reduce_results`` method of the ``Circuit`` class. By passing the parameter ``indices`` we can obtain the reduced results. To verify the correctness of the simulation, we can create another circuit and input the same state as Alice initially generated. Finally, we can compare the two results.
 
 ```python
-from qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
 
 # Check the measurement results of the receiver
 reduced_indices = [2]

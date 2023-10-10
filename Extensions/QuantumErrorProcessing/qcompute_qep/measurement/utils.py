@@ -21,7 +21,7 @@ Utility functions used in the `qcompute_qep.measurement` package.
 **Examples preparation**
 
     >>> import numpy as np
-    >>> from qcompute_qep.measurement.utils import extract_substr, init_cal_data, dict2vector, vector2dict, state_labels
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import extract_substr, init_cal_data, dict2vector, vector2dict, state_labels
 
 """
 import copy
@@ -29,7 +29,7 @@ import json
 import math
 import itertools
 from typing import List, Dict, Union, Iterable, Tuple, Any
-from qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
 from scipy.linalg import logm
 import networkx as nx
 
@@ -37,7 +37,7 @@ import networkx as nx
 import numpy as np
 from collections import OrderedDict
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 try:
     from matplotlib import pyplot as plt

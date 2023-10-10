@@ -466,8 +466,8 @@ def finish(self) -> None:
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 env = DESEnv("QKD Network Simulation", default=True)  # 创建用以模拟的仿真环境
 network = Network("Beijing QMAN")  # 创建北京城域网

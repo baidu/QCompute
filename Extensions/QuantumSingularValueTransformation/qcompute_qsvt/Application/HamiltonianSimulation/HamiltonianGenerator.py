@@ -41,7 +41,7 @@ def func_Hamiltonian_gen(num_qubits: int, num_terms: int) -> List[Tuple[float, s
         We could run the following program to generate and print
         a :math:`6` qubit Hamiltonian with :math:`2000` Pauli terms:
 
-        >>> from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianGenerator import func_Hamiltonian_gen
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianGenerator import func_Hamiltonian_gen
         >>> print(func_Hamiltonian_gen(num_qubits=6, num_terms=2000))
     """
     int_dim = 4 ** num_qubits  # n qubits Hamiltonian should be regarded as a int_dim dimension vector in Pauli basis

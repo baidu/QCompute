@@ -18,14 +18,14 @@
 """
 Convert the circuit to Qasm
 """
+FileErrorCode = 6
+
 import re
 from typing import List, Optional, Tuple, Set, Dict, Any
 
 from QCompute.OpenConvertor import ModuleErrorCode, ConvertorImplement
 from QCompute.QPlatform import Error
 from QCompute.QProtobuf import PBProgram, PBFixedGate, PBRotationGate, PBCompositeGate
-
-FileErrorCode = 4
 
 
 class CircuitToQasm(ConvertorImplement):

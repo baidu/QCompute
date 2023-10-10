@@ -29,9 +29,9 @@ import random
 import functools
 
 from QCompute import *
-from qcompute_qep.utils.types import QProgram
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.linalg import tensor
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor
 from copy import deepcopy
 from QCompute.QPlatform.QOperation import CircuitLine
 
@@ -523,8 +523,8 @@ def mutually_commute(paulis: Union[List[str], np.ndarray]) -> bool:
     **Examples**
 
         >>> # Use the [[4, 2, 2]] code as test: Its stabilizers mutually commute, while its logical operators do not.
-        >>> import qcompute_qep.correction
-        >>> qec_code = qcompute_qep.correction.FourTwoTwoCode()
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.correction
+        >>> qec_code = Extensions.QuantumErrorProcessing.qcompute_qep.correction.FourTwoTwoCode()
         >>> print("The stabilizers are: {}".format(qec_code.stabilizers))
         The stabilizers are: ['XXXX', 'ZZZZ']
         >>> print("The stabilizers mutually commute? {}".format(mutually_commute(qec_code.stabilizers)))
@@ -568,8 +568,8 @@ def mutually_anticommute(paulis: Union[List[str], np.ndarray]) -> bool:
     **Examples**
 
         >>> # Use the five qubit code as test: Its logical operators mutually anticommute.
-        >>> import qcompute_qep.correction
-        >>> qec_code = qcompute_qep.correction.FiveQubitCode()
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.correction
+        >>> qec_code = Extensions.QuantumErrorProcessing.qcompute_qep.correction.FiveQubitCode()
         >>> logical_operators = qec_code.logical_xs(form='str') + qec_code.logical_zs(form='str')
         >>> print("The logical operators are: {}".format(logical_operators))
         The logical operators are: ['ZIIZX', 'ZZZZZ']

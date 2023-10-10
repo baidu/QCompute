@@ -26,10 +26,10 @@ from QCompute.Define import (
 )
 from QCompute.Define.Utils import matchSdkVersion
 from QCompute.Module.MappingToBaiduQPUQianModule import MappingToBaiduQPUQianModule
-from QCompute.Module.MappingToIoPCASModule import MappingToIoPCASModule
-from QCompute.Module.MappingToIonAPMModule import MappingToIonAPMModule
 from QCompute.Module.UnrollCircuitToBaiduQPUQianModule import UnrollCircuitToBaiduQPUQianModule
+from QCompute.Module.MappingToIoPCASModule import MappingToIoPCASModule
 from QCompute.Module.UnrollCircuitToIoPCASModule import UnrollCircuitToIoPCASModule
+from QCompute.Module.MappingToIonAPMModule import MappingToIonAPMModule
 from QCompute.Module.UnrollCircuitToIonAPMModule import UnrollCircuitToIonAPMModule
 from QCompute.OpenModule.CompositeGateModule import CompositeGateModule
 from QCompute.OpenModule.CompressGateModule import CompressGateModule

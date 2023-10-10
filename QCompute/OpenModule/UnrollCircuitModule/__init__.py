@@ -3,6 +3,9 @@
 //qelib1.inc can be obtained from the link:
 //https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/qasm/libs/qelib1.inc
 """
+FileErrorCode = 6
+
+
 from copy import deepcopy
 from typing import List, Dict, Optional, Union
 
@@ -14,9 +17,6 @@ from QCompute.QPlatform.CircuitTools import gateToProtobuf
 from QCompute.QPlatform.QOperation.FixedGate import X, H, S, SDG, T, TDG, CX, CCX
 from QCompute.QPlatform.QOperation.RotationGate import U
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate
-
-FileErrorCode = 3
-
 
 class UnrollCircuitModule(ModuleImplement):
     """
@@ -50,11 +50,8 @@ class UnrollCircuitModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
+        super().__init__(arguments)
         if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
-
             if 'targetGates' in arguments:
                 self.targetGatesNames = arguments['targetGates']
 
@@ -71,6 +68,8 @@ class UnrollCircuitModule(ModuleImplement):
         :param program: the program
         :return: unrolled circuit
         """
+        if self.disable:
+            return program
 
         ret = deepcopy(program)
 
@@ -106,8 +105,9 @@ class UnrollCircuitModule(ModuleImplement):
             elif nRegs == 3:
                 [a, b, c] = circuitLine.qRegList
             else:
-                raise Error.ArgumentError(f'Wrong regs count. regs: {circuitLine.qRegList}!', ModuleErrorCode,
-                                          FileErrorCode, 1)
+                raise Error.ArgumentError(
+                    f'Wrong regs count! regs: {circuitLine.qRegList}.',
+                    ModuleErrorCode, FileErrorCode, 1)
 
             if op == 'fixedGate':
                 fixedGate: PBFixedGate = circuitLine.fixedGate
@@ -274,8 +274,10 @@ class UnrollCircuitModule(ModuleImplement):
             elif op == 'rotationGate':
                 rotationGate: PBRotationGate = circuitLine.rotationGate
                 if len(circuitLine.argumentIdList) > 0:
-                    raise Error.ArgumentError(f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!',
-                                              ModuleErrorCode, FileErrorCode, 2)
+                    raise Error.ArgumentError(
+                        f'Can not unroll argument id! angles id: {circuitLine.argumentIdList}.',
+                        ModuleErrorCode, FileErrorCode, 2)
+
                 nAngles = len(circuitLine.argumentValueList)
                 if nAngles == 1:
                     [theta] = circuitLine.argumentValueList
@@ -284,8 +286,9 @@ class UnrollCircuitModule(ModuleImplement):
                 elif nAngles == 3:
                     [theta, phi, lamda] = circuitLine.argumentValueList
                 else:
-                    raise Error.ArgumentError(f'Wrong angles count. angles value: {circuitLine.argumentValueList}!',
-                                              ModuleErrorCode, FileErrorCode, 3)
+                    raise Error.ArgumentError(
+                        f'Wrong angles count! angles value: {circuitLine.argumentValueList}.',
+                        ModuleErrorCode, FileErrorCode, 3)
 
                 gateName = PBRotationGate.Name(rotationGate)
                 if len(self.sourceGatesNames) > 0 and gateName not in self.sourceGatesNames:
@@ -383,7 +386,8 @@ class UnrollCircuitModule(ModuleImplement):
         # Unsupported gate
         if self.errorOnUnsupported:
             # error
-            raise Error.ArgumentError(f'Unsupported operation {circuitLine}!', ModuleErrorCode, FileErrorCode, 4)
+            raise Error.ArgumentError(
+                f'Unsupported operation {circuitLine}!', ModuleErrorCode, FileErrorCode, 4)
         else:
             # ignore
             ret = deepcopy(circuitLine)
@@ -415,6 +419,8 @@ def _expandAnglesInUGate(angles: List[float]):
     elif nAngles == 1:
         angles = [0.0, 0.0] + angles
     else:
-        raise Error.ArgumentError(f'Wrong angles count. angles: {angles}!', ModuleErrorCode, FileErrorCode, 5)
+        raise Error.ArgumentError(
+            f'Wrong angles count! angles: {angles}.',
+            ModuleErrorCode, FileErrorCode, 5)
 
     return angles

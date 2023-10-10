@@ -18,6 +18,7 @@
 """
 Statevector Initialization Process
 """
+FileErrorCode = 4
 
 from enum import unique, IntEnum
 from typing import Union
@@ -59,6 +60,5 @@ def initStateDense_1_0(n: int) -> numpy.ndarray:
     state = numpy.zeros([2] * n, complex)
     state.reshape(-1)[0] = 1.0
     return state
-
 
 

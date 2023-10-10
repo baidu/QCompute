@@ -1,0 +1,462 @@
+模块,模块编号,文件,文件编号,错误编号,错误提示
+Calibration,1
+,,__init__.py,1
+,,,,QC.3.1.1.1,f"Server error {content['error']}: {content['message']} {content['vendor']}"
+,,,,QC.3.1.1.2,f'Local keys file {str(localKeysFilePath)} not exists!'
+Convertor,2
+,,__init__.py,1
+Define,3
+,,Settings.py,1
+,,Utils.py,2
+,,__init__.py,3
+Module,4
+,,__init__.py,1
+,,MappingToBaiduQPUKunModule\__init__.py,2
+,,,,QC.1.4.2.1,f'Only {self.PHYSICAL_QUBITS} qubits are supported!'
+,,,,QC.1.4.2.2,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.4.2.3,'Please composite gate first!'
+,,,,QC.1.4.2.4,'Please unroll procedures first!'
+,,,,QC.1.4.2.5,f'Mapping Module Unsupported operation {op}!'
+,,MappingToBaiduQPUQianModule\__init__.py,3
+,,,,QC.1.4.3.1,f'Only {self.PHYSICAL_QUBITS} qubits are supported!'
+,,,,QC.1.4.3.2,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.4.3.3,'Please composite gate first!'
+,,,,QC.1.4.3.4,'Please unroll procedures first!'
+,,,,QC.1.4.3.5,f'Mapping Module Unsupported operation {op}!'
+,,MappingToBaqisModule\__init__.py,4
+,,,,QC.1.4.4.1,f'Only {self.PHYSICAL_QUBITS} qubits are supported!'
+,,,,QC.1.4.4.2,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.4.4.3,'Please composite gate first!'
+,,,,QC.1.4.4.4,'Please unroll procedures first!'
+,,,,QC.1.4.4.5,f'Mapping Module Unsupported operation {op}!'
+,,MappingToHYQubitModule\__init__.py,5
+,,MappingToIonAPMModule\__init__.py,6
+,,MappingToIoPCASModule\__init__.py,7
+,,,,QC.1.4.7.1,f'Only {self.PHYSICAL_QUBITS} qubits are supported!'
+,,,,QC.1.4.7.2,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.4.7.3,'Please composite gate first!'
+,,,,QC.1.4.7.4,'Please unroll procedures first!'
+,,,,QC.1.4.7.5,f'Mapping Module Unsupported operation {op}!'
+,,,,QC.1.4.7.6,f'Strategy {self.STRATEGY} not exist!'
+,,MappingToXanaduModule\__init__.py,8
+,,UnrollCircuitToBaiduQPUKunModule\__init__.py,9
+,,,,QC.1.4.9.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.4.9.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.9.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.9.4,f'Unsupported operation {circuitLine}!'
+,,UnrollCircuitToBaiduQPUQianModule\__init__.py,10
+,,,,QC.1.4.10.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.4.10.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.10.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.10.4,f'Unsupported operation {circuitLine}!'
+,,UnrollCircuitToBaqisModule\__init__.py,11
+,,UnrollCircuitToHYQubitModule\__init__.py,12
+,,,,QC.1.4.12.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.4.12.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.12.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.12.4,f'Unsupported operation {circuitLine}!'
+,,UnrollCircuitToIonAPMModule\__init__.py,13
+,,,,QC.1.4.13.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.4.13.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.13.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.13.4,f'Unsupported operation {circuitLine}!'
+,,UnrollCircuitToIoPCASModule\__init__.py,14
+,,,,QC.1.4.14.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.4.14.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.14.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.14.4,f'Unsupported operation {circuitLine}!'
+,,UnrollCircuitToXanaduModule\__init__.py,15
+,,,,QC.1.4.15.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.4.15.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.15.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.15.4,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.4.15.5,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.4.15.6,f'Unsupported operation {circuitLine}!'
+OpenConvertor,5
+,,__init__.py,1
+,,CircuitToDrawConsole\__init__.py,2
+,,,,QC.1.5.2.1,f'DrawConsole Unsupported operation {op}!'
+,,CircuitToInternalStruct\__init__.py,3
+,,,,QC.1.5.3.1,f'InternalStruct Unsupported operation {op}!'
+,,CircuitToIonQ\__init__.py,4
+,,,,QC.1.5.4.1,f'IonQ Unsupported operation {op}!'
+,,,,QC.1.5.4.2,f'IonQ Unsupported fixedGate {gateName}!'
+,,,,QC.1.5.4.3,f'IonQ Unsupported rotationGate {gateName}!'
+,,CircuitToJson\__init__.py,5
+,,CircuitToQasm\__init__.py,6
+,,,,QC.1.5.6.1,f'Invalid gate operation: {gate}'
+,,,,QC.1.5.6.2,f'Invalid procedure name: {item}'
+,,CircuitToQobj\__init__.py,7
+,,,,QC.1.5.7.1,'Measure must be the last operation'
+,,,,QC.1.5.7.2,'Unsupported operation customizedGate!'
+,,,,QC.1.5.7.3,'Unsupported operation compositeGate!'
+,,,,QC.1.5.7.4,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.5.7.5,f'Unsupported operation measure {measure.type.name}!'
+,,,,QC.1.5.7.6,'Measure must be once on a QReg!'
+,,,,QC.1.5.7.7,'Measure must be once on a CReg!'
+,,,,QC.1.5.7.8,f'Unsupported operation {circuitLine}!'
+,,CircuitToXanaduSF\__init__.py,8
+,,,,QC.1.5.8.1,f'Unsupported operation {op} at XanaduSF quarter!'
+,,,,QC.1.5.8.2,f'Unsupported operation {op} at XanaduSF third!'
+,,,,QC.1.5.8.3,f'Duplicate qubit {qRegList} at XanaduSF third!'
+,,,,QC.1.5.8.4,f'Duplicate qubit {qRegList} at XanaduSF third!'
+,,,,QC.1.5.8.5,f'Unsupported operation {op} at XanaduSF kerr!'
+,,,,QC.1.5.8.6,f'Unsupported fixedGate {PBFixedGate.Name(pbFixedGate)} at XanaduSF {type.value}!'
+,,,,QC.1.5.8.7,f'Unsupported rotationGate {PBRotationGate.Name(pbRotationGate)} at XanaduSF {type.value}!'
+,,InternalStructToCircuit\__init__.py,9
+,,IonQToCircuit\__init__.py,10
+,,,,QC.1.5.10.1,f'Unsupporte gate {gateName} at IonQ!'
+,,JsonToCircuit\__init__.py,11
+OpenModule,6
+,,CompositeGateModule\__init__.py,1
+,,,,QC.1.6.1.1,f'Unsupported composite gate {compositeGate.name}!'
+,,,,QC.1.6.1.2,'MS gate in procedure, must unroll procedure first!'
+,,CompressGateModule\__init__.py,2
+,,,,QC.1.6.2.1,f'Unsupported operation {circuitLine} at compress!'
+,,,,QC.1.6.2.2,'Wrong compression of gate!'
+,,,,QC.1.6.2.3,'Wrong construction of circuitMap!'
+,,,,QC.1.6.2.4,'Wrong construction of circuitMap!'
+,,CompressNoiseModule\__init__.py,3
+,,,,QC.1.6.3.1,f'Unsupported operation {circuitLine} at compress!'
+,,,,QC.1.6.3.2,'Wrong compression of gate!'
+,,,,QC.1.6.3.3,'Wrong construction of circuitMap!'
+,,InverseCircuitModule\__init__.py,4
+,,,,QC.1.6.4.1,f'Unsupported operation {circuitLine}!'
+,,ReverseCircuitModule\__init__.py,5
+,,UnrollCircuitModule\__init__.py,6
+,,,,QC.1.6.6.1,f'Wrong regs count. regs: {circuitLine.qRegList}!'
+,,,,QC.1.6.6.2,f'Can not unroll argument id. angles id: {circuitLine.argumentIdList}!'
+,,,,QC.1.6.6.3,f'Wrong angles count. angles value: {circuitLine.argumentValueList}!'
+,,,,QC.1.6.6.4,f'Unsupported operation {circuitLine}!'
+,,,,QC.1.6.6.5,f'Wrong angles count. angles: {angles}!'
+,,UnrollNoiseModule\__init__.py,7
+,,,,QC.1.6.7.1,f'Unnecessary QBit{diff} in noise {noiseDefine.qRegList}/{program.head.usingQRegList}!'
+,,UnrollProcedureModule\__init__.py,8
+,,,,QC.1.6.8.1,'QReg argument is not in procedure!'
+,,,,QC.1.6.8.2,'Unsupported operation customizedGate!'
+,,,,QC.1.6.8.3,f'Unsupported operation {op}!'
+OpenService,7
+,,__init__.py,1
+,,service_ubqc\__init__.py,2
+,,,,QC.1.7.2.1,'Computing Failed!'
+,,service_ubqc\client\client.py,3
+,,,,QC.1.7.3.1,f'Invalid position ({position}) with the type: `{type(position)}`!\nOnly `Tuple` is supported as the type of vertex position.'
+,,,,QC.1.7.3.2,f'Invalid rotation encryption angle ({angle}) with the type: `{type(angle)}`!\nOnly `float` is supported as the type of rotation encryption angle.'
+,,,,QC.1.7.3.3,f"Invalid rotation encryption angle: ({angle})!\nOnly '0', 'pi/4', 'pi/2', '3pi/4', 'pi', '5pi/4', '3pi/2' and '7pi/4' are supported as the rotation encryption angle."
+,,,,QC.1.7.3.4,f'Invalid flipping encryption angle ({angle}) with the type: `{type(angle)}`!\nOnly `float` is supported as the type of flipping encryption angle.'
+,,,,QC.1.7.3.5,f"Invalid flipping encryption angle: ({angle})!\nOnly '0' and 'pi' are supported as the flipping encryption angle."
+,,,,QC.1.7.3.6,f"Invalid command name: ({name})!\nOnly 'M', 'X', 'Z' and 'S' are supported as the names of operation commands on vertices, where 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command."
+,,,,QC.1.7.3.7,f'Failed to acquire computing resource!\n'
+,,,,QC.4.7.3.8,f'Unexpected message: ({msg})!'
+,,,,QC.7.3.9,f'Unexpected Error: ({error})!'
+,,,,QC.1.7.3.10,f'Failed to receive the measurement outcome!\n'
+,,,,QC.1.7.3.11,f'Invalid circuit ({program}) in the program!\nThis circuit is empty and has no qubit.'
+,,,,QC.1.7.3.12,f"Invalid gate: ({gateName})!\nOnly 'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ' are supported as the fixed gates in UBQC in this version."
+,,,,QC.1.7.3.13,f'Invalid gate type: ({op})!\nCustomized gates are not supported in UBQC in this version.'
+,,,,QC.1.7.3.14,f'Invalid measurement qubits: ({measurement_qubits})!\nAll qubits must be measured in UBQC in this version.'
+,,,,QC.1.7.3.15,f"Invalid measurement type: ({typeName})!\nOnly 'Z measurement' is supported as the measurement type in UBQC in this version."
+,,,,QC.1.7.3.16,f'Invalid operation: ({op})!\nThis operation is not supported in UBQC in this version.'
+,,,,QC.1.7.3.17,'Invalid brickwork pattern!This brickwork pattern has not been standardized yet.'
+,,service_ubqc\client\mcalculus.py,4
+,,,,QC.1.7.4.1,f'Invalid circuit ({circuit}) with the type: ({type(circuit)})!\nOnly `Circuit` is supported as the type of quantum circuit.'
+,,,,QC.1.7.4.2,f'Invalid circuit: ({circuit})!\nThis quantum circuit is not valid after the simplification! There is at least one qubit not operated by any effective quantum gates.'
+,,,,QC.1.7.4.3,f"Invalid gate name ({name})!\nOnly 'u', 'm' and 'd' are supported as the gate names in UBQC in this version, where 'u' is the 'unitary gate', 'm' is the 'measurement' and 'd' is the 'double qubit gate'."
+,,,,QC.1.7.4.4,f"Invalid gate list: ({gate_list})!\nOnly 'u' and 'm' are supported as the single qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'm' is the 'measurement'."
+,,,,QC.1.7.4.5,f"Invalid gate list: ({gate_list})!\nOnly 'u' and 'cnot' are supported as the double qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'cnot' is the 'CNOT gate'."
+,,,,QC.1.7.4.6,f'Invalid row indexes: {row1} and {row2}!\nOnly the adjacent qubits are supported as indexes of the quantum gates in UBQC in this version.'
+,,,,QC.1.7.4.7,'Invalid brickwork pattern!Brickwork pattern does not support quantum output in UBQC in this version.'
+,,,,QC.1.7.4.8,f"Invalid command names: ({name1}) and ({name2})!Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command."
+,,,,QC.1.7.4.9,f'Invalid command names: ({name1}) and ({name2})!The measurement command must be executed after the entanglement command.'
+,,,,QC.1.7.4.10,f"Invalid measurement plane: ({measurement_plane})!Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version."
+,,,,QC.1.7.4.11,f"Invalid measurement plane: ({measurement_plane})!Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version."
+,,,,QC.1.7.4.12,f'Invalid commands list ({cmds}) with the type: ({type(cmds)})!\nOnly `List` is supported as the type of commands list.'
+,,,,QC.1.7.4.13,f"Invalid command name: ({cmd_type}!Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command."
+,,service_ubqc\client\qobject.py,5
+,,,,QC.1.7.5.1,f'Invalid measurement angle ({angle}) with the type: `{type(angle)}`!\nOnly `float` and `int` are supported as the type of measurement angle.'
+,,,,QC.1.7.5.2,f"Invalid circuit width {width} with the type: `{type(width)}`!\nOnly 'int' is supported as the type of circuit width."
+,,,,QC.1.7.5.3,f"Invalid qubit index {which_qubit} with the type: `{type(which_qubit)}`!\nOnly 'int' is supported as the type of qubit index."
+,,,,QC.1.7.5.4,f'Invalid qubit index: {which_qubit}!\nQubit index must be smaller than the circuit width.'
+,,,,QC.1.7.5.5,f'Invalid qubit index: {which_qubit}!\nThis qubit has already been measured.'
+,,,,QC.1.7.5.6,f"Invalid qubit index {ctrl} with the type: `{type(ctrl)}`!\nOnly 'int' is supported as the type of qubit index."
+,,,,QC.1.7.5.7,f'Invalid qubit index: {ctrl}!\nQubit index must be smaller than the circuit width.'
+,,,,QC.1.7.5.8,f'Invalid qubit index: {ctrl}!\nThis qubit has already been measured.'
+,,,,QC.1.7.5.9,f"Invalid qubit index {tar} with the type: `{type(tar)}`!\nOnly 'int' is supported as the type of qubit index."
+,,,,QC.1.7.5.10,f'Invalid qubit index: {tar}!\nQubit index must be smaller than the circuit width.'
+,,,,QC.1.7.5.11,f'Invalid qubit index: {tar}!\nThis qubit has already been measured.'
+,,,,QC.1.7.5.12,f'Invalid qubit indexes: {ctrl} and {tar}!\nControl qubit must not be the same as target qubit.'
+,,,,QC.1.7.5.13,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.5.14,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.5.15,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.5.16,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.5.17,f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.5.18,f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.5.19,f'Invalid measurement basis list ({basis_list}) with the type: `{type(basis_list)}`!\nOnly `List` is supported as the type of measurement basis list.'
+,,,,QC.1.7.5.20,f'Invalid measurement basis list: ({basis_list})!\nMeasurement basis list must have four elements in total.'
+,,,,QC.1.7.5.21,f"Invalid measurement basis list: ({basis_list})!\nOnly 'float' and 'int' are supported as the type of measurement angle."
+,,,,QC.1.7.5.22,f"Invalid measurement basis list: ({basis_list})!\nOnly 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version."
+,,,,QC.1.7.5.23,f'Invalid input: ({which_qubit}) and ({basis_list})!\nSuch input is not supported in this version. Please choose another way to call the method.'
+,,,,QC.1.7.5.24,f'Invalid gate: ({name})!\nThis gate is not supported in this version.'
+,,,,QC.1.7.5.25,'Invalid brickwork mould!\nThis brickwork mould is not supported in UBQC.'
+,,,,QC.1.7.5.26,'Invalid brickwork mould!\nThis brickwork mould is not supported in UBQC.'
+,,,,QC.1.7.5.27,f'Invalid gate type: ({gate_type})!\nOnly single qubit gates and double qubit gates are supported in UBQC in this version.'
+,,service_ubqc\client\transpiler.py,6
+,,,,QC.1.7.6.1,f'Invalid circuit ({circuit}) with the type: ({type(circuit)})!\nOnly `Circuit` is supported as the type of quantum circuit.'
+,,service_ubqc\client\utils.py,7
+,,,,QC.1.7.7.1,f"Invalid Pauli gate index: ({gate})!\nOnly 'I', 'X', 'Y' and 'Z' are supported as the index of Pauli gate."
+,,,,QC.1.7.7.2,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.3,f"Invalid rotation axis: ({axis})!\nOnly 'x', 'y' and 'z' are supported as the index of rotation axis."
+,,,,QC.1.7.7.4,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.5,f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.6,f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.7,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.8,f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.9,f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.7.10,f'Invalid complex number: ({complex_number})!\nThe length of a complex number must be larger than 0.'
+,,,,QC.1.7.7.11,f'Invalid matrix ({u_mat}) with the type: `{type(u_mat)}`!\nOnly `ndarray` is supported as the type of the matrix.'
+,,,,QC.1.7.7.12,f'Invalid matrix ({u_mat}) with the shape: {u_mat.shape}!\nOnly (2, 2) is supported as the shape of the matrix.'
+,,,,QC.1.7.7.13,f'Invalid matrix ({u_mat}) with the norm: {u_error}!\nOnly unitary matrix is supported.'
+,,service_ubqc\client\__init__.py,8
+,,service_ubqc\server\qobject.py,9
+,,,,QC.1.7.9.1,f'Invalid vector ({vector}) with the type: `{type(vector)}`!\nOnly `List`, `Tuple` or `ndarray` are supported as the type of quantum state vector.'
+,,,,QC.1.7.9.2,f'Invalid system ({system}) with the type: `{type(system)}`!\nOnly `List` is supported as the type of quantum state system.'
+,,,,QC.1.7.9.3,f'Invalid vector ({vector}) and system ({system})!\nThe vector and the system must have the same qubit number.'
+,,,,QC.1.7.9.4,f"Invalid vector ({vector}) and system ({system})!\nPlease input 'vector' and 'system' together or input nothing."
+,,service_ubqc\server\server.py,10
+,,service_ubqc\server\simulator.py,11
+,,,,QC.1.7.11.1,f'Invalid graph ({graph}) with the type: `{type(graph)}`!\nOnly `List` is supported as the type of the graph.'
+,,,,QC.1.7.11.2,f'Invalid vertices ({vertices}) with the type: `{type(vertices)}`!\nOnly `List` is supported as the type of the vertices.'
+,,,,QC.1.7.11.3,f'Invalid edges ({edges}) with the type: `{type(edges)}`!\nOnly `List` is supported as the type of the edges.'
+,,,,QC.1.7.11.4,f'Invalid graph: ({graph})!\nThe edges must link two vertices on the graph.'
+,,,,QC.1.7.11.5,f'Invalid state ({state}) with the type: `{type(state)}`!\nOnly `State` is supported as the type of quantum state.'
+,,,,QC.1.7.11.6,f'Invalid vertex: ({vertex})!\nThis vertex is not on the graph.'
+,,,,QC.1.7.11.7,f"Invalid qubits: ({which_qubits})!\nThe qubits in 'which_qubits_list' must be activated first."
+,,,,QC.1.7.11.8,f'Invalid qubits: ({which_qubits})!\nControl qubit must not be the same as target qubit.'
+,,,,QC.1.7.11.9,f'Invalid state ({state}) with the type: `{type(state)}`!\nOnly `State` is supported as the type of quantum state.'
+,,,,QC.1.7.11.10,f'Invalid system: ({which_system})!\nThe system to be permuted must one of the state systems.'
+,,,,QC.1.7.11.11,f'Invalid qubit: ({which_qubit})!\nThe qubit to be measured must be activated first.'
+,,service_ubqc\server\utils.py,12
+,,,,QC.1.7.12.1,f"Invalid Pauli gate index: ({gate})!\nOnly 'I', 'X', 'Y' and 'Z' are supported as the index of Pauli gate."
+,,,,QC.1.7.12.2,f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.'
+,,,,QC.1.7.12.3,f"Invalid rotation axis: ({axis})!\nOnly 'x', 'y' and 'z' are supported as the index of rotation axis."
+,,,,QC.1.7.12.4,f"Invalid measurement basis index: ({index})!\nOnly 'XY', 'YZ', 'X', 'Y' and 'Z' are supported as the index of measurement basis."
+,,,,QC.1.7.12.5,f'Invalid measurement angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of measurement angle.'
+OpenSimulator,8
+,,__init__.py,1
+,,local_baidu_sim2\BaseSimulator.py,2
+,,,,QC.1.8.2.1,f'Unsupported operation {PBFixedGate.Name(fixedGate)}!'
+,,,,QC.1.8.2.2,f'Unsupported operation {PBRotationGate.Name(rotationGate)}!'
+,,local_baidu_sim2\GeneralNoiseSimulator.py,3
+,,,,QC.1.8.3.1,f'Unimplemented combination {self.matrixType.name}-{self.algorithm.name}-{self.measureMethod.name}'
+,,,,QC.1.8.3.2,f'Single-qubit noise {noise_type} must be applied after single-qubit gate!'
+,,,,QC.1.8.3.3,f'Double-qubit noise {noise_type} must be applied after double-qubit gate!'
+,,,,QC.1.8.3.4,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.8.3.5,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.8.3.6,f'Unsupported operation {op}!'
+,,local_baidu_sim2\InitState.py,4
+,,local_baidu_sim2\LowNoiseCircuitSimulator.py,5
+,,,,QC.1.8.5.1,f'Unimplemented combination {self.matrixType.name}-{self.algorithm.name}-{self.measureMethod.name}'
+,,,,QC.1.8.5.2,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.8.5.3,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.8.5.4,f'Unsupported operation {op}!'
+,,local_baidu_sim2\Measure.py,6
+,,local_baidu_sim2\MixedUnitaryNoiseSimulator.py,7
+,,,,QC.1.8.7.1,f'Unimplemented combination {self.matrixType.name}-{self.algorithm.name}-{self.measureMethod.name}'
+,,,,QC.1.8.7.2,f'Single-qubit noise {noise_type} must be applied after single-qubit gate!'
+,,,,QC.1.8.7.3,f'Double-qubit noise {noise_type} must be applied after double-qubit gate!'
+,,,,QC.1.8.7.4,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.8.7.5,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.8.7.6,f'Unsupported operation {op}!'
+,,,,QC.1.8.7.7,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.8.7.8,f'Unsupported operation {op}!'
+,,local_baidu_sim2\NoNoiseSimulator.py,8
+,,,,QC.1.8.8.1,f'Unimplemented combination {matrixType.name}-{algorithm.name}-{measureMethod.name}'
+,,,,QC.1.8.8.2,f'Unsupported operation {PBFixedGate.Name(fixedGate)}!'
+,,,,QC.1.8.8.3,f'Unsupported operation {PBRotationGate.Name(rotationGate)}!'
+,,,,QC.1.8.8.4,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.8.8.5,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.8.8.6,f'Unsupported operation {op}!'
+,,local_baidu_sim2\Simulator.py,9
+,,,,QC.1.8.9.1,f'Invalid shots {shots}, should in [0, {Define.maxShots}]'
+,,,,QC.1.8.9.2,f'Invalid seed {seed}, should in [0, {Define.maxSeed}]'
+,,,,QC.1.8.9.3,f'Invalid MatrixType {matrixTypeValue}'
+,,,,QC.1.8.9.4,f'Invalid Algorithm {algorithmValue}'
+,,,,QC.1.8.9.5,f'Invalid MeasureMethod {measureMethodValue}'
+,,local_baidu_sim2\SparseExtend.py,10
+,,,,QC.1.8.10.1,'repeated axis in `{}` argument'.format(argname)
+,,,,QC.1.8.10.2,'repeated axis'
+,,,,QC.1.8.10.3,'`source` and `destination` arguments must have the same number of elements'
+,,local_baidu_sim2\Transfer.py,11
+,,local_baidu_sim2\__init__.py,12
+,,,,QC.3.8.12.1,f'The dimension of ndarray does not support more than 32 qubits! Currently, QReg in the program counts {self.program.head.usingQRegList}.'
+,,local_baidu_sim_photonic\FockAddPhotons.py,13
+,,local_baidu_sim_photonic\FockAuxiliaryCalculation.py,14
+,,local_baidu_sim_photonic\FockCalculateInterferometer.py,15
+,,local_baidu_sim_photonic\FockCombination.py,16
+,,local_baidu_sim_photonic\FockPhotonCountMeasure.py,17
+,,local_baidu_sim_photonic\GaussAuxiliaryCalculation.py,18
+,,local_baidu_sim_photonic\GaussHeteroMea.py,19
+,,local_baidu_sim_photonic\GaussHomoMea.py,20
+,,local_baidu_sim_photonic\GaussPhotonCountMea.py,21
+,,local_baidu_sim_photonic\GaussTransfer.py,22
+,,local_baidu_sim_photonic\InitFockState.py,23
+,,local_baidu_sim_photonic\InitGaussState.py,24
+,,local_baidu_sim_photonic\Simulator.py,25
+,,,,QC.1.8.25.1,f'Invalid shots {shots}, should in [0, {Define.maxShots}]'
+,,,,QC.1.8.25.2,f'Invalid MatrixType {matrixTypeValue}'
+,,,,QC.1.8.25.3,f'Invalid Algorithm {algorithmValue}'
+,,,,QC.1.8.25.4,f'Unimplemented combination {matrixType.name}-{algorithm.name}'
+,,,,QC.1.8.25.5,f'Unsupported operation {PBPhotonicGaussianGate.Name(photonicGaussianGate)}!'
+,,,,QC.1.8.25.6,f'Unsupported operation measure {PBPhotonicGaussianMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.8.25.7,f'Unsupported operation {op}!'
+,,,,QC.1.8.25.8,f'Unsupported operation {PBPhotonicFockGate.Name(photonicFockGate)}!'
+,,,,QC.1.8.25.9,f'Unsupported operation {op}!'
+,,local_baidu_sim_photonic\__init__.py,26
+,,local_cuquantum\CheckEnv.py,27
+,,local_cuquantum\DistEinsum.py,28
+,,local_cuquantum\Kernel.py,29
+,,local_cuquantum\KernelTest.py,30
+,,local_cuquantum\Simulator.py,31
+,,,,QC.1.8.31.1,f'Invalid shots {shots}, should in [0, {Define.maxShots}]'
+,,,,QC.1.8.31.2,f'Invalid seed {seed}, should in [0, {Define.maxSeed}]'
+,,,,QC.1.8.31.3,f'Unsupported operation {PBFixedGate.Name(fixedGate)}!'
+,,,,QC.1.8.31.4,f'Unsupported operation {PBRotationGate.Name(rotationGate)}!'
+,,,,QC.1.8.31.5,'Unsupported operation procedure, please flatten by UnrollProcedureModule!'
+,,,,QC.1.8.31.6,f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!'
+,,,,QC.1.8.31.7,f'Unsupported operation {op}!'
+,,local_cuquantum\__init__.py,32
+,,,,QC.3.8.32.1,'cuQuantum needs to run in Linux!\nUbuntu 18-22 is suggested.'
+,,,,QC.3.8.32.2,'NVIDIA GPU dirver is not installed!\nMake sure you have a mainstream NVIDIA GPU first.\nThen, try to install the driver as well as CUDA Toolkit 11.\nPlease see https://developer.nvidia.com/cuda-11-8-0-download-archive\nThe runfile(local) installer is suggested.\nOr, try to install the driver by "Software & Updates" tools -> "Additional Drivers" tab when you use a mainstream ubuntu operating system.\nPlease confirm the compatibility among the GPU, OS, driver, cuda versions.'
+,,,,QC.3.8.32.3,'CUDA 11 is not installed!\nMake sure you have a mainstream NVIDIA GPU first.\nThen, try to install the driver as well as CUDA Toolkit 11.\nPlease see https://developer.nvidia.com/cuda-11-8-0-download-archive\nThe runfile(local) installer is suggested.\nPlease confirm the compatibility among the GPU, OS, driver, cuda versions.'
+,,,,QC.3.8.32.4,'libopenmpi is not installed!\nPlease install it.\nIf you are use ubuntu 18-22, you can try:\nsudo apt install libopenmpi-dev.'
+,,,,QC.3.8.32.5,f'The dimension of ndarray does not support more than 32 qubits! Currently, QReg in the program counts {self.program.head.usingQRegList}.'
+QPlatform,9
+,,BatchID.py,1
+,,CircuitTools.py,2
+,,,,QC.1.9.2.1,'Wrong opreation type!'
+,,Error.py,3
+,,InteractiveModule.py,4
+,,ProcedureParameterExpression.py,5
+,,ProcedureParameterPool.py,6
+,,QComposer.py,7
+,,QEnv.py,8
+,,,,QC.1.9.8.1,f'Duplicate procedure name: {name}!'
+,,,,QC.1.9.8.2,f"Don't have procedure name: {name}!"
+,,,,QC.1.9.8.3,f"Don't have procedure name: {name}!"
+,,,,QC.1.9.8.4,f"Don't have procedure name: {name}!"
+,,,,QC.1.9.8.5,f'Invalid backendName => {self.backendName.value}'
+,,,,QC.3.9.8.6,'Local tasks are not allowed in the online environment!'
+,,,,QC.1.9.8.7,f'Invalid local backend => {self.backendName.value}!'
+,,,,QC.1.9.8.8,f'Invalid service backend => {self.backendName.value}!'
+,,,,QC.1.9.8.9,f'Invalid qRegList({qRegList}) in noise {gateName}!'
+,,,,QC.1.9.8.10,f'Invalid bits({gateBits}/{noise.bits}) in noise {gateName}!'
+,,,,QC.1.9.8.11,f'Unsupported noise in QEnv.join and concatEnv!'
+,,QEnvOperation.py,9
+,,,,QC.1.9.9.1,'Mismatched qRegIndexList and cRegIndexList'
+,,QRegPool.py,10
+,,,,QC.1.9.10.1,'createList is called when self.registerMap is not empty!'
+,,QStatus.py,11
+,,QTask.py,12
+,,,,QC.5.9.12.1,errMsg
+,,,,QC.1.9.12.2,'Please provide a valid token'
+,,Utilities.py,13
+,,,,QC.1.9.13.1,'Matrix must be C-contiguous!'
+,,,,QC.1.9.13.2,'Matrix must be C-contiguous!'
+,,,,QC.1.9.13.3,f'Unsupported protobufQNoise type {noiseType}!'
+,,,,QC.1.9.13.4,'Floating gate not a 1-qubit gate'
+,,,,QC.1.9.13.5,'Parking gate not a 1-qubit gate'
+,,,,QC.1.9.13.6,'Floating gate not a 1-qubit gate'
+,,,,QC.1.9.13.7,'Parking gate not a 2-qubit gate'
+,,,,QC.1.9.13.8,f'InternalStruct Unsupported operation {op}!'
+,,__init__.py,14
+,,,,QC.1.9.14.1,'Unknown backend name.'
+,,Condition\__init__.py,15
+,,Processor\ModuleFilter.py,16
+,,,,QC.1.9.16.1,f'Unsupported {module.__class__.__name__} in Simulator'
+,,,,QC.1.9.16.2,f'Unsupported {module.__class__.__name__} in {backendName.name}'
+,,,,QC.1.9.16.3,f'Unsupported {module.__class__.__name__} in Hardware'
+,,,,QC.1.9.16.4,f'Unsupported {module.__class__.__name__} in {backendName.name}'
+,,,,QC.1.9.16.5,f'Unsupported {module.__class__.__name__} in {backendName.name}'
+,,Processor\PostProcessor.py,17
+,,Processor\PreProcess.py,18
+,,,,QC.1.9.18.1,'Measure must be the last operation!'
+,,,,QC.1.9.18.2,'Measure must be once on a QReg'
+,,,,QC.1.9.18.3,'Measure must be once on a CReg'
+,,,,QC.1.9.18.4,'At least one measurement operation is required in a quantum circuit.'
+,,Processor\__init__.py,19
+,,QNoise\AmplitudeDamping.py,20
+,,QNoise\BitFlip.py,21
+,,QNoise\BitPhaseFlip.py,22
+,,QNoise\CustomizedNoise.py,23
+,,QNoise\Depolarizing.py,24
+,,QNoise\PauliNoise.py,25
+,,QNoise\PhaseDamping.py,26
+,,QNoise\PhaseFlip.py,27
+,,QNoise\ResetNoise.py,28
+,,QNoise\Utilities.py,29
+,,QNoise\__init__.py,30
+,,QOperation\Barrier.py,31
+,,QOperation\CompositeGate.py,32
+,,,,QC.1.9.32.1,f'allowArgumentCounts is not len(angleList)!'
+,,,,QC.1.9.32.2,f'Can not inverse argument id. angles id: {argument.index}!'
+,,,,QC.1.9.32.3,f'Wrong angles count. angles value: {self.argumentList}!'
+,,,,QC.1.9.32.4,f'Unsupported inverse {self.name}!'
+,,QOperation\CustomizedGate.py,33
+,,,,QC.1.9.33.1,'bits must be an integer!'
+,,QOperation\FixedGate.py,34
+,,QOperation\Measure.py,35
+,,QOperation\QProcedure.py,36
+,,,,QC.1.9.36.1,'Not enough QProcedure argument!'
+,,,,QC.1.9.36.2,'Wrong QProcedure argument!'
+,,,,QC.1.9.36.3,"QProcedureOP can't getInversed! Please use QEnv.inverseProcedure."
+,,QOperation\RotationGate.py,37
+,,,,QC.1.9.37.1,f'allowArgumentCounts is not len(angleList)!'
+,,,,QC.1.9.37.2,f'Can not inverse argument id. angles id: {argument.index}!'
+,,,,QC.1.9.37.3,f'Wrong angles count. angles value: {self.argumentList}!'
+,,,,QC.1.9.37.4,f'Wrong angles count. angles: {self.argumentList}!'
+,,QOperation\__init__.py,38
+,,,,QC.1.9.38.1,f'{self.__class__.__name__} do not have matrix!'
+,,,,QC.1.9.38.2,f'{self.__class__.__name__} only support photonic gate!'
+,,,,QC.1.9.38.3,'QReg must belong to the same env!'
+,,,,QC.1.9.38.4,'QProcedure should not be operated!'
+,,,,QC.1.9.38.5,'The number of QReg must match the setting!'
+,,,,QC.1.9.38.6,'QReg of operators in circuit are not repeatable!'
+,,,,QC.1.9.38.7,'QReg and CReg in measure must have same count!'
+,,,,QC.1.9.38.8,'QReg must belong to the same env!'
+,,,,QC.1.9.38.9,'QProcedure must not be measured!'
+,,,,QC.1.9.38.10,'Must have QReg in measure!'
+,,,,QC.1.9.38.11,'QReg of measure in circuit are not repeatable!'
+,,,,QC.1.9.38.12,'Measure must be once on a QReg!'
+,,,,QC.1.9.38.13,'Must have CReg in measure!'
+,,,,QC.1.9.38.14,'CReg of measure in circuit are not repeatable!'
+,,,,QC.1.9.38.15,'Measure must be once on a CReg!'
+,,QOperation\Photonic\PhotonicFockGate.py,39
+,,,,QC.1.9.39.1,f'allowArgumentCounts is not len(argumentList)!'
+,,QOperation\Photonic\PhotonicFockMeasure.py,40
+,,,,QC.1.9.40.1,f'photonicArgument is invalid!'
+,,,,QC.1.9.40.2,f'photonicArgument is invalid!'
+,,QOperation\Photonic\PhotonicGaussianGate.py,41
+,,,,QC.1.9.41.1,f'allowArgumentCounts is not len(aargumentList)!'
+,,QOperation\Photonic\PhotonicGaussianMeasure.py,42
+,,,,QC.1.9.42.1,f'allowArgumentCounts is invalid!'
+,,,,QC.1.9.42.2,f'allowArgumentCounts is invalid!'
+,,,,QC.1.9.42.3,f'allowArgumentCounts is invalid!'
+,,QOperation\Photonic\__init__.py,43
+,,RemoteJob\RandomGenerator.py,44
+,,RemoteJob\VQEQChem.py,45
+,,RemoteJob\__init__.py,46
+,,,,QC.1.9.46.1,'Remote job only support cloud backend.'
+Simulator,10
+,,__init__.py,1
+,,local_aer\__init__.py,2
+,,,,QC.3.10.2.1,f'Unsupported system {sys.platform}!'
+,,local_baidu_sim2_cpp\sync.py,3
+,,local_baidu_sim2_cpp\__init__.py,4
+,,,,QC.1.10.4.1,f'Unsupported simulator type {Settings.linuxDirectSim2CppType}'
+,,,,QC.3.10.4.2,f'Unsupported system {sysStr}'
+Utilize,11
+,,__init__.py,1
+,,ControlledCircuit\__init__.py,2
+,,,,QC.1.11.2.1,f'Wrong bits count. bits value: {op.bits}!'
+,,,,QC.1.11.2.2,f'Wrong angles count. angles value: {op.argumentList}!'
+,,,,QC.1.11.2.3,f"{op.__class__.__name__} {op.name} can't be controlled in procedure!"
+,,MultiCtrlXProcedure\__init__.py,3

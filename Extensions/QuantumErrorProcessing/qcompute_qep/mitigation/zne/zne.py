@@ -21,10 +21,10 @@ Implementation of the Zero-Noise Extrapolation method in the Quantum Circuit Mod
 from typing import Callable, List, Union, Any
 from matplotlib.figure import Figure
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.mitigation import Mitigator
-import qcompute_qep.mitigation.zne as zne
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import Mitigator
+import Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.zne as zne
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 class ZNEMitigator(Mitigator):

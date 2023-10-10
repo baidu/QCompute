@@ -18,6 +18,8 @@
 """
 Barrier Operation
 """
+FileErrorCode = 33
+
 from typing import TYPE_CHECKING
 
 from QCompute.QPlatform.QOperation import QOperation
@@ -30,7 +32,11 @@ class BarrierOP(QOperation):
     """
     The barrier instruction
 
-    Barrier does nothing for implementing circuits on simulator but does STOP optimization between two barriers
+    Barrier does nothing for implementing circuits on simulator but does STOP optimization between two barriers.
+
+    :param qRegList: Quantum register list.
+
+    :type qRegList: List[QRegStorage]
     """
 
     def __init__(self):

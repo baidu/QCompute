@@ -19,7 +19,7 @@
 __init__ file of the `qcompute_qep.utils` module.
 """
 
-from qcompute_qep.utils.utils import global_phase, decompose_yzy, limit_angle,\
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import global_phase, decompose_yzy, limit_angle,\
                             str_to_state, expval_from_counts, expval_z_from_counts
 
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute

@@ -23,7 +23,7 @@ import abc
 from typing import Any
 import numpy as np
 
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 class Tomography(abc.ABC):

@@ -34,12 +34,12 @@ import statistics
 from tqdm import tqdm
 import collections
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
-from qcompute_qep.utils.circuit import execute, circuit_to_state, map_qubits
-from qcompute_qep.utils.utils import expval_from_counts
-import qcompute_qep.estimation as estimation
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, circuit_to_state, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import expval_from_counts
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
 
 
 class DFEState(estimation.Estimation):

@@ -33,12 +33,12 @@ import numpy as np
 
 from QCompute import *
 from QCompute.QPlatform.QOperation import FixedGate
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.quantum import clifford
-from qcompute_qep.mitigation.utils import plot_zne_sequences
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils.types import QProgram, QComputer
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.utils import plot_zne_sequences
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 
 def calculator(qp: QProgram = None, qc: QComputer = None) -> float:

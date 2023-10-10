@@ -21,7 +21,7 @@ Module for quantum noises.
 
 from typing import List
 import numpy
-from qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
 
 __all__ = [
     "Noise"

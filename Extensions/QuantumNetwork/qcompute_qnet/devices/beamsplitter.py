@@ -20,7 +20,7 @@ Module for beam splitters.
 """
 
 from typing import Tuple
-from qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
 
 __all__ = [
     "PolarizationBeamSplitter"

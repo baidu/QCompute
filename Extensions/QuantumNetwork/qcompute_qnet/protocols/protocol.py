@@ -23,7 +23,7 @@ from abc import ABC
 from typing import List, Union
 import networkx as nx
 import matplotlib.pyplot as plt
-from qcompute_qnet.core.des import Event, Scheduler, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Event, Scheduler, EventHandler
 
 __all__ = [
     "Protocol",
@@ -284,7 +284,7 @@ class ProtocolStack:
             self.__update_from_relations(relation)
         else:
             raise TypeError("Should input a single protocol or a list of protocol relations!")
-        from qcompute_qnet.topology.node import Node
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
         if isinstance(self.owner, Node):
             self.sync_env(self.owner)
 
@@ -323,7 +323,7 @@ class ProtocolStack:
         assert upper_protocols is not None or lower_protocols is not None,\
             f"Should assign at least an upper protocol or a lower protocol!"
 
-        from qcompute_qnet.topology.node import Node
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
         if isinstance(self.owner, Node):
             protocol.node = self.owner
             protocol.scheduler.env = self.owner.env

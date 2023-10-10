@@ -18,6 +18,10 @@
 """
 Rotation Gate Operation
 """
+from QCompute.QPlatform.ProcedureParameterExpression import ProcedureParameterExpression
+
+FileErrorCode = 39
+
 import importlib
 from typing import List, Optional, TYPE_CHECKING
 
@@ -30,8 +34,6 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 
 if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation import RotationArgument, OperationFunc
-
-FileErrorCode = 10
 
 
 class RotationGateOP(QOperation):
@@ -46,12 +48,11 @@ class RotationGateOP(QOperation):
                  uGateArgumentList: List['RotationArgument']) -> None:
         super().__init__(gate, bits)
         if len(angleList) not in allowArgumentCounts:
-            raise Error.ArgumentError(f'allowArgumentCounts is not len(angleList)!',
-                                      ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(f'allowArgumentCounts is not len(angleList)!', ModuleErrorCode, FileErrorCode, 1)
+
         self.allowArgumentCounts = allowArgumentCounts
         self.argumentList: List['RotationArgument'] = angleList
         self.uGateArgumentList: List['RotationArgument'] = uGateArgumentList
-
 
     def __call__(self, *qRegList: QRegStorage) -> None:
         self._op(list(qRegList))
@@ -64,14 +65,17 @@ class RotationGateOP(QOperation):
         Generate a single-qubit rotation gate with 3 angles
 
         :param theta: angle
+
         :param phi: angle
+
         :param lamda: angle
+
         :return: U3 matrix
         """
 
         self.matrix = numpy.array([[numpy.cos(theta / 2.0), -numpy.exp(1j * lamda) * numpy.sin(theta / 2.0)],
                                    [numpy.exp(1j * phi) * numpy.sin(theta / 2.0),
-                                     numpy.exp(1j * lamda + 1j * phi) * numpy.cos(theta / 2.0)]])
+                                    numpy.exp(1j * lamda + 1j * phi) * numpy.cos(theta / 2.0)]])
         return self.matrix
 
     def _u2Matrix(self, phi: float, lamda: float) -> numpy.ndarray:
@@ -79,7 +83,9 @@ class RotationGateOP(QOperation):
         Generate a single-qubit rotation gate with 2 angles
 
         :param phi: angle
+
         :param lamda: angle
+
         :return: U2 matrix
         """
 
@@ -92,6 +98,7 @@ class RotationGateOP(QOperation):
         Generate a single-qubit rotation gate along the Z-axis
 
         :param lamda: angle
+
         :return: U1 matrix
         """
 
@@ -102,12 +109,12 @@ class RotationGateOP(QOperation):
     def _cu3Matrix(self, theta: float, phi: float, lamda: float) -> numpy.ndarray:
         self.matrix = numpy.kron(numpy.eye(2),
                                  numpy.array([[1, 0],
-                                               [0, 0]])
+                                              [0, 0]])
                                  ) + \
                       numpy.kron(self._u3Matrix(theta, phi, lamda),
-                                  numpy.array([[0, 0],
-                                               [0, 1]])
-                                  )
+                                 numpy.array([[0, 0],
+                                              [0, 1]])
+                                 )
         return self.matrix
 
     def _generateUMatrix(self) -> numpy.ndarray:
@@ -134,11 +141,6 @@ class RotationGateOP(QOperation):
         #     return self._cu1Matrix(*self.uGateArgumentList)
 
     def getInversed(self) -> 'RotationGateOP':
-        for argument in self.argumentList:
-            if isinstance(argument, ProcedureParameterStorage):
-                raise Error.ArgumentError(f'Can not inverse argument id. angles id: {argument.index}!', ModuleErrorCode,
-                                          FileErrorCode, 2)
-
         nAngles = len(self.argumentList)
         if nAngles == 1:
             [theta] = self.argumentList
@@ -147,8 +149,9 @@ class RotationGateOP(QOperation):
         elif nAngles == 3:
             [theta, phi, lamda] = self.argumentList
         else:
-            raise Error.ArgumentError(f'Wrong angles count. angles value: {self.argumentList}!', ModuleErrorCode,
-                                      FileErrorCode, 3)
+            raise Error.ArgumentError(
+                f'Wrong angles count! angles value: {self.argumentList}.',
+                ModuleErrorCode, FileErrorCode, 2)
 
         if self.name == 'RX':
             return RX(-theta)
@@ -164,14 +167,16 @@ class RotationGateOP(QOperation):
             return CRZ(-theta)
         elif self.name == 'U':
             if nAngles == 1:
-                angles = [-self.argumentList[0]]
+                angles = [-theta]
             elif nAngles == 2:
-                angles = [numpy.pi - self.argumentList[1], numpy.pi - self.argumentList[0]]
+                angles = [numpy.pi - phi, numpy.pi - theta]
             elif nAngles == 3:
-                angles = [self.argumentList[0], numpy.pi - self.argumentList[2], numpy.pi - self.argumentList[1]]
+                angles = [theta, numpy.pi - lamda, numpy.pi - phi]
             else:
-                raise Error.ArgumentError(f'Wrong angles count. angles: {self.argumentList}!', ModuleErrorCode,
-                                          FileErrorCode, 4)
+                raise Error.ArgumentError(
+                    f'Wrong angles count! angles: {self.argumentList}.',
+                    ModuleErrorCode, FileErrorCode, 3)
+
             return U(*angles)
         elif self.name == 'CU':
             return CU(theta, numpy.pi - lamda, numpy.pi - phi)
@@ -334,7 +339,9 @@ def createRotationGateInstance(name: str, *angles: 'RotationArgument') -> 'Opera
     Create a new gate according to name and angles.
 
     :param name: rotation gate name
+
     :param angles: angle param list
+
     :return: new gate
     """
 

@@ -22,7 +22,7 @@ Module for discrete-event simulation environment with extra functionalities.
 from enum import Enum
 from typing import List, Union
 
-from qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
 
 __all__ = [
     "QuantumEnv"

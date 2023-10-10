@@ -17,6 +17,8 @@
 """
 Photonic gate operations for simulating quantum circuits based on fock state
 """
+FileErrorCode = 41
+
 import numpy
 from typing import List, TYPE_CHECKING, Union
 
@@ -27,9 +29,6 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation import OperationFunc
 
-FileErrorCode = 17
-
-
 class PhotonicFockGateOP(QOperation):
     """
     Photonic gate.
@@ -38,8 +37,8 @@ class PhotonicFockGateOP(QOperation):
     def __init__(self, gate: str, bits: int, allowArgumentCounts: int, argumentList: List[Union[float, int]]) -> None:
         super().__init__(gate, bits)
         if len(argumentList) != allowArgumentCounts:
-            raise Error.ArgumentError(f'allowArgumentCounts is not len(argumentList)!',
-                                      ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(f'allowArgumentCounts is not len(argumentList)!', ModuleErrorCode, FileErrorCode, 1)
+
         self.allowArgumentCounts = allowArgumentCounts
         self.argumentList: List[Union[float, int]] = argumentList
         self.matrix: numpy.ndarray = None
@@ -81,10 +80,7 @@ def PhotonicAP(num_photons: int) -> 'OperationFunc':
     """
 
     assert num_photons >= 0
-    num_photons = int(num_photons)
-    gate = PhotonicFockGateOP('PhotonicFockAP', 1, 1, [num_photons])
-    gate.generateMatrix = gate._generateAPMatrix
-    return gate
+    return PhotonicFockGateOP('PhotonicFockAP', 1, 1, [num_photons])
 
 
 PhotonicAP.type = 'PhotonicFockGateOP'
@@ -98,9 +94,7 @@ def PhotonicPHA(phi: float) -> 'OperationFunc':
     :param phi: phase shift
     """
 
-    gate = PhotonicFockGateOP('PhotonicFockPHA', 1, 1, [phi])
-    gate.generateMatrix = gate._generatePHAMatrix
-    return gate
+    return PhotonicFockGateOP('PhotonicFockPHA', 1, 1, [phi])
 
 
 PhotonicPHA.type = 'PhotonicFockGateOP'
@@ -121,9 +115,7 @@ def PhotonicBS(t: float) -> 'OperationFunc':
     """
 
     assert 0 <= t <= 1
-    gate = PhotonicFockGateOP('PhotonicFockBS', 2, 1, [t])
-    gate.generateMatrix = gate._generateBSMatrix
-    return gate
+    return PhotonicFockGateOP('PhotonicFockBS', 2, 1, [t])
 
 
 PhotonicBS.type = 'PhotonicFockGateOP'
@@ -144,9 +136,7 @@ def PhotonicMZ(phi_in: float, phi_ex: float) -> 'OperationFunc':  # CompositeGat
     :param phi_ex: external phase
     """
 
-    gate = PhotonicFockGateOP('PhotonicFockMZ', 2, 2, [phi_in, phi_ex])
-    gate.generateMatrix = gate._generateMZMatrix
-    return gate
+    return PhotonicFockGateOP('PhotonicFockMZ', 2, 2, [phi_in, phi_ex])
 
 
 PhotonicMZ.type = 'PhotonicFockGateOP'

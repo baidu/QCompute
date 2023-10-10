@@ -18,6 +18,7 @@
 """
 Fock state initialization
 """
+FileErrorCode = 23
 
 from enum import unique, IntEnum
 import numpy

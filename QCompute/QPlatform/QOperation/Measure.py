@@ -18,6 +18,8 @@
 """
 Measure Operation
 """
+FileErrorCode = 37
+
 import importlib
 from typing import List, TYPE_CHECKING, Union
 from QCompute.QPlatform.QOperation import QOperation
@@ -41,8 +43,10 @@ class MeasureOP(QOperation):
     def __call__(self, qRegList: List['QRegStorage'], cRegList: Union[List[int], range]) -> None:
         """
         Hack initialize by calling parent classes
-        :param qRegList: the quantum register list
-        :param cRegList: the classical register list. [2, 4, 6] or range(0, 3)
+
+        :param qRegList: The quantum register list. List[QRegStorage]
+
+        :param cRegList: The classical register list. Union[List[int], range]
         """
         if isinstance(cRegList, range):  # compatible 'range'
             cRegList = list(cRegList)
@@ -58,10 +62,13 @@ Z measure: measurement along computational basis.
 
 def getMeasureInstance(name: str) -> 'MeasureOP':
     """
-    Get a measure according to name
+    Get a measure according to name.
 
-    :param name: measure name
-    :return: gate
+    :param name: measure name.
+
+    :type name: str
+
+    :return: gate.
     """
 
     currentModule = importlib.import_module(__name__)

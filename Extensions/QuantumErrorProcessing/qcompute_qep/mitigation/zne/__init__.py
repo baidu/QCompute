@@ -18,9 +18,11 @@
 """
 Export the entire directory as a library
 """
-from qcompute_qep.mitigation.zne.folder import Folder, CircuitFolder, LayerFolder, GateFolder
-from qcompute_qep.mitigation.zne.extrapolator import Extrapolator, LinearExtrapolator, ExponentialExtrapolator, \
-                PolynomialExtrapolator, RichardsonExtrapolator, ExpPolyExtrapolator, CustomizedExtrapolator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.zne.folder import \
+    Folder, CircuitFolder, LayerFolder, GateFolder
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.zne.extrapolator import \
+    Extrapolator, LinearExtrapolator, ExponentialExtrapolator, PolynomialExtrapolator, \
+    RichardsonExtrapolator, ExpPolyExtrapolator, CustomizedExtrapolator
 
 __all__ = [
     'Folder', 'Extrapolator',

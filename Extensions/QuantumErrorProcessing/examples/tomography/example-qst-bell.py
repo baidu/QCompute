@@ -19,7 +19,7 @@
 Example to demonstrate quantum state tomography on the Bell state.
 """
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 # Step 1. Set up the quantum program for preparing the Bell state

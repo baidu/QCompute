@@ -37,8 +37,8 @@ is often used as a building block for more complex codes.
 
 import QCompute
 
-from qcompute_qep.correction import BasicCode, ColorTable
-import qcompute_qep.utils.circuit as circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction import BasicCode, ColorTable
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 
 
 # To construct the three-qubit bit-flip code, we need to specify its stabilizers and detectable error types.

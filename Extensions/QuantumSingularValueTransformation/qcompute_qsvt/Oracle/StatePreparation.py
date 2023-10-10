@@ -36,7 +36,7 @@ import numpy as np
 from QCompute import X
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_ry
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_ry
 
 
 def circ_state_pre(reg_sys: List[QRegStorage], reg_ctrlling: Optional[List[QRegStorage]],
@@ -80,7 +80,7 @@ def circ_state_pre(reg_sys: List[QRegStorage], reg_ctrlling: Optional[List[QRegS
         +0.5|4\rangle+0.25|5\rangle+0.25|6\rangle` could be prepared by
 
         >>> from QCompute import QEnv
-        >>> from qcompute_qsvt.Oracle.StatePreparation import circ_state_pre
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.StatePreparation import circ_state_pre
         >>> list_t = [0.25, 0.25, 0.5, 0.5, 0.5, 0.25, 0.25]
         >>> env = QEnv()
         >>> reg_s = [env.Q[0], env.Q[1], env.Q[2]]

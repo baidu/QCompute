@@ -25,7 +25,7 @@ from enum import Enum
 from typing import List, Optional, Union
 import numpy as np
 import pandas as pd
-from qcompute_qnet.quantum.backends import qcompute, Backend, mbqc
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import qcompute, Backend, mbqc
 
 __all__ = [
     "Circuit"
@@ -838,7 +838,7 @@ class Circuit:
     def print_agenda(self) -> None:
         r"""Print the events scheduled for the circuit.
         """
-        from qcompute_qnet.core.des import Event
+        from Extensions.QuantumNetwork.qcompute_qnet.core.des import Event
 
         df = Event.events_to_dataframe(self.agenda)
         print(f"\nAgenda of {self.name} (unsorted):\n{df.to_string()}")
@@ -868,7 +868,7 @@ class Circuit:
 
         Examples:
 
-            >>> from qcompute_qnet.quantum.circuit import Circuit
+            >>> from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
             >>> cir = Circuit()
             >>> cir.x(0)
             >>> cir.y(1)

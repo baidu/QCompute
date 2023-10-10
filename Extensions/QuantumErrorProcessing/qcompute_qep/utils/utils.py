@@ -18,7 +18,7 @@
 """
 Utility functions used in the ``qcompute_qep`` module.
 """
-from qcompute_qep.utils.linalg import dagger
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import dagger
 from QCompute.QPlatform.QOperation.QProcedure import QProcedure
 import math
 import functools

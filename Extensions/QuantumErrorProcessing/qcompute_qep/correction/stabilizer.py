@@ -22,7 +22,7 @@ The implementations of various stabilizer codes must inherit this abstract class
 import abc
 from typing import Any, List
 
-from qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
 
 
 class StabilizerCode(abc.ABC):

@@ -19,9 +19,9 @@
 An example to demonstrate the Interleaved Randomized Benchmarking protocol.
 """
 from QCompute import *
-import qcompute_qep.benchmarking as rb
-import qcompute_qep.utils.types as types
-import qcompute_qep.quantum.clifford as clifford
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford as clifford
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).

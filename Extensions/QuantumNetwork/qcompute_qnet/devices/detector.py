@@ -21,8 +21,8 @@ Module for photon detectors.
 
 from typing import List, Tuple
 from numpy import random
-from qcompute_qnet.core.des import Entity, EventHandler
-from qcompute_qnet.devices.beamsplitter import PolarizationBeamSplitter
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.devices.beamsplitter import PolarizationBeamSplitter
 
 __all__ = [
     "SinglePhotonDetector",

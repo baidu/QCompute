@@ -155,9 +155,13 @@ Hamiltonian = random_H_generator(n, K)  # Our Hamiltonian H
 def NKron(AMatrix, BMatrix, *args):
     """
     Recursively execute kron n times. This function at least has two matrices.
+    
     :param AMatrix: First matrix
+    
     :param BMatrix: Second matrix
+    
     :param args: If have more matrix, they are delivered by this matrix
+    
     :return: The result of tensor product.
     """
 

@@ -28,6 +28,8 @@ from QCompute.QProtobuf.Library.QPhotonicOperation_pb2 import \
     PhotonicGaussianGate as PBPhotonicGaussianGate, PhotonicGaussianMeasure as PBPhotonicGaussianMeasure, \
     PhotonicFockGate as PBPhotonicFockGate, PhotonicFockMeasure as PBPhotonicFockMeasure
 from QCompute.QProtobuf.Library.QNoise_pb2 import QNoise as PBQNoise, QNoiseDefine as PBQNoiseDefine
+from QCompute.QProtobuf.Library.ParameterExpression_pb2 import ExpressionList as PBExpressionList, \
+    ParameterExpression as PBParameterExpression, MathOperator as PBMathOperator
 from QCompute.QProtobuf.Library.QObj_pb2 import QObject as PBQObject, Experiment as PBExperiment, \
     Instruction as PBInstruction
 from QCompute.QProtobuf.Library.UniversalBlindQuantumComputing_pb2 import InitState as PBUbpcInitState, \

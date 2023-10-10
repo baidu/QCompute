@@ -241,7 +241,7 @@ Next, we use QNET to simulate the quantum entanglement swapping protocol in a qu
 First, we create a simulation environment ``QuantumEnv``.
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # Create an environment for simulation
 env = QuantumEnv("Repeater", default=True)
@@ -250,9 +250,9 @@ env = QuantumEnv("Repeater", default=True)
 Then, we create the quantum nodes that correspond to the four kinds of roles in the protocol and specify the pre-installed protocol in the protocol stack of each node as ``EntanglementSwapping``. Then we configure the communication links between the nodes.
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import EntanglementSwapping
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import EntanglementSwapping
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # Create nodes with quantum registers and specify their pre-installed protocols
 alice = QuantumNode("Alice", qreg_size=1, protocol=EntanglementSwapping)
@@ -273,7 +273,7 @@ link_repeater_source_br = Link("Link_repeater_source_br", ends=(repeater, source
 Then, we create a quantum network and install the configured nodes and links.
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a network, install the nodes and links
 network = Network("Repeater network")
@@ -285,7 +285,7 @@ network.install([alice, bob, repeater, source_ar, source_br,
 Now we have created the simulation environment and constructed the quantum network. Next, we can call ``start`` method to start the protocol in the protocol stack.
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # Start the entanglement swapping protocol
 alice.start(role="UpstreamNode", peer=bob, repeater=repeater)

@@ -24,7 +24,7 @@ import numpy as np
 from skimage.transform import resize
 from QCompute import Define
 from QCompute.QPlatform import BackendName
-from qcompute_qapp.algorithm.kernel_classifier import KernelClassifier
+from Extensions.QuantumApp.qcompute_qapp.algorithm.kernel_classifier import KernelClassifier
 
 # If user have a Quantum-hub account and wish to use a cloud simulator/qpu, please
 

@@ -21,10 +21,10 @@ Module for quantum nodes.
 
 from typing import Optional
 
-from qcompute_qnet.topology.node import Node
-from qcompute_qnet.devices.register import QuantumRegister
-from qcompute_qnet.models.qpu.message import QuantumMsg
-from qcompute_qnet.protocols.protocol import ProtocolStack
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+from Extensions.QuantumNetwork.qcompute_qnet.devices.register import QuantumRegister
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.message import QuantumMsg
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import ProtocolStack
 
 __all__ = [
     "QuantumNode"

@@ -44,10 +44,10 @@ from copy import deepcopy
 import scipy.linalg as la
 from scipy.optimize import minimize, Bounds
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm, complete_pauli_basis
-from qcompute_qep.tomography import GateSet
-from qcompute_qep.utils.linalg import cholesky_matrix_to_vec, vec_to_cholesky_matrix, \
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm, complete_pauli_basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import GateSet
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import cholesky_matrix_to_vec, vec_to_cholesky_matrix, \
     tensor, cholesky_decomposition, complex_matrix_to_vec
 
 

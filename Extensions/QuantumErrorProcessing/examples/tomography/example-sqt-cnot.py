@@ -29,7 +29,7 @@ from cmath import *
 import numpy as np
 
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 #######################################################################################################################

@@ -18,6 +18,8 @@
 """
 Utilities
 """
+FileErrorCode = 31
+
 from typing import Optional, List
 import numpy as np
 import math
@@ -53,6 +55,7 @@ def numpyMatrixToTensorMatrix(numpyMatrix: np.ndarray) -> np.ndarray:
     Covert the matrix from numpy format to tensor format. Must be square matrix.
 
     :param numpyMatrix: np.ndarray, a matrix of numpy format
+
     :return: np.ndarray, a matrix of tensor format
     """
     old_shape = numpyMatrix.shape
@@ -65,6 +68,7 @@ def tensorMatrixToNumpyMatrix(tensorMatrix: np.ndarray) -> np.ndarray:
     Covert the matrix form tensor format to numpy format. Must be square matrix.
 
     :param tensorMatrix: np.ndarray, a matrix of tensor format
+
     :return: np.ndarray, a matrix of numpy format
     """
     bits = int(len(tensorMatrix.shape) / 2)
@@ -77,7 +81,9 @@ def noiseTensor(krausList1: List[np.ndarray], krausList2: List[np.ndarray]) -> L
     Tensor two noises, whose Kraus operators are KrausList1 and KrausList2, respectively.
 
     :param krausList1: List[np.ndarray], Kraus operator of noise 1
+
     :param krausList2: List[np.ndarray], Kraus operator of noise 2
+
     :return: List[np.ndarray], a list of Kraus operators
     """
 
@@ -92,7 +98,9 @@ def isTracePreserving(krauses: List[np.ndarray], probabilities: Optional[List[fl
     Verify the input Kraus operators satisfy TP (i.e., trace preserving)
 
     :param krauses: list(np.ndarray), the Kraus operators of a noise
+
     :param probabilities: Optional[List[float], default None, the probabilities correspond to the Kraus operators
+
     :return: bool, true for yes and false for no
 
     Matrix form:
@@ -121,6 +129,7 @@ def _proportionalUnitary(Matrix: np.ndarray) -> bool:
     Verity a matrix whether it is proportional to a unitary or not.
 
     :param Matrix: np.ndarray, a matrix of numpy format
+
     :return: bool, true for yes and false for no
 
     Works for non-zero numpy matrix.
@@ -136,6 +145,7 @@ def _normMatrix(Matrix: np.ndarray) -> np.ndarray:
     Calculate a normalized Matrix.
 
     :param Matrix: np.ndarray, a matrix of numpy format
+
     :return: np.ndarray, a noramlized matrix
 
     :math:`\hat{M} = M / \text{Tr}[M^{\dagger} M]`

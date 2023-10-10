@@ -479,7 +479,7 @@ First, we create a simulation environment ``QuantumEnv``.
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # Create an environment for simulation
 env = QuantumEnv("Magic square game", default=True)
@@ -489,9 +489,9 @@ Then, we create the quantum nodes that correspond to the four roles in the proto
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import MagicSquareGame
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import MagicSquareGame
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # Create quantum nodes with quantum registers and specify their pre-installed protocols
 alice = QuantumNode("Alice", qreg_size=2, protocol=MagicSquareGame)
@@ -510,7 +510,7 @@ Next, we create a quantum network and install all the configured nodes and links
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a network, install the nodes and links
 network = Network("Magic square game network")
@@ -537,7 +537,7 @@ By calling the ``estimate_statistics`` method of ``Referee`` sub-protocol, we ca
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # Initialize the environment and run simulation
 env.init()

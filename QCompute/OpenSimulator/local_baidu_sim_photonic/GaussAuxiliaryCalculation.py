@@ -18,6 +18,8 @@
 """
 Auxiliary functions for quantum circuit based on gaussian state
 """
+FileErrorCode = 18
+
 
 import numpy
 from typing import Tuple
@@ -140,7 +142,7 @@ def CalculateP0_and_H(fir_mom: numpy.ndarray, sec_mom: numpy.ndarray, num_cutoff
     identity_mat_2N = numpy.eye(2 * num_mode)
     unitary_mat_2N = 1 / numpy.sqrt(2) * numpy.block([[-1j * identity_mat_N, 1j * identity_mat_N],
                                                       [identity_mat_N, identity_mat_N]])
-    sec_mom_M_2N = sec_mom_M_2N
+
     I_mins_2M = identity_mat_2N - 2 * sec_mom_M_2N
     I_plus_2M = identity_mat_2N + 2 * sec_mom_M_2N
 
@@ -206,59 +208,42 @@ def HermitePolynomials(R_2N: numpy.ndarray, y_2N: numpy.ndarray, num_cutoff: int
     :return H_2N: hermite polynomials
     """
 
-    # Get the dimension
     dim_y = len(y_2N)
-    # The tensor of multidimensional hermite polynomials is initialized as zero matrix.
     H_2N = numpy.zeros(dim_y * [num_cutoff + 1], dtype=complex)
 
-    # The 'former coordinate' is initialized as zero matrix.
-    former_coor = numpy.zeros(dim_y, dtype=int)
-    # The first element of tensor of multidimensional hermite polynomials is known value.
-    H_2N[tuple(former_coor)] = 1
-
-    for latter_coor_tuple, value_H in numpy.ndenumerate(H_2N):
-        # Convert 'tuple' to 'array'
-        latter_coor = numpy.array(latter_coor_tuple)
-
-        # The coordinate starts from zero vector whose corresponding element of H is 1, and thus we should jump.
-        if max(latter_coor) == 0:
+    for latter_coor_tuple, _ in numpy.ndenumerate(H_2N):
+        latter_coor_array = numpy.array(latter_coor_tuple)
+        if max(latter_coor_array) == 0:
+            H_2N[latter_coor_tuple] = 1
+            former_coor_array = latter_coor_array
             continue
 
-        # Obtain e_k and k
-        e_k = latter_coor - former_coor
-        if numpy.any(e_k < 0):
-            former_coor[e_k < 0] = 0
-            e_k[e_k < 0] = 0
+        for index in range(dim_y - 1, -1, -1):
+            if latter_coor_array[index] > former_coor_array[index]:
+                k = index
+                if k == dim_y - 1:
+                    break
+                else:
+                    former_coor_array[k + 1:] = 0
+                    break
 
-        k = (numpy.nonzero(e_k)[0])[0]
-
-        # Calculate the first term of recurrence equation of multidimensional hermite polynomials
+        H2 = H3 = 0
         sum_R_by_y = 0
-        for i in range(dim_y):
-            sum_R_by_y += R_2N[k, i] * y_2N[i]
-
-        H_1 = sum_R_by_y * H_2N[tuple(former_coor)]
-
-        # Calculate the second term of recurrence equation of multidimensional hermite polynomials
-        H_2 = H_3 = 0
         for j in range(dim_y):
-            e_j = numpy.array(dim_y * [0], dtype=int)
-            e_j[j] = 1
-
-            former_coor_j = former_coor - e_j
-            if numpy.any(former_coor_j < 0):
+            sum_R_by_y += R_2N[k, j] * y_2N[j, 0]
+            if former_coor_array[j] > 0:
+                former_coor_j = numpy.copy(former_coor_array)
+                former_coor_j[j] -= 1
+                if k != j:
+                    H2 += R_2N[k, j] * latter_coor_array[j] * H_2N[tuple(former_coor_j)]
+                else:
+                    H3 = R_2N[k, k] * (latter_coor_array[j] - 1) * H_2N[tuple(former_coor_j)]
+            else:
                 continue
-            elif (j != k):
-                qm = R_2N[k, j] * latter_coor[j]
-                H_2 += qm * H_2N[tuple(former_coor_j)]
-            elif (j == k):
-                qm = R_2N[k, j] * (latter_coor[k] - 1)
-                H_3 = qm * H_2N[tuple(former_coor_j)]
 
-        # Combine the results of recurrence and fill the tensor element of H
-        H_2N[tuple(latter_coor)] = H_1 - H_2 - H_3
-        # Update the former coordinate that is used to calculate the next element of H
-        former_coor = latter_coor
+        H1 = sum_R_by_y * H_2N[tuple(former_coor_array)]
+        H_2N[latter_coor_tuple] = H1 - H2 - H3
+        former_coor_array = latter_coor_array
 
     return H_2N.real
 

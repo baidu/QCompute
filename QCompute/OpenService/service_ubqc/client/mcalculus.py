@@ -17,6 +17,8 @@
 """
 mcalculus
 """
+FileErrorCode = 4
+
 
 from typing import Tuple
 from numpy import pi
@@ -29,8 +31,6 @@ from QCompute.OpenService.service_ubqc.client.qobject import Pattern, Circuit
 __all__ = [
     "MCalculus"
 ]
-
-FileErrorCode = 2
 
 
 class MCalculus:
@@ -61,17 +61,10 @@ class MCalculus:
             circuit (Circuit): a quantum circuit
         """
         if not isinstance(circuit, Circuit):
-            raise Error.ArgumentError(f"Invalid circuit ({circuit}) with the type: ({type(circuit)})!\n"
-                                      "Only `Circuit` is supported as the type of quantum circuit.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 1)
+            raise Error.ArgumentError(f'Invalid circuit ({circuit}) with the type: ({type(circuit)})!\nOnly `Circuit` is supported as the type of quantum circuit.', ModuleErrorCode, FileErrorCode, 1)
 
         if not circuit.is_valid():
-            raise Error.ArgumentError(f"Invalid circuit: ({circuit})!\n"
-                                      "This quantum circuit is not valid after the simplification! "
-                                      "There is at least one qubit not operated by any effective quantum gates.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(f'Invalid circuit: ({circuit})!\nThis quantum circuit is not valid after the simplification! There is at least one qubit not operated by any effective quantum gates.', ModuleErrorCode, FileErrorCode, 2)
 
         self.__circuit = circuit
         self.__width = circuit.get_width()
@@ -288,14 +281,7 @@ class MCalculus:
             list: a list of commands
         """
         if not {name}.issubset(['u', 'm', 'd']):
-            raise Error.ArgumentError(f"Invalid gate name ({name})!\n"
-                                      "Only 'u', 'm' and 'd' are supported as the gate names "
-                                      "in UBQC in this version, where "
-                                      "'u' is the 'unitary gate', "
-                                      "'m' is the 'measurement' and "
-                                      "'d' is the 'double qubit gate'.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 3)
+            raise Error.ArgumentError(f"Invalid gate name ({name})!\nOnly 'u', 'm' and 'd' are supported as the gate names in UBQC in this version, where 'u' is the 'unitary gate', 'm' is the 'measurement' and 'd' is the 'double qubit gate'.", ModuleErrorCode, FileErrorCode, 3)
 
         # Single qubit unitary gate commands
         if name == 'u':
@@ -364,13 +350,7 @@ class MCalculus:
             col_in = input_[1]
 
             if not {name}.issubset(['u', 'm']):
-                raise Error.ArgumentError(f"Invalid gate list: ({gate_list})!\n"
-                                          "Only 'u' and 'm' are supported as the single qubit gate names "
-                                          "in UBQC in this version, where "
-                                          "'u' is the 'unitary gate' and "
-                                          "'m' is the 'measurement'.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 4)
+                raise Error.ArgumentError(f"Invalid gate list: ({gate_list})!\nOnly 'u' and 'm' are supported as the single qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'm' is the 'measurement'.", ModuleErrorCode, FileErrorCode, 4)
 
             # Unitary gate
             if name == 'u':
@@ -404,13 +384,7 @@ class MCalculus:
             name2 = gate1[0]
 
             if not {name1, name2}.issubset(['u', 'cnot']):
-                raise Error.ArgumentError(f"Invalid gate list: ({gate_list})!\n"
-                                          "Only 'u' and 'cnot' are supported as the double qubit gate names "
-                                          "in UBQC in this version, where "
-                                          "'u' is the 'unitary gate' and "
-                                          "'cnot' is the 'CNOT gate'.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 5)
+                raise Error.ArgumentError(f"Invalid gate list: ({gate_list})!\nOnly 'u' and 'cnot' are supported as the double qubit gate names in UBQC in this version, where 'u' is the 'unitary gate' and 'cnot' is the 'CNOT gate'.", ModuleErrorCode, FileErrorCode, 5)
 
             # Two unitary gates
             if name1 == name2 == 'u':
@@ -426,11 +400,7 @@ class MCalculus:
             row1 = input1[0]
             row2 = input2[0]
             if not abs(row1 - row2) == 1:
-                raise Error.ArgumentError(f"Invalid row indexes: {row1} and {row2}!\n"
-                                          "Only the adjacent qubits are supported as indexes of the quantum gates "
-                                          "in UBQC in this version.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 6)
+                raise Error.ArgumentError(f'Invalid row indexes: {row1} and {row2}!\nOnly the adjacent qubits are supported as indexes of the quantum gates in UBQC in this version.', ModuleErrorCode, FileErrorCode, 6)
 
             col_in = input1[1]
             col_out = output1[1]
@@ -467,10 +437,7 @@ class MCalculus:
 
         self.__build_brickwork(bw_cir)
         if self.__measured_qubits != list(range(self.__width)):
-            raise Error.ArgumentError("Invalid brickwork pattern!"
-                                      "Brickwork pattern does not support quantum output in UBQC in this version.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 7)
+            raise Error.ArgumentError('Invalid brickwork pattern! Brickwork pattern does not support quantum output in UBQC in this version.', ModuleErrorCode, FileErrorCode, 7)
 
         input_ = self.__get_input()
         output_ = self.__get_output()
@@ -508,16 +475,7 @@ class MCalculus:
         name2 = cmd2.name
 
         if not {name1, name2}.issubset(['E', 'M', 'X', 'Z', 'S']):
-            raise Error.ArgumentError(f"Invalid command names: ({name1}) and ({name2})!"
-                                      "Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names "
-                                      "in UBQC in this version, where "
-                                      "'E' is the entanglement command, "
-                                      "'M' is the measurement command, "
-                                      "'X' is the X byproduct correction command, "
-                                      "'Z' is the Z byproduct correction command and "
-                                      "'S' is the signal shifting command.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 8)
+            raise Error.ArgumentError(f"Invalid command names: ({name1}) and ({name2})! Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command.", ModuleErrorCode, FileErrorCode, 8)
 
         # [X, E] --> [E, X]
         if name1 == 'X' and name2 == 'E':
@@ -539,10 +497,7 @@ class MCalculus:
             if cmd1.which_qubit not in cmd2.which_qubits:
                 return [cmd2, cmd1]  # swap the independent commands
             else:
-                raise Error.ArgumentError(f"Invalid command names: ({name1}) and ({name2})!"
-                                          "The measurement command must be executed after the entanglement command.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 9)
+                raise Error.ArgumentError(f'Invalid command names: ({name1}) and ({name2})! The measurement command must be executed after the entanglement command.', ModuleErrorCode, FileErrorCode, 9)
 
         # [X, M] --> [M, X]
         elif name1 == 'X' and name2 == 'M':
@@ -557,11 +512,7 @@ class MCalculus:
                 elif measurement_plane == 'YZ':
                     M_new = Pattern.CommandM(M_qubit, cmd2.angle, 'YZ', cmd2.domain_s, cmd2.domain_t + cmd1.domain)
                 else:
-                    raise Error.ArgumentError(f"Invalid measurement plane: ({measurement_plane})!"
-                                              "Only 'XY' and 'YZ' are supported as the measurement plane "
-                                              "in UBQC in this version.",
-                                              ModuleErrorCode,
-                                              FileErrorCode, 10)
+                    raise Error.ArgumentError(f"Invalid measurement plane: ({measurement_plane})! Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version.", ModuleErrorCode, FileErrorCode, 10)
 
                 return [M_new]  # create a new command
 
@@ -578,11 +529,8 @@ class MCalculus:
                 elif measurement_plane == 'XY':
                     M_new = Pattern.CommandM(M_qubit, cmd2.angle, 'XY', cmd2.domain_s, cmd2.domain_t + cmd1.domain)
                 else:
-                    raise Error.ArgumentError(f"Invalid measurement plane: ({measurement_plane})!"
-                                              "Only 'XY' and 'YZ' are supported as the measurement plane "
-                                              "in UBQC in this version.",
-                                              ModuleErrorCode,
-                                              FileErrorCode, 11)
+                    raise Error.ArgumentError(f"Invalid measurement plane: ({measurement_plane})! Only 'XY' and 'YZ' are supported as the measurement plane in UBQC in this version.", ModuleErrorCode, FileErrorCode, 11)
+
                 return [M_new]  # create a new command
 
         # [Z, X] --> [X, Z]
@@ -661,10 +609,7 @@ class MCalculus:
             list: a list of new commands after propagation
         """
         if not isinstance(cmds, list):
-            raise Error.ArgumentError(f"Invalid commands list ({cmds}) with the type: ({type(cmds)})!\n"
-                                      "Only `List` is supported as the type of commands list.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 12)
+            raise Error.ArgumentError(f'Invalid commands list ({cmds}) with the type: ({type(cmds)})!\nOnly `List` is supported as the type of commands list.', ModuleErrorCode, FileErrorCode, 12)
 
         # Back to front, propagate command E, command M, command X and command Z sequentially
         if {cmd_type}.issubset(['E', 'M', 'X', 'Z']):
@@ -729,16 +674,7 @@ class MCalculus:
                   False if the type of commands is not in a standard order
         """
         if not {cmd_type}.issubset(['E', 'M', 'X', 'Z', 'S']):
-            raise Error.ArgumentError(f"Invalid command name: ({cmd_type}!"
-                                      "Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names "
-                                      "in UBQC in this version, where "
-                                      "'E' is the entanglement command, "
-                                      "'M' is the measurement command, "
-                                      "'X' is the X byproduct correction command, "
-                                      "'Z' is the Z byproduct correction command and "
-                                      "'S' is the signal shifting command.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 13)
+            raise Error.ArgumentError(f"Invalid command name: ({cmd_type}! Only 'E', 'M', 'X', 'Z' and 'S' are supported as the command names in UBQC in this version, where 'E' is the entanglement command, 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command.", ModuleErrorCode, FileErrorCode, 13)
 
         # Map the commands to numbers
         cmds_count, cmd_num_wild, cmd_num_std = self.__cmds_to_nums(cmds)

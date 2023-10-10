@@ -21,10 +21,10 @@ Solve LiH ground state energy with VQE
 import numpy as np
 from QCompute import Define
 from QCompute.QPlatform import BackendName
-from qcompute_qapp.application.chemistry import LiH_HAMILTONIAN, MolecularGroundStateEnergy
-from qcompute_qapp.algorithm import VQE
-from qcompute_qapp.circuit import RealEntangledCircuit
-from qcompute_qapp.optimizer import SMO
+from Extensions.QuantumApp.qcompute_qapp.application.chemistry import LiH_HAMILTONIAN, MolecularGroundStateEnergy
+from Extensions.QuantumApp.qcompute_qapp.algorithm import VQE
+from Extensions.QuantumApp.qcompute_qapp.circuit import RealEntangledCircuit
+from Extensions.QuantumApp.qcompute_qapp.optimizer import SMO
 
 
 lih = MolecularGroundStateEnergy(num_qubits=LiH_HAMILTONIAN[0], hamiltonian=LiH_HAMILTONIAN[1])

@@ -19,20 +19,20 @@
 This file aims to collect functions related to quantum state tomography.
 """
 
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 from typing import List, Union
 import scipy.linalg as la
 import numpy as np
 from tqdm import tqdm
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, MeasurementBasis, init_measurement_basis
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.linalg import dagger
-from qcompute_qep.quantum.pauli import ptm_to_operator
-from qcompute_qep.quantum.metrics import state_fidelity
-from qcompute_qep.utils.utils import expval_from_counts
-from qcompute_qep.utils.circuit import circuit_to_state, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import Tomography, MeasurementBasis, init_measurement_basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import dagger
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import ptm_to_operator
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics import state_fidelity
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_state, map_qubits
 
 
 class StateTomography(Tomography):
@@ -107,9 +107,9 @@ class StateTomography(Tomography):
         **Examples**
 
             >>> import QCompute
-            >>> from qcompute_qep.quantum.pauli import operator_to_ptm, complete_pauli_basis
-            >>> from qcompute_qep.utils.circuit import circuit_to_state
-            >>> from qcompute_qep.quantum.metrics import state_fidelity
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import operator_to_ptm, complete_pauli_basis
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_state
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics import state_fidelity
             >>> qp = QCompute.QEnv()
             >>> qp.Q.createList(2)
             >>> QCompute.H(qp.Q[0])

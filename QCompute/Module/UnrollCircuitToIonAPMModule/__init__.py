@@ -16,14 +16,14 @@
 """
 Unroll Circuit To IonAPM
 """
+FileErrorCode = 14
+
 from typing import List, Dict, Optional, Union
 
 from QCompute.OpenModule import ModuleImplement
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate
 
 
-
-FileErrorCode = 11
 
 
 class UnrollCircuitToIonAPMModule(ModuleImplement):
@@ -48,7 +48,7 @@ class UnrollCircuitToIonAPMModule(ModuleImplement):
 
     env.module(UnrollCircuitToIonAPMModule({'errorOnUnsupported': False, 'targetGates': ['RX', 'RY'], 'sourceGates': ['S', 'T']}))
 
-    env.serverModule(ServerModule.UnrollCircuitToIonAPMModule, {"disable": True})
+    env.serverModule(ServerModule.UnrollCircuitToIonAPM, {"disable": True})
     """
     
 
@@ -58,7 +58,7 @@ class UnrollCircuitToIonAPMModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
+        super().__init__(arguments)
         
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
@@ -66,6 +66,7 @@ class UnrollCircuitToIonAPMModule(ModuleImplement):
         Process the Module
 
         :param program: the program
+
         :return: unrolled circuit
         """
         from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented at local sdk')

@@ -34,7 +34,7 @@ References:
 """
 import numpy as np
 from typing import List, Tuple
-from qcompute_qep.quantum.pauli import pauli2bsf
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import pauli2bsf
 
 
 class ColorTable:

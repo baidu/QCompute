@@ -18,6 +18,8 @@
 """
 Photonic measurement operations for simulating quantum circuits based on fock state
 """
+FileErrorCode = 42
+
 
 from QCompute.QPlatform import Error, ModuleErrorCode, FileErrorCode
 from typing import List, TYPE_CHECKING, Union
@@ -39,7 +41,7 @@ class PhotonicFockMeasureOP(QOperation):
             if allowArgumentCounts != 1:
                 raise Error.ArgumentError(f'photonicArgument is invalid!', ModuleErrorCode, FileErrorCode, 1)
         else:
-            raise Error.ArgumentError(f'photonicArgument is invalid!', ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(f'photonicArgument is invalid!', ModuleErrorCode, FileErrorCode, 2)
 
         self.allowArgumentCounts = allowArgumentCounts
         if gate == 'PhotonCount':

@@ -20,10 +20,10 @@ Module for the QKD routing protocol.
 """
 
 from typing import List
-from qcompute_qnet.core.des import EventHandler
-from qcompute_qnet.protocols.routing import Routing
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
-from qcompute_qnet.models.qkd.message import QKDMessage
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.routing import Routing
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.message import QKDMessage
 
 __all__ = [
     "QKDRouting"
@@ -108,8 +108,8 @@ class QKDRouting(Routing):
             lower_protocol (type): lower protocol that sends the message
             **kwargs: received keyword arguments
         """
-        from qcompute_qnet.models.qkd.node import TrustedRepeaterNode, EndNode
-        from qcompute_qnet.models.qkd.application import QKDApp
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import TrustedRepeaterNode, EndNode
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.application import QKDApp
 
         peer = kwargs['peer']
         self.keys[peer] = kwargs['sifted_keys']
@@ -151,8 +151,8 @@ class QKDRouting(Routing):
             msg (QKDMessage): received QKDMessage
             **kwargs (Any): keyword arguments for receiving the classical message
         """
-        from qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode
-        from qcompute_qnet.models.qkd.application import QKDApp
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.application import QKDApp
 
         if msg.data['type'] == QKDMessage.Type.REQUEST:
             self.node.env.logger.info(f"{self.node.name} received 'REQUEST' of QKDApp "

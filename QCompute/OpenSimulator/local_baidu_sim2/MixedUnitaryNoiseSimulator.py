@@ -18,6 +18,7 @@
 """
 MixedUnitaryNoiseSimulator
 """
+FileErrorCode = 7
 
 from datetime import datetime
 from typing import List, Union, Dict
@@ -39,9 +40,6 @@ from QCompute.QPlatform.Utilities import normalizeNdarrayOrderForTranspose
 from QCompute.QPlatform.Utilities import protobufQNoiseToQNoise, contract_in_3
 from QCompute.QProtobuf import PBProgram, PBMeasure
 
-
-
-FileErrorCode = 5
 
 
 class MixedUnitaryNoiseSimulator(BaseSimulator):
@@ -67,7 +65,7 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
 
         # accumulate
         if self.measureMethod in [MeasureMethod.Probability, MeasureMethod.Accumulation,
-                             MeasureMethod.OutputProbability]:
+                                  MeasureMethod.OutputProbability]:
             counts = {}
 
             noise_rngList = self.batchedNoiseRng(maxRunNum)
@@ -157,7 +155,7 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
             program = self.program
 
         qRegMap = {qReg: index for index,
-                                   qReg in enumerate(program.head.usingQRegList)}
+        qReg in enumerate(program.head.usingQRegList)}
         qRegCount = len(qRegMap)
 
         state = initState_1_0(self.matrixType, qRegCount)
@@ -167,13 +165,12 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
         # local code reuse
         def transferNoiseMatrix(rng: List[int]) -> None:
             nonlocal state, pointer, matrix, qRegList, matrixCache, qRegListCache
-            
+
             # matrix multiplication for maximum 3 qubits
-            if len(set(qRegListCache)|set(qRegList)) <= 3: 
+            if len(set(qRegListCache) | set(qRegList)) <= 3:
                 matrixCache, qRegListCache = contract_in_3(matrixCache, qRegListCache, matrix, qRegList)
             else:
-                if self.matrixType == MatrixType.Sparse:
-                    matrixCache = sparse.COO(matrixCache)
+                
                 state = transfer(state, matrixCache, qRegListCache)
                 matrixCache = matrix
                 qRegListCache = qRegList
@@ -188,17 +185,14 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
                 noise_matrix = noise_instance.krauses[rng[pointer]]
 
                 if len(qRegList) == 1 and noise_matrix.shape != (2, 2):
-                    raise Error.ArgumentError(
-                        f'Single-qubit noise {noise_type} must be applied after single-qubit gate!',
-                        ModuleErrorCode, FileErrorCode, 7)
+                    raise Error.ArgumentError(f'Single-qubit noise {noise_type} must be applied after single-qubit gate!', ModuleErrorCode, FileErrorCode, 2)
+
                 if len(qRegList) == 2 and noise_matrix.shape != (2, 2, 2, 2):
-                    raise Error.ArgumentError(
-                        f'Double-qubit noise {noise_type} must be applied after double-qubit gate!',
-                        ModuleErrorCode, FileErrorCode, 8)
+                    raise Error.ArgumentError(f'Double-qubit noise {noise_type} must be applied after double-qubit gate!', ModuleErrorCode, FileErrorCode, 3)
 
                 # update cache matrix and qRegList
                 matrixCache, qRegListCache = contract_in_3(matrixCache, qRegListCache, noise_matrix, sorted(qRegList))
-              
+
                 pointer += 1
 
         measured = False
@@ -215,20 +209,22 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
                 matrix = self.getGateMatrix(circuitLine, MatrixType.Dense, self.operationDict)
                 transferNoiseMatrix(noise_rng)
             elif op == 'procedureName':  # procedure
-                raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
-                                          ModuleErrorCode, FileErrorCode, 12)
+                raise Error.ArgumentError(
+                    'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                    ModuleErrorCode, FileErrorCode, 4)
+
                 # it is not implemented, flattened by UnrollProcedureModule
             elif op == 'measure':  # measure
                 # transfer cache matrix
-                if self.matrixType == MatrixType.Sparse:
-                    matrixCache = sparse.COO(matrixCache)
+                
                 state = transfer(state, matrixCache, qRegListCache)
 
                 measure: PBMeasure = circuitLine.measure
                 if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                     raise Error.ArgumentError(
-                        f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
-                        FileErrorCode, 13)
+                        f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!',
+                        ModuleErrorCode, FileErrorCode, 5)
+
                 if not measured:
                     counts = measurer(state, self.shots)
                     measured = True
@@ -236,7 +232,7 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
                 pass
             else:  # unsupported operation
                 raise Error.ArgumentError(
-                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 14)
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 6)
 
         if self.measureMethod in [MeasureMethod.Probability, MeasureMethod.Accumulation]:
             counts = filterMeasure(counts, self.compactedCRegDict)
@@ -278,14 +274,16 @@ class MixedUnitaryNoiseSimulator(BaseSimulator):
                 if rngList:
                     batchedNoiseRng.append(rngList)
             elif op == 'procedureName':  # procedure
-                raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
-                                          ModuleErrorCode, FileErrorCode, 12)
+                raise Error.ArgumentError(
+                    'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                    ModuleErrorCode, FileErrorCode, 7)
+
                 # it is not implemented, flattened by UnrollProcedureModule
-            elif op == 'measure' or op == 'barrier': 
+            elif op == 'measure' or op == 'barrier':
                 pass
             else:  # unsupported operation
                 raise Error.ArgumentError(
-                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 14)
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 8)
 
         # Reshape list
         batchedNoiseRng = [out_rng for in_rng in batchedNoiseRng for out_rng in in_rng]

@@ -41,17 +41,23 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-matchSdkVersion('Python 3.3.3')
+matchSdkVersion('Python 3.3.5')
 
 
 def CU1(q1: QRegStorage, q2: QRegStorage, float_theta: float) -> None:
     """
     a single-parameter two-qubit gate, which is the ctrl version for U1 gate,
+
     the matrix form of CU1(theta) is the diagonal matrix {1,1,1,e^{i theta}}
+
     in fact we do not distinguish which qubit is the ctrlling or ctrlled qubit
+
     :param q1: a qubit
+
     :param q2: another qubit
+
     :param float_theta: the rotation angle
+
     :return: |q1>|q2> -> <0|q1>*|q1>|q2> + <1|q1>*|q1>U1(theta)|q2>
     """
     CU(0, 0, float_theta)(q1, q2)
@@ -60,12 +66,19 @@ def CU1(q1: QRegStorage, q2: QRegStorage, float_theta: float) -> None:
 def CCU1(q1: QRegStorage, q2: QRegStorage, q3: QRegStorage, float_theta: float) -> None:
     """
     a single-parameter three-qubit gate, which is the double-ctrl version for U1 gate,
+
     the matrix form of CCU1(theta) is the diagonal matrix {1,1,1,1,1,1,1,e^{i theta}}
+
     in fact we do not distinguish which qubit is the ctrlling or ctrlled qubit
+
     :param q1: a qubit
+
     :param q2: another qubit
+
     :param q3: a third qubit
+
     :param float_theta: the rotation angle
+
     :return: |q1>|q2>|q3> -> <0|q1*q2*q3>*|q1>|q2>|q3> + e^{i theta}*<1|q1*q2*q3>*|q1>|q2>|q3>
     """
     float_theta_half = float_theta / 2
@@ -79,8 +92,11 @@ def CCU1(q1: QRegStorage, q2: QRegStorage, q3: QRegStorage, float_theta: float) 
 def func_qftadd(reg_system: List[QRegStorage], int_adder: int):
     """
     a circuit implement the addition under the Fourier bases
+
     :param reg_system: QFT|s>, we write the state as a image of the Fourier transform
+
     :param int_adder: a
+
     :return: a circuit which implement the map: QFT|s> -> QFT|s+a>
     """
     for idx_qubit in range(len(reg_system)):  # For each qubit in the reg_s, we operate a U1 gate on it
@@ -91,8 +107,11 @@ def func_qftadd(reg_system: List[QRegStorage], int_adder: int):
 def func_qftadd_inverse(reg_system: List[QRegStorage], int_adder: int):
     """
     the inverse circuit for func_qftadd
+
     :param reg_system: QFT|s+a>
+
     :param int_adder: a
+
     :return: a circuit which implement the map: QFT|s+a> -> QFT|s>
     """
     for idx_qubit in range(len(reg_system)):  # For each qubit in the reg_s, we operate a U1 gate on it
@@ -103,9 +122,13 @@ def func_qftadd_inverse(reg_system: List[QRegStorage], int_adder: int):
 def func_ctrl_qftadd(reg_system: List[QRegStorage], qubit_ctrlling: QRegStorage, int_adder: int):
     """
     the ctrl version for func_qftadd
+
     :param qubit_ctrlling: the ctrlling qubit |c>
+
     :param reg_system: QFT|s>
+
     :param int_adder: a
+
     :return: |c>QFT|s> -> <0|c>*|c>QFT|s> + <1|c>*|c>QFT|s+a>
     """
     for idx_qubit in range(len(reg_system)):  # For each qubit in the reg_s, we operate a CU1 gate on |c> and it
@@ -116,9 +139,13 @@ def func_ctrl_qftadd(reg_system: List[QRegStorage], qubit_ctrlling: QRegStorage,
 def func_ctrl_qftadd_inverse(reg_system: List[QRegStorage], qubit_ctrlling: QRegStorage, int_adder: int):
     """
     the inverse circuit for func_ctrl_qftadd; also the ctrl version for func_qftadd_inverse
+
     :param qubit_ctrlling: |c>
+
     :param reg_system: QFT|s+a>
+
     :param int_adder: a
+
     :return: |c>QFT|s+a> -> <0|c>*|c>QFT|s+a> + <1|c>*|c>QFT|s>
     """
     for idx_qubit in range(len(reg_system)):  # For each qubit in the reg_s, we operate a CU1 gate on |c> and it
@@ -129,9 +156,13 @@ def func_ctrl_qftadd_inverse(reg_system: List[QRegStorage], qubit_ctrlling: QReg
 def func_double_ctrl_qftadd(reg_system: List[QRegStorage], reg_ctrlling: List[QRegStorage], int_adder: int):
     """
     the double-ctrl version for func_qftadd
+
     :param reg_ctrlling: a list of two ctrlling qubit [|c_1>,|c_2>]
+
     :param reg_system: QFT|s>
+
     :param int_adder: a
+
     :return: |c_1>|c_2>QFT|s> -> <0|c_1*c_2>*|c_1>|c_2>QFT|s> + <1|c_1*c_2>*|c_1>|c_2>QFT|s+a>
     """
     for idx_qubit in range(len(reg_system)):  # For each qubit in the reg_s, we operate a CCU1 gate on |c_1>|c_2> and it

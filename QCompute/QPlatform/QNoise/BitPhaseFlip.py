@@ -18,13 +18,15 @@
 """
 Bit Phase Flip
 """
+FileErrorCode = 24
+
 import random
 import numpy as np
 from typing import TYPE_CHECKING, List
 from QCompute.QPlatform.QNoise import QNoise
 from QCompute.QPlatform.QNoise.Utilities import sigma
 
-if TYPE_CHECKING:   
+if TYPE_CHECKING:
     from QCompute.OpenSimulator.local_baidu_sim2.Transfer import TransferProcessor
 
 
@@ -57,6 +59,7 @@ class BitPhaseFlip(QNoise):
         Generate a batch of sampled random numbers.
 
         :param num: the number of sampled random numbers
+
         :return: List[int], a set of random numbers
         """
 
@@ -67,8 +70,11 @@ class BitPhaseFlip(QNoise):
         Generate a sampled Kraus operator.
 
         :param transfer: 'TransferProcessor', matrix-vector multiplication algorithm
+
         :param state: np.ndarray, current state in simulator
+
         :param qRegList: List[int], quantum register where the noise is added
+
         :return: np.ndarray, a sampled Kraus operator
         """
 

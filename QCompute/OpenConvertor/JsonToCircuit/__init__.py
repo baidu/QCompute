@@ -18,6 +18,8 @@
 """
 Convert the json to circuit
 """
+FileErrorCode = 11
+
 from google.protobuf.json_format import Parse
 
 from QCompute.OpenConvertor import ConvertorImplement

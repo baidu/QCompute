@@ -19,6 +19,7 @@
 Export the entire directory as a library
 """
 ModuleErrorCode = 5
+FileErrorCode = 1
 
 
 class ConvertorImplement:

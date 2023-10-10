@@ -26,7 +26,7 @@
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
 
 env = DESEnv("Simulation Env", default=True)
 ```
@@ -60,7 +60,7 @@ env.run(end_time=8e9, logging=True)  # 设定仿真运行的虚拟时间和日�
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 network = Network("Simple Network")  # 创建量子网络
 ```
@@ -104,7 +104,7 @@ network.print_quantum_topology()  # 打印量子网络拓扑图
 
 
 ```python
-from qcompute_qnet.topology.node import Node
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
 
 alice = Node("Alice")  # 创建节点
 network.install(alice)  # 将节点加载到网络中
@@ -126,8 +126,8 @@ alice.send_quantum_msg(dst=bob, msg=qmsg)  # 发送量子消息
 
 
 ```python
-from qcompute_qnet.devices.source import PhotonSource
-from qcompute_qnet.devices.detector import PolarizationDetector
+from Extensions.QuantumNetwork.qcompute_qnet.devices.source import PhotonSource
+from Extensions.QuantumNetwork.qcompute_qnet.devices.detector import PolarizationDetector
 
 source = PhotonSource("Photon source")  # 创建一个光子源
 detector = PolarizationDetector("Polarization detector")  # 创建一个光子探测器
@@ -147,9 +147,9 @@ alice.install([source, detector])  # 将相关物理装置配置到节点中
 
 
 ```python
-from qcompute_qnet.models.qkd.key_generation import BB84
-from qcompute_qnet.models.qkd.routing import QKDRouting
-from qcompute_qnet.protocols.protocol import ProtocolStack
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import BB84
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.routing import QKDRouting
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import ProtocolStack
 
 bb84 = BB84("BB84")
 routing = QKDRouting("QKD Routing")
@@ -178,7 +178,7 @@ alice.load_protocol(stack)
 
 
 ```python
-from qcompute_qnet.models.qkd.node import QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDNode
 
 # 创建 QKD 节点
 alice = QKDNode("Alice")
@@ -206,7 +206,7 @@ bob.protocol_stack.build(bb84_bob)
 
 
 ```python
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 link_ab = Link("A_B")  # 创建一条链路
 network.install(link_ab)  # 将链路装入网络中
@@ -217,7 +217,7 @@ link_ab.connect(alice, bob)  # 通过链路连接网络中的两个节点
 
 
 ```python
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 link_ab = Link("A_B", ends=(alice, bob))  # 创建一条链路并指定两端节点
 network.install(link_ab)  # 将链路装入网络中
@@ -235,7 +235,7 @@ network.install(link_ab)  # 将链路装入网络中
 
 
 ```python
-from qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
 
 # 创建通信信道并通过 connect 方法连接节点
 c1 = ClassicalFiberChannel("c_A2B", distance=1e3)
@@ -272,12 +272,12 @@ link_ab.install([c1, c2, q1, q2])  # 将通信信道装入链路中
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qkd.node import QKDNode
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
 
 # 1. 创建环境并设置其为默认环境
 env = DESEnv("BB84", default=True)

@@ -18,9 +18,13 @@
 """
 Export the entire directory as a library
 """
-from typing import Dict, Any
+from QCompute.Define.Utils import loadPythonModule
+from QCompute.QPlatform import Error
 
-ModuleErrorCode = 3
+ModuleErrorCode = 6
+FileErrorCode = 1
+
+from typing import Dict, Any
 
 
 class ModuleImplement:
@@ -30,5 +34,23 @@ class ModuleImplement:
     arguments = None  # Any can serialize to json
     disable = False
 
-    def __call__(self, arguments: Dict[str, Any]) -> None:
-        pass
+    def __init__(self, arguments: Dict[str, Any]) -> None:
+        self.arguments = arguments
+        if arguments is not None and type(arguments) is dict:
+            if 'disable' in arguments:
+                self.disable = arguments['disable']
+
+    def __call__(self, program: 'PBProgram') -> 'PBProgram':
+        return program
+
+
+def makeModuleObject(name: str, arguments: Dict[str, Any]) -> ModuleImplement:
+    # import the module according to the module name
+    module = loadPythonModule(f'QCompute.OpenModule.{name}')
+    if module is None:
+        module = loadPythonModule(f'QCompute.Module.{name}')
+    if module is None:
+        raise Error.ArgumentError(f'Invalid module => {name}!', ModuleErrorCode, FileErrorCode, 1)
+
+    moduleClass = getattr(module, name)
+    return moduleClass(arguments)

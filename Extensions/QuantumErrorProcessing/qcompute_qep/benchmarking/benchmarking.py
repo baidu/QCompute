@@ -25,8 +25,8 @@ import numpy as np
 import QCompute
 import functools
 
-from qcompute_qep.utils.types import QProgram
-import qcompute_qep.utils.circuit as circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 
 
 class RandomizedBenchmarking(abc.ABC):

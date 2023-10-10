@@ -18,9 +18,11 @@
 """
 Condition
 """
+FileErrorCode = 16
+
 from typing import Tuple, Set
 
-from QCompute.QProtobuf import PBProgram, PBCircuitLine
+from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBPhotonicGaussianMeasure
 
 
 def checkRealCondition(program: 'PBProgram') -> Tuple[int, int, int]:
@@ -31,3 +33,19 @@ def checkRealCondition(program: 'PBProgram') -> Tuple[int, int, int]:
         if circuitLine.WhichOneof('op') == 'measure':
             cRegSet.update(circuitLine.measure.cRegList)
     return len(qRegSet), len(cRegSet), len(program.body.circuit)
+
+
+def checkPhotonicRealCondition(program: 'PBProgram') -> Tuple[int, int, int, int]:
+    qRegSet: Set[int] = set()
+    cRegSet: Set[int] = set()
+    cutoff = 0
+    for circuitLine in program.body.circuit:
+        qRegSet.update(circuitLine.qRegList)
+        if circuitLine.WhichOneof('op') == 'photonicGaussianMeasure':
+            cRegSet.update(circuitLine.photonicGaussianMeasure.cRegList)
+            if circuitLine.photonicGaussianMeasure.type == PBPhotonicGaussianMeasure.PhotonCount:
+                cutoff = circuitLine.photonicGaussianMeasure.photonCount.cutoff
+        if circuitLine.WhichOneof('op') == 'photonicFockMeasure':
+            cRegSet.update(circuitLine.photonicFockMeasure.cRegList)
+            cutoff = circuitLine.photonicFockMeasure.cutoff
+    return len(qRegSet), len(cRegSet), len(program.body.circuit), cutoff

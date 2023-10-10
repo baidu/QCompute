@@ -23,6 +23,7 @@ Two simulating methods (SIM_METHOD) are provided:
 2) matmul format (MATMUL)
 The matmul format can often accelerate calculation.
 """
+FileErrorCode = 11
 
 import copy
 from enum import IntEnum, unique

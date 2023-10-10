@@ -20,6 +20,7 @@ There is a simple case of simulating a circuit with 1-qubit noise.
 Real values after noisy circuits are calculated for comparison.
 """
 import sys
+from multiprocessing import freeze_support
 from typing import List, Union, Dict
 
 import numpy as np
@@ -28,7 +29,7 @@ from QCompute import *
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.3')
+matchSdkVersion('Python 3.3.5')
 
 noiseType = Union['AmplitudeDamping', 'BitFlip', 'CustomizedNoise', 'BitPhaseFlip',
                   'Depolarizing', 'PauliNoise', 'PhaseDamping', 'PhaseFlip', 'ResetNoise']
@@ -37,13 +38,19 @@ noiseType = Union['AmplitudeDamping', 'BitFlip', 'CustomizedNoise', 'BitPhaseFli
 def test_circuit_1qubit(noises: List[noiseType], bool_Xgate: bool, bool_Hgate: bool) -> 'QEnv':
     """
     This function gives a QCompute environment to test noise on 1-qubit gate,
+
     - "state preparation circuit"  -  S - Z - S - noise.
+
     Here the "state preparation circuit" generates a basis of states in one-dimensional Hilbert space,
+
     which is composed by X and H gates on one qubit.
 
     :param noises: a list of QCompute noise instances
+
     :param bool_Xgate: true for inserting an X gate, false for None
+
     :param bool_Hgate: true for inserting a H gate, false for None
+
     :return: a QCompute environment 
     """
     # Create environment
@@ -79,10 +86,15 @@ def test_circuit_1qubit(noises: List[noiseType], bool_Xgate: bool, bool_Hgate: b
 def test_real_value(noises: List[noiseType], bool_Xgate: bool, bool_Hgate: bool, shots: int) -> Dict[str, int]:
     """
     This function calculates the output of a sequential of noises for a circuit
+
     which is determined by bool_Xgate and bool_Hgate.
+
     :param noises: a list of QCompute noise instances
+
     :param bool_Xgate: true for inserting an X gate, false for None
+
     :param bool_Hgate: true for inserting a H gate, false for None
+
     :param shots: the shots after measuring the output state in Z basis
     """
     # Initial state before any gate
@@ -106,7 +118,9 @@ def test_real_value(noises: List[noiseType], bool_Xgate: bool, bool_Hgate: bool,
 def apply_noise(noises: List[noiseType], state: np.ndarray) -> np.ndarray:
     """
     This function calculate the output of a sequential of noises for any input state,
+
     :param noises: a list of QCompute noise instances
+
     :param state: the input state before a sequential of noises
     """
     density_matrix = np.outer(state, state.T.conjugate())
@@ -167,4 +181,9 @@ def main():
 
 
 if __name__ == '__main__':
+    # For multiprocess
+    # Must use `if __name__ == '__main__':`
+    # And use `freeze_support()` in it.
+    freeze_support()
+
     main()

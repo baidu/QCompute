@@ -18,6 +18,8 @@
 """
 Quantum Environment Operation
 """
+FileErrorCode = 9
+
 from typing import TYPE_CHECKING, Optional, Callable, Union, List
 
 from QCompute.QPlatform import Error, ModuleErrorCode
@@ -38,8 +40,6 @@ if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation.CustomizedGate import CustomizedGateOP
     from QCompute.QPlatform.QOperation.CompositeGate import CompositeGateOP
     from QCompute.QPlatform.QOperation.QProcedure import QProcedure
-
-FileErrorCode = 3
 
 
 class QEnvOperation(QEnv):

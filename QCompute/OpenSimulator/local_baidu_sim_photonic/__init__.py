@@ -18,6 +18,8 @@
 """
 To adapt Sim photonic to PySDK
 """
+FileErrorCode = 26
+
 import subprocess
 from enum import Enum
 from pathlib import Path
@@ -30,8 +32,6 @@ from QCompute.Define.Utils import filterConsoleOutput, findUniError
 from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
 from QCompute.OpenSimulator import QImplement, ModuleErrorCode, withNoise, QPhotonicResult
 from QCompute.OpenSimulator.local_baidu_sim_photonic.Simulator import runSimulator
-
-FileErrorCode = 4
 
 
 class Backend(QImplement):
@@ -56,8 +56,7 @@ class Backend(QImplement):
         Or self.runOutProcess()  # in another process
         """
 
-        if Settings.inProcessSimulator and not (
-                withNoise(self.program) and Settings.noiseMultiprocessingSimulator):
+        if Settings.inProcessSimulator:
             self.runInProcess()
         else:
             self.runOutProcess()
@@ -102,7 +101,7 @@ class Backend(QImplement):
         # call the simulator
         completedProcess = subprocess.run(
             # Compatible with Python3.6, in Python3.7 and above, the more understandable alias of 'universal_newlines' is 'text'.
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf-8')
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8')
 
         self.result = QPhotonicResult()
         self.result.log = filterConsoleOutput(completedProcess.stdout)

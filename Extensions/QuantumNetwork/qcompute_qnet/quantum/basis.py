@@ -22,8 +22,8 @@ Module for quantum measurement bases.
 from argparse import ArgumentTypeError
 import numpy
 from numpy import pi
-from qcompute_qnet.quantum.gate import Gate
-from qcompute_qnet.quantum.state import One, Zero, Plus, Minus
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import One, Zero, Plus, Minus
 
 __all__ = [
     "Basis"

@@ -30,11 +30,11 @@ import itertools
 import warnings
 
 import QCompute
-from qcompute_qep.utils import expval_from_counts, execute
-from qcompute_qep.quantum import clifford
-from qcompute_qep.utils.types import QComputer, get_qc_name
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts, execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, get_qc_name
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError as QEPError
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
 
 warnings.filterwarnings('ignore')
 try:
@@ -179,7 +179,7 @@ class StandardRB(rb.RandomizedBenchmarking):
 
             >>> import qiskit
             >>> from qiskit.providers.fake_provider import FakeSantiago
-            >>> from qcompute_qep.benchmarking.standardrb import StandardRB
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.standardrb import StandardRB
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
             >>> benchmarking = StandardRB()
             >>> rb_results = benchmarking.benchmark(qubits=[1], qc=qc)

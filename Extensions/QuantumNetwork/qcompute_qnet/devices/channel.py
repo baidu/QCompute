@@ -21,7 +21,7 @@ Module for communication channels.
 
 from abc import abstractmethod, ABC
 from numpy import random
-from qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
 
 __all__ = [
     "Channel",

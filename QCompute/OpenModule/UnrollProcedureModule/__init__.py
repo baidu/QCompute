@@ -18,14 +18,17 @@
 """
 Unroll Procedure
 """
-from copy import deepcopy
-from typing import TYPE_CHECKING, Dict, List, Optional
+FileErrorCode = 8
 
+import math
+from copy import deepcopy
+from typing import Dict, List, Optional
+
+from QCompute.Define import Settings
 from QCompute.OpenModule import ModuleImplement, ModuleErrorCode
 from QCompute.QPlatform import Error
-from QCompute.QProtobuf import PBProgram, PBCircuitLine
-
-FileErrorCode = 2
+from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBParameterExpression, PBMathOperator, PBQProcedure, \
+    PBExpressionList
 
 
 class UnrollProcedureModule(ModuleImplement):
@@ -38,7 +41,7 @@ class UnrollProcedureModule(ModuleImplement):
 
     env.module(UnrollProcedureModule({'disable': True}))  # Disable
     """
-    _procedureMap: Dict[str, 'PBProcedure'] = None
+    _procedureMap: Dict[str, 'PBQProcedure'] = None
     _circuitOut: List['PBCircuitLine'] = None
 
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
@@ -47,10 +50,7 @@ class UnrollProcedureModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
-        if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -59,6 +59,8 @@ class UnrollProcedureModule(ModuleImplement):
         :param program: the program
         :return: unrolled procedure
         """
+        if self.disable:
+            return program
 
         ret = deepcopy(program)
 
@@ -70,18 +72,29 @@ class UnrollProcedureModule(ModuleImplement):
         qRegMap = {qReg: qReg for qReg in program.head.usingQRegList}
 
         self._procedureMap = program.body.procedureMap
-        self._unrollProcedure(program.body.circuit, qRegMap, None)
+        self._unrollProcedure(None, program.body.circuit, qRegMap, None, 0)
 
         return ret
 
-    def _unrollProcedure(self, circuit: List['PBCircuitLine'], qRegMap: Dict[int, int],
-                         argumentValueList: Optional[List[float]]) -> None:
+    def _unrollProcedure(self, procedureName: str, circuit: List['PBCircuitLine'], qRegMap: Dict[int, int],
+                         argumentValueList: Optional[List[float]], indentationNum: int) -> None:
+        if Settings.outputInfo:
+            if procedureName:
+                print(' ' * indentationNum * 2 + 'Procedure', procedureName, argumentValueList)
+            else:
+                print('Base circuit')
+
         # Fill in the circuit
         for circuitLine in circuit:
             op = circuitLine.WhichOneof('op')
             if op in ['fixedGate', 'rotationGate', 'compositeGate', 'measure', 'barrier']:
                 ret = deepcopy(circuitLine)
-                if len(ret.argumentIdList) > 0:
+                if len(ret.argumentExpressionList) > 0:
+                    ret.argumentValueList[:] = self._unrollArgumentExpression(ret.argumentExpressionList,
+                                                                              argumentValueList)
+                    del ret.argumentExpressionList[:]
+                    del ret.argumentIdList[:]
+                elif len(ret.argumentIdList) > 0:
                     if len(ret.argumentValueList) == 0:
                         ret.argumentValueList[:] = [0.0] * len(ret.argumentIdList)
                     for index, argumentId in enumerate(ret.argumentIdList):
@@ -90,8 +103,9 @@ class UnrollProcedureModule(ModuleImplement):
                     del ret.argumentIdList[:]
                 for index, qReg in enumerate(ret.qRegList):
                     if qReg not in qRegMap:
-                        raise Error.ArgumentError('QReg argument is not in procedure!', ModuleErrorCode, FileErrorCode,
-                                                  1)
+                        raise Error.ArgumentError(
+                            'QReg argument is not in procedure!', ModuleErrorCode, FileErrorCode, 1)
+
                     ret.qRegList[index] = qRegMap[qReg]
                 self._circuitOut.append(ret)
             elif op == 'customizedGate':  # Customized gate
@@ -99,19 +113,82 @@ class UnrollProcedureModule(ModuleImplement):
             elif op == 'procedureName':  # procedure
                 qProcedureRegMap = {index: qRegMap[qReg] for index, qReg in enumerate(circuitLine.qRegList)}
 
-                argumentIdLen = len(circuitLine.argumentIdList)
-                argumentValueLen = len(circuitLine.argumentValueList)
-                argumentLen = argumentIdLen if argumentIdLen > argumentValueLen else argumentValueLen
-                argumentList = [0.0] * argumentLen
-                for i in range(argumentLen):
-                    if i < argumentIdLen:
-                        argumentId = circuitLine.argumentIdList[i]
-                        if argumentId != -1:
-                            argumentList[i] = argumentValueList[argumentId]
-                            continue
-                    argumentList[i] = circuitLine.argumentValueList[i]
+                if len(circuitLine.argumentExpressionList) > 0:
+                    circuitLine.argumentValueList[:] = self._unrollArgumentExpression(
+                        circuitLine.argumentExpressionList,
+                        argumentValueList)
+                    del circuitLine.argumentExpressionList[:]
+                    del circuitLine.argumentIdList[:]
+                elif len(circuitLine.argumentIdList) > 0:
+                    if len(circuitLine.argumentValueList) == 0:
+                        circuitLine.argumentValueList[:] = [0.0] * len(circuitLine.argumentIdList)
+                    for index, argumentId in enumerate(circuitLine.argumentIdList):
+                        if argumentId >= 0:
+                            circuitLine.argumentValueList[index] = argumentValueList[argumentId]
+                    del circuitLine.argumentIdList[:]
 
                 procedure = self._procedureMap[circuitLine.procedureName]
-                self._unrollProcedure(procedure.circuit, qProcedureRegMap, argumentList)
+                self._unrollProcedure(circuitLine.procedureName, procedure.circuit, qProcedureRegMap,
+                                      circuitLine.argumentValueList, indentationNum + 1)
             else:  # Unsupported operation
-                raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 3)
+                raise Error.ArgumentError(
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 3)
+
+    def _unrollArgumentExpression(self,
+                                  argumentExpressionList: List['PBExpressionList'],
+                                  argumentValueList: Optional[List[float]]) -> List[float]:
+        ret: List[float] = []
+        for expressionList in argumentExpressionList:
+            valueQueue: List[PBParameterExpression] = []
+            for parameterExpression in expressionList.list:
+                expressionType = parameterExpression.WhichOneof('expression')
+                if expressionType == 'argumentId':
+                    valueQueue.append(argumentValueList[parameterExpression.argumentId])
+                elif expressionType == 'argumentValue':
+                    valueQueue.append(parameterExpression.argumentValue)
+                elif expressionType == 'operator':
+                    self._computeOperator(parameterExpression.operator, valueQueue)
+                else:
+                    raise Error.ArgumentError("Wrong expressionType!")
+            ret.append(valueQueue[0])
+        return ret
+
+    def _computeOperator(self, operator: PBMathOperator, valueQueue: List[PBParameterExpression]) -> None:
+        if operator is PBMathOperator.NEG:
+            valueQueue[-1] = -valueQueue[-1]
+        elif operator is PBMathOperator.POS:
+            pass
+        elif operator is PBMathOperator.ABS:
+            valueQueue[-1] = math.fabs(valueQueue[-1])
+
+        elif operator is PBMathOperator.ADD:
+            valueQueue[-2] = valueQueue[-2] + valueQueue[-1]
+            del valueQueue[-1]
+        elif operator is PBMathOperator.SUB:
+            valueQueue[-2] = valueQueue[-2] - valueQueue[-1]
+            del valueQueue[-1]
+        elif operator is PBMathOperator.MUL:
+            valueQueue[-2] = valueQueue[-2] * valueQueue[-1]
+            del valueQueue[-1]
+        elif operator is PBMathOperator.TRUEDIV:
+            valueQueue[-2] = valueQueue[-2] / valueQueue[-1]
+            del valueQueue[-1]
+        elif operator is PBMathOperator.FLOORDIV:
+            valueQueue[-2] = valueQueue[-2] // valueQueue[-1]
+            del valueQueue[-1]
+        elif operator is PBMathOperator.MOD:
+            valueQueue[-2] = valueQueue[-2] % valueQueue[-1]
+            del valueQueue[-1]
+        elif operator is PBMathOperator.POW:
+            valueQueue[-2] = valueQueue[-2] ** valueQueue[-1]
+            del valueQueue[-1]
+
+        elif operator is PBMathOperator.SIN:
+            valueQueue[-1] = math.sin(valueQueue[-1])
+        elif operator is PBMathOperator.COS:
+            valueQueue[-1] = math.cos(valueQueue[-1])
+        elif operator is PBMathOperator.TAN:
+            valueQueue[-1] = math.tan(valueQueue[-1])
+
+        else:
+            raise Error.ArgumentError("Wrong operator!")

@@ -18,6 +18,8 @@
 """
 Photonic Measure Operations
 """
+FileErrorCode = 44
+
 import numpy
 
 from QCompute.QPlatform import Error, ModuleErrorCode, FileErrorCode
@@ -37,13 +39,13 @@ class PhotonicGaussianMeasureOP(QOperation):
                  photonicArgumentList: Optional[Union[List[Tuple[float, float]], int]]) -> None:
         super().__init__(gate)
         if allowArgumentCounts == 0 and photonicArgumentList is not None:
-            raise Error.ArgumentError(f'allowArgumentCounts is invalid!', ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError('allowArgumentCounts is invalid!', ModuleErrorCode, FileErrorCode, 1)
         elif isinstance(photonicArgumentList, int):
             if allowArgumentCounts != 1:
-                raise Error.ArgumentError(f'allowArgumentCounts is invalid!', ModuleErrorCode, FileErrorCode, 1)
+                raise Error.ArgumentError('allowArgumentCounts is invalid!', ModuleErrorCode, FileErrorCode, 2)
         elif isinstance(photonicArgumentList, (numpy.ndarray, list)) \
                 and allowArgumentCounts != len(photonicArgumentList):
-            raise Error.ArgumentError(f'allowArgumentCounts is invalid!', ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError('allowArgumentCounts is invalid!', ModuleErrorCode, FileErrorCode, 3)
         self.allowArgumentCounts = allowArgumentCounts
         if gate == 'PhotonCount':
             self.cutoff: int = photonicArgumentList

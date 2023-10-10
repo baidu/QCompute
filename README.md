@@ -21,7 +21,7 @@ English | [简体中文](README_CN.md)
 
 ![](https://release-data.cdn.bcebos.com/github-qleaf%2F%E9%87%8F%E6%98%93%E4%BC%8F%E5%9B%BE%E6%A0%87.png)
 
-[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) ![](https://img.shields.io/badge/build-passing-green) ![](https://img.shields.io/badge/Python-3.9--3.11-blue) ![](https://img.shields.io/badge/release-v3.3.3-blue) 
+[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) ![](https://img.shields.io/badge/build-passing-green) ![](https://img.shields.io/badge/Python-3.9--3.11-blue) ![](https://img.shields.io/badge/release-v3.3.5-blue) 
 
 ![](https://img.shields.io/badge/OS-MacOS%20|%20Windows%20|%20Linux-lightgrey.svg?style=flat-square)
 

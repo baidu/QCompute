@@ -18,10 +18,10 @@
 """
 Check Env
 """
+FileErrorCode = 27
+
 import ctypes
 import os
-
-FileErrorCode = 3
 
 
 def __which(pgm):

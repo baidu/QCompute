@@ -36,10 +36,10 @@ import scipy.stats as st
 import itertools
 import warnings
 
-from qcompute_qep.utils.types import QComputer, get_qc_name
-import qcompute_qep.utils.circuit as circuit
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, get_qc_name
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError as QEPError
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
 
 warnings.filterwarnings('ignore')
 
@@ -197,7 +197,7 @@ class XEB(rb.RandomizedBenchmarking):
 
             >>> import qiskit
             >>> from qiskit.providers.fake_provider import FakeSantiago
-            >>> from qcompute_qep.benchmarking.xeb import XEB
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.xeb import XEB
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
             >>> xeb = XEB()
             >>> xeb_results = xeb.benchmark(qubits=[1], qc=qc)

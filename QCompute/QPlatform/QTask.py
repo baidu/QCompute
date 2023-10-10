@@ -18,6 +18,8 @@
 """
 Quantum Task
 """
+FileErrorCode = 12
+
 import base64
 import hashlib
 import json
@@ -47,8 +49,6 @@ from QCompute.Define import Settings
 from QCompute.QPlatform import Error, ModuleErrorCode
 from QCompute.QPlatform.BatchID import BatchID
 
-FileErrorCode = 7
-
 _bosClient: BceClientConfiguration = None
 
 
@@ -58,6 +58,14 @@ def _retryWhileNetworkError(func: Callable) -> Callable:
     """
 
     def _func(*args, **kwargs):
+        qtaskAttributesStr = ''
+        if isinstance(args[0], QTask):
+            qtask = args[0]
+            if qtask.circuitId != -1:
+                qtaskAttributesStr += f'CircuitId: {qtask.circuitId}, '
+            if qtask.taskId != -1:
+                qtaskAttributesStr += f'TaskId: {qtask.taskId}, '
+
         retryCount = 0
         ret = None
         
@@ -72,14 +80,18 @@ def _retryWhileNetworkError(func: Callable) -> Callable:
                 # retry if that's a network related error
                 # other errors will be raised
                 retryCount += 1
-                print(f'Network error for {func.__name__}, {retryCount} retrying to connect...')
+                print(f'{qtaskAttributesStr}Network error for {func.__name__}, {retryCount} retrying to connect...')
                 lastError = e
                 time.sleep(Define.waitTaskRetryDelaySeconds)
             except bce_http_client.BceHttpClientError as e:
                 retryCount += _bosClient.config.retry_policy.max_error_retry
-                print(f'Network error for putObject, {retryCount} retrying to connect...')
+                print(f'{qtaskAttributesStr}Network error for putObject, {retryCount} retrying to connect...')
                 lastError = e
                 time.sleep(Define.waitTaskRetryDelaySeconds)
+            except Exception as e:
+                print(f'{qtaskAttributesStr}Service error for {func.__name__}, {e}')
+                time.sleep(Define.waitTaskRetryDelaySeconds)
+                raise
         # else:
         #     ret = func(*args, **kwargs)
 
@@ -87,7 +99,7 @@ def _retryWhileNetworkError(func: Callable) -> Callable:
             
 
             if lastError is None:
-                print(f'Successfully reconnect to {func.__name__}')
+                print(f'{qtaskAttributesStr}Successfully retry to {func.__name__}')
             else:
                 raise lastError
         return ret
@@ -111,7 +123,7 @@ def _invokeBackend(target: str, params: object) -> Dict:
         errMsg = ret.get('message', '')
         vendor = ret.get('vendor', '')
         if errCode == 401:
-            raise Error.TokenError(errMsg, ModuleErrorCode, FileErrorCode, 2)
+            raise Error.TokenError(errMsg, ModuleErrorCode, FileErrorCode, 1)
         else:
             raise Error.LogicError(f'errCode: {errCode}; errMsg: {errMsg}', vendor=vendor)
 
@@ -125,7 +137,7 @@ def _downloadToFile(url: str, localFile: Path) -> Tuple[Path, int]:
     """
 
     total = 0
-    with requests.get(url, stream=True) as req:
+    with requests.get(url, stream=True, timeout=Settings.httpTimeout) as req:
         req.raise_for_status()
         with open(localFile, 'wb') as fObj:
             for chunk in req.iter_content(chunk_size=8192):
@@ -153,7 +165,7 @@ class QTask:
 
     def __init__(self):
         if not Define.hubToken:
-            raise Error.ArgumentError('Please provide a valid token', ModuleErrorCode, FileErrorCode, 4)
+            raise Error.ArgumentError('Please provide a valid token', ModuleErrorCode, FileErrorCode, 2)
 
         self.circuitId = -1
         self.taskId = -1
@@ -178,8 +190,6 @@ class QTask:
     def _getSTSToken(self) -> Tuple[BosClient, str]:
         """
         Get the token to upload the file
-
-        :return:
         """
         config = _invokeBackend("circuit/genSTS", {"token": Define.hubToken})
 
@@ -292,11 +302,12 @@ class QTask:
         """
         Fetch the result files from the taskId
         """
-
         ret = _invokeBackend("task/getTaskInfo", {"token": Define.hubToken, "taskId": self.taskId})
+
         result = ret["result"]
         originUrl = result["originUrl"]
         # originSize = result["originSize"]
+
         try:
             if not Settings.cloudTaskDoNotWriteFile:
                 self.originFile, downloadSize = _downloadToFile(originUrl,
@@ -311,6 +322,7 @@ class QTask:
 
         measureUrl = result["measureUrl"]
         # measureSize = result["measureSize"]
+
         try:
             if not Settings.cloudTaskDoNotWriteFile:
                 self.measureFile, downloadSize = _downloadToFile(measureUrl,
@@ -366,8 +378,10 @@ class QTask:
             try:
                 time.sleep(Define.pollInterval)
                 ret = _invokeBackend('task/checkTask', req)
+
                 newStatusName = ret["status"]
                 newStatus = _Status[newStatusName]
+
                 if newStatus > 0:
                     if Settings.outputInfo:
                         print(f'status changed {stepStatusName} => {newStatusName}')

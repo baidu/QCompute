@@ -24,8 +24,8 @@ import math
 from typing import List, Dict, Union, Iterable, Tuple
 import numpy as np
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import complete_pauli_basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis
 
 try:
     from matplotlib import pyplot as plt
@@ -62,7 +62,7 @@ def plot_process_ptm(ptm: np.ndarray,
     **Examples**
 
         >>> import QCompute
-        >>> import qcompute_qep.tomography as tomography
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
         >>> qp = QCompute.QEnv()
         >>> qp.Q.createList(2)
         >>> QCompute.CZ(qp.Q[1], qp.Q[0])
@@ -137,10 +137,10 @@ def compare_process_ptm(ptms: List[np.ndarray],
     **Examples**
 
         >>> import QCompute
-        >>> import qcompute_qep.tomography as tomography
-        >>> from qcompute_qep.utils.circuit import circuit_to_unitary
-        >>> import qcompute_qep.quantum.channel as channel
-        >>> import qcompute_qep.utils.types as typing
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_unitary
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel as channel
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as typing
         >>> qp = QCompute.QEnv()
         >>> qp.Q.createList(2)
         >>> QCompute.CZ(qp.Q[1], qp.Q[0])

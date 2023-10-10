@@ -18,6 +18,7 @@
 """
 NoNoiseSimulator
 """
+FileErrorCode = 8
 
 from datetime import datetime
 from typing import List, Union, Dict
@@ -37,9 +38,6 @@ from QCompute.QPlatform.QOperation.RotationGate import U
 from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix, normalizeNdarrayOrderForTranspose
 from QCompute.QProtobuf import PBProgram, PBFixedGate, PBRotationGate, PBCustomizedGate, PBMeasure
 
-
-
-FileErrorCode = 5
 
 
 class NoNoiseSimulator(BaseSimulator):
@@ -99,7 +97,7 @@ class NoNoiseSimulator(BaseSimulator):
         operationDict = self.operationDict
 
         qRegMap = {qReg: index for index,
-                                   qReg in enumerate(program.head.usingQRegList)}
+        qReg in enumerate(program.head.usingQRegList)}
         qRegCount = len(qRegMap)
 
         if seed is None:
@@ -120,15 +118,17 @@ class NoNoiseSimulator(BaseSimulator):
                 fixedGate: PBFixedGate = circuitLine.fixedGate
                 matrix = operationDict.get(fixedGate)
                 if matrix is None:
-                    raise Error.ArgumentError(f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode,
-                                              FileErrorCode, 7)
+                    raise Error.ArgumentError(
+                        f'Unsupported operation {PBFixedGate.Name(fixedGate)}!', ModuleErrorCode, FileErrorCode, 2)
+
                 state = transfer(state, matrix, qRegList)
             elif op == 'rotationGate':  # rotation gate
                 rotationGate: PBRotationGate = circuitLine.rotationGate
                 if rotationGate != PBRotationGate.U:
                     raise Error.ArgumentError(
-                        f'Unsupported operation {PBRotationGate.Name(rotationGate)}!', ModuleErrorCode, FileErrorCode,
-                        8)
+                        f'Unsupported operation {PBRotationGate.Name(rotationGate)}!',
+                        ModuleErrorCode, FileErrorCode, 3)
+
                 uGate = U(*circuitLine.argumentValueList)
                 if matrixType == MatrixType.Dense:
                     matrix = uGate.getMatrix()
@@ -143,15 +143,18 @@ class NoNoiseSimulator(BaseSimulator):
                     from QCompute.QPlatform import Error; raise Error.RuntimeError('Not implemented')
                 state = transfer(state, matrix, qRegList)
             elif op == 'procedureName':  # procedure
-                raise Error.ArgumentError('Unsupported operation procedure, please flatten by UnrollProcedureModule!',
-                                          ModuleErrorCode, FileErrorCode, 9)
+                raise Error.ArgumentError(
+                    'Unsupported operation procedure, please flatten by UnrollProcedureModule!',
+                    ModuleErrorCode, FileErrorCode, 4)
+
                 # it is not implemented, flattened by UnrollProcedureModule
             elif op == 'measure':  # measure
                 measure: PBMeasure = circuitLine.measure
                 if measure.type != PBMeasure.Type.Z:  # only Z measure is supported
                     raise Error.ArgumentError(
-                        f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!', ModuleErrorCode,
-                        FileErrorCode, 10)
+                        f'Unsupported operation measure {PBMeasure.Type.Name(measure.type)}!',
+                        ModuleErrorCode, FileErrorCode, 5)
+
                 if not measured:
                     counts = measurer(state, shots)
                     measured = True
@@ -159,7 +162,8 @@ class NoNoiseSimulator(BaseSimulator):
                 pass
                 # unimplemented operation
             else:  # unsupported operation
-                raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 11)
+                raise Error.ArgumentError(
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 6)
 
         if measureMethod in [MeasureMethod.Probability, MeasureMethod.Accumulation]:
             return filterMeasure(counts, self.compactedCRegDict)

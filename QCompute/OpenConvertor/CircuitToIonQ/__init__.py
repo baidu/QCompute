@@ -18,6 +18,8 @@
 """
 Convert the circuit to IonQ
 """
+FileErrorCode = 4
+
 import json
 from typing import List, TYPE_CHECKING, Dict
 
@@ -27,8 +29,6 @@ from QCompute.QProtobuf import PBFixedGate, PBRotationGate
 
 if TYPE_CHECKING:
     from QCompute.QProtobuf import PBProgram
-
-FileErrorCode = 6
 
 
 class CircuitToIonQ(ConvertorImplement):

@@ -27,8 +27,8 @@ import re
 import QCompute
 from QCompute.QPlatform.QOperation import QOperation, CircuitLine
 
-import qcompute_qep.utils.MultiCtrlGates as multictrl
-from qcompute_qep.exceptions import ArgumentError
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.MultiCtrlGates as multictrl
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
 
 
 class CPauliOP(QOperation):
@@ -85,7 +85,7 @@ class CPauliOP(QOperation):
 
         The quantum gate :math:`C^{2,3}_0(XYZ)` could be called by
 
-        >>> from qcompute_qep.utils.circuit import print_circuit
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
         >>> qp = QCompute.QEnv()
         >>> qp.Q.createList(5)
         >>> reg_c = [qp.Q[0], qp.Q[1]]

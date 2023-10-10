@@ -18,6 +18,8 @@
 """
 To adapt Sim2 to PySDK
 """
+FileErrorCode = 12
+
 import subprocess
 from enum import Enum
 from pathlib import Path
@@ -31,8 +33,6 @@ from QCompute.OpenConvertor.CircuitToJson import CircuitToJson
 from QCompute.OpenSimulator import QImplement, ModuleErrorCode, withNoise, QResult
 from QCompute.OpenSimulator.local_baidu_sim2.Simulator import runSimulator
 from QCompute.QPlatform import Error
-
-FileErrorCode = 4
 
 
 class Backend(QImplement):
@@ -86,9 +86,7 @@ class Backend(QImplement):
         """
 
         if len(self.program.head.usingQRegList) > 32:
-            raise Error.RuntimeError('The dimension of ndarray does not support more than 32 qubits! '
-                                     f'Currently, QReg in the program counts {self.program.head.usingQRegList}.',
-                                     ModuleErrorCode, FileErrorCode, 1)
+            raise Error.RuntimeError(f'The dimension of ndarray does not support more than 32 qubits! Currently, QReg in the program counts {self.program.head.usingQRegList}.', ModuleErrorCode, FileErrorCode, 1)
 
         if Settings.inProcessSimulator and not (
                 withNoise(self.program) and Settings.noiseMultiprocessingSimulator):

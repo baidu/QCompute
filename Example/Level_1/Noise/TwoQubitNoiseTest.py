@@ -19,6 +19,8 @@
 There is a simple case of simulating a circuit with 2-qubit noise.
 Real value after a noisy circuit is calculated for comparison.
 """
+from multiprocessing import freeze_support
+
 from QCompute import *
 from typing import List, Dict
 import sys
@@ -26,7 +28,7 @@ import numpy as np
 
 sys.path.append('../..')
 
-matchSdkVersion('Python 3.3.3')
+matchSdkVersion('Python 3.3.5')
 
 noiseType = 'Depolarizing'
 
@@ -34,14 +36,21 @@ noiseType = 'Depolarizing'
 def test_circuit_2qubit(noises: List[noiseType], bool_gate_dict: Dict[int, List[bool]]) -> 'QEnv':
     """
     This function gives a QCompute environment to test noise on 2-qubit gates,
+
     - "state preparation circuit"  -  CX - CX - noise.
+
     Here the "state preparation circuit" generates a basis of states in two-dimensional Hilbert space,
+
     which is composed by X and H gates on two qubits.
 
     :param noises: a list of QCompute noise instances
+
     :param bool_gate_dict: {0: [bool_Xgate_0, bool_Hgate_0], 1: [boo_Xgate_1, bool_Hgate_1]}
+
         where bool_Xgate_index: true for inserting an X gate on the qubit q[index], false for None
+
         and bool_Hgate_index: true for inserting a H gate on the qubit q[index], false for None
+
     :return: a QCompute environment 
     """
     # Create environment
@@ -77,11 +86,17 @@ def test_circuit_2qubit(noises: List[noiseType], bool_gate_dict: Dict[int, List[
 def test_real_value(noises: List[noiseType], bool_gate_dict: Dict[int, List[bool]], shots: int) -> Dict[str, int]:
     """
     This function calculates the output of a sequential of noises for a circuit
+
     which is composed of X and H gates on two qubits and its description is written in bool_gate_dict.
+
     :param noises: a list of QCompute noise instances
+
     :param bool_gate_dict: {0: [bool_Xgate_0, bool_Hgate_0], 1: [boo_Xgate_1, bool_Hgate_1]}
+
         where bool_Xgate_index: true for inserting an X gate on the qubit q[index], false for None
+
         and bool_Hgate_index: true for inserting a H gate on the qubit q[index], false for None
+
     :param shots: the shots after measuring the output state in Z basis
     """
     # Initialize state before any gate
@@ -125,7 +140,9 @@ def test_real_value(noises: List[noiseType], bool_gate_dict: Dict[int, List[bool
 def apply_noise(noises: List[noiseType], state: np.ndarray) -> np.ndarray:
     """
     This function calculates the output of a sequential of noises for any input state,
+
     :param noises: a list of QCompute noise instances
+
     :param state: the input state of a sequential of noises
     """
     density_matrix = np.outer(state, state.T.conjugate())
@@ -166,4 +183,9 @@ def main():
 
 
 if __name__ == '__main__':
+    # For multiprocess
+    # Must use `if __name__ == '__main__':`
+    # And use `freeze_support()` in it.
+    freeze_support()
+
     main()

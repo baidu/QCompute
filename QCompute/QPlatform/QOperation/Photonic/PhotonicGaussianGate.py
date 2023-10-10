@@ -18,6 +18,8 @@
 """
 Photonic gate operation for simulating quantum circuits based on gaussian state
 """
+FileErrorCode = 43
+
 import numpy
 from typing import List, TYPE_CHECKING
 
@@ -28,9 +30,6 @@ from QCompute.QPlatform.QRegPool import QRegStorage
 if TYPE_CHECKING:
     from QCompute.QPlatform.QOperation import OperationFunc
 
-FileErrorCode = 17
-
-
 class PhotonicGaussianGateOP(QOperation):
     """
     Photonic gate.
@@ -40,8 +39,8 @@ class PhotonicGaussianGateOP(QOperation):
                  argumentList: List[float]) -> None:
         super().__init__(gate, bits)
         if len(argumentList) != allowArgumentCounts:
-            raise Error.ArgumentError(f'allowArgumentCounts is not len(aargumentList)!',
-                                      ModuleErrorCode, FileErrorCode, 1)
+            raise Error.ArgumentError(f'allowArgumentCounts is not len(aargumentList)!', ModuleErrorCode, FileErrorCode, 1)
+
         self.allowArgumentCounts = allowArgumentCounts
         self.argumentList: List[float] = argumentList
         self.displace_vector: numpy.ndarray = None
@@ -147,9 +146,7 @@ def PhotonicDX(d_x: float) -> 'OperationFunc':
     :param d_x: displacement along the direction of position
     """
 
-    gate = PhotonicGaussianGateOP('PhotonicGaussianDX', 1, 1, [d_x])
-    gate.generateMatrixAndVector = gate._generateDXMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianDX', 1, 1, [d_x])
 
 
 PhotonicDX.type = 'PhotonicGaussianGateOP'
@@ -167,9 +164,7 @@ def PhotonicDP(d_p: float) -> 'OperationFunc':
     :param d_p: displacement along the direction of momentum
     """
 
-    gate = PhotonicGaussianGateOP('PhotonicGaussianDP', 1, 1, [d_p])
-    gate.generateMatrixAndVector = gate._generateDPMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianDP', 1, 1, [d_p])
 
 
 PhotonicDP.type = 'PhotonicGaussianGateOP'
@@ -191,9 +186,7 @@ def PhotonicPHA(phi: float) -> 'OperationFunc':
     :param phi: phase shift
     """
 
-    gate = PhotonicGaussianGateOP('PhotonicGaussianPHA', 1, 1, [phi])
-    gate.generateMatrixAndVector = gate._generatePHAMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianPHA', 1, 1, [phi])
 
 
 PhotonicPHA.type = 'PhotonicGaussianGateOP'
@@ -218,9 +211,7 @@ def PhotonicBS(t: float) -> 'OperationFunc':
     """
 
     assert 0 <= t <= 1
-    gate = PhotonicGaussianGateOP('PhotonicGaussianBS', 2, 1, [t])
-    gate.generateMatrixAndVector = gate._generateBSMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianBS', 2, 1, [t])
 
 
 PhotonicBS.type = 'PhotonicGaussianGateOP'
@@ -244,9 +235,7 @@ def PhotonicCZ(phi: float) -> 'OperationFunc':
     :param phi: phase shift
     """
 
-    gate = PhotonicGaussianGateOP('PhotonicGaussianCZ', 2, 1, [phi])
-    gate.generateMatrixAndVector = gate._generateCZMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianCZ', 2, 1, [phi])
 
 
 PhotonicCZ.type = 'PhotonicGaussianGateOP'
@@ -270,9 +259,7 @@ def PhotonicCX(g: float) -> 'OperationFunc':
     :param g: interaction gain
     """
 
-    gate = PhotonicGaussianGateOP('PhotonicGaussianCX', 2, 1, [g])
-    gate.generateMatrixAndVector = gate._generateCXMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianCX', 2, 1, [g])
 
 
 PhotonicCX.type = 'PhotonicGaussianGateOP'
@@ -292,9 +279,7 @@ def PhotonicDIS(r: float, phi: float) -> 'OperationFunc':
     """
 
     assert r >= 0
-    gate = PhotonicGaussianGateOP('PhotonicGaussianDIS', 1, 2, [r, phi])
-    gate.generateMatrixAndVector = gate._generateDISMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianDIS', 1, 2, [r, phi])
 
 
 PhotonicDIS.type = 'PhotonicGaussianGateOP'
@@ -320,9 +305,7 @@ def PhotonicSQU(r: float, phi: float) -> 'OperationFunc':
     """
 
     assert r >= 0
-    gate = PhotonicGaussianGateOP('PhotonicGaussianSQU', 1, 2, [r, phi])
-    gate.generateMatrixAndVector = gate._generateSQUMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianSQU', 1, 2, [r, phi])
 
 
 PhotonicSQU.type = 'PhotonicGaussianGateOP'
@@ -350,9 +333,7 @@ def PhotonicTSQU(r: float, phi: float) -> 'OperationFunc':
     """
 
     assert r >= 0
-    gate = PhotonicGaussianGateOP('PhotonicGaussianTSQU', 2, 2, [r, phi])
-    gate.generateMatrixAndVector = gate._generateTSQUMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianTSQU', 2, 2, [r, phi])
 
 
 PhotonicTSQU.type = 'PhotonicGaussianGateOP'
@@ -388,9 +369,7 @@ def PhotonicMZ(phi_in: float, phi_ex: float) -> 'OperationFunc':  # CompositeGat
     :param phi_ex: external phase
     """
 
-    gate = PhotonicGaussianGateOP('PhotonicGaussianMZ', 2, 2, [phi_in, phi_ex])
-    gate.generateMatrixAndVector = gate._generateMZMatrixAndVector
-    return gate
+    return PhotonicGaussianGateOP('PhotonicGaussianMZ', 2, 2, [phi_in, phi_ex])
 
 
 PhotonicMZ.type = 'PhotonicGaussianGateOP'

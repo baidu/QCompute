@@ -24,14 +24,14 @@ import numpy as np
 from typing import List
 from tqdm import tqdm
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, StateTomography, MeasurementBasis, PreparationBasis, \
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import Tomography, StateTomography, MeasurementBasis, PreparationBasis, \
                             init_measurement_basis, init_preparation_basis
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.linalg import dagger
-from qcompute_qep.utils.circuit import circuit_to_unitary
-from qcompute_qep.quantum.channel import QuantumChannel, PTM, unitary_to_ptm, ptm_to_process
-from qcompute_qep.quantum.metrics import average_gate_fidelity
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import dagger
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_unitary
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import QuantumChannel, PTM, unitary_to_ptm, ptm_to_process
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics import average_gate_fidelity
 
 
 class ProcessTomography(Tomography):
@@ -110,11 +110,11 @@ class ProcessTomography(Tomography):
 
         **Examples**
 
-            >>> from qcompute_qep.quantum.channel import unitary_to_ptm
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import unitary_to_ptm
             >>> import QCompute
-            >>> import qcompute_qep.tomography as tomography
-            >>> from qcompute_qep.utils.circuit import circuit_to_unitary
-            >>> import qcompute_qep.utils.types as typing
+            >>> import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_unitary
+            >>> import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as typing
             >>> qp = QCompute.QEnv()
             >>> qp.Q.createList(2)
             >>> QCompute.CZ(qp.Q[1], qp.Q[0])

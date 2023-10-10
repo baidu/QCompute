@@ -17,6 +17,7 @@
 """
 utils
 """
+FileErrorCode = 7
 
 from numpy import array, pi, linalg, ndarray
 from numpy import exp, log, cos, sin, sqrt, arcsin, arctan
@@ -44,7 +45,6 @@ __all__ = ["plus_state",
            "decompose"
            ]
 
-FileErrorCode = 5
 eps = 1e-12  # error
 
 
@@ -381,11 +381,7 @@ def pauli_gate(gate):
     elif gate == 'Z':  # Pauli Z gate
         return array([[1, 0], [0, -1]], dtype='float64')
     else:
-        raise Error.ArgumentError(f"Invalid Pauli gate index: ({gate})!\n"
-                                  "Only 'I', 'X', 'Y' and 'Z' are supported as the index of Pauli gate.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 1)
-
+        raise Error.ArgumentError(f"Invalid Pauli gate index: ({gate})!\nOnly 'I', 'X', 'Y' and 'Z' are supported as the index of Pauli gate.", ModuleErrorCode, FileErrorCode, 1)
 
 def rotation_gate(axis, theta):
     r"""Define a rotation gate.
@@ -435,10 +431,7 @@ def rotation_gate(axis, theta):
          [0.        +0.j         0.96592583+0.25881905j]]
     """
     if not isinstance(theta, float) and not isinstance(theta, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 2)
+        raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 2)
 
     # Calculate half of the input theta
     half_theta = theta / 2
@@ -450,11 +443,7 @@ def rotation_gate(axis, theta):
     elif axis == 'z':  # rotation-z gate matrix
         return pauli_gate('I') * cos(half_theta) + sin(half_theta) * -1j * pauli_gate('Z')
     else:
-        raise Error.ArgumentError(f"Invalid rotation axis: ({axis})!\n"
-                                  "Only 'x', 'y' and 'z' are supported as the index of rotation axis.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 3)
-
+        raise Error.ArgumentError(f"Invalid rotation axis: ({axis})!\nOnly 'x', 'y' and 'z' are supported as the index of rotation axis.", ModuleErrorCode, FileErrorCode, 3)
 
 def u3_gate(theta, phi, lamda):
     r"""Define a single qubit unitary gate。
@@ -482,17 +471,13 @@ def u3_gate(theta, phi, lamda):
         ndarray: the ``ndarray`` form of a single qubit unitary gate
     """
     if not isinstance(theta, float) and not isinstance(theta, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode, FileErrorCode, 4)
+        raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 4)
+
     if not isinstance(phi, float) and not isinstance(phi, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode, FileErrorCode, 5)
+        raise Error.ArgumentError(f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 5)
+
     if not isinstance(lamda, float) and not isinstance(lamda, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode, FileErrorCode, 6)
+        raise Error.ArgumentError(f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 6)
 
     u_mat = matmul(matmul(rotation_gate('z', phi), rotation_gate('y', theta)), rotation_gate('z', lamda))
     return u_mat
@@ -524,17 +509,15 @@ def u_gate(theta, phi, lamda):
         ndarray: the ``ndarray`` form of a single qubit unitary gate
     """
     if not isinstance(theta, float) and not isinstance(theta, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode, FileErrorCode, 7)
+        raise Error.ArgumentError(f'Invalid rotation angle ({theta}) with the type: `{type(theta)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 7)
+
+
     if not isinstance(phi, float) and not isinstance(phi, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode, FileErrorCode, 8)
+        raise Error.ArgumentError(f'Invalid rotation angle ({phi}) with the type: `{type(phi)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 8)
+
+
     if not isinstance(lamda, float) and not isinstance(lamda, int):
-        raise Error.ArgumentError(f"Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\n"
-                                  "Only `float` and `int` are supported as the type of rotation angle.",
-                                  ModuleErrorCode, FileErrorCode, 9)
+        raise Error.ArgumentError(f'Invalid rotation angle ({lamda}) with the type: `{type(lamda)}`!\nOnly `float` and `int` are supported as the type of rotation angle.', ModuleErrorCode, FileErrorCode, 9)
 
     u_mat = matmul(matmul(rotation_gate('z', phi), rotation_gate('x', theta)), rotation_gate('z', lamda))
 
@@ -571,10 +554,7 @@ def _log(complex_number):
 
     # Zero
     if abs(complex_number) <= eps:
-        raise Error.ArgumentError(f"Invalid complex number: ({complex_number})!\n"
-                                  "The length of a complex number must be larger than 0.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 21)
+        raise Error.ArgumentError(f'Invalid complex number: ({complex_number})!\nThe length of a complex number must be larger than 0.', ModuleErrorCode, FileErrorCode, 10)
 
     real_in = complex_number.real
     real_phase = real_in / abs(real_in)
@@ -634,24 +614,15 @@ def decompose(u_mat):
         float: the rotation angle of the right Rz gate
     """
     if not isinstance(u_mat, ndarray):
-        raise Error.ArgumentError(f"Invalid matrix ({u_mat}) with the type: `{type(u_mat)}`!\n"
-                                  "Only `ndarray` is supported as the type of the matrix.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 22)
+        raise Error.ArgumentError(f'Invalid matrix ({u_mat}) with the type: `{type(u_mat)}`!\nOnly `ndarray` is supported as the type of the matrix.', ModuleErrorCode, FileErrorCode, 11)
+
     if u_mat.shape != (2, 2):
-        raise Error.ArgumentError(f"Invalid matrix ({u_mat}) with the shape: {u_mat.shape}!\n"
-                                  "Only (2, 2) is supported as the shape of the matrix.",
-                                  ModuleErrorCode,
-                                  FileErrorCode, 23)
+        raise Error.ArgumentError(f'Invalid matrix ({u_mat}) with the shape: {u_mat.shape}!\nOnly (2, 2) is supported as the shape of the matrix.', ModuleErrorCode, FileErrorCode, 12)
 
     u_error = linalg.norm(matmul(c(t(u_mat)), u_mat) - pauli_gate('I'))
     is_unitary = u_error < eps
     if not is_unitary:
-        raise Error.ArgumentError(
-            f"Invalid matrix ({u_mat}) with the norm: {u_error}!\n"
-            "Only unitary matrix is supported.",
-            ModuleErrorCode,
-            FileErrorCode, 24)
+        raise Error.ArgumentError(f'Invalid matrix ({u_mat}) with the norm: {u_error}!\nOnly unitary matrix is supported.', ModuleErrorCode, FileErrorCode, 13)
 
     a = u_mat[0][0]
     b = u_mat[0][1]

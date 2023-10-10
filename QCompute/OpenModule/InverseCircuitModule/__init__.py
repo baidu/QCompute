@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+FileErrorCode = 4
+
 from copy import deepcopy
 from typing import List, Dict, Optional
 
@@ -27,8 +29,6 @@ from QCompute.QPlatform.QOperation.FixedGate import getFixedGateInstance
 from QCompute.QPlatform.QOperation.RotationGate import createRotationGateInstance
 from QCompute.QPlatform.Utilities import protobufMatrixToNumpyMatrix
 from QCompute.QProtobuf import PBProgram, PBCircuitLine, PBFixedGate, PBRotationGate, PBCompositeGate
-
-FileErrorCode = 4
 
 
 class InverseCircuitModule(ModuleImplement):
@@ -46,18 +46,14 @@ class InverseCircuitModule(ModuleImplement):
     """
     errorOnUnsupported = True
 
-
     def __init__(self, arguments: Optional[Dict[str, bool]] = None):
         """
         Initialize the Module.
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
+        super().__init__(arguments)
         if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
-
             if 'errorOnUnsupported' in arguments:
                 self.errorOnUnsupported = arguments['errorOnUnsupported']
 
@@ -68,6 +64,8 @@ class InverseCircuitModule(ModuleImplement):
         :param program: the program
         :return: inversed circuit
         """
+        if self.disable:
+            return program
 
         ret = deepcopy(program)
 
@@ -87,7 +85,7 @@ class InverseCircuitModule(ModuleImplement):
         :param circuitIn: output circuit
         """
 
-        for circuitLine in reversed(deepcopy(circuitIn)):
+        for circuitLine in reversed(circuitIn):
             circuitOut.append(self._inverse_gate(circuitLine))
 
     def _inverse_gate(self, circuitLine: 'PBCircuitLine'):
@@ -100,8 +98,7 @@ class InverseCircuitModule(ModuleImplement):
 
         op = circuitLine.WhichOneof('op')
         if op == 'procedureName' or op == 'measure' or op == 'barrier':
-            ret = deepcopy(circuitLine)
-            return ret
+            return deepcopy(circuitLine)
         if op == 'fixedGate':
             fixedGate: PBFixedGate = circuitLine.fixedGate
             gateName = PBFixedGate.Name(fixedGate)
@@ -121,10 +118,12 @@ class InverseCircuitModule(ModuleImplement):
             mat = protobufMatrixToNumpyMatrix(circuitLine.customizedGate.matrix)
             return gateToProtobuf(CustomizedGateOP(mat).getInversed(), circuitLine.qRegList)
 
-        # unsupported gate
-        if self.errorOnUnsupported:
-            # error
-            raise Error.ArgumentError(f'Unsupported operation {circuitLine}!', ModuleErrorCode, FileErrorCode, 1)
         else:
-            # ignore
-            return deepcopy(circuitLine)
+            # unsupported gate
+            if self.errorOnUnsupported:
+                # error
+                raise Error.ArgumentError(
+                    f'Unsupported operation {circuitLine}', ModuleErrorCode, FileErrorCode, 1)
+            else:
+                # ignore
+                return deepcopy(circuitLine)

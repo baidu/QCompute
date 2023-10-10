@@ -18,6 +18,8 @@
 """
 Quantum Status
 """
+FileErrorCode = 11
+
 import traceback
 from typing import List, Dict, Any
 
@@ -25,8 +27,6 @@ import requests
 
 from QCompute import Define
 from QCompute.QPlatform import Error, ModuleErrorCode
-
-FileErrorCode = 8
 
 
 def getDeviceStatus(backendList: List[str]) -> Dict[str, Any]:

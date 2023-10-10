@@ -18,6 +18,8 @@
 """
 Configuration
 """
+FileErrorCode = 1
+
 from enum import Enum, IntEnum, unique
 from QCompute.Define import MeasureFormat
 
@@ -91,6 +93,7 @@ class NoiseMethod(IntEnum):
     GeneralNoise = MixedUnitaryNoise + 1
     LowNoiseCircuit = GeneralNoise + 1
 
+
 noiseMethod = NoiseMethod.LowNoiseCircuit
 """
 Noise method
@@ -130,7 +133,20 @@ Values: True, False
 linuxDirectSim2Cpp = False
 """
 Use local sim2 cpp directly in linux.
+
+Values: True, False
 """
 
+alwaysRetryTask = False
+"""
+Always retry task.
+
+Values: True, False
+"""
+
+httpTimeout = 3
+"""
+Http timeout seconds.
+"""
 
 

@@ -18,6 +18,8 @@
 client
 """
 
+FileErrorCode = 3
+
 from typing import List, Tuple, Dict
 from numpy import random, pi
 
@@ -48,8 +50,6 @@ __all__ = [
     "PlatformClient",
 ]
 
-FileErrorCode = 1
-
 
 class BrickworkVertex:
     r"""Define the ``BrickworkVertex`` class.
@@ -73,10 +73,7 @@ class BrickworkVertex:
             position (Tuple): vertex position
         """
         if not isinstance(position, Tuple):
-            raise Error.ArgumentError(f"Invalid position ({position}) with the type: `{type(position)}`!\n"
-                                      "Only `Tuple` is supported as the type of vertex position.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 1)
+            raise Error.ArgumentError(f'Invalid position ({position}) with the type: `{type(position)}`!\nOnly `Tuple` is supported as the type of vertex position.', ModuleErrorCode, FileErrorCode, 1)
 
         self.__position = position  # vertex position
         self.__rotation_encryption_angle: float = None  # angle for rotation encryption
@@ -92,17 +89,12 @@ class BrickworkVertex:
                                      [0, pi/4, pi/2, 3pi/4, pi, 5pi/4, 3pi/2, 7pi/4]
         """
         if not isinstance(angle, float):
-            raise Error.ArgumentError(f"Invalid rotation encryption angle ({angle}) with the type: `{type(angle)}`!\n"
-                                      "Only `float` is supported as the type of rotation encryption angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(f'Invalid rotation encryption angle ({angle}) with the type: `{type(angle)}`!\nOnly `float` is supported as the type of rotation encryption angle.', ModuleErrorCode, FileErrorCode, 2)
+
         if all(abs(angle - quarter_pi) >= eps for quarter_pi in
                [0, pi / 4, pi / 2, 3 * pi / 4, pi, 5 * pi / 4, 3 * pi / 2, 7 * pi / 4]):
-            raise Error.ArgumentError(f"Invalid rotation encryption angle: ({angle})!\n"
-                                      "Only '0', 'pi/4', 'pi/2', '3pi/4', 'pi', '5pi/4', '3pi/2' and '7pi/4' "
-                                      "are supported as the rotation encryption angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 3)
+            raise Error.ArgumentError(f"Invalid rotation encryption angle: ({angle})!\nOnly '0', 'pi/4', 'pi/2', '3pi/4', 'pi', '5pi/4', '3pi/2' and '7pi/4' are supported as the rotation encryption angle.", ModuleErrorCode, FileErrorCode, 3)
+
         self.__rotation_encryption_angle = angle
 
     def get_rotation_encryption_angle(self):
@@ -121,15 +113,10 @@ class BrickworkVertex:
             angle (float, optional): flipping encryption angle with the range of [0, pi]
         """
         if not isinstance(angle, float):
-            raise Error.ArgumentError(f"Invalid flipping encryption angle ({angle}) with the type: `{type(angle)}`!\n"
-                                      "Only `float` is supported as the type of flipping encryption angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(f'Invalid flipping encryption angle ({angle}) with the type: `{type(angle)}`!\nOnly `float` is supported as the type of flipping encryption angle.', ModuleErrorCode, FileErrorCode, 4)
+
         if all(abs(angle - zero_or_pi) >= eps for zero_or_pi in [0, pi]):
-            raise Error.ArgumentError(f"Invalid flipping encryption angle: ({angle})!\n"
-                                      "Only '0' and 'pi' are supported as the flipping encryption angle.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 3)
+            raise Error.ArgumentError(f"Invalid flipping encryption angle: ({angle})!\nOnly '0' and 'pi' are supported as the flipping encryption angle.", ModuleErrorCode, FileErrorCode, 5)
 
         self.__flipping_encryption_angle = angle
 
@@ -149,15 +136,7 @@ class BrickworkVertex:
         """
         name: str = which_command.name
         if not {name}.issubset(['M', 'X', 'Z', 'S']):
-            raise Error.ArgumentError(f"Invalid command name: ({name})!\n"
-                                      "Only 'M', 'X', 'Z' and 'S' are supported as the "
-                                      "names of operation commands on vertices, where "
-                                      "'M' is the measurement command, "
-                                      "'X' is the X byproduct correction command, "
-                                      "'Z' is the Z byproduct correction command and "
-                                      "'S' is the signal shifting command.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 4)
+            raise Error.ArgumentError(f"Invalid command name: ({name})!\nOnly 'M', 'X', 'Z' and 'S' are supported as the names of operation commands on vertices, where 'M' is the measurement command, 'X' is the X byproduct correction command, 'Z' is the Z byproduct correction command and 'S' is the signal shifting command.", ModuleErrorCode, FileErrorCode, 6)
 
         self.__commands.append(which_command)
 
@@ -227,7 +206,7 @@ class PlatformClient:
 
         # Queue is thread-safe so that it can be shared
         self.shot_outbox = Queue()
-        self.ret: Dict[str,int] = {}
+        self.ret: Dict[str, int] = {}
         self.shot_threadings: Dict[int, threading.Thread] = {}
         self.program = program
         self.phase_auth = True  # whether or not in the testing process
@@ -243,9 +222,7 @@ class PlatformClient:
             "shots": shots,
         })
         if not ok:
-            raise Error.ArgumentError(f"Failed to acquire computing resource!\n",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 5)
+            raise Error.ArgumentError('Failed to acquire computing resource!', ModuleErrorCode, FileErrorCode, 7)
 
         self.wsapp = websocket.WebSocketApp(
             self.entry,  # just for local tests
@@ -304,10 +281,7 @@ class PlatformClient:
             self.phase_auth = False
         else:
             self.wsapp.keep_running = False
-            raise Error.LogicError(f'Unexpected message: ({msg})!',
-                                   ModuleErrorCode,
-                                   FileErrorCode,
-                                   12)
+            raise Error.LogicError(f'Unexpected message: ({msg})!', ModuleErrorCode, FileErrorCode, 8)
 
     def on_message(self, ws, buf):
         r"""Prepare to transmit the message.
@@ -391,10 +365,7 @@ class PlatformClient:
         self.wsapp.keep_running = False
         if not self.ws_opened.is_set():
             self.ws_opened.set()
-        raise Error.Error(f'Unexpected Error: ({error})!',
-                          ModuleErrorCode,
-                          FileErrorCode,
-                          13)
+        raise Error.Error(f'Unexpected Error: ({error})!', ModuleErrorCode, FileErrorCode, 9)
 
     def on_close(self, ws, code, reason):
         r"""Close the websocket connection.
@@ -508,7 +479,7 @@ class UbqcClient(threading.Thread):
         self.__bw_pattern = None  # brickwork pattern
         self.__width: int = None  # width
         self.__depth: int = None  # depth
-        self.__shots: int = shots # shot
+        self.__shots: int = shots  # shot
         self.__states = None
         self.inbox: Queue = inbox
         self.outbox: Queue = outbox
@@ -633,9 +604,7 @@ class UbqcClient(threading.Thread):
         # Receive the measurement outcomes
         measure = self.wait_for_messages()
         if measure is None:
-            raise Error.ArgumentError(f"Failed to receive the measurement outcome!\n",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 6)
+            raise Error.ArgumentError('Failed to receive the measurement outcome!', ModuleErrorCode, FileErrorCode, 10)
 
         serverResBuf = b64decode(measure['params']['outcome'])
 
@@ -718,10 +687,7 @@ class UbqcClient(threading.Thread):
             bit_idxes.update(gate.qRegList)
         width = max(bit_idxes) + 1
         if width <= 0:
-            raise Error.ArgumentError(f"Invalid circuit ({program}) in the program!\n"
-                                      "This circuit is empty and has no qubit.",
-                                      ModuleErrorCode,
-                                      FileErrorCode, 7)
+            raise Error.ArgumentError(f'Invalid circuit ({program}) in the program!\nThis circuit is empty and has no qubit.', ModuleErrorCode, FileErrorCode, 11)
 
         # Instantiate ``Circuit`` and map gates and measurements to methods in ``Circuit``
         circuit = Circuit(width)
@@ -759,10 +725,7 @@ class UbqcClient(threading.Thread):
                     circuit.cnot(bit_idx)
                     circuit.h(bit_idx[1])
                 else:
-                    raise Error.ArgumentError(f"Invalid gate: ({gateName})!\n"
-                                              "Only 'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ' are supported as the "
-                                              "fixed gates in UBQC in this version.", ModuleErrorCode,
-                                              FileErrorCode, 8)
+                    raise Error.ArgumentError(f"Invalid gate: ({gateName})!\nOnly 'H', 'CX', 'X', 'Y', 'Z', 'S', 'T', 'CZ' are supported as the fixed gates in UBQC in this version.", ModuleErrorCode, FileErrorCode, 12)
 
             # Map ``rotationGate`` (including 'RX', 'RY', 'RZ', 'U') to the methods in ``Circuit``
             elif op == 'rotationGate':
@@ -808,34 +771,22 @@ class UbqcClient(threading.Thread):
                     circuit.u(theta2, phi2, lamda2, bit_idx[0])
 
             elif op == 'customizedGate':
-                raise Error.ArgumentError(f"Invalid gate type: ({op})!\n"
-                                          "Customized gates are not supported in UBQC in this version.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 9)
+                raise Error.ArgumentError(f'Invalid gate type: ({op})!\nCustomized gates are not supported in UBQC in this version.', ModuleErrorCode, FileErrorCode, 13)
 
             elif op == 'measure':
                 measurement_qubits = set(PBGate.qRegList)
                 if measurement_qubits != set(range(width)):
-                    raise Error.ArgumentError(f"Invalid measurement qubits: ({measurement_qubits})!\n"
-                                              "All qubits must be measured in UBQC in this version.",
-                                              ModuleErrorCode,
-                                              FileErrorCode, 10)
+                    raise Error.ArgumentError(f'Invalid measurement qubits: ({measurement_qubits})!\nAll qubits must be measured in UBQC in this version.', ModuleErrorCode, FileErrorCode, 14)
 
                 for qReg in PBGate.qRegList:
                     typeName: PBMeasure = PBMeasure.Type.Name(PBGate.measure.type)
                     if typeName == 'Z':
                         circuit.measure(qReg)
                     else:
-                        raise Error.ArgumentError(f"Invalid measurement type: ({typeName})!\n"
-                                                  "Only 'Z measurement' is supported as the measurement type "
-                                                  "in UBQC in this version.",
-                                                  ModuleErrorCode,
-                                                  FileErrorCode, 11)
+                        raise Error.ArgumentError(f"Invalid measurement type: ({typeName})!\nOnly 'Z measurement' is supported as the measurement type in UBQC in this version.", ModuleErrorCode, FileErrorCode, 15)
+
             else:
-                raise Error.ArgumentError(f"Invalid operation: ({op})!\n"
-                                          "This operation is not supported in UBQC in this version.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 12)
+                raise Error.ArgumentError(f'Invalid operation: ({op})!\nThis operation is not supported in UBQC in this version.', ModuleErrorCode, FileErrorCode, 16)
 
         return circuit
 
@@ -872,10 +823,7 @@ class UbqcClient(threading.Thread):
         for vertex in self.__client_knowledge.values():
             cmds = vertex.get_commands()
             if len(cmds) == 0:
-                raise Error.ArgumentError("Invalid brickwork pattern!"
-                                          "This brickwork pattern has not been standardized yet.",
-                                          ModuleErrorCode,
-                                          FileErrorCode, 13)
+                raise Error.ArgumentError('Invalid brickwork pattern! This brickwork pattern has not been standardized yet.', ModuleErrorCode, FileErrorCode, 17)
 
     def prepare_states(self):
         r"""Prepare the single qubit quantum states.

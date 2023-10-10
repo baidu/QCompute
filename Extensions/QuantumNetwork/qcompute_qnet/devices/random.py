@@ -22,8 +22,8 @@ Module for random number generators.
 import math
 from enum import Enum
 from typing import List, Optional
-from qcompute_qnet.core.des import Entity
-from qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
 
 __all__ = [
     "RandomNumberGenerator"

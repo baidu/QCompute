@@ -45,7 +45,7 @@ DES 将系统随时间的变化抽象成一系列发生在离散时间点上的�
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv, EventHandler, Entity
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv, EventHandler, Entity
 ```
 
 然后，我们创建一个 `Customer` 类用于模拟顾客，该类包含两个属性：顾客到达队列的序号（相当于一个服务编号）和顾客到达队列的时间。

@@ -27,8 +27,8 @@ import qiskit
 import QCompute
 from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform import QOperation
-from qcompute_qep.utils import limit_angle
-import qcompute_qep.utils.circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import limit_angle
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit
 
 # Currently supported quantum gates in OpenQASM 2.0
 __QASM_SUPPORTED_GATES__ = {
@@ -183,7 +183,7 @@ def to_qasm(circuit: List[CircuitLine], fname: str = None) -> str:
     output.write_header()
 
     # Number of qubits in the quantum circuit
-    n = qcompute_qep.utils.circuit.num_qubits_of_circuit(circuit)
+    n = Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit.num_qubits_of_circuit(circuit)
     qubit_indices = []
     for cl in circuit:
         qubit_indices.extend(cl.qRegList)
@@ -191,7 +191,7 @@ def to_qasm(circuit: List[CircuitLine], fname: str = None) -> str:
     num_of_register_qubits = max(x for x in qubit_indices) + 1
 
     # Pop the last measurement operation if exists
-    measurement = qcompute_qep.utils.circuit.remove_measurement(circuit)
+    measurement = Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit.remove_measurement(circuit)
 
     if measurement is not None:
         output.write_comment('Qubits: {}, Bits: {}'.format(qubit_indices, list(range(n))))

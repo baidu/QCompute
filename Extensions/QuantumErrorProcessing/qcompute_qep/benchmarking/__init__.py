@@ -17,11 +17,12 @@
 
 """__init__ file of the `qcompute_qep.benchmark` module."""
 
-from qcompute_qep.benchmarking.benchmarking import RandomizedBenchmarking, default_prep_circuit, default_meas_circuit
-from qcompute_qep.benchmarking.standardrb import StandardRB
-from qcompute_qep.benchmarking.unitarityrb import UnitarityRB
-from qcompute_qep.benchmarking.xeb import XEB
-from qcompute_qep.benchmarking.interleavedrb import InterleavedRB
+from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.benchmarking import \
+    RandomizedBenchmarking, default_prep_circuit, default_meas_circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.standardrb import StandardRB
+from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.unitarityrb import UnitarityRB
+from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.xeb import XEB
+from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.interleavedrb import InterleavedRB
 
 __all__ = [
     'RandomizedBenchmarking', 'StandardRB', 'UnitarityRB', 'XEB', 'InterleavedRB',

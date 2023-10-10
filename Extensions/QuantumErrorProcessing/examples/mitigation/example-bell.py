@@ -21,8 +21,8 @@ implemented in the Zero-Noise Extrapolation method.
 """
 
 from QCompute import *
-import qcompute_qep.mitigation as mitigation
-import qcompute_qep.utils.circuit as circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.mitigation as mitigation
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 
 ##########################################################################################
 # Step 1. Setup the quantum program for preparing the Bell state

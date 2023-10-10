@@ -24,7 +24,7 @@ from typing import List, Any
 import numpy
 from numpy import conj, random, trace, sqrt, reshape, transpose, real, square, abs
 from qcompute_qnet import EPSILON
-from qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
 
 __all__ = [
     "QuantumState",

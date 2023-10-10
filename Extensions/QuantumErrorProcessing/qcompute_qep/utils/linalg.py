@@ -24,7 +24,7 @@ from collections.abc import Iterable
 import numpy as np
 import scipy.linalg as la
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 
 def normalize(A: np.ndarray, axis: int = 0) -> np.ndarray:

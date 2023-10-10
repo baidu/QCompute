@@ -32,15 +32,15 @@ from copy import deepcopy
 import warnings
 
 import QCompute
-from qcompute_qep.utils.linalg import tensor
-from qcompute_qep.utils import expval_from_counts, execute, circuit, str_to_state
-from qcompute_qep.quantum import clifford
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
-from qcompute_qep.utils.types import QComputer, get_qc_name, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts, execute, circuit, str_to_state
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError as QEPError
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, get_qc_name, QProgram, number_of_qubits
 from QCompute import *
 from QCompute.QPlatform.QOperation import CircuitLine
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 warnings.filterwarnings('ignore')
 try:
@@ -189,7 +189,7 @@ class UnitarityRB(rb.RandomizedBenchmarking):
 
             >>> import qiskit
             >>> from qiskit.providers.fake_provider import FakeSantiago
-            >>> from qcompute_qep.benchmarking.unitarityrb import UnitarityRB
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.unitarityrb import UnitarityRB
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
             >>> urb = UnitarityRB(qubits=[0], qc=qc)
             >>> urb_results = urb.benchmark()
@@ -531,7 +531,7 @@ def _prep_circuit(ch, qp, qubits) -> QProgram:
     """The function is testing for class UnitarityRB.
 
     Will be updated in the future. For more information, see
-    qcompute_qep.tomography.basis.PauliPrepBasis.
+    Extensions.QuantumErrorProcessing.qcompute_qep.tomography.basis.PauliPrepBasis.
     """
     if isinstance(qp, QCompute.QEnv):
         n = number_of_qubits(qp)
@@ -568,7 +568,7 @@ def _meas_circuit(pauli, qp, qubits):
     """This function is only used in class UnitarityRB.
 
     Will be updated in the future. For more information, see
-    qcompute_qep.tomography.basis.PauliMeasBasis.
+    Extensions.QuantumErrorProcessing.qcompute_qep.tomography.basis.PauliMeasBasis.
     """
     if isinstance(qp, QCompute.QEnv):
         eigs = []

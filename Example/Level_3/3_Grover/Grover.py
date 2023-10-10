@@ -37,14 +37,17 @@ from random import randint
 sys.path.append('../..')  # "from QCompute import *" requires this
 from QCompute import *
 
-# matchSdkVersion('Python 3.3.3')
+# matchSdkVersion('Python 3.3.5')
 
 
 def func_find_borrowable_qubits(reg_work, num_qubits_borrowed=1):
     """
     Find several qubits not used (so they are borrowable) and form a new register.
+
     :param reg_work: a quantum register which should be disjoint with borrowed qubits
+
     :param num_qubits_borrowed: the number of borrowable qubits we need
+
     :return: a quantum register containing n_q_b borrowable qubits
     """
     reg_borrowed = []
@@ -61,17 +64,29 @@ def func_find_borrowable_qubits(reg_work, num_qubits_borrowed=1):
 def circ_multictrl_X(qubit_target, reg_ctrlling, reg_borrowed=None):
     """
     An implement for multi-control X gate (abbreviated as CnX) with several borrowed qubits, whose cost will be O(n).
+
     The decomposition algorithm refers to [3] and [4].
+
     Here CnX(|c>|t>) == |c> X|t>, if |c> == |11...1>;
+
                         |c>|t>,   else.
+
     :param qubit_target: |t>, the target qubit of the CnX gate
+
     :param reg_ctrlling: |c>, a quantum register containing several qubits as the controlling qubits for the CnX gate.
+
                               It is noted that r_c may be an empty register, i.e. r_c == [].
+
     :param reg_borrowed: |b>, a quantum register containing several qubits as the borrowed qubits for the CnX gate.
+
                               It is noted that r_b may also be an empty register, i.e. r_b == [].
+
     :return: Set n = the number of qubits in |c>.
+
              If n != 0, the state |b>|c>|t> will change into |b> CnX(|c>|t>) after this quantum circuit;
+
              Else if n == 0, the state |b>|t> will change into |b> X|t> after this quantum circuit.
+
              It is noted that the state |b> will always stay unchanged, so called borrowed qubits.
     """
     if reg_borrowed is None:
@@ -112,16 +127,27 @@ def circ_multictrl_X(qubit_target, reg_ctrlling, reg_borrowed=None):
 def circ_multictrl_Z(qubit_target, reg_ctrlling, reg_borrowed=None):
     """
     An implement for multi-control Z gate (abbreviated as CnZ) with several borrowed qubits, whose cost will be O(n).
+
     Here CnZ(|c>|t>) == |c>Z|t>, if |c> == |11...1>;
+
                         |c>|t>,  else.
+
     :param qubit_target: |t>, the target qubit of the CnZ gate
+
     :param reg_ctrlling: |c>, a quantum register containing several qubits as the controlling qubits for the CnZ gate.
+
                               It is noted that r_c may be an empty register, i.e. r_c == [].
+
     :param reg_borrowed: |b>, a quantum register containing several qubits as the borrowed qubits for the CnZ gate.
+
                               It is noted that r_b may also be an empty register, i.e. r_b == [].
+
     :return: Set n = the number of qubits in |c>.
+
              If n != 0, the state |b>|c>|t> will change into |b> CnZ(|c>|t>);
+
              Else if n == 0, the state |b>|t> will change into |b> X|t>
+
              It is noted that the state |b> will stay unchanged.
     """
     num_qubit_ctrlling = len(reg_ctrlling)  # count the number n in reg_ctrlling
@@ -138,12 +164,19 @@ def circ_multictrl_Z(qubit_target, reg_ctrlling, reg_borrowed=None):
 def circ_Grover_oracle(reg_sys, int_target):
     """
     This function give a circuit to implement the Grover oracle in Grover's algorithm.
+
     Generally, the search target should be unknown, and encoded by Grover oracle.
+
     However, in this implement we suppose the search target is known, such that we can implement an oracle to encode it.
+
     :param reg_sys: |s>, the system register to operate the Grover oracle
+
     :param int_target: t, the search target we want.
+
     :return: GO == I - 2|t><t|,
+
              GO |s> == -|s>, if s == t;
+
                        |s>,  if <t|s> == 0.
     """
     num_qubit = len(reg_sys)
@@ -168,11 +201,17 @@ def circ_Grover_oracle(reg_sys, int_target):
 def circ_diffusion_operator(reg_sys):
     """
     This function give a circuit to implement the diffusion operator in Grover's algorithm.
+
     The diffusion operator flip the phase along the state |++...+>,
+
     which could be implemented by CnZ and two layers of H gates and two layers of X gates.
+
     :param reg_sys: |s>, the system register to operate the diffusion operator
+
     :return: DO == I - 2|++...+><++...+|,
+
              DO |s> == -|s>, if |s> == |++...+>;
+
                        |s>,  if <++...+|s> == 0.
     """
     # the first layer of H gates and the first layer of X gates
@@ -194,6 +233,7 @@ def circ_diffusion_operator(reg_sys):
 def Grover(num_qubit, int_target=None):
     """
     :param num_qubit: n, the number of qubits which will encode the database to search
+
     :param int_target: t, the index of the search target, defaulted to be generated randomly
     """
     # create environment

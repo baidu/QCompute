@@ -18,10 +18,15 @@
 """
 Procedure Parameter Pool
 """
+FileErrorCode = 6
+
+import copy
 from typing import Dict
 
+from QCompute.QPlatform.ProcedureParameterExpression import ProcedureParameterExpression
 
-class ProcedureParameterStorage:
+
+class ProcedureParameterStorage(ProcedureParameterExpression):
     """
     The storage for procedure parameter
     """
@@ -29,10 +34,12 @@ class ProcedureParameterStorage:
     def __init__(self, index: int) -> None:
         """
         The quantum param object needs to know its index.
+
         :param index: the quantum register index
         """
 
         self.index = index
+        self.expressionList = [copy.copy(self)]
 
 
 class ProcedureParameterPool:
@@ -46,7 +53,7 @@ class ProcedureParameterPool:
         """
 
         # the inner data for procedure params dict
-        self.parameterMap: Dict[int,ProcedureParameterStorage] = {}
+        self.parameterMap: Dict[int, ProcedureParameterStorage] = {}
 
     def __getitem__(self, index: int) -> ProcedureParameterStorage:
         return self._get(index)
@@ -61,7 +68,7 @@ class ProcedureParameterPool:
         Create the register when it does not exist.
 
         :param index:
-        :return: ProcedureParamStorage
+
         :return: ProcedureParamStorage
         """
 

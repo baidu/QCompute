@@ -18,6 +18,7 @@
 """
 According to the type of gate or measurement implemented to quantum circuit, we can determine which circuit to run.
 """
+FileErrorCode = 25
 
 import argparse
 from datetime import datetime
@@ -33,12 +34,10 @@ from QCompute.QPlatform.Processor.PreProcess import preProcess
 from QCompute.QProtobuf import PBProgram, PBPhotonicGaussianGate, PBPhotonicGaussianMeasure, \
     PBPhotonicFockGate, PBPhotonicFockMeasure
 
-FileErrorCode = 5
 
-
-def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> 'QPhotonicResult':
+def isGaussianOrFock(program: 'PBProgram') -> bool:
     """
-    Initialization process
+    Test is gaussian or fock
     """
 
     isGaussian = False
@@ -55,70 +54,78 @@ def runSimulator(args: Optional[List[str]], program: Optional['PBProgram']) -> '
             isFock = True
             if isGaussian:
                 assert False
-
-    if isGaussian:
-        from QCompute.OpenSimulator.local_baidu_sim_photonic.InitGaussState import MatrixType
-        from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussTransfer import Algorithm
-    elif isFock:
-        from QCompute.OpenSimulator.local_baidu_sim_photonic.InitFockState import MatrixType
-        from QCompute.OpenSimulator.local_baidu_sim_photonic.FockCalculateInterferometer import Algorithm
-    else:
+    if not isGaussian and not isFock:
         assert False
+    return isGaussian
 
+
+def runSimulator(args: List[str], program: 'PBProgram') -> 'QPhotonicResult':
+    """
+    Initialization process
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('-mt', default='dense', type=str)
-    parser.add_argument('-a', default='matmul', type=str)
-
+    # parser.add_argument('-a', default='matmul', type=str)
     parser.add_argument('-shots', default=None, type=int)
     parser.add_argument('-inputFile', default=None, type=str)
 
     args = parser.parse_args(args=args)
     matrixType: str = args.mt.lower()
-    algorithm: str = args.a.lower()
+    # algorithm: str = args.a.lower()
     shots: int = args.shots  # shots=1 for Homo and Hetero measurement
     inputFile: str = args.inputFile
 
+    if inputFile is not None:
+        jsonStr = Path(inputFile).read_text()
+        program = JsonToCircuit().convert(jsonStr)
+
+    isGaussian = isGaussianOrFock(program)
+
+    if isGaussian:
+        from QCompute.OpenSimulator.local_baidu_sim_photonic.InitGaussState import MatrixType
+    else:
+        isFock = True
+        from QCompute.OpenSimulator.local_baidu_sim_photonic.InitFockState import MatrixType
+        # from QCompute.OpenSimulator.local_baidu_sim_photonic.FockCalculateInterferometer import Algorithm
+
     if shots < 1 or shots > Define.maxShots:
-        raise Error.ArgumentError(f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode,
-                                  FileErrorCode, 1)
+        raise Error.ArgumentError(
+            f'Invalid shots {shots}, should in [0, {Define.maxShots}]', ModuleErrorCode, FileErrorCode, 1)
 
     matrixTypeValue: Optional[MatrixType] = None
     if matrixType == 'dense':
         matrixTypeValue = MatrixType.Dense
     
     else:
-        raise Error.ArgumentError(
-            f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 2)
+        raise Error.ArgumentError(f'Invalid MatrixType {matrixTypeValue}', ModuleErrorCode, FileErrorCode, 2)
 
-    algorithmValue: Optional[Algorithm] = None
-    if algorithm == 'matmul':
-        algorithmValue = Algorithm.Matmul
-    elif algorithm == 'einsum':
-        algorithmValue = Algorithm.Einsum
-    else:
-        raise Error.ArgumentError(
-            f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 4)
+    # algorithmValue: Optional[Algorithm] = None
+    # if algorithm == 'matmul':
+    #     algorithmValue = Algorithm.Matmul
+    # elif algorithm == 'einsum':
+    #     algorithmValue = Algorithm.Einsum
+    # else:
+    #     raise Error.ArgumentError(f'Invalid Algorithm {algorithmValue}', ModuleErrorCode, FileErrorCode, 3)
 
     
 
-    if inputFile is not None:
-        jsonStr = Path(inputFile).read_text()
-        program = JsonToCircuit().convert(jsonStr)
-
     if isGaussian:
-        SV = GaussianCircuitVector(program, matrixTypeValue, algorithmValue, shots)
+        # SV = GaussianCircuitVector(program, matrixTypeValue, algorithmValue, shots)
+        SV = GaussianCircuitVector(program, matrixTypeValue, shots)
     elif isFock:
-        SV = FockCircuitVector(program, matrixTypeValue, algorithmValue, shots)
+        # SV = FockCircuitVector(program, matrixTypeValue, algorithmValue, shots)
+        SV = FockCircuitVector(program, matrixTypeValue, shots)
     else:
         assert False
+
     return SV.core()
 
 
 class GaussianCircuitVector:
-    def __init__(self, program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm', shots: int) -> None:
+    # def __init__(self, program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm', shots: int) -> None:
+    def __init__(self, program: 'PBProgram', matrixType: 'MatrixType', shots: int) -> None:
         self.program = program
         self.matrixType = matrixType
-        self.algorithm = algorithm
         self.shots = shots
         self.compactedCRegDict = None
 
@@ -153,8 +160,8 @@ class GaussianCircuitVector:
         """
         Simulation process for ideal circuit
         """
-        from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianGate import PhotonicDX, PhotonicDP, PhotonicPHA, \
-            PhotonicBS, PhotonicCZ, PhotonicCX, PhotonicDIS, PhotonicSQU, PhotonicTSQU, PhotonicMZ
+        # from QCompute.QPlatform.QOperation.Photonic.PhotonicGaussianGate import PhotonicDX, PhotonicDP, PhotonicPHA, \
+        #     PhotonicBS, PhotonicCZ, PhotonicCX, PhotonicDIS, PhotonicSQU, PhotonicTSQU, PhotonicMZ
         from QCompute.OpenSimulator.local_baidu_sim_photonic.InitGaussState import initState
         from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussTransfer import GaussStateTransferProcessor
         from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussHomoMea import HomodyneMeasure
@@ -168,17 +175,16 @@ class GaussianCircuitVector:
 
         program = self.program
         matrixType = self.matrixType
-        algorithm = self.algorithm
         shots = self.shots
 
         qRegMap = {qReg: index for index, qReg in enumerate(program.head.usingQRegList)}
         qRegCount = len(qRegMap)
 
         state_list = initState(matrixType, qRegCount)
-        transfer = GaussStateTransferProcessor(matrixType, algorithm)
-        homodyne_measurer = HomodyneMeasure(matrixType, algorithm)
-        heterodyne_measurer = HeterodyneMeasure(matrixType, algorithm)
-        photon_count_measurer = PhotonCountMeasure(matrixType, algorithm)
+        transfer = GaussStateTransferProcessor(matrixType)
+        homodyne_measurer = HomodyneMeasure(matrixType)
+        heterodyne_measurer = HeterodyneMeasure(matrixType)
+        photon_count_measurer = PhotonCountMeasure(matrixType)
         measured = False
         for circuitLine in program.body.circuit:  # Traverse the circuit
             op = circuitLine.WhichOneof('op')
@@ -188,42 +194,25 @@ class GaussianCircuitVector:
             if op == 'photonicGaussianGate':
                 photonicGaussianGate = circuitLine.photonicGaussianGate  # type: PBPhotonicGaussianGate
                 gateName = PBPhotonicGaussianGate.Name(photonicGaussianGate)
-                if gateName == 'PhotonicGaussianDX':
-                    gate_list = PhotonicDX(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianDP':
-                    gate_list = PhotonicDP(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianPHA':
-                    gate_list = PhotonicPHA(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianBS':
-                    gate_list = PhotonicBS(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianCZ':
-                    gate_list = PhotonicCZ(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianCX':
-                    gate_list = PhotonicCX(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianDIS':
-                    gate_list = PhotonicDIS(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianSQU':
-                    gate_list = PhotonicSQU(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianTSQU':
-                    gate_list = PhotonicTSQU(*circuitLine.argumentValueList)
-                elif gateName == 'PhotonicGaussianMZ':
-                    gate_list = PhotonicMZ(*circuitLine.argumentValueList)
-                else:
+                if gateName not in ['PhotonicGaussianDX', 'PhotonicGaussianDP', 'PhotonicGaussianPHA',
+                                    'PhotonicGaussianBS', 'PhotonicGaussianCZ', 'PhotonicGaussianCX',
+                                    'PhotonicGaussianDIS', 'PhotonicGaussianSQU', 'PhotonicGaussianTSQU',
+                                    'PhotonicGaussianMZ']:
                     raise Error.ArgumentError(
-                        f'Unsupported operation {PBPhotonicGaussianGate.Name(photonicGaussianGate)}!', ModuleErrorCode,
-                        FileErrorCode,
-                        8)
-                state_list = transfer(state_list, gate_list, numpy.array(qRegList))
+                        f'Unsupported operation {PBPhotonicGaussianGate.Name(photonicGaussianGate)}!',
+                        ModuleErrorCode, FileErrorCode, 3)
+
+                state_list = transfer(gateName, state_list, circuitLine.argumentValueList, qRegList)
 
             elif op == 'photonicGaussianMeasure':
                 measure: PBPhotonicGaussianMeasure = circuitLine.photonicGaussianMeasure
                 if not measured:
                     measured = True
                 if measure.type == PBPhotonicGaussianMeasure.Type.Homodyne:
-                    assert (shots == 1)
+                    assert (shots >= 1 and type(shots) == int)
                     result_measure = homodyne_measurer(state_list, numpy.array(qRegList), shots)
                 elif measure.type == PBPhotonicGaussianMeasure.Type.Heterodyne:
-                    assert (shots == 1)
+                    assert (shots >= 1 and type(shots) == int)
                     result_measure = heterodyne_measurer(state_list, circuitLine.photonicGaussianMeasure.heterodyne,
                                                          numpy.array(qRegList), shots)
                 elif measure.type == PBPhotonicGaussianMeasure.Type.PhotonCount:
@@ -233,20 +222,19 @@ class GaussianCircuitVector:
                 else:
                     raise Error.ArgumentError(
                         f'Unsupported operation measure {PBPhotonicGaussianMeasure.Type.Name(measure.type)}!',
-                        ModuleErrorCode,
-                        FileErrorCode, 13)
+                        ModuleErrorCode, FileErrorCode, 4)
 
             else:
-                raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 11)
+                raise Error.ArgumentError(
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 5)
 
         return result_measure
 
 
 class FockCircuitVector:
-    def __init__(self, program: 'PBProgram', matrixType: 'MatrixType', algorithm: 'Algorithm', shots: int) -> None:
+    def __init__(self, program: 'PBProgram', matrixType: 'MatrixType', shots: int) -> None:
         self.program = program
         self.matrixType = matrixType
-        self.algorithm = algorithm
         self.shots = shots
         self.compactedCRegDict = None
 
@@ -281,10 +269,9 @@ class FockCircuitVector:
         Simulation process for ideal circuit
         """
 
-        from QCompute.QPlatform.QOperation.Photonic.PhotonicFockGate import PhotonicAP, PhotonicPHA, PhotonicBS, \
-            PhotonicMZ
         from QCompute.OpenSimulator.local_baidu_sim_photonic.InitFockState import initState
-        from QCompute.OpenSimulator.local_baidu_sim_photonic.FockCalculateInterferometer import FockStateTransferProcessor
+        from QCompute.OpenSimulator.local_baidu_sim_photonic.FockCalculateInterferometer import \
+            FockStateTransferProcessor
         from QCompute.OpenSimulator.local_baidu_sim_photonic.FockAddPhotons import AddPhotonsToInitFockState
         from QCompute.OpenSimulator.local_baidu_sim_photonic.FockPhotonCountMeasure import PhotonCountMeasure
         # if self.program is None:
@@ -294,7 +281,6 @@ class FockCircuitVector:
         #     program = self.program
         program = self.program
         matrixType = self.matrixType
-        algorithm = self.algorithm
         shots = self.shots
 
         qRegMap = {qReg: index for index, qReg in enumerate(program.head.usingQRegList)}
@@ -302,9 +288,9 @@ class FockCircuitVector:
 
         fock_state_vector = initState(matrixType, qRegCount)
         add_photons = AddPhotonsToInitFockState(matrixType)
-        calcu_unitary_trans = FockStateTransferProcessor(algorithm)
-        unitary_trans_total = numpy.eye(qRegCount)
-        photon_count_measurer = PhotonCountMeasure(matrixType, algorithm)
+        calcu_unitary_trans = FockStateTransferProcessor()
+        unitary_trans_total = numpy.eye(qRegCount, dtype=complex)
+        photon_count_measurer = PhotonCountMeasure(matrixType)
         measured = False
         for circuitLine in program.body.circuit:  # Traverse the circuit
             op = circuitLine.WhichOneof('op')
@@ -315,30 +301,25 @@ class FockCircuitVector:
                 photonicFockGate = circuitLine.photonicFockGate  # type: PBPhotonicFockGate
                 gateName = PBPhotonicFockGate.Name(photonicFockGate)
                 if gateName == 'PhotonicFockAP':
-                    gate_matrix = PhotonicAP(*circuitLine.argumentValueList)
-                    fock_state_vector = add_photons(fock_state_vector, gate_matrix, numpy.array(qRegList))
+                    fock_state_vector = add_photons(fock_state_vector, circuitLine.argumentValueList, qRegList)
+                elif gateName in ['PhotonicFockPHA', 'PhotonicFockBS', 'PhotonicFockMZ']:
+                    unitary_trans_total = \
+                        calcu_unitary_trans(gateName, unitary_trans_total, circuitLine.argumentValueList, qRegList)
                 else:
-                    if gateName == 'PhotonicFockPHA':
-                        gate_matrix = PhotonicPHA(*circuitLine.argumentValueList)
-                    elif gateName == 'PhotonicFockBS':
-                        gate_matrix = PhotonicBS(*circuitLine.argumentValueList)
-                    elif gateName == 'PhotonicFockMZ':
-                        gate_matrix = PhotonicMZ(*circuitLine.argumentValueList)
-                    else:
-                        raise Error.ArgumentError(
-                            f'Unsupported operation {PBPhotonicFockGate.Name(photonicFockGate)}!', ModuleErrorCode,
-                            FileErrorCode, 8)
-                    unitary_trans_total = calcu_unitary_trans(unitary_trans_total, gate_matrix, numpy.array(qRegList))
+                    raise Error.ArgumentError(
+                        f'Unsupported operation {PBPhotonicFockGate.Name(photonicFockGate)}!',
+                        ModuleErrorCode, FileErrorCode, 6)
 
             elif op == 'photonicFockMeasure':
                 measure: PBPhotonicFockMeasure = circuitLine.photonicFockMeasure
                 if not measured:
                     measured = True
                 assert (shots >= 1 and type(shots) == int)
-                result_measure = photon_count_measurer(fock_state_vector, unitary_trans_total,
-                                                           measure.cutoff, shots)
+                result_measure = \
+                    photon_count_measurer(fock_state_vector, unitary_trans_total, measure.cutoff, shots)
             else:
-                raise Error.ArgumentError(f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 11)
+                raise Error.ArgumentError(
+                    f'Unsupported operation {op}!', ModuleErrorCode, FileErrorCode, 7)
 
         return result_measure
 

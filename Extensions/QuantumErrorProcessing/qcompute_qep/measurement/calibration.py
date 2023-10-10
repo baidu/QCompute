@@ -29,13 +29,13 @@ and performs a noisy measurement of each qubit, keeping the record of the measur
     >>> from QCompute import BackendName
     >>>
     >>> from qiskit.test.mock import FakeSantiago
-    >>> from qcompute_qep.measurement.calibration import CompleteCalibrator
-    >>> from qcompute_qep.measurement.calibration import TPCalibrator
-    >>> from qcompute_qep.measurement.calibration import init_complete_cal_circuits
-    >>> from qcompute_qep.measurement.calibration import init_tp_cal_circuits
-    >>> from qcompute_qep.measurement.calibration import extract_cal_data
-    >>> from qcompute_qep.measurement.calibration import load_cal_data
-    >>> from qcompute_qep.utils.circuit import print_circuit
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import CompleteCalibrator
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import TPCalibrator
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import init_complete_cal_circuits
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import init_tp_cal_circuits
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import extract_cal_data
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import load_cal_data
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
     >>>
     >>> # Set the default maximal number of measurement shots
     >>> MAX_SHOTS = 4096
@@ -56,12 +56,12 @@ from scipy.linalg import expm
 
 from QCompute import *
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement.utils import extract_substr, init_cal_data, special_log, get_qc_topo
-from qcompute_qep.utils.types import QProgram, QComputer
-from qcompute_qep.utils.linalg import tensor, normalize
-from qcompute_qep.utils.circuit import execute
-from qcompute_qep.utils.graph import connected_subgraphs
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import extract_substr, init_cal_data, special_log, get_qc_topo
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor, normalize
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.graph import connected_subgraphs
 
 
 class Calibrator(ABC):

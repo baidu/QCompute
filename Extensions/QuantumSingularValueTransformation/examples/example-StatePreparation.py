@@ -25,7 +25,7 @@ import numpy as np
 from QCompute import QEnv, BackendName, MeasureZ
 from QCompute.Define import Settings as QC_Settings
 
-from qcompute_qsvt.Oracle.StatePreparation import circ_state_pre
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.StatePreparation import circ_state_pre
 
 # not to draw the quantum circuit locally
 QC_Settings.drawCircuitControl = []

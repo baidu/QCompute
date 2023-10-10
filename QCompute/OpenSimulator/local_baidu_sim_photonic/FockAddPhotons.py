@@ -18,6 +18,7 @@
 """
 Add photon(s) to a single-qumode
 """
+FileErrorCode = 13
 
 from typing import Union
 import numpy
@@ -30,23 +31,20 @@ from QCompute.OpenSimulator.local_baidu_sim_photonic.InitFockState import Matrix
 class AddPhotonsToInitFockState:
     r"""
     This class is used to generate the vector of :math:`N`-qumode fock state after adding photon(s).
-    Note that the current version does not support adding photon(s) to multiple qumodes simultaneously.
     """
 
     def __init__(self, matrixType: MatrixType) -> None:
         if matrixType == MatrixType.Dense:
             self.proc = self.AddPhotonsDirectly
 
-    def __call__(self, fock_state_vector: Union[numpy.ndarray, 'COO'],
-                 gate_matrix: Union[numpy.ndarray, 'COO'], modes: numpy.ndarray) \
-            -> Union[numpy.ndarray, 'COO']:
+    def __call__(self, fock_state_vector: numpy.ndarray, gate_matrix: numpy.ndarray, modes: list) -> numpy.ndarray:
         """
         To enable the object callable
         """
 
         return self.proc(fock_state_vector, gate_matrix, modes)
 
-    def AddPhotonsDirectly(self, fock_state_vector: numpy.ndarray, gate_matrix: numpy.ndarray, modes: numpy.ndarray) \
+    def AddPhotonsDirectly(self, fock_state_vector: numpy.ndarray, argument_list: list, modes: list) \
             -> numpy.ndarray:
         r"""
         Get the vector of :math:`N`-qumode fock state after adding photon(s)
@@ -57,6 +55,5 @@ class AddPhotonsToInitFockState:
         :return fock_state_vector: numpy.ndarray, a vector of :math:`N`-qumode fock state after adding photon(s)
         """
 
-        count_array = gate_matrix.getMatrix()
-        fock_state_vector[modes[0]] = fock_state_vector[modes[0]] + int(count_array[0, 0])
+        fock_state_vector[modes[0]] = fock_state_vector[modes[0]] + int(argument_list[0])
         return fock_state_vector

@@ -18,13 +18,17 @@
 """
 Heterodyne measurement
 """
+import multiprocess
+
+FileErrorCode = 19
+
 import numpy
+import math
+import copy
 from typing import Union, Tuple, List, Dict
 
 
 from QCompute.OpenSimulator.local_baidu_sim_photonic.InitGaussState import MatrixType
-from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussTransfer import Algorithm
-from QCompute.OpenSimulator.local_baidu_sim_photonic.GaussAuxiliaryCalculation import TraceOneMode, TensorProduct
 
 
 class HeterodyneMeasure:
@@ -32,26 +36,23 @@ class HeterodyneMeasure:
     Perform heterodyne measurement
     """
 
-    def __init__(self, matrixType: MatrixType, algorithm: Algorithm) -> None:
+    def __init__(self, matrixType: MatrixType) -> None:
 
         if matrixType == MatrixType.Dense:
-            if algorithm == Algorithm.Matmul:
-                self.proc = self.RunMultiDenseHeteroByMatmul
-            else:
-                assert False
+            self.proc = self.RunMultiDenseHeteroByMatmul
         else:
             assert False
 
     def __call__(self, state_list: Union[List[numpy.ndarray], List['COO']], r_and_phi_list: List[Tuple[float, float]],
-                 modes_array: numpy.ndarray, shots=1) -> Dict[str, list]:
+                 modes_array: numpy.ndarray, shots) -> Dict[str, list]:
         """
         To enable the object callable
         """
 
         return self.proc(state_list, r_and_phi_list, modes_array, shots)
 
-    def RunSingleDenseHeteroByMatmul(self, state_list: List[numpy.ndarray], r: float, phi: float, mode: int, shots=1) \
-            -> Tuple[list, list]:
+    def RunSingleDenseHeteroByMatmul(self, inputParam: Tuple[int, List[numpy.ndarray], float, float, int]) \
+            -> Tuple[int, numpy.ndarray, list]:
         """
         Simulate the sampling process of measuring single-qumode coherent state
 
@@ -59,57 +60,65 @@ class HeterodyneMeasure:
         :param r: amplitude of the measured coherent state
         :param phi: phase of the measured coherent state
         :param mode: target qumode
-        :param shots: 'shots' must be set to 1
         :return: sampling results, as well as the first and second moment of rest state.
         """
 
-        state_fir_mom, state_sec_mom = state_list
+        (index, state_list, r, phi, mode) = inputParam
 
-        # Get the vector and the block second moment of traced and rest qumodes
-        (list_vector, list_matrix) = TraceOneMode(state_fir_mom, state_sec_mom, mode)
-        vector_a, vector_b = list_vector
-        matrix_A, matrix_B, matrix_C = list_matrix
+        fir_mom, sec_mom = state_list
 
-        sec_mom_coherent = numpy.eye(2)
-        x_central_value = numpy.sqrt(2) * r * numpy.cos(phi)
-        p_central_value = numpy.sqrt(2) * r * numpy.sin(phi)
-        x_value = numpy.random.normal(x_central_value, sec_mom_coherent[0, 0], size=shots)[0]
-        p_value = numpy.random.normal(p_central_value, sec_mom_coherent[1, 1], size=shots)[0]
-        fir_mom_coherent = numpy.array([[x_value],
-                                        [p_value]])
+        xcoor = 2 * mode
+        xprow = copy.copy(sec_mom[:, xcoor: xcoor + 2])
+        matB = copy.copy(sec_mom[xcoor: xcoor + 2, xcoor: xcoor + 2])
+        inverse_BplusI = numpy.linalg.inv(matB + numpy.eye(2))
 
-        matrix_C_T = numpy.transpose(matrix_C)
-        inverse_matrix = numpy.linalg.inv(matrix_B + sec_mom_coherent)
+        # Update the second moment
+        sec_mom -= numpy.matmul(numpy.matmul(xprow, inverse_BplusI), numpy.transpose(xprow))
+        sec_mom[xcoor: xcoor + 2, :] = sec_mom[:, xcoor: xcoor + 2] = 0
+        sec_mom[xcoor, xcoor] = sec_mom[xcoor + 1, xcoor + 1] = 1
 
-        # We need to update the first and second-moment
-        fir_mom_rest = vector_a - numpy.matmul(numpy.matmul(matrix_C, inverse_matrix), vector_b - fir_mom_coherent)
-        sec_mom_rest = matrix_A - numpy.matmul(numpy.matmul(matrix_C, inverse_matrix), matrix_C_T)
-        state_fir_mom, state_sec_mom = TensorProduct(fir_mom_rest, sec_mom_rest, mode)
-        state_list = [state_fir_mom, state_sec_mom]
+        # Get random x and p
+        central_xp = numpy.sqrt(2) * r * numpy.array([[math.cos(phi)],
+                                                      [math.sin(phi)]])
+        random_xp = numpy.array([numpy.random.normal(central_xp[0, 0], scale=1.0, size=1),
+                                 numpy.random.normal(central_xp[1, 0], scale=1.0, size=1)])
 
-        return [x_value, p_value], state_list
+        # Update the first moment
+        b_minus_rxp = fir_mom[xcoor: xcoor + 2] - random_xp
+        fir_mom -= numpy.matmul(numpy.matmul(xprow, inverse_BplusI), b_minus_rxp)
+        fir_mom[xcoor: xcoor + 2] = 0
+
+        state_list = [fir_mom, sec_mom]
+
+        return index, random_xp[:, 0], state_list
 
     def RunMultiDenseHeteroByMatmul(self, state_list: List[numpy.ndarray], r_and_phi_list: list,
-                                     modes_array: numpy.ndarray, shots=1) -> Dict[str, list]:
+                                    modes_array: numpy.ndarray, shots: int) -> Dict[str, list]:
         """
         Simulate the sampling process of measuring multi-qumode coherent state
 
         :param state_list: the first and second moments
         :param r_and_phi_list: amplitude and phase of the measured coherent state
         :param modes_array: measured qumodes
-        :param shots: 'shots' must be set to 1
+        :param shots: 'shots'
         :return dictionary_results: sampling results
         """
+        random_xp_list = [numpy.array([0, 0])] * len(r_and_phi_list)
+
+        for _ in range(shots):
+            updated_state_list = copy.deepcopy(state_list)
+            for index in range(len(modes_array)):
+                mode = modes_array[index]
+                single_r_and_phi = r_and_phi_list[index]
+                phi = single_r_and_phi.phi
+                r = single_r_and_phi.r
+                index, xp_array, updated_state_list = self.RunSingleDenseHeteroByMatmul(
+                    (index, updated_state_list, r, phi, mode))
+                random_xp_list[index] = random_xp_list[index] + xp_array
 
         dictionary_results = dict()
         for index in range(len(modes_array)):
-            mode = modes_array[index]
-            single_r_and_phi = r_and_phi_list[index]
-            phi = single_r_and_phi.phi
-            r = single_r_and_phi.r
-            xp_list, updated_state_list = self.RunSingleDenseHeteroByMatmul(state_list, r, phi, mode, shots)
-            mode_str = str(mode)
-            dictionary_results[mode_str] = xp_list
-            state_list = updated_state_list
+            mode_str = str(modes_array[index])
+            dictionary_results[mode_str] = list(random_xp_list[index] / shots)
 
         return dictionary_results

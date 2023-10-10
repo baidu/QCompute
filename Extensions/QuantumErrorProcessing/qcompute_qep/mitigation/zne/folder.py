@@ -24,11 +24,11 @@ from typing import Any, List, Tuple
 import copy
 import numpy as np
 
-from qcompute_qep.utils.circuit import remove_measurement, remove_barrier, \
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import remove_measurement, remove_barrier, \
     append_measurement, circuit_to_layers, group_gate_indices, \
     inverse_layer, inverse_layers, layers_to_circuit, depth_of_circuit, print_circuit
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
 
 __SUPPORTED_FOLDERS__ = {'circuit', 'layer', 'gate'}
 __SUPPORTED_METHODS__ = {'left', 'right', 'random'}

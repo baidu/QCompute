@@ -33,8 +33,8 @@ import numpy as np
 from QCompute import H, RY, CU, QEnv, BackendName, MeasureZ, UnrollCircuitModule, CompressGateModule, CircuitToQasm
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.QSVT import circ_QSVT_from_BE, circ_QSVT_from_BE_inverse
-from qcompute_qsvt.Application.HamiltonianSimulation.SymmetricQSPHS import func_LBFGS_QSP_HS
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.QSVT import circ_QSVT_from_BE, circ_QSVT_from_BE_inverse
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.SymmetricQSPHS import func_LBFGS_QSP_HS
 
 
 def circ_HS_QSVT(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], reg_ancilla: List[QRegStorage],

@@ -25,9 +25,9 @@ from typing import List, Dict
 import numpy
 import numpy.random
 
-from qcompute_qnet.protocols.protocol import Protocol, SubProtocol
-from qcompute_qnet.messages.message import ClassicalMessage
-from qcompute_qnet.models.qpu.message import QuantumMsg
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol, SubProtocol
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import ClassicalMessage
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.message import QuantumMsg
 
 __all__ = [
     "Teleportation",

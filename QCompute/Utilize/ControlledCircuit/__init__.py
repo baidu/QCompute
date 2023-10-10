@@ -18,6 +18,8 @@
 """
 Controlled Circuit
 """
+FileErrorCode = 2
+
 import copy
 from typing import List
 
@@ -28,8 +30,6 @@ from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.QOperation.FixedGate import CX, CY, CH, CCX, SDG, S, H, CSWAP, CZ
 from QCompute.QPlatform.QOperation.RotationGate import RotationGateOP, CU, CRX, CRY, CRZ, U
 from QCompute.Utilize import ModuleErrorCode
-
-FileErrorCode = 1
 
 
 def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: int, cuFirst: bool) \
@@ -53,8 +53,8 @@ def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: 
     elif op.__class__.__name__ == 'QProcedureOP':
         pass
     else:
-        raise Error.ArgumentError(f'Wrong bits count. bits value: {op.bits}!', ModuleErrorCode,
-                                  FileErrorCode, 1)
+        raise Error.ArgumentError(
+            f'Wrong bits count! {op.name} bits value: {op.bits}.', ModuleErrorCode, FileErrorCode, 1)
 
     if isinstance(op, RotationGateOP):
         nAngles = len(op.argumentList)
@@ -65,8 +65,8 @@ def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: 
         elif nAngles == 3:
             [theta, phi, lamda] = op.argumentList
         else:
-            raise Error.ArgumentError(f'Wrong angles count. angles value: {op.argumentList}!', ModuleErrorCode,
-                                      FileErrorCode, 2)
+            raise Error.ArgumentError(
+                f'Wrong angles count! {op.name} angles value: {op.argumentList}.', ModuleErrorCode, FileErrorCode, 2)
 
     # 1-qubit, FixedGate
     if op.name == 'ID':
@@ -129,21 +129,15 @@ def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: 
 
     # 1-qubit, RotationGate
     elif op.name == 'U':
-        if op.allowArgumentCounts == 1:
-            newCircuitLine = CircuitLine()
+        newCircuitLine = CircuitLine()
+        if nAngles == 1:
             newCircuitLine.data = CU(0, 0, theta)
-            newCircuitLine.qRegList = [q1, q0]
-            ret.append(newCircuitLine)
-        elif op.allowArgumentCounts == 2:
-            newCircuitLine = CircuitLine()
+        elif nAngles == 2:
             newCircuitLine.data = CU(numpy.pi / 2, theta, phi)
-            newCircuitLine.qRegList = [q1, q0]
-            ret.append(newCircuitLine)
-        elif op.allowArgumentCounts == 3:
-            newCircuitLine = CircuitLine()
+        elif nAngles == 3:
             newCircuitLine.data = CU(theta, phi, lamda)
-            newCircuitLine.qRegList = [q1, q0]
-            ret.append(newCircuitLine)
+        newCircuitLine.qRegList = [q1, q0]
+        ret.append(newCircuitLine)
     elif op.name == 'RX':
         newCircuitLine = CircuitLine()
         if cuFirst:
@@ -490,7 +484,7 @@ def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: 
         ret.append(newCircuitLine)
 
     elif op.__class__.__name__ == 'QProcedureOP':
-        newProcedure, newProcedureName = env.controlProcedure(op.name, cuFirst)
+        newProcedureName, newProcedure = env.controlProcedure(op.name, cuFirst)
         env.procedureMap[newProcedureName] = newProcedure
 
         newCircuitLine = CircuitLine()
@@ -502,7 +496,6 @@ def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: 
     # Unsupported
     else:
         raise Error.ArgumentError(
-            f"{op.__class__.__name__} {op.name} can't be controlled in procedure!",
-            ModuleErrorCode, FileErrorCode, 3)
+            f"{op.__class__.__name__} {op.name} can't be controlled in procedure!", ModuleErrorCode, FileErrorCode, 3)
 
     return ret

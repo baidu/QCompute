@@ -18,48 +18,12 @@
 r"""
 Calculate overall unitary :math:`U` of interferometer
 """
+import copy
 
-from enum import IntEnum, unique
-from typing import Union
+FileErrorCode = 15
+
+import math
 import numpy
-
-
-
-
-@unique
-class Algorithm(IntEnum):
-    """
-    Only the 'MATMUL' algorithm is implemented in current version.
-    """
-
-    Matmul = 0
-    Einsum = Matmul + 1
-
-
-def CalcuGateMatrix(gate_matrix: numpy.ndarray, modes: numpy.ndarray, n: int) -> numpy.ndarray:
-    r"""
-    Covert the gate matrix defined in scripy 'PhotonicFockGate'
-    into an :math:`N \times N` matrix that can act on :math:`N`-qumode quantum states.
-
-    :param gate_matrix: the matrix of single- or two-qumode gate
-    :param modes: a list of target qumode(s)
-    :param n: the total number of qumodes
-    :return: an :math:`N \times N` matrix
-    """
-
-    pending_gate = gate_matrix.getMatrix()
-    nmode_gate_matrix = numpy.eye(n, dtype=complex)
-    if len(modes) == 1:
-        nmode_gate_matrix[modes[0], modes[0]] = pending_gate[0, 0]
-    elif len(modes) == 2:
-        mode_1 = modes[0]
-        mode_2 = modes[1]
-        nmode_gate_matrix[mode_1, mode_1] = pending_gate[0, 0]
-        nmode_gate_matrix[mode_1, mode_2] = pending_gate[0, 1]
-        nmode_gate_matrix[mode_2, mode_1] = pending_gate[1, 0]
-        nmode_gate_matrix[mode_2, mode_2] = pending_gate[1, 1]
-
-    return nmode_gate_matrix
 
 
 class FockStateTransferProcessor:
@@ -67,31 +31,75 @@ class FockStateTransferProcessor:
     Calculate the overall unitary :math:`U` of interferometer.
     """
 
-    def __init__(self, algorithm: Algorithm) -> None:
-        if algorithm == Algorithm.Matmul:
-            self.proc = self.CalcuInterByMatmul
-        else:
-            assert False
+    def __init__(self) -> None:
+        self.proc = self.WhichPhotonicGate
 
-    def __call__(self, unitary_trans_total: Union[numpy.ndarray, 'COO'], gate_matrix: Union[numpy.ndarray, 'COO'],
-                 modes: numpy.ndarray) -> Union[numpy.ndarray, 'COO']:
+    def __call__(self, gate_name: str, unitary_trans_total: numpy.ndarray, argument_list: list, modes: list) \
+            -> numpy.ndarray:
         """
         To enable the object callable
         """
 
-        return self.proc(unitary_trans_total, gate_matrix, modes)
+        return self.proc(gate_name, unitary_trans_total, argument_list, modes)
 
-    def CalcuInterByMatmul(self, unitary_trans_total: numpy.ndarray, gate_matrix: numpy.ndarray, modes: numpy.ndarray)\
+    def WhichPhotonicGate(self, gate_name: str, unitary_trans_total: numpy.ndarray, argument_list: list, modes: list) \
             -> numpy.ndarray:
-        r"""
-        Update the overall unitary :math:`U` of interferometer.
+        """
+        To judge which quantum gate.
+        """
+        if gate_name == 'PhotonicFockPHA':
+            return self.CRTransferByPHA(unitary_trans_total, argument_list, modes)
+        elif gate_name == 'PhotonicFockBS':
+            return self.CRTransferByBS(unitary_trans_total, argument_list, modes)
+        elif gate_name == 'PhotonicFockMZ':
+            return self.CRTransferByMZ(unitary_trans_total, argument_list, modes)
+        else:
+            assert False
 
-        :param unitary_trans_total: unitary :math:`U` of interferometer
-        :param gate_matrix: the matrix of single- or two-qumode gate
-        :param modes: a list of target qumode(s)
-        :return unitary_trans_total: updated unitary :math:`U` of interferometer
+    def CRTransferByPHA(self, unitary_trans_total: numpy.ndarray, argument_list: list, modes: list) -> numpy.ndarray:
+        """
+        Update the unitary :math:`U` by phase gate.
         """
 
-        unitary_trans_single = CalcuGateMatrix(gate_matrix, modes, unitary_trans_total.shape[0])
-        unitary_trans_total = numpy.matmul(unitary_trans_single, unitary_trans_total)
+        phi = argument_list[0]
+        coor = modes[0]
+
+        row = copy.copy(unitary_trans_total[coor, :])
+        unitary_trans_total[coor, :] = numpy.exp(1j * phi) * row
+
+        return unitary_trans_total
+
+    def CRTransferByBS(self, unitary_trans_total: numpy.ndarray, argument_list: list, modes: list) -> numpy.ndarray:
+        """
+        Update the unitary :math:`U` by beam splitter
+        """
+
+        t = argument_list[0]
+        [coor1, coor2] = modes
+        sqrtt, sqrtr = math.sqrt(t), math.sqrt(1 - t) * 1j
+
+        row1 = copy.copy(unitary_trans_total[coor1, :])
+        row2 = copy.copy(unitary_trans_total[coor2, :])
+
+        unitary_trans_total[coor1, :] = sqrtt * row1 + sqrtr * row2
+        unitary_trans_total[coor2, :] = sqrtr * row1 + sqrtt * row2
+
+        return unitary_trans_total
+
+    def CRTransferByMZ(self, unitary_trans_total: numpy.ndarray, argument_list: list, modes: list) -> numpy.ndarray:
+        """
+        Update the unitary :math:`U` by Mach-Zehnder interferometer
+        """
+
+        [phi_in, phi_ex] = argument_list
+        expin = numpy.exp(1j * phi_in)
+        expex = numpy.exp(1j * phi_ex)
+        [coor1, coor2] = modes
+
+        row1 = copy.copy(unitary_trans_total[coor1, :])
+        row2 = copy.copy(unitary_trans_total[coor2, :])
+
+        unitary_trans_total[coor1, :] = ((-(1 - expin) * expex) * row1 + (1j * (1 + expin)) * row2) / 2
+        unitary_trans_total[coor2, :] = (((1j * (1 + expin)) * expex) * row1 + (1 - expin) * row2) / 2
+
         return unitary_trans_total

@@ -22,12 +22,12 @@ An example of the workflow for quantum network simulation.
 import sys
 sys.path.append('..')
 
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qkd.node import QKDNode
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
 
 
 # 1. Create the simulation environment and set as default

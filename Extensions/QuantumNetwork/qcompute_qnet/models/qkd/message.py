@@ -21,7 +21,7 @@ Module for messages in quantum key distribution.
 
 from enum import Enum, unique
 from typing import Dict
-from qcompute_qnet.messages.message import ClassicalMessage
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import ClassicalMessage
 
 __all__ = [
     "QKDMessage"

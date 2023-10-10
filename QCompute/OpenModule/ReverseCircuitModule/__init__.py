@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+FileErrorCode = 5
+
 from copy import deepcopy
 from typing import List, Dict, Optional
 
@@ -40,10 +42,7 @@ class ReverseCircuitModule(ModuleImplement):
 
         Json serialization is allowed by the requested parameter.
         """
-        self.arguments = arguments
-        if arguments is not None and type(arguments) is dict:
-            if 'disable' in arguments:
-                self.disable = arguments['disable']
+        super().__init__(arguments)
 
     def __call__(self, program: 'PBProgram') -> 'PBProgram':
         """
@@ -52,6 +51,8 @@ class ReverseCircuitModule(ModuleImplement):
         :param program: the program
         :return: reversed circuit
         """
+        if self.disable:
+            return program
 
         ret = deepcopy(program)
 
@@ -72,4 +73,4 @@ class ReverseCircuitModule(ModuleImplement):
         """
 
         for circuitLine in reversed(deepcopy(circuitIn)):
-            circuitOut.append(deepcopy(circuitLine))
+            circuitOut.append(circuitLine)

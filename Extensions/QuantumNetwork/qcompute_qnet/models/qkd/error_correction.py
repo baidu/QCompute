@@ -20,7 +20,7 @@ Module for error correction protocols.
 """
 
 from abc import ABC
-from qcompute_qnet.protocols.protocol import Protocol
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol
 
 __all__ = [
     "ErrorCorrection",
