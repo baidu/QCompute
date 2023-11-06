@@ -20,7 +20,7 @@ An example to demonstrate the Cross-Platform Estimation of Quantum States protoc
 """
 
 import QCompute
-import qcompute_qep.estimation.cpe_state as cp
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation.cpe_state as cp
 
 # Step 1:Read the data of sampled unitaries and measurement results collected from
 # different quantum devices
@@ -28,30 +28,30 @@ import qcompute_qep.estimation.cpe_state as cp
 #                                qc=QCompute.BackendName.LocalBaiduSim2,
 #                                qubits=[0])
 
-ideal_baidu1 = cp.read_quantum_snapshot('Baidu ideal1_08_15_15', 'baidu ideal1')
+ideal_baidu1 = cp.read_quantum_snapshot("Baidu ideal1_08_15_15", "baidu ideal1")
 
 # ideal_baidu2 = QuantumSnapshot(qc_name='Baidu ideal2',
 #                                qc=QCompute.BackendName.LocalBaiduSim2,
 #                                qubits=[0])
 
-ideal_baidu2 = cp.read_quantum_snapshot('Baidu ideal2_08_15_16', 'baidu ideal2')
+ideal_baidu2 = cp.read_quantum_snapshot("Baidu ideal2_08_15_16", "baidu ideal2")
 
-ideal_baidu3 = cp.read_quantum_snapshot('Baidu ideal3_08_16_09', 'baidu ideal3')
+ideal_baidu3 = cp.read_quantum_snapshot("Baidu ideal3_08_16_09", "baidu ideal3")
 
-dev_list = [ideal_baidu1,
-            ideal_baidu2,
-            ideal_baidu3,
-            # read_quantum_snapshot('Baidu ideal3_08_16_09', 'baidu ideal4'),
-            # read_quantum_snapshot('Baidu ideal1_08_15_15', 'baidu ideal5'),
-            # read_quantum_snapshot('Baidu ideal2_08_15_16', 'baidu ideal6'),
-            ]
+dev_list = [
+    ideal_baidu1,
+    ideal_baidu2,
+    ideal_baidu3,
+    # read_quantum_snapshot('Baidu ideal3_08_16_09', 'baidu ideal4'),
+    # read_quantum_snapshot('Baidu ideal1_08_15_15', 'baidu ideal5'),
+    # read_quantum_snapshot('Baidu ideal2_08_15_16', 'baidu ideal6'),
+]
 # Step 2: Set up the quantum program
 qp = QCompute.QEnv()
 qp.Q.createList(1)
 
 # Step 3: Perform cross-platform estimation of different quantum devices.
 est = cp.CPEState()
-result = est.estimate(dev_list, qp, samples=100, shots=50, show=True, filename='test.png')
+result = est.estimate(dev_list, qp, samples=100, shots=50, show=True, filename="test.png")
 
 print(result)
-

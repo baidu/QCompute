@@ -37,7 +37,7 @@ ExtrapolationResult = Tuple[
     Callable,  # store the fit function, must be a callable object
 ]
 
-__SUPPORTED_EXTRAPOLATORS__ = {'linear', 'exponential', 'richardson', 'polynomial', 'exppoly', 'customized'}
+__SUPPORTED_EXTRAPOLATORS__ = {"linear", "exponential", "richardson", "polynomial", "exppoly", "customized"}
 
 
 class Extrapolator(abc.ABC):
@@ -45,14 +45,15 @@ class Extrapolator(abc.ABC):
 
     Each inherited class must implement the ``extrapolate`` method.
     """
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._extra_value: float = None  # store the extrapolated value
         self._extra_error: float = None  # store the (estimated) error of the extrapolated value
         self._popt: List[float] = None  # store the optimal fitting parameters
         self._pcov: np.ndarray = None  # store the covariance of the fitting parameters
         self._data: Tuple[List[float], List[float]] = None  # store the xdata and ydata
-        self._order = kwargs.get('order', 1)  # the extrapolation order
-        self._asymptote = kwargs.get('asymptote', 1)  # the fitting asymptotic value
+        self._order = kwargs.get("order", 1)  # the extrapolation order
+        self._asymptote = kwargs.get("asymptote", 1)  # the fitting asymptotic value
         self._func: Callable = None  # the fit function, must be a callable object
         self._has_extrapolated = False
 
@@ -68,11 +69,11 @@ class Extrapolator(abc.ABC):
         raise NotImplementedError
 
     def __str__(self) -> str:
-        s = 'A(n) {} object. has extrapolation record: {}'.format(self.name, self.has_extrapolated)
+        s = "A(n) {} object. has extrapolation record: {}".format(self.name, self.has_extrapolated)
         if self.has_extrapolated:
-            s += '\nextrapolation result: {:.2f}, error of result: {:.2f}'.format(self._extra_value, self._extra_error)
-            s += '\noptimized parameters: {}'.format(np.round(s, 2))
-            s += '\ncovariance of optimized parameters:\n{}'.format(np.round(self._pcov, 2))
+            s += "\nextrapolation result: {:.2f}, error of result: {:.2f}".format(self._extra_value, self._extra_error)
+            s += "\noptimized parameters: {}".format(np.round(s, 2))
+            s += "\ncovariance of optimized parameters:\n{}".format(np.round(self._pcov, 2))
         return s
 
     def plot_data(self, save: bool = False, fname: str = None) -> Figure:
@@ -86,14 +87,14 @@ class Extrapolator(abc.ABC):
         """
         fig = plt.figure(figsize=(8, 5))
 
-        plt.scatter(self._data[0], self._data[1], edgecolors='k', c='lightblue')
+        plt.scatter(self._data[0], self._data[1], edgecolors="k", c="lightblue")
 
-        plt.xlabel('Scaling factor — $\lambda$', fontsize=13)
-        plt.ylabel('Expectation — $E(\lambda)$', fontsize=13)
-        plt.title('Original Data', fontsize=16)
+        plt.xlabel("Scaling factor — $\lambda$", fontsize=13)
+        plt.ylabel("Expectation — $E(\lambda)$", fontsize=13)
+        plt.title("Original Data", fontsize=16)
         plt.show()
         if save:
-            fname = 'original_data' if fname is None else fname
+            fname = "original_data" if fname is None else fname
             fig.savefig(fname, dpi=300)
         return fig
 
@@ -108,19 +109,19 @@ class Extrapolator(abc.ABC):
         """
         fig = plt.figure(figsize=(8, 5))
         # plot the raw data
-        plt.scatter(self._data[0], self._data[1], edgecolors='lightblue', c='lightblue', alpha=0.6)
+        plt.scatter(self._data[0], self._data[1], edgecolors="lightblue", c="lightblue", alpha=0.6)
         # plot the extrapolation value
-        plt.scatter(0, self._extra_value, c='red', marker='*', alpha=0.6)
+        plt.scatter(0, self._extra_value, c="red", marker="*", alpha=0.6)
         # plot the fitted curve
         x = np.linspace(0, self._data[0][-1])
         y = self.fitted_func(x)
-        plt.plot(x, y, '--', color='k')
-        plt.xlabel(r'Scaling Factor — $\lambda$', fontsize=13)
-        plt.ylabel(r'Expectation Value — $E(\lambda)$', fontsize=13)
+        plt.plot(x, y, "--", color="k")
+        plt.xlabel(r"Scaling Factor — $\lambda$", fontsize=13)
+        plt.ylabel(r"Expectation Value — $E(\lambda)$", fontsize=13)
         fig.tight_layout()
         plt.show()
         if save:
-            fname = 'extrapolation_result' if fname is None else fname
+            fname = "extrapolation_result" if fname is None else fname
             fig.savefig(fname, dpi=300)
         return fig
 
@@ -145,9 +146,7 @@ class Extrapolator(abc.ABC):
 
 
 # Self-defined polynomial extrapolation function
-def qep_poly_extrapolate(xdata: List[float],
-                         ydata: List[float],
-                         order: int) -> ExtrapolationResult:
+def qep_poly_extrapolate(xdata: List[float], ydata: List[float], order: int) -> ExtrapolationResult:
     r"""Use the ``numpy.polyfit`` function to fit the data.
 
     :param xdata: List[float], the independent variable where the ydata is measured
@@ -190,18 +189,18 @@ def qep_curve_extrapolate(ansatz: Callable, xdata: List[float], ydata: List[floa
     :param ydata: List[float], the dependent data, nominally f(xdata, ...)
     :return: ExtrapolationResult, the extrapolation results
     """
-    p0 = kwargs.get('p0', None)
-    sigma = kwargs.get('sigma', None)
-    bounds = kwargs.get('bounds', (-np.inf, np.inf))
+    p0 = kwargs.get("p0", None)
+    sigma = kwargs.get("sigma", None)
+    bounds = kwargs.get("bounds", (-np.inf, np.inf))
     try:
         popt, pcov = optimize.curve_fit(ansatz, xdata, ydata, p0=p0, sigma=sigma, bounds=bounds, maxfev=5000)
     except ValueError:
-        print('optimize.curve_fit() fails. Either ydata or xdata contain NaNs. popt set to 0.')
+        print("optimize.curve_fit() fails. Either ydata or xdata contain NaNs. popt set to 0.")
         sig = signature(ansatz)
         popt = np.zeros(len(sig.parameters) - 1)
         pcov = None
     except RuntimeError:
-        print('optimize.curve_fit() fails because the least-squares minimization cannot converge. popt set to 0.')
+        print("optimize.curve_fit() fails because the least-squares minimization cannot converge. popt set to 0.")
         sig = signature(ansatz)
         popt = np.zeros(len(sig.parameters) - 1)
         pcov = None
@@ -218,8 +217,8 @@ def qep_curve_extrapolate(ansatz: Callable, xdata: List[float], ydata: List[floa
 
 
 class LinearExtrapolator(Extrapolator):
-    r"""The Linear Extrapolator Class.
-    """
+    r"""The Linear Extrapolator Class."""
+
     def extrapolate(self, xdata: List[float], ydata: List[float], **kwargs: Any) -> float:
         r"""Use the `numpy.polyfit` linear function to fit the data.
 
@@ -244,8 +243,8 @@ class LinearExtrapolator(Extrapolator):
 
 
 class PolynomialExtrapolator(Extrapolator):
-    r"""The Polynomial Extrapolator Class.
-    """
+    r"""The Polynomial Extrapolator Class."""
+
     def extrapolate(self, xdata: List[float], ydata: List[float], order: int = 1, **kwargs: Any) -> float:
         r"""Use the `numpy.polyfit` polynomial function to fit the data.
 
@@ -271,14 +270,11 @@ class PolynomialExtrapolator(Extrapolator):
 
 
 class ExpPolyExtrapolator(Extrapolator):
-    r"""The Exponential Polynomial Extrapolator Class.
-    """
-    def extrapolate(self,
-                    xdata: List[float],
-                    ydata: List[float],
-                    order: int = 1,
-                    asymptote: float = None,
-                    **kwargs: Any) -> float:
+    r"""The Exponential Polynomial Extrapolator Class."""
+
+    def extrapolate(
+        self, xdata: List[float], ydata: List[float], order: int = 1, asymptote: float = None, **kwargs: Any
+    ) -> float:
         r"""
         Use the `numpy.polyfit` exponential-polynomial function to fit data.
 
@@ -319,27 +315,21 @@ class ExpPolyExtrapolator(Extrapolator):
         if asymptote is None:
             # fit and extrapolate
             p0 = [0, sign, -1] + [0] * (self._order - 1)
-            self.extrapolation_result = qep_curve_extrapolate(_ansatz_unknown,
-                                                              self._data[0],
-                                                              self._data[1],
-                                                              p0=p0)
+            self.extrapolation_result = qep_curve_extrapolate(_ansatz_unknown, self._data[0], self._data[1], p0=p0)
             self._extra_error = np.sqrt(self._pcov[0, 0] + self._pcov[1, 1] + 2 * self._pcov[0, 1])
 
         else:
             # fit and extrapolate
             p0 = [sign, -1] + [0] * (self._order - 1)
-            self.extrapolation_result = qep_curve_extrapolate(_ansatz_known,
-                                                              self._data[0],
-                                                              self._data[1],
-                                                              p0=p0)
+            self.extrapolation_result = qep_curve_extrapolate(_ansatz_known, self._data[0], self._data[1], p0=p0)
             self._extra_error = np.sqrt(self._pcov[0, 0])
 
         return self._extra_value
 
 
 class ExponentialExtrapolator(Extrapolator):
-    r"""The Exponential Extrapolator Class.
-    """
+    r"""The Exponential Extrapolator Class."""
+
     def extrapolate(self, xdata: List[float], ydata: List[float], **kwargs: Any) -> float:
         r"""Use the `scipy.optimize.curve_fit` exponential function to fit data.
 
@@ -354,7 +344,7 @@ class ExponentialExtrapolator(Extrapolator):
         :return: float, the extrapolated value to the zero-limit
         """
         self._has_extrapolated = True
-        self._asymptote = kwargs.get('asymptote', 1)
+        self._asymptote = kwargs.get("asymptote", 1)
         # sort the xdata ascendingly and rearrange the ydata accordingly
         idx_sort = np.argsort(xdata)
         self._data = (np.array(xdata)[idx_sort], np.array(ydata)[idx_sort])
@@ -366,23 +356,19 @@ class ExponentialExtrapolator(Extrapolator):
         if self._asymptote is None:
             # non-linear fitting
             ansatz = lambda x, a, b, c: a + b * np.exp(-c * x)
-            self.extrapolation_result = qep_curve_extrapolate(ansatz,
-                                                              self._data[0],
-                                                              self._data[1],
-                                                              p0=[self._data[1][0], sign, -1])
+            self.extrapolation_result = qep_curve_extrapolate(
+                ansatz, self._data[0], self._data[1], p0=[self._data[1][0], sign, -1]
+            )
         else:
             ansatz = lambda x, b, c: self._asymptote + b * np.exp(-c * x)
-            self.extrapolation_result = qep_curve_extrapolate(ansatz,
-                                                              self._data[0],
-                                                              self._data[1],
-                                                              p0=[sign, -1])
+            self.extrapolation_result = qep_curve_extrapolate(ansatz, self._data[0], self._data[1], p0=[sign, -1])
 
         return self._extra_value
 
 
 class RichardsonExtrapolator(Extrapolator):
-    r"""The Richardson Extrapolator Class.
-    """
+    r"""The Richardson Extrapolator Class."""
+
     def extrapolate(self, xdata: List[float], ydata: List[float], **kwargs: Any) -> float:
         r"""Use the Richardson extrapolation function to fit the data.
 
@@ -414,8 +400,8 @@ class RichardsonExtrapolator(Extrapolator):
 
 
 class CustomizedExtrapolator(Extrapolator):
-    r"""The Customized Extrapolator Class.
-    """
+    r"""The Customized Extrapolator Class."""
+
     def __init__(self, ansatz: Callable = None, *args: Any, **kwargs: Any) -> None:
         super(CustomizedExtrapolator, self).__init__()
         self._func = ansatz

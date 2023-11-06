@@ -27,15 +27,9 @@ from enum import Enum, unique
 from heapq import heappush, heappop
 import numpy as np
 import pandas as pd
-from qcompute_qnet.core.log import log_init
+from Extensions.QuantumNetwork.qcompute_qnet.core.log import log_init
 
-__all__ = [
-    "Entity",
-    "Event",
-    "EventHandler",
-    "Scheduler",
-    "DESEnv"
-]
+__all__ = ["Entity", "Event", "EventHandler", "Scheduler", "DESEnv"]
 
 
 class Entity(ABC):
@@ -61,9 +55,11 @@ class Entity(ABC):
         self.name = name
         if env is None:
             if DESEnv.get_default_env() is None:
-                raise ValueError(f"Default DES environment is None. "
-                                 f"Should set a default DES environment first"
-                                 f"or assign an explicit DES environment to {self.name}.")
+                raise ValueError(
+                    f"Default DES environment is None. "
+                    f"Should set a default DES environment first"
+                    f"or assign an explicit DES environment to {self.name}."
+                )
             else:
                 self.env = DESEnv.get_default_env()
         else:
@@ -77,8 +73,7 @@ class Entity(ABC):
 
     @abstractmethod
     def init(self):
-        r"""Abstract method that should be implemented by a specific entity.
-        """
+        r"""Abstract method that should be implemented by a specific entity."""
         pass
 
     def attach(self, env: "DESEnv") -> None:
@@ -132,29 +127,30 @@ class Entity(ABC):
         self.components.append(other)
 
     def print_components(self) -> None:
-        r"""Print the components of the entity.
-        """
+        r"""Print the components of the entity."""
         df = pd.DataFrame(columns=["type", "name", "env", "owner"])
 
         for i, component in enumerate(self.components):
-            component_info = pd.DataFrame({"type": component.__class__.__name__,
-                                           "name": component.name,
-                                           "env": component.env.name,
-                                           "owner": component.owner.name},
-                                          index=[f"Component {i + 1}"])
+            component_info = pd.DataFrame(
+                {
+                    "type": component.__class__.__name__,
+                    "name": component.name,
+                    "env": component.env.name,
+                    "owner": component.owner.name,
+                },
+                index=[f"Component {i + 1}"],
+            )
             df = pd.concat([df, component_info])
 
         print(f"\nComponent list of the {self.__class__.__name__}, '{self.name}':\n{df.to_string()}")
 
     def print_agenda(self) -> None:
-        r"""Print the events scheduled for the entity.
-        """
+        r"""Print the events scheduled for the entity."""
         df = Event.events_to_dataframe(self.agenda)
         print(f"\nAgenda of {self.name} (unsorted):\n{df.to_string()}")
 
     def print_signed_events(self) -> None:
-        r"""Print the events scheduled by the entity.
-        """
+        r"""Print the events scheduled by the entity."""
         df = Event.events_to_dataframe(self.signed_events)
         print(f"\nSigned events by {self.name} (unsorted):\n{df.to_string()}")
 
@@ -193,8 +189,7 @@ class Event:
 
     @unique
     class Status(Enum):
-        r"""Event status.
-        """
+        r"""Event status."""
 
         CREATED = "Created"
         SCHEDULED = "Scheduled"
@@ -202,8 +197,7 @@ class Event:
         CANCELLED = "Cancelled"
 
     def cancel(self) -> None:
-        r"""Set the event status as cancelled.
-        """
+        r"""Set the event status as cancelled."""
         self.status = Event.Status.CANCELLED
 
     @classmethod
@@ -242,19 +236,22 @@ class Event:
         """
         df = pd.DataFrame(columns=["time", "priority", "object", "method", "status", "signature"])
         for i, event in enumerate(events):
-            event_info = pd.DataFrame({"time": event.time,
-                                       "priority": event.priority,
-                                       "object": event.handler.owner.name,
-                                       "method": event.handler.method,
-                                       "status": event.status.value,
-                                       "signature": event.signature.name},
-                                      index=[f"Event {i + 1}"])
+            event_info = pd.DataFrame(
+                {
+                    "time": event.time,
+                    "priority": event.priority,
+                    "object": event.handler.owner.name,
+                    "method": event.handler.method,
+                    "status": event.status.value,
+                    "signature": event.signature.name,
+                },
+                index=[f"Event {i + 1}"],
+            )
             df = pd.concat([df, event_info])
         return df
 
     def print(self) -> None:
-        r"""Print the event details.
-        """
+        r"""Print the event details."""
         df = Event.events_to_dataframe([self])
         print(f"\nEvent details:\n{df.to_string()}")
 
@@ -300,8 +297,7 @@ class EventHandler:
         self.kwargs = kwargs
 
     def handle(self) -> None:
-        r"""Method to execute the event.
-        """
+        r"""Method to execute the event."""
         return getattr(self.owner, self.method)(*self.params, **self.kwargs)
 
 
@@ -438,14 +434,13 @@ class DESEnv:
         self.status = DESEnv.Status.STOPPED
         self.logging = False
         self.logger = None
-        self.log_config = {'path': None, 'level': "DEBUG"}
+        self.log_config = {"path": None, "level": "DEBUG"}
         if default:
             self.set_default_env()
 
     @unique
     class Status(Enum):
-        r"""Simulation status.
-        """
+        r"""Simulation status."""
 
         READY = "Ready"
         RUNNING = "Running"
@@ -461,8 +456,7 @@ class DESEnv:
         self.status = DESEnv.Status.READY  # switch the environment status to 'Ready'
 
     def set_default_env(self) -> None:
-        r"""Set the current environment as default.
-        """
+        r"""Set the current environment as default."""
         DESEnv.__DEFAULT_ENV = self
 
     @classmethod
@@ -483,7 +477,8 @@ class DESEnv:
         Returns:
             Node: node entity to return
         """
-        from qcompute_qnet.topology.node import Node
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+
         for entity in self.entities:
             if isinstance(entity, Node) and entity.name == name:
                 return entity
@@ -495,7 +490,8 @@ class DESEnv:
         Returns:
             Network: network in the discrete-event simulation environment
         """
-        from qcompute_qnet.topology.network import Network
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+
         for entity in self.entities:
             if isinstance(entity, Network):
                 return entity
@@ -508,9 +504,9 @@ class DESEnv:
             level (str): logging level of the logger
         """
         if path is not None:
-            self.log_config['path'] = path
+            self.log_config["path"] = path
         if level is not None:
-            self.log_config['level'] = level
+            self.log_config["level"] = level
 
     @property
     def now(self) -> int:
@@ -536,7 +532,7 @@ class DESEnv:
         self.end_time = float("inf") if end_time is None else round(end_time)
 
         self.logging = logging
-        self.logger = log_init(self, self.log_config['path'], self.log_config['level'])
+        self.logger = log_init(self, self.log_config["path"], self.log_config["level"])
 
         # Use time.time_ns() instead of time.time() to avoid float type accuracy loss
         sim_start = time.time_ns()
@@ -570,8 +566,9 @@ class DESEnv:
         elapsed_time = sim_end - sim_start
 
         self.logger.info("-" * 20 + "Simulation ends" + "-" * 20)
-        self.logger.info(f"Elapsed wall time: {elapsed_time * 1e-9:.4f}s \t"
-                         f" Elapsed virtual time: {self.now * 1e-12:.4f}s")
+        self.logger.info(
+            f"Elapsed wall time: {elapsed_time * 1e-9:.4f}s \t" f" Elapsed virtual time: {self.now * 1e-12:.4f}s"
+        )
         self.logger.debug(f"Scheduled events: {self.counter_scheduled} \t Handled events: {self.counter_handled}")
         if summary:
             self.print_summary(elapsed_time)
@@ -585,8 +582,7 @@ class DESEnv:
         self.logger.info("Simulation is stopped")
 
     def reset(self) -> None:
-        r"""Reset the discrete-event simulation environment.
-        """
+        r"""Reset the discrete-event simulation environment."""
         raise NotImplementedError("Not available in this version!")
 
     @staticmethod
@@ -599,8 +595,7 @@ class DESEnv:
         np.random.seed = random_seed
 
     def print_summary(self, elapsed_time: int) -> None:
-        r"""Print the summary information of the simulation.
-        """
+        r"""Print the summary information of the simulation."""
         string = StringIO()
         string.write("-" * 50 + "\n")
         string.write(f"Simulation status:\t'{self.status.value}'\n\n")
@@ -624,8 +619,7 @@ class DESEnv:
         """
 
         def __init__(self):
-            r"""Constructor for FutureEvents class.
-            """
+            r"""Constructor for FutureEvents class."""
             self.events = []
 
         def push(self, event: "Event") -> None:
@@ -653,7 +647,6 @@ class DESEnv:
             return True if not self.events else False
 
         def print(self) -> None:
-            r"""Print the future event list.
-            """
+            r"""Print the future event list."""
             df = Event.events_to_dataframe(self.events)
             print(f"\nFuture event list (unsorted):\n{df.to_string()}")

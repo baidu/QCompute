@@ -19,14 +19,4 @@ r"""
 Module for quantum information processing.
 """
 
-__all__ = [
-    "backends",
-    "basis",
-    "circuit",
-    "gate",
-    "mcalculus",
-    "noise",
-    "pattern",
-    "state",
-    "utils"
-]
+__all__ = ["backends", "basis", "circuit", "gate", "mcalculus", "noise", "pattern", "state", "utils"]

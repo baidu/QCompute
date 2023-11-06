@@ -22,13 +22,11 @@ Module for quantum registers.
 from typing import List, Union, Optional, Any
 import numpy
 
-from qcompute_qnet.core.des import Entity, EventHandler
-from qcompute_qnet.quantum.circuit import Circuit
-from qcompute_qnet.quantum.state import QuantumState
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import QuantumState
 
-__all__ = [
-    "QuantumRegister"
-]
+__all__ = ["QuantumRegister"]
 
 
 class QuantumRegister(Entity):
@@ -58,13 +56,12 @@ class QuantumRegister(Entity):
 
         self.units = []  # each unit stores a qubit, with its local address, quantum state and source
         for i in range(self.size):
-            self.units.append({"address": i, "qubit": None, "identifier": self.owner, 'outcome': None})
+            self.units.append({"address": i, "qubit": None, "identifier": self.owner, "outcome": None})
         self.circuit_index = -1
         self.__op_counter = 0
 
     def init(self) -> None:
-        r"""Initialization of the quantum register.
-        """
+        r"""Initialization of the quantum register."""
         assert self.owner != self, f"{self.name} has no owner!"
 
     @property
@@ -109,7 +106,7 @@ class QuantumRegister(Entity):
             address (int): unit address of the quantum register
         """
         index = self.circuit.init_new_qreg_unit()
-        self.units[address]['qubit'] = QuantumState(state=numpy.array([[index]]))
+        self.units[address]["qubit"] = QuantumState(matrix=numpy.array([[index]]))
 
     def reset(self, address: int) -> None:
         r"""Reset the qubit with the given address.
@@ -117,8 +114,8 @@ class QuantumRegister(Entity):
         Args:
             address (int): local address of the qubit to reset
         """
-        self.units[address]['qubit'] = None
-        self.units[address]['identifier'] = self.owner
+        self.units[address]["qubit"] = None
+        self.units[address]["identifier"] = self.owner
 
     def get_qubit(self, address: int) -> "QuantumState":
         r"""Get the qubit with the given address.
@@ -132,7 +129,7 @@ class QuantumRegister(Entity):
         Returns:
             QuantumState: quantum state of the qubit with the given address
         """
-        qubit = self.units[address]['qubit']
+        qubit = self.units[address]["qubit"]
         self.reset(address)
 
         return qubit
@@ -147,8 +144,8 @@ class QuantumRegister(Entity):
             int: local address of the qubit that matches the id
         """
         for unit in self.units:
-            if unit['identifier'] == identifier:
-                return unit['address']
+            if unit["identifier"] == identifier:
+                return unit["address"]
 
     def store_qubit(self, qubit: "QuantumState", identifier: Any) -> None:
         r"""Store a received qubit to the quantum register.
@@ -161,12 +158,12 @@ class QuantumRegister(Entity):
             qubit (QuantumState): received qubit
             identifier (Any): identity to store the qubit
         """
-        assert any(unit['qubit'] is None for unit in self.units), f"No available units in {self.name}."
+        assert any(unit["qubit"] is None for unit in self.units), f"No available units in {self.name}."
 
         for unit in self.units:
-            if unit['qubit'] is None:
-                unit['qubit'] = qubit
-                unit['identifier'] = identifier
+            if unit["qubit"] is None:
+                unit["qubit"] = qubit
+                unit["identifier"] = identifier
                 return
 
     def __add_single_qubit_gate(self, operation: str, address: int, **params) -> None:
@@ -177,30 +174,40 @@ class QuantumRegister(Entity):
             address (int): unit address of the quantum register
             **params (Any): gate parameters
         """
-        if self.units[address]['qubit'] is None:
+        if self.units[address]["qubit"] is None:
             self.init_unit(address)
 
-        which_qubit = int(self.units[address]['qubit'].state[0][0])
+        which_qubit = int(self.units[address]["qubit"].matrix[0][0])
 
         # Single-qubit gate with condition
         if "condition" in params.keys():
             # Parameterized single-qubit gate with condition
-            if operation in ['rx', 'ry', 'rz']:
-                handler = EventHandler(self.circuit, operation, [which_qubit, params['angle']],
-                                       signature=self.owner, condition=params['condition'])
-            elif operation == 'u3':
-                handler = EventHandler(self.circuit, operation, [which_qubit, *params['angles']],
-                                       signature=self.owner, condition=params['condition'])
+            if operation in ["rx", "ry", "rz"]:
+                handler = EventHandler(
+                    self.circuit,
+                    operation,
+                    [which_qubit, params["angle"]],
+                    signature=self.owner,
+                    condition=params["condition"],
+                )
+            elif operation in ["u", "u3"]:
+                handler = EventHandler(
+                    self.circuit,
+                    operation,
+                    [which_qubit, *params["angles"]],
+                    signature=self.owner,
+                    condition=params["condition"],
+                )
             # Fixed single-qubit gate with condition
             else:
                 handler = EventHandler(self.circuit, operation, [which_qubit], signature=self.owner, **params)
         # Single-qubit gate without condition
         else:
             # Parameterized single-qubit gate without condition
-            if operation in ['rx', 'ry', 'rz']:
-                handler = EventHandler(self.circuit, operation, [which_qubit, params['angle']], signature=self.owner)
-            elif operation == 'u3':
-                handler = EventHandler(self.circuit, operation, [which_qubit, *params['angles']], signature=self.owner)
+            if operation in ["rx", "ry", "rz"]:
+                handler = EventHandler(self.circuit, operation, [which_qubit, params["angle"]], signature=self.owner)
+            elif operation in ["u", "u3"]:
+                handler = EventHandler(self.circuit, operation, [which_qubit, *params["angles"]], signature=self.owner)
             # Fixed single-qubit gate without condition (including measurement)
             else:
                 handler = EventHandler(self.circuit, operation, [which_qubit], signature=self.owner)
@@ -216,18 +223,20 @@ class QuantumRegister(Entity):
             address (list): unit address of the quantum register in the order of [control, target]
             **params (Any): gate parameters
         """
-        if self.units[address[0]]['qubit'] is None:
+        if self.units[address[0]]["qubit"] is None:
             self.init_unit(address[0])
-        if self.units[address[1]]['qubit'] is None:
+        if self.units[address[1]]["qubit"] is None:
             self.init_unit(address[1])
 
-        ctrl, targ = int(self.units[address[0]]['qubit'].state[0][0]), int(self.units[address[1]]['qubit'].state[0][0])
+        ctrl, targ = int(self.units[address[0]]["qubit"].matrix[0][0]), int(
+            self.units[address[1]]["qubit"].matrix[0][0]
+        )
 
         # Parameterized double-qubit gate
-        if operation in ['crx', 'cry', 'crz']:
-            handler = EventHandler(self.circuit, operation, [[ctrl, targ], params['angle']], signature=self.owner)
-        elif operation == 'cu3':
-            handler = EventHandler(self.circuit, operation, [[ctrl, targ], *params['angles']], signature=self.owner)
+        if operation in ["crx", "cry", "crz"]:
+            handler = EventHandler(self.circuit, operation, [[ctrl, targ], params["angle"]], signature=self.owner)
+        elif operation in ["cu", "cu3"]:
+            handler = EventHandler(self.circuit, operation, [[ctrl, targ], *params["angles"]], signature=self.owner)
         # Fixed double-qubit gate
         else:
             handler = EventHandler(self.circuit, operation, [[ctrl, targ]], signature=self.owner)
@@ -240,7 +249,7 @@ class QuantumRegister(Entity):
         Args:
             address (int): local address of the qubit to act on in the quantum register
         """
-        self.__add_single_qubit_gate('id', address)
+        self.__add_single_qubit_gate("id", address)
 
     def h(self, address: int, **condition) -> None:
         r"""Apply a Hadamard gate on the local qubit with a given address.
@@ -249,7 +258,7 @@ class QuantumRegister(Entity):
             address (int): local address of the qubit to act on in the quantum register
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('h', address, **condition)
+        self.__add_single_qubit_gate("h", address, **condition)
 
     def x(self, address: int, **condition) -> None:
         r"""Apply a X gate on the local qubit with a given address.
@@ -258,7 +267,7 @@ class QuantumRegister(Entity):
             address (int): local address of the qubit to act on in the quantum register
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('x', address, **condition)
+        self.__add_single_qubit_gate("x", address, **condition)
 
     def y(self, address: int, **condition) -> None:
         r"""Apply a Y gate on the local qubit with a given address.
@@ -267,7 +276,7 @@ class QuantumRegister(Entity):
             address (int): local address of the qubit to act on in the quantum register
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('y', address, **condition)
+        self.__add_single_qubit_gate("y", address, **condition)
 
     def z(self, address: int, **condition) -> None:
         r"""Apply a Z gate on the local qubit with a given address.
@@ -276,7 +285,7 @@ class QuantumRegister(Entity):
             address (int): local address of the qubit to act on in the quantum register
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('z', address, **condition)
+        self.__add_single_qubit_gate("z", address, **condition)
 
     def s(self, address: int) -> None:
         r"""Apply a S gate on the local qubit with a given address.
@@ -284,7 +293,7 @@ class QuantumRegister(Entity):
         Args:
             address (int): local address of the qubit to act on in the quantum register
         """
-        self.__add_single_qubit_gate('s', address)
+        self.__add_single_qubit_gate("s", address)
 
     def t(self, address: int) -> None:
         r"""Apply a T gate on the local qubit with a given address.
@@ -292,7 +301,7 @@ class QuantumRegister(Entity):
         Args:
             address (int): local address of the qubit to act on in the quantum register
         """
-        self.__add_single_qubit_gate('t', address)
+        self.__add_single_qubit_gate("t", address)
 
     def rx(self, address: int, theta: Union[float, int], **condition) -> None:
         r"""Apply a rotation gate around x-axis on the local qubit with a given address.
@@ -302,7 +311,7 @@ class QuantumRegister(Entity):
             theta (Union[float, int]): rotation angle
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('rx', address, angle=theta, **condition)
+        self.__add_single_qubit_gate("rx", address, angle=theta, **condition)
 
     def ry(self, address: int, theta: Union[float, int], **condition) -> None:
         r"""Apply a rotation gate around y-axis on the local qubit a the given address.
@@ -312,7 +321,7 @@ class QuantumRegister(Entity):
             theta (Union[float, int]): rotation angle
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('ry', address, angle=theta, **condition)
+        self.__add_single_qubit_gate("ry", address, angle=theta, **condition)
 
     def rz(self, address: int, theta: Union[float, int], **condition) -> None:
         r"""Apply a rotation gate around z-axis on the local qubit with the given address.
@@ -322,10 +331,11 @@ class QuantumRegister(Entity):
             theta (Union[float, int]): rotation angle
             **condition (int): control qubit address
         """
-        self.__add_single_qubit_gate('rz', address, angle=theta, **condition)
+        self.__add_single_qubit_gate("rz", address, angle=theta, **condition)
 
-    def u3(self, address: int, theta: Union[float, int], phi: Union[float, int], gamma: Union[float, int],
-           **condition) -> None:
+    def u(
+        self, address: int, theta: Union[float, int], phi: Union[float, int], gamma: Union[float, int], **condition
+    ) -> None:
         r"""Apply a rotation gate on the local qubit with a given address.
 
         Args:
@@ -336,7 +346,22 @@ class QuantumRegister(Entity):
             **condition (int): control qubit address
         """
         angles = [theta, phi, gamma]
-        self.__add_single_qubit_gate('u3', address, angles=angles, **condition)
+        self.__add_single_qubit_gate("u", address, angles=angles, **condition)
+
+    def u3(
+        self, address: int, theta: Union[float, int], phi: Union[float, int], gamma: Union[float, int], **condition
+    ) -> None:
+        r"""Apply a rotation gate on the local qubit with a given address.
+
+        Args:
+            address (int): local address of the qubit to act on in the quantum register
+            theta (Union[float, int]): the rotation angle of the Ry gate
+            phi (Union[float, int]): the rotation angle of the left Rz gate
+            gamma (Union[float, int]): the rotation angle of the right Rz gate
+            **condition (int): control qubit address
+        """
+        angles = [theta, phi, gamma]
+        self.__add_single_qubit_gate("u3", address, angles=angles, **condition)
 
     def ch(self, address: List[int]) -> None:
         r"""Apply a Controlled-Hadamard gate on the local qubits with given addresses.
@@ -344,7 +369,7 @@ class QuantumRegister(Entity):
         Args:
             address (List[int]): local addresses of the qubits to act on in the quantum register
         """
-        self.__add_double_qubit_gate('ch', address)
+        self.__add_double_qubit_gate("ch", address)
 
     def cx(self, address: List[int]) -> None:
         r"""Apply a Controlled-X gate on the local qubits with given addresses.
@@ -352,7 +377,7 @@ class QuantumRegister(Entity):
         Args:
             address (List[int]): local addresses of the qubits to act on in the quantum register
         """
-        self.__add_double_qubit_gate('cx', address)
+        self.__add_double_qubit_gate("cx", address)
 
     def cnot(self, address: List[int]) -> None:
         r"""Apply a Controlled-NOT gate on the local qubits with given addresses.
@@ -360,7 +385,7 @@ class QuantumRegister(Entity):
         Args:
             address (List[int]): local addresses of the qubits to act on in the quantum register
         """
-        self.__add_double_qubit_gate('cx', address)
+        self.__add_double_qubit_gate("cx", address)
 
     def cy(self, address: List[int]) -> None:
         r"""Apply a Controlled-Y gate on the local qubits with given addresses.
@@ -368,7 +393,7 @@ class QuantumRegister(Entity):
         Args:
             address (List[int]): local addresses of the qubits to act on in the quantum register
         """
-        self.__add_double_qubit_gate('cy', address)
+        self.__add_double_qubit_gate("cy", address)
 
     def cz(self, address: List[int]) -> None:
         r"""Apply a Controlled-Z gate on the local qubits with given addresses.
@@ -376,7 +401,7 @@ class QuantumRegister(Entity):
         Args:
             address (List[int]): local addresses of the qubits to act on in the quantum register
         """
-        self.__add_double_qubit_gate('cz', address)
+        self.__add_double_qubit_gate("cz", address)
 
     def crx(self, address: List[int], theta: Union[float, int]) -> None:
         r"""Apply a Controlled-rotation gate around x-axis on the local qubit with given addresses.
@@ -385,7 +410,7 @@ class QuantumRegister(Entity):
             address (List[int]): local addresses of the qubits to act on in the quantum register
             theta (Union[float, int]): rotation angle
         """
-        self.__add_double_qubit_gate('crx', address, angle=theta)
+        self.__add_double_qubit_gate("crx", address, angle=theta)
 
     def cry(self, address: List[int], theta: Union[float, int]) -> None:
         r"""Apply a Controlled-rotation gate around y-axis on the local qubit with given addresses.
@@ -394,7 +419,7 @@ class QuantumRegister(Entity):
             address (List[int]): local addresses of the qubits to act on in the quantum register
             theta (Union[float, int]): rotation angle
         """
-        self.__add_double_qubit_gate('cry', address, angle=theta)
+        self.__add_double_qubit_gate("cry", address, angle=theta)
 
     def crz(self, address: List[int], theta: Union[float, int]) -> None:
         r"""Apply a Controlled-rotation gate around z-axis on the local qubit with given addresses.
@@ -403,10 +428,11 @@ class QuantumRegister(Entity):
             address (List[int]): local addresses of the qubits to act on in the quantum register
             theta (Union[float, int]): rotation angle
         """
-        self.__add_double_qubit_gate('crz', address, angle=theta)
+        self.__add_double_qubit_gate("crz", address, angle=theta)
 
-    def cu3(self, address: List[int],
-            theta: Union[float, int], phi: Union[float, int], gamma: Union[float, int]) -> None:
+    def cu(
+        self, address: List[int], theta: Union[float, int], phi: Union[float, int], gamma: Union[float, int]
+    ) -> None:
         r"""Apply a Controlled-rotation gate on the local qubit with given addresses.
 
         Args:
@@ -416,7 +442,21 @@ class QuantumRegister(Entity):
             gamma (Union[float, int]): the rotation angle of the right Rz gate
         """
         angles = [theta, phi, gamma]
-        self.__add_double_qubit_gate('cu3', address, angles=angles)
+        self.__add_double_qubit_gate("cu", address, angles=angles)
+
+    def cu3(
+        self, address: List[int], theta: Union[float, int], phi: Union[float, int], gamma: Union[float, int]
+    ) -> None:
+        r"""Apply a Controlled-rotation gate on the local qubit with given addresses.
+
+        Args:
+            address (List[int]): local addresses of the qubits to act on in the quantum register
+            theta (Union[float, int]): the rotation angle of the Ry gate
+            phi (Union[float, int]): the rotation angle of the left Rz gate
+            gamma (Union[float, int]): the rotation angle of the right Rz gate
+        """
+        angles = [theta, phi, gamma]
+        self.__add_double_qubit_gate("cu3", address, angles=angles)
 
     def swap(self, address: List[int]) -> None:
         r"""Apply a SWAP gate on the local qubits with given addresses.
@@ -424,9 +464,9 @@ class QuantumRegister(Entity):
         Args:
             address (List[int]): local addresses of the qubits to act on in the quantum register
         """
-        self.__add_double_qubit_gate('cx', address)
-        self.__add_double_qubit_gate('cx', [address[1], address[0]])
-        self.__add_double_qubit_gate('cx', address)
+        self.__add_double_qubit_gate("cx", address)
+        self.__add_double_qubit_gate("cx", [address[1], address[0]])
+        self.__add_double_qubit_gate("cx", address)
 
     def measure(self, address: int, basis: Optional[str] = "z") -> None:
         r"""Measure the qubit with a given address in the computational basis.
@@ -442,8 +482,8 @@ class QuantumRegister(Entity):
             self.__add_single_qubit_gate("measure", address)
 
         # Side effect for measurement, the trick here is to use the qubit register as its measurement outcome
-        which_qubit = int(self.units[address]['qubit'].state[0][0])
-        self.units[address]['outcome'] = which_qubit
+        which_qubit = int(self.units[address]["qubit"].matrix[0][0])
+        self.units[address]["outcome"] = which_qubit
 
         # Rest the unit once measured
         self.reset(address)

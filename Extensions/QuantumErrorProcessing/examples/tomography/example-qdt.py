@@ -20,7 +20,7 @@ Example to demonstrate quantum detector tomography.
 """
 
 from QCompute import *
-import qcompute_qep.tomography.detector_tomography as detector_tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography.detector_tomography as detector_tomography
 
 
 ##########################################################################################
@@ -56,10 +56,10 @@ qdt = detector_tomography.DetectorTomography()
 # qdt = DetectorTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-meas = qdt.fit(qp, qc, method='mle', shots=4096, ptm=False, tol=1e-5, qubits=[1, 2])
+meas = qdt.fit(qp, qc, method="mle", shots=4096, ptm=False, tol=1e-5, qubits=[1, 2])
 
 # Compute the fidelity
-print('Measurement fidelity: F = {:.5f}'.format(qdt.fidelity))
+print("Measurement fidelity: F = {:.5f}".format(qdt.fidelity))
 
 # meas1 = qdt.fit(qp, qc, method='mle', shots=4096, ptm=False, tol=1e-5)
 # print('Fidelity between the ideal and noisy measurement is: F = {:.5f}'.format(qdt.fidelity))

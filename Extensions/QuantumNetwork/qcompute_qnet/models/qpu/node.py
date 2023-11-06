@@ -21,14 +21,12 @@ Module for quantum nodes.
 
 from typing import Optional
 
-from qcompute_qnet.topology.node import Node
-from qcompute_qnet.devices.register import QuantumRegister
-from qcompute_qnet.models.qpu.message import QuantumMsg
-from qcompute_qnet.protocols.protocol import ProtocolStack
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+from Extensions.QuantumNetwork.qcompute_qnet.devices.register import QuantumRegister
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.message import QuantumMsg
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import ProtocolStack
 
-__all__ = [
-    "QuantumNode"
-]
+__all__ = ["QuantumNode"]
 
 
 class QuantumNode(Node):
@@ -53,8 +51,10 @@ class QuantumNode(Node):
 
         self.qreg = QuantumRegister(name=f"{name}_qreg", size=qreg_size)  # create a quantum register
         self.install(self.qreg)
-        ps = ProtocolStack(name=f"ps_{self.name}",
-                           protocol=protocol(f"{protocol.__name__}_{self.name}") if protocol is not None else None)
+        ps = ProtocolStack(
+            name=f"ps_{self.name}",
+            protocol=protocol(f"{protocol.__name__}_{self.name}") if protocol is not None else None,
+        )
         self.load_protocol(ps)
 
     @property

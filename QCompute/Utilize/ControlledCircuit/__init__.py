@@ -490,7 +490,7 @@ def getControlledCircuit(env: QEnv, circuitLine: CircuitLine, controlQRegIndex: 
         ret.append(newCircuitLine)
 
     elif op.__class__.__name__ == 'QProcedureOP':
-        newProcedure, newProcedureName = env.controlProcedure(op.name, cuFirst)
+        newProcedureName, newProcedure = env.controlProcedure(op.name, cuFirst)
         env.procedureMap[newProcedureName] = newProcedure
 
         newCircuitLine = CircuitLine()

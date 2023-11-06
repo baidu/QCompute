@@ -13,7 +13,7 @@ shots = 4096
 # Define.hubToken= 'Your Token'
 
 # Set the message that Alice wishes to send to Bob
-message = '11'
+message = "11"
 
 # Set up environment
 env = QEnv()
@@ -35,11 +35,11 @@ H(q[0])
 CX(q[0], q[1])
 
 # Alice operates its qubits according to the information that needs to be transmitted
-if message == '01':
+if message == "01":
     X(q[0])
-elif message == '10':
+elif message == "10":
     Z(q[0])
-elif message == '11':
+elif message == "11":
     Z(q[0])
     X(q[0])
 

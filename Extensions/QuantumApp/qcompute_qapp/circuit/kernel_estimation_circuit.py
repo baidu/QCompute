@@ -27,8 +27,8 @@ from .encoding_circuit import IQPEncodingCircuit
 
 
 class KernelEstimationCircuit(BasicCircuit):
-    r""" Kernel Estimation Circuit class
-    """
+    r"""Kernel Estimation Circuit class"""
+
     def __init__(self, num: int, encoding_style: str):
         r"""The constructor of the KernelEstimationCircuit class
 
@@ -51,13 +51,13 @@ class KernelEstimationCircuit(BasicCircuit):
 
         """
 
-        if self._encoding_style == 'IQP':
+        if self._encoding_style == "IQP":
             encoding_circuit_first = IQPEncodingCircuit(num=self._num)
             encoding_circuit_first.add_circuit(q, x1)
 
             encoding_circuit_second = IQPEncodingCircuit(num=self._num, inverse=True)
             encoding_circuit_second.add_circuit(q, x2)
         else:
-            raise Error.ArgumentError('Error EA03001(QAPP): Encoding style not yet supported!')
+            raise Error.ArgumentError("Error EA03001(QAPP): Encoding style not yet supported!")
 
         MeasureZ(q, range(self._num))

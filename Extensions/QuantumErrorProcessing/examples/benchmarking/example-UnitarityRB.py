@@ -19,8 +19,8 @@
 An example to demonstrate the Unitarity Randomized Benchmarking protocol.
 """
 from QCompute import *
-import qcompute_qep.benchmarking.unitarityrb as unitarityrb
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.unitarityrb as unitarityrb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 ##########################################################################################
@@ -47,16 +47,13 @@ urb = unitarityrb.UnitarityRB()
 
 # Call the randomized benchmarking procedure and obtain estimated error rate
 qubits = [0, 1]
-urb.benchmark(qc=qc,
-              qubits=qubits,
-              seq_lengths=[1, 2, 3, 4, 5],
-              repeats=5)
+urb.benchmark(qc=qc, qubits=qubits, seq_lengths=[1, 2, 3, 4, 5], repeats=5)
 print("*******************************************************************************")
 print("* UnitarityRB on qubits: {}".format(qubits))
-print("* Estimated unitarity parameter: {}".format(urb.results['u']))
-print("* Estimated A: {}".format(urb.results['A']))
-print("* Estimated B: {}".format(urb.results['B']))
-print("* Standard deviation error of estimation: {}".format(urb.results['u_err']))
+print("* Estimated unitarity parameter: {}".format(urb.results["u"]))
+print("* Estimated A: {}".format(urb.results["A"]))
+print("* Estimated B: {}".format(urb.results["B"]))
+print("* Standard deviation error of estimation: {}".format(urb.results["u_err"]))
 fname = "UnitarityRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* UnitarityRB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results

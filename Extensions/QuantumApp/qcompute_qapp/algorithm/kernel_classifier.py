@@ -25,9 +25,9 @@ from ..circuit import KernelEstimationCircuit
 
 
 class KernelClassifier:
-    """Kernel Classifier class
-    """
-    def __init__(self, backend: str, encoding_style: str = 'IQP', kernel_type: str = 'qke', shots: int = 1024):
+    """Kernel Classifier class"""
+
+    def __init__(self, backend: str, encoding_style: str = "IQP", kernel_type: str = "qke", shots: int = 1024):
         r"""The constructor of the KernelClassifier class
 
         Args:
@@ -46,16 +46,17 @@ class KernelClassifier:
         self._normalized_training_vectors = None
         self._unnormalized_training_vectors = None
         self._training_labels = None
-        if kernel_type == 'qke':
+        if kernel_type == "qke":
             self._kernel_circuit = KernelEstimationCircuit
-            if encoding_style == 'IQP':
+            if encoding_style == "IQP":
                 self._encoding_style = encoding_style
             else:
                 raise ValueError(
                     f"Error EA01001(QAPP): The encoding style {encoding_style:s} "
-                    f"is not compatible with kernel type {kernel_type:s}")
+                    f"is not compatible with kernel type {kernel_type:s}"
+                )
         else:
-            raise ValueError('Error EA01002(QAPP): The kernel type is not supported yet')
+            raise ValueError("Error EA01002(QAPP): The kernel type is not supported yet")
         self._kernel_type = kernel_type
 
     def _compute_kernel_entry(self, x1: np.ndarray, x2: np.ndarray) -> float:
@@ -76,7 +77,7 @@ class KernelClassifier:
         circuit = self._kernel_circuit(num=qubit_num, encoding_style=self._encoding_style)
         circuit.add_circuit(q, x1, x2)
         # Submit job
-        counts = env.commit(self._shots, fetchMeasure=True)['counts']
+        counts = env.commit(self._shots, fetchMeasure=True)["counts"]
         self._num_evaluation += 1
         # Expectation
         if str(0) * qubit_num in counts.keys():
@@ -101,15 +102,13 @@ class KernelClassifier:
             kernel_matrix = np.zeros([len(data_vectors_1), len(data_vectors_2)])
             for i in range(len(data_vectors_1)):
                 for j in range(len(data_vectors_2)):
-                    kernel_matrix[i, j] = self._compute_kernel_entry(data_vectors_1[i],
-                                                                     data_vectors_2[j])
+                    kernel_matrix[i, j] = self._compute_kernel_entry(data_vectors_1[i], data_vectors_2[j])
             kernel_matrix = kernel_matrix.transpose()
         else:
             kernel_matrix = np.zeros([len(data_vectors_1), len(data_vectors_1)])
             for i in range(len(data_vectors_1)):
                 for j in range(i, len(data_vectors_1)):
-                    kernel_matrix[i, j] = self._compute_kernel_entry(data_vectors_1[i],
-                                                                     data_vectors_1[j])
+                    kernel_matrix[i, j] = self._compute_kernel_entry(data_vectors_1[i], data_vectors_1[j])
                     kernel_matrix[j, i] = kernel_matrix[i, j]
         return kernel_matrix
 
@@ -126,7 +125,7 @@ class KernelClassifier:
         X = X / abs(X).max() * np.pi
         self._normalized_training_vectors = X
         self._kernel_matrix = self._get_kernel_matrix(self._normalized_training_vectors, None)
-        self._clf.kernel = 'precomputed'
+        self._clf.kernel = "precomputed"
         self._clf.fit(self._kernel_matrix, y)
 
     def predict(self, x: np.ndarray) -> np.ndarray:

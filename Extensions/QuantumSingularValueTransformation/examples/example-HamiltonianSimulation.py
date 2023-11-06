@@ -24,7 +24,10 @@ from numpy import pi
 from QCompute import X, H, S, SDG, RY, CZ, QEnv, BackendName, MeasureZ
 from QCompute.Define import Settings as QC_Settings
 
-from qcompute_qsvt.Application.HamiltonianSimulation import circ_HS_QSVT, func_HS_QSVT
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation import (
+    circ_HS_QSVT,
+    func_HS_QSVT,
+)
 
 # not to draw the quantum circuit locally
 QC_Settings.drawCircuitControl = []
@@ -43,7 +46,7 @@ def func_MS_test_QSVT():
 
     to test it.
     """
-    list_str_Pauli_representation = [(1, 'X0X1')]
+    list_str_Pauli_representation = [(1, "X0X1")]
     num_qubit_sys = 2
     float_tau = -np.pi / 4
     float_epsilon = 1e-6
@@ -93,7 +96,7 @@ def func_MS_test_QSVT():
         MeasureZ(*env.Q.toListPair())
 
         # commit
-        assert env.commit(10000, downloadResult=True)['counts']['00000'] == 10000
+        assert env.commit(10000, downloadResult=True)["counts"]["00000"] == 10000
     print("MS test passed.")
 
 
@@ -113,7 +116,7 @@ def func_HH_test_QSVT():
     env = QEnv()
     env.backend(BackendName.LocalBaiduSim2)
 
-    list_str_Pauli_representation = [(0.5, 'X0X1'), (0.5, 'X0Z1'), (0.5, 'Z0X1'), (0.5, 'Z0Z1')]
+    list_str_Pauli_representation = [(0.5, "X0X1"), (0.5, "X0Z1"), (0.5, "Z0X1"), (0.5, "Z0Z1")]
     num_qubit_sys = 2
     float_tau = np.pi / 4
     float_epsilon = 1e-6
@@ -163,14 +166,26 @@ def func_HH_test_QSVT():
         MeasureZ(*env.Q.toListPair())
 
         # commit
-        assert env.commit(10000, downloadResult=True)['counts']['000000'] == 10000
+        assert env.commit(10000, downloadResult=True)["counts"]["000000"] == 10000
     print("HH test passed.")
 
 
 if __name__ == "__main__":
     func_MS_test_QSVT()
     func_HH_test_QSVT()
-    print(func_HS_QSVT(list_str_Pauli_rep=[(1, 'X0X1'), (1, 'X0Z1'), (1, 'Z0X1'), (1, 'Z0Z1')],
-          num_qubit_sys=2, float_tau=-pi / 8, float_epsilon=1e-6, circ_output=False))
-    func_HS_QSVT(list_str_Pauli_rep=[(1, 'X0X1'), (1, 'X0Z1'), (1, 'Z0X1'), (1, 'Z0Z1')],
-                 num_qubit_sys=2, float_tau=-pi / 8, float_epsilon=1e-6, circ_output="HH_HS_Circuit.c")
+    print(
+        func_HS_QSVT(
+            list_str_Pauli_rep=[(1, "X0X1"), (1, "X0Z1"), (1, "Z0X1"), (1, "Z0Z1")],
+            num_qubit_sys=2,
+            float_tau=-pi / 8,
+            float_epsilon=1e-6,
+            circ_output=False,
+        )
+    )
+    func_HS_QSVT(
+        list_str_Pauli_rep=[(1, "X0X1"), (1, "X0Z1"), (1, "Z0X1"), (1, "Z0Z1")],
+        num_qubit_sys=2,
+        float_tau=-pi / 8,
+        float_epsilon=1e-6,
+        circ_output="HH_HS_Circuit.c",
+    )

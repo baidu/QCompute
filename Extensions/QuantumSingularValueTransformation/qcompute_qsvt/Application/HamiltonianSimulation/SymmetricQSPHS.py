@@ -53,7 +53,10 @@ from typing import List, Tuple
 import numpy as np
 from scipy.special import jv as BesselJ
 
-from qcompute_qsvt.SymmetricQSP.SymmetricQSPExternal import __func_Wx_map, __func_LBFGS_QSP
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.SymmetricQSP.SymmetricQSPExternal import (
+    __func_Wx_map,
+    __func_LBFGS_QSP,
+)
 
 
 def __HS_approx_data(float_tau: float, int_deg: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -83,8 +86,8 @@ def __HS_approx_data(float_tau: float, int_deg: int) -> Tuple[np.ndarray, np.nda
     int_period = 4 * (int_deg + 2)
     float_factor = np.pi / (2 * (int_deg + 2))
     reg_cos_quarter = [np.cos(idx * float_factor) for idx in range(int_deg + 3)]
-    reg_cos_half = reg_cos_quarter + [- float_cos for float_cos in reversed(reg_cos_quarter[1:-1])]
-    reg_cos = np.array(reg_cos_half + [- float_cos for float_cos in reg_cos_half])
+    reg_cos_half = reg_cos_quarter + [-float_cos for float_cos in reversed(reg_cos_quarter[1:-1])]
+    reg_cos = np.array(reg_cos_half + [-float_cos for float_cos in reg_cos_half])
     vec_x = np.array(reg_cos_quarter[1::2])
     vec_BesselJ = np.array([BesselJ(idx, float_tau) * (1j ** (idx % 4)) for idx in range(int_deg + 1)], dtype=complex)
     vec_BesselJ[0] *= 0.5
@@ -97,8 +100,9 @@ def __HS_approx_data(float_tau: float, int_deg: int) -> Tuple[np.ndarray, np.nda
     return vec_fx_re, vec_fx_im, vec_x
 
 
-def func_LBFGS_QSP_HS(float_tau: float, float_epsilon: float = 1e-14,
-                      method: str = "interpolation") -> Tuple[List[float], List[float]]:
+def func_LBFGS_QSP_HS(
+    float_tau: float, float_epsilon: float = 1e-14, method: str = "interpolation"
+) -> Tuple[List[float], List[float]]:
     r"""Compute processing parameters :math:`\vec\phi_\Re` and :math:`\vec\phi_\Im` encoding the QSP function in
     Hamiltonian simulation.
 

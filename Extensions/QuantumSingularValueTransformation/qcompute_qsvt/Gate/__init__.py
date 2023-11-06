@@ -19,11 +19,22 @@
 __init__ file of the `qcompute_qsvt.Gate` module.
 """
 
-from qcompute_qsvt.Gate.MultiCtrlGates import func_find_borrowable_qubits, \
-    circ_multictrl_X, circ_multictrl_Y, circ_multictrl_Z, circ_multictrl_Pauli, \
-    circ_multictrl_ry, circ_multictrl_rz
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import (
+    func_find_borrowable_qubits,
+    circ_multictrl_X,
+    circ_multictrl_Y,
+    circ_multictrl_Z,
+    circ_multictrl_Pauli,
+    circ_multictrl_ry,
+    circ_multictrl_rz,
+)
 
 __all__ = [
-    'func_find_borrowable_qubits', 'circ_multictrl_X', 'circ_multictrl_Y', 'circ_multictrl_Z',
-    'circ_multictrl_Pauli', 'circ_multictrl_ry', 'circ_multictrl_rz'
+    "func_find_borrowable_qubits",
+    "circ_multictrl_X",
+    "circ_multictrl_Y",
+    "circ_multictrl_Z",
+    "circ_multictrl_Pauli",
+    "circ_multictrl_ry",
+    "circ_multictrl_rz",
 ]

@@ -19,9 +19,7 @@
 __init__ file of the `qcompute_qsvt` package.
 """
 
-from qcompute_qsvt import Application, Gate, Oracle, QSVT, SymmetricQSP
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt import Application, Gate, Oracle, QSVT, SymmetricQSP
 
 
-__all__ = [
-    'Application', 'Gate', 'Oracle', 'QSVT', 'SymmetricQSP'
-]
+__all__ = ["Application", "Gate", "Oracle", "QSVT", "SymmetricQSP"]

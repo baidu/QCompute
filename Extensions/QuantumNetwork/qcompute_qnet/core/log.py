@@ -33,6 +33,7 @@ class LoggingFilter(logging.Filter):
     Attributes:
         env (DESEnv): discrete-event simulation environment to log
     """
+
     def __init__(self, env: "DESEnv"):
         r"""Constructor for LoggingFilter class.
 

@@ -19,8 +19,8 @@
 An example to demonstrate the Cross Entropy Randomized Benchmarking protocol.
 """
 from QCompute import *
-import qcompute_qep.benchmarking as rb
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 ##########################################################################################
@@ -58,15 +58,11 @@ xeb = rb.XEB()
 
 # Call the cross entropy randomized benchmarking procedure and obtain estimated error rate
 qubits = [0, 1]
-xeb.benchmark(qc=qc,
-              qubits=qubits,
-              shots=4096,
-              seq_lengths=[1, 5, 10, 15, 20],
-              repeats=5)
+xeb.benchmark(qc=qc, qubits=qubits, shots=4096, seq_lengths=[1, 5, 10, 15, 20], repeats=5)
 print("*******************************************************************************")
 print("* XEB on qubits: {}".format(qubits))
-print("* Estimated noise rate (ENR): {}".format(xeb.results['lambda']))
-print("* Standard deviation error of estimation: {}".format(xeb.results['lambda_err']))
+print("* Estimated noise rate (ENR): {}".format(xeb.results["lambda"]))
+print("* Standard deviation error of estimation: {}".format(xeb.results["lambda_err"]))
 fname = "XEB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* XEB data is visualized in figure '{}'.".format(fname))
 # Plot the cross entropy benchmarking results
@@ -75,15 +71,11 @@ print("*************************************************************************
 
 # You can also perform the cross entropy randomized benchmarking procedure on other qubits, for example [q1, q3]
 qubits = [1, 3]
-xeb.benchmark(qc=qc,
-              qubits=qubits,
-              shots=4096,
-              seq_lengths=[1, 5, 10, 15, 20],
-              repeats=5)
+xeb.benchmark(qc=qc, qubits=qubits, shots=4096, seq_lengths=[1, 5, 10, 15, 20], repeats=5)
 print("*******************************************************************************")
 print("* XEB on qubits: {}".format(qubits))
-print("* Estimated noise rate (ENR): {}".format(xeb.results['lambda']))
-print("* Standard deviation error of estimation: {}".format(xeb.results['lambda_err']))
+print("* Estimated noise rate (ENR): {}".format(xeb.results["lambda"]))
+print("* Standard deviation error of estimation: {}".format(xeb.results["lambda_err"]))
 fname = "XEB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* XEB data is visualized in figure '{}'.".format(fname))
 # Plot the cross entropy benchmarking results

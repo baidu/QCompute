@@ -39,12 +39,12 @@ from scipy.stats import unitary_group
 import QCompute
 from QCompute.QPlatform import QOperation
 from QCompute.QPlatform.QOperation import CircuitLine, RotationGate, FixedGate
-from qcompute_qep.interface import conversion
-from qcompute_qep.utils.types import QProgram, QComputer, number_of_qubits
-from qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
-from qcompute_qep.utils.utils import limit_angle, decompose_yzy, COLOR_TABLE
-from qcompute_qep.utils.gate import CPauliOP, decompose_CPauli
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.interface import conversion
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import expand, permute_systems, dagger, basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import limit_angle, decompose_yzy, COLOR_TABLE
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.gate import CPauliOP, decompose_CPauli
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 
 def inv_opr(ops: List[QOperation.QOperation]) -> RotationGate.RotationGateOP:
@@ -99,7 +99,7 @@ def circuit_to_dag(circuit: List[CircuitLine]) -> nx.MultiDiGraph:
         >>> dag = circuit_to_dag(qp.circuit)
         >>> nx.draw(dag)
     """
-    circ_tmp = (copy.deepcopy(circuit))
+    circ_tmp = copy.deepcopy(circuit)
 
     num_gates = len(circ_tmp)
     dag = nx.MultiDiGraph()
@@ -285,11 +285,26 @@ def _width_of_gate(cl: CircuitLine) -> int:
     :return: width, int type, char unit
     """
     gate_widths = {
-        'ID': 1, 'X': 1, 'Y': 1, 'Z': 1, 'S': 1, 'H': 1, 'T': 1,
-        'CX': 1, 'CY': 1, 'CZ': 1, 'CH': 1, 'SWAP': 1,
-        'CSWAP': 1, 'CCX': 1, 'CPauli': 1,
-        'TDG': 3, 'SDG': 3,
-        'measure': 4, 'barrier': 1}
+        "ID": 1,
+        "X": 1,
+        "Y": 1,
+        "Z": 1,
+        "S": 1,
+        "H": 1,
+        "T": 1,
+        "CX": 1,
+        "CY": 1,
+        "CZ": 1,
+        "CH": 1,
+        "SWAP": 1,
+        "CSWAP": 1,
+        "CCX": 1,
+        "CPauli": 1,
+        "TDG": 3,
+        "SDG": 3,
+        "measure": 4,
+        "barrier": 1,
+    }
     if isinstance(cl.data, QOperation.FixedGate.FixedGateOP):
         return gate_widths[cl.data.name]
     elif isinstance(cl.data, QOperation.RotationGate.RotationGateOP):
@@ -303,20 +318,16 @@ def _width_of_gate(cl: CircuitLine) -> int:
             # e.g. U3(+0.12,-2.12,+0.23)
             return 21
     elif isinstance(cl.data, QOperation.Barrier.BarrierOP):
-        return gate_widths['barrier']
+        return gate_widths["barrier"]
     elif isinstance(cl.data, QOperation.Measure.MeasureOP):
-        return gate_widths['measure']
+        return gate_widths["measure"]
     elif isinstance(cl.data, CPauliOP):
-        return gate_widths['CPauli']
+        return gate_widths["CPauli"]
     else:
-        raise TypeError('print_circuit(): {} is not a supported gate type'.format(type(cl.data)))
+        raise TypeError("print_circuit(): {} is not a supported gate type".format(type(cl.data)))
 
 
-def print_circuit(circuit: List[CircuitLine],
-                  style='text',
-                  show=True,
-                  num_qubits=None,
-                  colors=None) -> Optional[str]:
+def print_circuit(circuit: List[CircuitLine], style="text", show=True, num_qubits=None, colors=None) -> Optional[str]:
     r"""Print a quantum circuit in the simple text style.
 
     The @colors parameter is a dictionary that specifies the colors of the qubits. It has the form:
@@ -333,8 +344,8 @@ def print_circuit(circuit: List[CircuitLine],
     :param colors: a dictionary specifying what the colors of the qubits
     :return: Optional[str], the quantum circuit in the simple text style
     """
-    if style != 'text':
-        raise ValueError('currently only support text display style')
+    if style != "text":
+        raise ValueError("currently only support text display style")
     # If there is no quantum gate, simply print the circuit line
     # For example
     #
@@ -343,14 +354,14 @@ def print_circuit(circuit: List[CircuitLine],
 
     if not circuit:
         if num_qubits is None:
-            print('in print_circuit(): the given circuit is empty!')
+            print("in print_circuit(): the given circuit is empty!")
             return None
-        str_lines = ['{}: '.format(i) + '------------' for i in range(num_qubits)]
-        str_longitude = [' ' * 3 + '   '] * (num_qubits - 1)
+        str_lines = ["{}: ".format(i) + "------------" for i in range(num_qubits)]
+        str_longitude = [" " * 3 + "   "] * (num_qubits - 1)
         str_print = [[str_lines[i], str_longitude[i]] for i in range(num_qubits - 1)]
         str_print.append([str_lines[-1]])  # each element is a list
         str_print = sum(str_print, [])
-        str_print = '\n'.join(str_print)
+        str_print = "\n".join(str_print)
         if show:
             print(str_print)
         return str_print
@@ -378,58 +389,80 @@ def print_circuit(circuit: List[CircuitLine],
         layers_print.append(layer_font_part)
 
     # Gate to string dictionary
-    gate_strings = {'qw': '---', 'cw': '===', 'qwx': '|', 'cwx': '||',
-                    'ctrl': '●', 'barrier': '≡', 'space': '   ', 'meas': 'MEAS',
-                    'ID': 'I', 'X': 'X', 'Y': 'Y', 'Z': 'Z', 'H': 'H', 'S': 'S', 'T': 'T', 'TDG': 'TDG', 'SDG': 'SDG',
-                    'CX': ('●', 'X'), 'CY': ('●', 'Y'), 'CZ': ('●', 'Z'), 'CH': ('●', 'H'),
-                    'SWAP': ('x', 'x'), 'CSWAP': ('●', 'x', 'x'), 'CCX': ('●', '●', 'X'),
-                    '0': '○', '1': '●', 'I': 'I'}
+    gate_strings = {
+        "qw": "---",
+        "cw": "===",
+        "qwx": "|",
+        "cwx": "||",
+        "ctrl": "●",
+        "barrier": "≡",
+        "space": "   ",
+        "meas": "MEAS",
+        "ID": "I",
+        "X": "X",
+        "Y": "Y",
+        "Z": "Z",
+        "H": "H",
+        "S": "S",
+        "T": "T",
+        "TDG": "TDG",
+        "SDG": "SDG",
+        "CX": ("●", "X"),
+        "CY": ("●", "Y"),
+        "CZ": ("●", "Z"),
+        "CH": ("●", "H"),
+        "SWAP": ("x", "x"),
+        "CSWAP": ("●", "x", "x"),
+        "CCX": ("●", "●", "X"),
+        "0": "○",
+        "1": "●",
+        "I": "I",
+    }
 
     def single_qubit_gate_str(cl: CircuitLine):
         gname = cl.data.name
         if isinstance(cl.data, QOperation.FixedGate.FixedGateOP):
             return gate_strings[gname]
         elif isinstance(cl.data, QOperation.RotationGate.RotationGateOP):
-            if gname in {'RX', 'RY', 'RZ'}:
+            if gname in {"RX", "RY", "RZ"}:
                 angle = limit_angle(cl.data.argumentList[0])
-                return '{}({:+.2f})'.format(gname.capitalize(), angle)
+                return "{}({:+.2f})".format(gname.capitalize(), angle)
             else:  # U3 gate
                 angles = list(map(limit_angle, cl.data.argumentList))
-                return 'U3({:+.2f},{:+.2f},{:+.2f})'.format(*angles)
+                return "U3({:+.2f},{:+.2f},{:+.2f})".format(*angles)
         else:
-            raise TypeError(
-                '{} is not a supported gate type to print'.format(type(cl.data)))
+            raise TypeError("{} is not a supported gate type to print".format(type(cl.data)))
 
     def multi_qubit_gate_str(cl: CircuitLine):
         gname = cl.data.name
         if isinstance(cl.data, QOperation.FixedGate.FixedGateOP):
             return gate_strings[gname]
         elif isinstance(cl.data, QOperation.RotationGate.RotationGateOP):
-            if gname in {'CRX', 'CRY', 'CRZ'}:
+            if gname in {"CRX", "CRY", "CRZ"}:
                 angle = limit_angle(cl.data.argumentList[0])
-                return gate_strings['ctrl'], '{}({:+.2f})'.format(gname[1:].capitalize(), angle)
+                return gate_strings["ctrl"], "{}({:+.2f})".format(gname[1:].capitalize(), angle)
             else:
                 # CU3 gate
                 angles = list(map(limit_angle, cl.data.argumentList))
-                return gate_strings['ctrl'], 'U3({:+.2f},{:+.2f},{:+.2f})'.format(*angles)
+                return gate_strings["ctrl"], "U3({:+.2f},{:+.2f},{:+.2f})".format(*angles)
         else:
-            raise TypeError('{} is not a supported gate type to print'.format(type(cl.data)))
+            raise TypeError("{} is not a supported gate type to print".format(type(cl.data)))
 
     def extend_gate_str(gstr, lw):
-        return int((lw - len(gstr)) / 2) * '-' + gstr + int((lw - len(gstr)) / 2) * '-'
+        return int((lw - len(gstr)) / 2) * "-" + gstr + int((lw - len(gstr)) / 2) * "-"
 
     def extend_space_str(spstr, lw):
-        return int((lw - len(spstr)) / 2) * ' ' + spstr + int((lw - len(spstr)) / 2) * ' '
+        return int((lw - len(spstr)) / 2) * " " + spstr + int((lw - len(spstr)) / 2) * " "
 
     # Initialize the quantum circuit strings.
     # If there are more than 10 qubits, we must use 2 spaces to display the qubit number.
     # We do not consider the case where there are more than 100 qubits.
     if num_qubits > 10:
-        str_lines = ['{:2d}: '.format(i) + gate_strings['qw'] for i in range(num_qubits)]  # length: n
-        str_longitude = [' ' * 4 + gate_strings['space']] * (num_qubits - 1)  # length: n - 1
+        str_lines = ["{:2d}: ".format(i) + gate_strings["qw"] for i in range(num_qubits)]  # length: n
+        str_longitude = [" " * 4 + gate_strings["space"]] * (num_qubits - 1)  # length: n - 1
     else:
-        str_lines = ['{}: '.format(i) + gate_strings['qw'] for i in range(num_qubits)]
-        str_longitude = [' ' * 3 + gate_strings['space']] * (num_qubits - 1)
+        str_lines = ["{}: ".format(i) + gate_strings["qw"] for i in range(num_qubits)]
+        str_longitude = [" " * 3 + gate_strings["space"]] * (num_qubits - 1)
 
     for layer in layers_print:
         # Tag quantum registers for every layer
@@ -455,16 +488,16 @@ def print_circuit(circuit: List[CircuitLine],
                 space_span = range(min(qRegList), max(qRegList))
                 space_added[space_span] = 1  # tag drawn
                 for idx in space_span:
-                    str_longitude[idx] += extend_space_str(gate_strings['qwx'], layer_width)
+                    str_longitude[idx] += extend_space_str(gate_strings["qwx"], layer_width)
             # Measurements on specified qubits
             elif isinstance(cl.data, QOperation.Measure.MeasureOP):
                 for i in range(len(qRegList)):
-                    str_lines[qRegList[i]] += extend_gate_str(gate_strings['meas'], layer_width)
-                str_longitude = [str_longitude[i] + gate_strings['space'] for i in range(num_qubits - 1)]
+                    str_lines[qRegList[i]] += extend_gate_str(gate_strings["meas"], layer_width)
+                str_longitude = [str_longitude[i] + gate_strings["space"] for i in range(num_qubits - 1)]
             # Barrier gate on all qubits
             elif isinstance(cl.data, QOperation.Barrier.BarrierOP):
-                str_lines = [str_lines[i] + gate_strings['barrier'] for i in range(num_qubits)]
-                str_longitude = [str_longitude[i] + gate_strings['barrier'] for i in range(num_qubits - 1)]
+                str_lines = [str_lines[i] + gate_strings["barrier"] for i in range(num_qubits)]
+                str_longitude = [str_longitude[i] + gate_strings["barrier"] for i in range(num_qubits - 1)]
                 # Qubit and Space tags, indicating that the Barrier column is occupied
                 qreg_added = np.ones(num_qubits)
                 space_added = np.ones(num_qubits - 1)
@@ -479,36 +512,37 @@ def print_circuit(circuit: List[CircuitLine],
                 space_span = range(min(qRegList), max(qRegList))
                 space_added[space_span] = 1  # tag drawn
                 for idx in space_span:
-                    str_longitude[idx] += extend_space_str(gate_strings['qwx'], layer_width)
+                    str_longitude[idx] += extend_space_str(gate_strings["qwx"], layer_width)
             else:
-                raise TypeError('{} is not a supported gate type to print'.format(type(cl.data)))
+                raise TypeError("{} is not a supported gate type to print".format(type(cl.data)))
 
         # Append quantum wires and spaces for qubits without quantum gates to keep the quantum circuit aligned
         for idx in np.where(qreg_added == 0)[0]:
-            str_lines[idx] += '-' * layer_width
+            str_lines[idx] += "-" * layer_width
         for idx in np.where(space_added == 0)[0]:
-            str_longitude[idx] += ' ' * layer_width
+            str_longitude[idx] += " " * layer_width
 
-        str_lines = [str_lines[i] + gate_strings['qw'] for i in range(num_qubits)]
-        str_longitude = [str_longitude[i] + gate_strings['space'] for i in range(num_qubits - 1)]
+        str_lines = [str_lines[i] + gate_strings["qw"] for i in range(num_qubits)]
+        str_longitude = [str_longitude[i] + gate_strings["space"] for i in range(num_qubits - 1)]
 
     # Add colors to qubits if the @colors parameter is set
     if colors is not None:
         for color_name, qubits in colors.items():
             color_name = color_name.lower()
             if color_name not in COLOR_TABLE:
-                raise ArgumentError("print_circuit(): {} is not a supported color name "
-                                    "in the COLOR_TABLE!".format(color_name))
+                raise ArgumentError(
+                    "print_circuit(): {} is not a supported color name " "in the COLOR_TABLE!".format(color_name)
+                )
             # Only color those qubits that appear in the quantum circuit
             indices = [idx for idx in qubits if idx < num_qubits]
             for idx in indices:
-                str_lines[idx] = COLOR_TABLE[color_name] + str_lines[idx] + COLOR_TABLE['end']
+                str_lines[idx] = COLOR_TABLE[color_name] + str_lines[idx] + COLOR_TABLE["end"]
 
     # Concat and print (optional)
     str_print = [[str_lines[i], str_longitude[i]] for i in range(num_qubits - 1)]
     str_print.append([str_lines[-1]])  # each element is a list
     str_print = sum(str_print, [])
-    str_print = '\n'.join(str_print)
+    str_print = "\n".join(str_print)
     if show:
         print(str_print)
     return str_print
@@ -534,8 +568,7 @@ def remove_measurement(qp: Union[QCompute.QEnv, List[CircuitLine]]) -> Optional[
     :return: Optional[CircuitLine], represents the removed measurement operation.
             If there is no measurement operation in the quantum circuit, return ``None``
     """
-    circuit = qp.circuit if isinstance(
-        qp, QCompute.QEnv) else qp  # List[CircuitLine]
+    circuit = qp.circuit if isinstance(qp, QCompute.QEnv) else qp  # List[CircuitLine]
 
     if contain_measurement(circuit):
         return circuit.pop()
@@ -567,13 +600,11 @@ def add_barrier(qp: Union[QCompute.QEnv, List[CircuitLine]]) -> None:
     """
     # construct a Barrier-type CircuitLine
     if isinstance(qp, QCompute.QEnv):
-        cl = CircuitLine(data=QOperation.Barrier.BarrierOP(),
-                         qRegList=qp.Q.toListPair()[1])
+        cl = CircuitLine(data=QOperation.Barrier.BarrierOP(), qRegList=qp.Q.toListPair()[1])
         qp.circuit.append(cl)
     else:
         num_qubits = num_qubits_of_circuit(qp)
-        cl = CircuitLine(data=QOperation.Barrier.BarrierOP(),
-                         qRegList=list(range(num_qubits)))
+        cl = CircuitLine(data=QOperation.Barrier.BarrierOP(), qRegList=list(range(num_qubits)))
         qp.append(cl)
 
 
@@ -582,7 +613,7 @@ def remove_barrier(qp: Union[QCompute.QEnv, List[CircuitLine]]) -> None:
 
     :param qp: QProgram, a quantum program for which we will remove all barriers
     """
-    tag = 'barrier'
+    tag = "barrier"
     circuit = qp.circuit if isinstance(qp, QCompute.QEnv) else qp
 
     for i, cl in enumerate(circuit):
@@ -634,10 +665,10 @@ def layer_to_unitary(layer: List[CircuitLine], n: int) -> np.ndarray:
     # If there is a quantum measurement operation in the end, remove it
     remove_measurement(layer)
 
-    _TWO_QUBIT_GATESET = {'CX', 'CY', 'CZ', 'CH', 'SWAP'}
-    _THREE_QUBIT_GATESET = {'CCX', 'CSWAP'}
+    _TWO_QUBIT_GATESET = {"CX", "CY", "CZ", "CH", "SWAP"}
+    _THREE_QUBIT_GATESET = {"CCX", "CSWAP"}
 
-    U = np.identity(2 ** n, dtype='complex')
+    U = np.identity(2**n, dtype="complex")
     for cl in layer:
         indices = cl.qRegList
         local_u = cl.data.getMatrix()
@@ -704,13 +735,13 @@ def circuit_to_unitary(qp: QCompute.QEnv, qubits: List[int] = None) -> np.ndarra
     if qubits is None:
         qubits = [i for i in range(len(qp.Q.registerMap.keys()))]
 
-    _TWO_QUBIT_GATESET = {'CX', 'CY', 'CZ', 'CH', 'SWAP'}
-    _THREE_QUBIT_GATESET = {'CCX', 'CSWAP'}
+    _TWO_QUBIT_GATESET = {"CX", "CY", "CZ", "CH", "SWAP"}
+    _THREE_QUBIT_GATESET = {"CCX", "CSWAP"}
 
     # Number of qubits in the quantum program
     n = len(qubits)
 
-    U = np.identity(2 ** n, dtype='complex')
+    U = np.identity(2**n, dtype="complex")
     # Process the circuit layer by layer, each layer corresponds to a :math:`2^n\times 2^n` unitary matrix
     for circuit in qp.circuit:
         indices = [qubits.index(i) for i in circuit.qRegList]
@@ -727,8 +758,9 @@ def circuit_to_unitary(qp: QCompute.QEnv, qubits: List[int] = None) -> np.ndarra
     return U
 
 
-def circuit_to_state(qp: Union[QCompute.QEnv, List[CircuitLine]], vector: bool = False,
-                     qubits: List[int] = None) -> np.ndarray:
+def circuit_to_state(
+    qp: Union[QCompute.QEnv, List[CircuitLine]], vector: bool = False, qubits: List[int] = None
+) -> np.ndarray:
     r"""Compute the quantum state generated by the quantum circuit.
 
     When computing  quantum state, we assume the initial input state is the all-zero state: :math:`\vert 0\cdots 0\rangle`.
@@ -737,7 +769,7 @@ def circuit_to_state(qp: Union[QCompute.QEnv, List[CircuitLine]], vector: bool =
 
     :param qp: Union[QProgram, List[CircuitLine]], the state generating quantum circuit
     :param vector: bool, if ``True``, the return value is a state vector (a :math:`2^n\times 1` matrix),
-                         where :math:`n` is the number of qubits;       
+                         where :math:`n` is the number of qubits;
                          if ``False``, the return value is a density operator (a :math:`2^n\times 2^n` matrix)
     :param qubits: List[int], the target qubit(s), default to None
     :return: np.ndarray, the target quantum state (state vector or density operator)
@@ -763,8 +795,8 @@ def circuit_to_state(qp: Union[QCompute.QEnv, List[CircuitLine]], vector: bool =
     if qubits is None:
         qubits = [i for i in range(len(qp.Q.registerMap.keys()))]
 
-    _TWO_QUBIT_GATESET = {'CX', 'CY', 'CZ', 'CH', 'SWAP'}
-    _THREE_QUBIT_GATESET = {'CCX', 'CSWAP'}
+    _TWO_QUBIT_GATESET = {"CX", "CY", "CZ", "CH", "SWAP"}
+    _THREE_QUBIT_GATESET = {"CCX", "CSWAP"}
 
     n = len(qubits)
     state = basis(n, 0)
@@ -837,11 +869,9 @@ def group_gate_indices(circuit: List[CircuitLine]) -> Tuple[List[int], List[int]
     return one_qubit_gate_indices, multi_qubit_gate_indices
 
 
-def random_circuit(qubits: List[int],
-                   cycle: int,
-                   single: List[str] = None,
-                   multi: List[str] = None,
-                   neighboring: bool = True) -> QProgram:
+def random_circuit(
+    qubits: List[int], cycle: int, single: List[str] = None, multi: List[str] = None, neighboring: bool = True
+) -> QProgram:
     r"""Construct a random circuit of given cyles.
 
     Construct a random circuit of given cyles, each cycle is composed of two layers:
@@ -874,7 +904,7 @@ def random_circuit(qubits: List[int],
 
     **Examples**
 
-        >>> from qcompute_qep.utils import circuit
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils import circuit
         >>> qubits = [0, 1]
         >>> qp = circuit.random_circuit(qubits=qubits, cycle=2)
         >>> circuit.print_circuit(qp.circuit)
@@ -883,25 +913,27 @@ def random_circuit(qubits: List[int],
         1: ---U3(-2.14,+1.98,-0.17)---@---U3(+1.53,-2.60,-2.63)---@---MEAS---
     """
 
-    _SINGLE_QUBIT_GATE_SET = {'X', 'Y', 'Z', 'ID', 'H', 'T', 'S', 'TDG', 'SDG', 'RX', 'RY', 'RZ', 'U'}
-    _MULTI_QUBIT_GATE_SET = {'CX', 'CZ', 'CH', 'CY'}
+    _SINGLE_QUBIT_GATE_SET = {"X", "Y", "Z", "ID", "H", "T", "S", "TDG", "SDG", "RX", "RY", "RZ", "U"}
+    _MULTI_QUBIT_GATE_SET = {"CX", "CZ", "CH", "CY"}
     if single:
         if all((gate in _SINGLE_QUBIT_GATE_SET) for gate in single):
             _single_qubit_gateset = single
         else:
-            raise ArgumentError("in random_circuit(): "
-                                "Supported single-qubit gates are: {}.".format(_SINGLE_QUBIT_GATE_SET))
+            raise ArgumentError(
+                "in random_circuit(): " "Supported single-qubit gates are: {}.".format(_SINGLE_QUBIT_GATE_SET)
+            )
     else:
-        _single_qubit_gateset = ['U']
+        _single_qubit_gateset = ["U"]
 
     if multi:
         if all((gate in _MULTI_QUBIT_GATE_SET) for gate in multi):
             _multi_qubit_gateset = multi
         else:
-            raise ArgumentError("in random_circuit(): "
-                                "Supported multi-qubit gates are {}.".format(_MULTI_QUBIT_GATE_SET))
+            raise ArgumentError(
+                "in random_circuit(): " "Supported multi-qubit gates are {}.".format(_MULTI_QUBIT_GATE_SET)
+            )
     else:
-        _multi_qubit_gateset = ['CZ']
+        _multi_qubit_gateset = ["CZ"]
 
     # Create environment
     env = QCompute.QEnv()
@@ -914,13 +946,13 @@ def random_circuit(qubits: List[int],
         # single-qubit gate layer in current cycle
         for i in range(n_qubits):
             gate_name = np.random.choice(_single_qubit_gateset)
-            if gate_name == 'U':
+            if gate_name == "U":
                 # randomly generate a 2*2 unitary matrix and use YZY decomposition
                 u = unitary_group.rvs(2)
                 alpha, theta, phi, lam = decompose_yzy(u)
                 angles = [phi, theta, lam]
-                gate = RotationGate.createRotationGateInstance('U', *angles)
-            elif gate_name == 'RX' or gate_name == 'RY' or gate_name == 'RZ':
+                gate = RotationGate.createRotationGateInstance("U", *angles)
+            elif gate_name == "RX" or gate_name == "RY" or gate_name == "RZ":
                 # randomly generate a rotation angle in :math:`[0, 2\pi]`
                 theta = 2 * np.pi * random.random()
                 gate = RotationGate.createRotationGateInstance(gate_name, theta)
@@ -936,8 +968,9 @@ def random_circuit(qubits: List[int],
                     return []
                 else:
                     qubit_pair = random.sample(qubits_list, 2)
-                    return [qubit_pair] + qubit_pairs_exclusive(qubits_list=[idx for idx in qubits_list
-                                                                             if idx not in qubit_pair])
+                    return [qubit_pair] + qubit_pairs_exclusive(
+                        qubits_list=[idx for idx in qubits_list if idx not in qubit_pair]
+                    )
 
             qubit_pairs = qubit_pairs_exclusive(copy.deepcopy(qubits))
         else:  # only neighbor qubits can execute two-qubit gates
@@ -979,8 +1012,7 @@ def random_circuit(qubits: List[int],
     if not contain_measurement(env):
         index_list: list[int]
         qreg_list, index_list = env.Q.toListPair()
-        QCompute.MeasureZ(qRegList=[qreg_list[x] for x in qubits],
-                          cRegList=[index_list[x] for x in qubits])
+        QCompute.MeasureZ(qRegList=[qreg_list[x] for x in qubits], cRegList=[index_list[x] for x in qubits])
     return env
 
 
@@ -1072,8 +1104,9 @@ def enlarge_circuit(qp: QProgram, extra: int) -> QProgram:
     return new_qp
 
 
-def execute(qp: Union[QProgram, List[QProgram]],
-            qc: QComputer, **kwargs) -> Union[Dict[str, int], List[Dict[str, int]]]:
+def execute(
+    qp: Union[QProgram, List[QProgram]], qc: QComputer, **kwargs
+) -> Union[Dict[str, int], List[Dict[str, int]]]:
     r"""Execute a quantum program or a list of quantum programs on a quantum computer.
 
     This method supports the following two scenarios:
@@ -1183,8 +1216,10 @@ def execute(qp: Union[QProgram, List[QProgram]],
     if isinstance(qc, QCompute.BackendName):
         # Each QuantumProgram must be a QCompute.QEnv instance, otherwise cannot be executed in QCompute.BackendName
         if any(not isinstance(qp, QCompute.QEnv) for qp in qps):
-            raise ArgumentError("in execute(): since the quantum computer is a 'QCompute.BackendName' instance, "
-                                "all Quantum Programs must be the 'QCompute.QEnv' type!")
+            raise ArgumentError(
+                "in execute(): since the quantum computer is a 'QCompute.BackendName' instance, "
+                "all Quantum Programs must be the 'QCompute.QEnv' type!"
+            )
 
         res = _execute_in_qcompute(qps=qps, qc=qc, **kwargs)
     # Case 2. the quantum computer is a QCompute.BackendName instance
@@ -1197,28 +1232,34 @@ def execute(qp: Union[QProgram, List[QProgram]],
             elif isinstance(qp, QCompute.QEnv):
                 converted_qps.append(conversion.from_qcompute_to_qiskit(qp))
             else:
-                raise ArgumentError("in execute(): since the quantum computer is a 'qiskit.providers.Backend' "
-                                    "instance, all Quantum Programs must be either "
-                                    "the 'QCompute.QEnv' type or the 'qiskit.QuantumCircuit' type!")
+                raise ArgumentError(
+                    "in execute(): since the quantum computer is a 'qiskit.providers.Backend' "
+                    "instance, all Quantum Programs must be either "
+                    "the 'QCompute.QEnv' type or the 'qiskit.QuantumCircuit' type!"
+                )
 
         res = _execute_in_qiskit(qps=converted_qps, qc=qc, **kwargs)
     # Case 3. the quantum computer is a Callable instance
     elif isinstance(qc, Callable):
         res = _execute_in_callable(qps=qps, qc=qc, **kwargs)
     else:  # Currently, other quantum computer instances are not supported
-        raise ArgumentError("in execute(): currently this method does not support specifying {} as "
-                            "a 'QuantumComputer' instance!".format(qc))
+        raise ArgumentError(
+            "in execute(): currently this method does not support specifying {} as "
+            "a 'QuantumComputer' instance!".format(qc)
+        )
 
     # If @qp is a QuantumProgram, convert the output to a dictionary of counts (but not a list of dictionaries)
     if not _IS_QP_LIST:
-        assert len(res) == 1, "The number of input quantum programs is 1, " \
-                              "so the number of output count dictionary must be 1!"
+        assert len(res) == 1, (
+            "The number of input quantum programs is 1, " "so the number of output count dictionary must be 1!"
+        )
         res = res[0]
     return res
 
 
-def _execute_in_qcompute(qps: List[QCompute.QEnv],
-                         qc: QCompute.QPlatform.BackendName, **kwargs) -> List[Dict[str, int]]:
+def _execute_in_qcompute(
+    qps: List[QCompute.QEnv], qc: QCompute.QPlatform.BackendName, **kwargs
+) -> List[Dict[str, int]]:
     r"""Execute quantum programs on a quantum computer from QCompute.
 
     The measurement outcomes will be returned in a list of dictionaries, each corresponds to a quantum program.
@@ -1238,7 +1279,7 @@ def _execute_in_qcompute(qps: List[QCompute.QEnv],
     :param qc: QCompute.QPlatform.BackendName, the target quantum computer
     :return: List[Dict[str, int]], a list of dictionaries recording the measurement counts for each quantum program
     """
-    shots: int = kwargs.get('shots', 1024)
+    shots: int = kwargs.get("shots", 1024)
     res = []
 
     for qp in qps:
@@ -1247,13 +1288,13 @@ def _execute_in_qcompute(qps: List[QCompute.QEnv],
         # Remove barrier gates, forbid mapping and enable unroll
         remove_barrier(qp)
         if qc == QCompute.BackendName.CloudIoPCAS:
-            qp.serverModule(QCompute.ServerModule.MappingToIoPCAS, {'disable': False})
-            qp.serverModule(QCompute.ServerModule.UnrollCircuitToIoPCAS, {'disable': False})
+            qp.serverModule(QCompute.ServerModule.MappingToIoPCAS, {"disable": False})
+            qp.serverModule(QCompute.ServerModule.UnrollCircuitToIoPCAS, {"disable": False})
         elif qc == QCompute.BackendName.CloudBaiduQPUQian:
-            qp.serverModule(QCompute.ServerModule.MappingToBaiduQPUQian, {'disable': False})
-            qp.serverModule(QCompute.ServerModule.UnrollCircuitToBaiduQPUQian, {'disable': False})
+            qp.serverModule(QCompute.ServerModule.MappingToBaiduQPUQian, {"disable": False})
+            qp.serverModule(QCompute.ServerModule.UnrollCircuitToBaiduQPUQian, {"disable": False})
         elif qc == QCompute.BackendName.CloudIonAPM:
-            qp.serverModule(QCompute.ServerModule.UnrollCircuitToIonAPM, {'disable': False})
+            qp.serverModule(QCompute.ServerModule.UnrollCircuitToIonAPM, {"disable": False})
         else:
             pass
 
@@ -1265,8 +1306,9 @@ def _execute_in_qcompute(qps: List[QCompute.QEnv],
     return res
 
 
-def _execute_in_qiskit(qps: List[qiskit.QuantumCircuit],
-                       qc: qiskit.providers.Backend, **kwargs) -> List[Dict[str, int]]:
+def _execute_in_qiskit(
+    qps: List[qiskit.QuantumCircuit], qc: qiskit.providers.Backend, **kwargs
+) -> List[Dict[str, int]]:
     r"""Execute quantum programs on a quantum computer from qiskit.
 
     The measurement outcomes will be returned in a list of dictionaries, each corresponds to a quantum program.
@@ -1289,9 +1331,9 @@ def _execute_in_qiskit(qps: List[qiskit.QuantumCircuit],
     :param qc: QCompute.QPlatform.BackendName, the target quantum computer
     :return: List[Dict[str, int]], a list of dictionaries recording the measurement counts for each quantum program
     """
-    shots: int = kwargs.get('shots', 1024)
+    shots: int = kwargs.get("shots", 1024)
     # If the optimization level is set by the user, apply it
-    optimization_level: int = kwargs.get('optimization_level', 0)
+    optimization_level: int = kwargs.get("optimization_level", 0)
 
     res = []
     if isinstance(qc, IBMQBackend):

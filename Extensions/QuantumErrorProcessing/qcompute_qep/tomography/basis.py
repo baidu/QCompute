@@ -28,14 +28,14 @@ import itertools
 from QCompute import *
 from QCompute.QPlatform.QOperation import CircuitLine
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.linalg import tensor
-from qcompute_qep.quantum.pauli import complete_pauli_basis, QUBIT_PAULI_BASIS
-from qcompute_qep.quantum.gellmann import GELL_MANN_BASIS
-from qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis, QUBIT_PAULI_BASIS
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.gellmann import GELL_MANN_BASIS
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
 
-SUPPORTED_MEASUREMENT_BASIS = {'Pauli', 'GellMann'}
-SUPPORTED_PREPARATION_BASIS = {'Pauli', 'PauliOC'}
+SUPPORTED_MEASUREMENT_BASIS = {"Pauli", "GellMann"}
+SUPPORTED_PREPARATION_BASIS = {"Pauli", "PauliOC"}
 
 
 class Basis(abc.ABC):
@@ -105,6 +105,7 @@ class Basis(abc.ABC):
             -3 \end{bmatrix}`}
 
     """
+
     @abc.abstractmethod
     def __init__(self):
         """
@@ -281,15 +282,15 @@ class Basis(abc.ABC):
 
         return val
 
+
 #######################################################################################################################
 # The `MeasurementBasis` Abstract Class and its inherited classes
 #######################################################################################################################
 
 
 class MeasurementBasis(Basis):
-    """The Measurement Basis abstract class.
+    """The Measurement Basis abstract class."""
 
-    """
     @abc.abstractmethod
     def __init__(self):
         """
@@ -341,6 +342,7 @@ class GellMannMeasBasis(MeasurementBasis):
 
             These operators are properly normalized.
     """
+
     def __init__(self):
         """
         Initializes the 2-Qubit Gell-Mann measurement basis class.
@@ -389,7 +391,7 @@ class GellMannMeasBasis(MeasurementBasis):
             n = len(qubits)
             qubits.sort()
 
-        if (n % 2 != 0):
+        if n % 2 != 0:
             raise ArgumentError("n is not a odd number!!!")
         meas_qps: List[QProgram] = []
         meas_obs: List[np.ndarray] = []
@@ -411,104 +413,104 @@ class GellMannMeasBasis(MeasurementBasis):
             for i, ch in enumerate(p_name):
                 # Calculate the qubit index under the LSB mode assumption
                 # TODO: test if `qubits` works ??
-                qubit_idx = qubits[n - i*2 - 1]
-                if ch == 'S12':
+                qubit_idx = qubits[n - i * 2 - 1]
+                if ch == "S12":
                     # H \otimes I means H_Gate on 1st qubit and ID_Gate on 0th qubit
                     ID(meas_qp.Q[qubit_idx])
-                    H(meas_qp.Q[qubit_idx-1])
+                    H(meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([1, -1, 0, 0]))
-                elif ch == 'S13':
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "S13":
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     eigs.append(np.diag([1, 0, -1, 0]))
-                elif ch == 'S14':
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "S14":
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([1, 0, 0, -1]))
-                elif ch == 'S23':
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "S23":
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([0, 1, -1, 0]))
-                elif ch == 'S24':
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "S24":
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     eigs.append(np.diag([0, 1, 0, -1]))
-                elif ch == 'S34':
+                elif ch == "S34":
                     ID(meas_qp.Q[qubit_idx])
-                    H(meas_qp.Q[qubit_idx-1])
+                    H(meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([0, 0, 1, -1]))
-                if ch == 'A12':
+                if ch == "A12":
                     # H \otimes I means H_Gate on 1st qubit and ID_Gate on 0th qubit
                     ID(meas_qp.Q[qubit_idx])
-                    SDG(meas_qp.Q[qubit_idx-1])
-                    H(meas_qp.Q[qubit_idx-1])
+                    SDG(meas_qp.Q[qubit_idx - 1])
+                    H(meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([1, -1, 0, 0]))
-                elif ch == 'A13':
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "A13":
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    SDG(meas_qp.Q[qubit_idx-1])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                    SDG(meas_qp.Q[qubit_idx - 1])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     eigs.append(np.diag([1, 0, -1, 0]))
-                elif ch == 'A14':
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "A14":
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    SDG(meas_qp.Q[qubit_idx-1])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
+                    SDG(meas_qp.Q[qubit_idx - 1])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([1, 0, 0, -1]))
-                elif ch == 'A23':
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "A23":
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    SDG(meas_qp.Q[qubit_idx-1])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
-                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx-1])
+                    SDG(meas_qp.Q[qubit_idx - 1])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
+                    CX(meas_qp.Q[qubit_idx], meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([0, 1, -1, 0]))
-                elif ch == 'A24':
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                elif ch == "A24":
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     ID(meas_qp.Q[qubit_idx])
-                    SDG(meas_qp.Q[qubit_idx-1])
-                    H(meas_qp.Q[qubit_idx-1])
-                    SWAP(meas_qp.Q[qubit_idx-1], meas_qp.Q[qubit_idx])
+                    SDG(meas_qp.Q[qubit_idx - 1])
+                    H(meas_qp.Q[qubit_idx - 1])
+                    SWAP(meas_qp.Q[qubit_idx - 1], meas_qp.Q[qubit_idx])
                     eigs.append(np.diag([0, 1, 0, -1]))
-                elif ch == 'A34':
+                elif ch == "A34":
                     ID(meas_qp.Q[qubit_idx])
-                    SDG(meas_qp.Q[qubit_idx-1])
-                    H(meas_qp.Q[qubit_idx-1])
+                    SDG(meas_qp.Q[qubit_idx - 1])
+                    H(meas_qp.Q[qubit_idx - 1])
                     eigs.append(np.diag([0, 0, 1, -1]))
-                elif ch == 'D00':
-                    ID(meas_qp.Q[qubit_idx-1])
+                elif ch == "D00":
+                    ID(meas_qp.Q[qubit_idx - 1])
                     ID(meas_qp.Q[qubit_idx])
-                    eigs.append(np.diag([1, 1, 1, 1])/np.sqrt(2))
+                    eigs.append(np.diag([1, 1, 1, 1]) / np.sqrt(2))
                     # Should keep in mind that in the tomography module all Pauli operators are properly normalized.
-                elif ch == 'D11':
-                    ID(meas_qp.Q[qubit_idx-1])
+                elif ch == "D11":
+                    ID(meas_qp.Q[qubit_idx - 1])
                     ID(meas_qp.Q[qubit_idx])
                     eigs.append(np.diag([1, -1, 0, 0]))
-                elif ch == 'D22':
-                    ID(meas_qp.Q[qubit_idx-1])
+                elif ch == "D22":
+                    ID(meas_qp.Q[qubit_idx - 1])
                     ID(meas_qp.Q[qubit_idx])
-                    eigs.append(np.diag([1, 1, -2, 0])/np.sqrt(3))
-                elif ch == 'D33':
-                    ID(meas_qp.Q[qubit_idx-1])
+                    eigs.append(np.diag([1, 1, -2, 0]) / np.sqrt(3))
+                elif ch == "D33":
+                    ID(meas_qp.Q[qubit_idx - 1])
                     ID(meas_qp.Q[qubit_idx])
-                    eigs.append(np.diag([1, 1, 1, -3])/np.sqrt(6))
+                    eigs.append(np.diag([1, 1, 1, -3]) / np.sqrt(6))
 
             # Measurement in the Z basis
             MeasureZ(*meas_qp.Q.toListPair())
@@ -534,6 +536,7 @@ class PauliMeasBasis(MeasurementBasis):
 
             These operators are properly normalized.
     """
+
     def __init__(self):
         """
         Initializes the Pauli measurement basis class.
@@ -602,30 +605,30 @@ class PauliMeasBasis(MeasurementBasis):
             for i, ch in enumerate(p_name):
                 # Calculate the qubit index under the LSB mode assumption
                 qubit_idx = qubits[n - i - 1]
-                if ch == 'I':
+                if ch == "I":
                     ID(meas_qp.Q[qubit_idx])
-                elif ch == 'X':
+                elif ch == "X":
                     H(meas_qp.Q[qubit_idx])
-                elif ch == 'Y':
+                elif ch == "Y":
                     SDG(meas_qp.Q[qubit_idx])
                     H(meas_qp.Q[qubit_idx])
-                elif ch == 'Z':
+                elif ch == "Z":
                     pass
                 else:
                     raise ArgumentError("in meas_circuits(): illegal basis name {}!".format(ch))
                 # Compute the eigenvalues of the corresponding *normalized* Pauli operator.
                 # Should keep in mind that in the tomography module all Pauli operators are properly normalized.
-                eigs.append(np.diag([1, 1]) / np.sqrt(2) if ch == 'I' else np.diag([1, -1]) / np.sqrt(2))
+                eigs.append(np.diag([1, 1]) / np.sqrt(2) if ch == "I" else np.diag([1, -1]) / np.sqrt(2))
 
             # Measurement in the Z basis
             qreglist, indexlist = meas_qp.Q.toListPair()
-            MeasureZ(qRegList=[qreglist[x] for x in qubits],
-                     cRegList=[indexlist[x] for x in qubits])
+            MeasureZ(qRegList=[qreglist[x] for x in qubits], cRegList=[indexlist[x] for x in qubits])
 
             meas_qps.append(meas_qp)
             meas_obs.append(tensor(eigs))
 
         return meas_qps, meas_obs
+
 
 #######################################################################################################################
 # The `PreparationBasis` Abstract Class and its inherited classes
@@ -636,6 +639,7 @@ class PreparationBasis(Basis):
     """
     The Preparation Basis abstract class.
     """
+
     def __init__(self):
         """
         The init function of the preparation basis class.  This method is an abstract method.
@@ -661,16 +665,19 @@ class PauliPrepBasis(PreparationBasis):
         "L": :math:`\frac{1}{2}\begin{bmatrix} 1 & -j \\ j & 1 \end{bmatrix}`}
 
     """
+
     def __init__(self):
         """
         Initializes the Pauli preparation basis class.
         """
         super().__init__()
         self._name = "Single-Qubit Pauli Preparation Basis"
-        self._basis = {"0": np.array([[1, 0], [0, 0]]).astype(complex),
-                       "1": np.array([[0, 0], [0, 1]]).astype(complex),
-                       "A": np.array([[1, 1], [1, 1]]).astype(complex)/2,
-                       "L": np.array([[1, -1j], [1j, 1]]).astype(complex)/2}
+        self._basis = {
+            "0": np.array([[1, 0], [0, 0]]).astype(complex),
+            "1": np.array([[0, 0], [0, 1]]).astype(complex),
+            "A": np.array([[1, 1], [1, 1]]).astype(complex) / 2,
+            "L": np.array([[1, -1j], [1j, 1]]).astype(complex) / 2,
+        }
 
     def prep_circuits(self, qp: QEnv, qubits: List[int] = None) -> List[QEnv]:
         r"""
@@ -735,15 +742,15 @@ class PauliPrepBasis(PreparationBasis):
             for i, ch in enumerate(p_name):
                 # Calculate the qubit index under the LSB mode assumption
                 qubit_idx = qubits[n - i - 1]
-                if ch == '0':
+                if ch == "0":
                     pass
-                elif ch == '1':  # Execute X on the target qubit to the beginning of the quantum program
+                elif ch == "1":  # Execute X on the target qubit to the beginning of the quantum program
                     clX = CircuitLine(data=X, qRegList=[qubit_idx])
                     prep_qp.circuit = [clX] + prep_qp.circuit
-                elif ch == 'A':  # Execute H on the target qubit to the beginning of the quantum program
+                elif ch == "A":  # Execute H on the target qubit to the beginning of the quantum program
                     clH = CircuitLine(data=H, qRegList=[qubit_idx])
                     prep_qp.circuit = [clH] + prep_qp.circuit
-                elif ch == 'L':  # Execute H and S on the target qubit to the beginning of the quantum program
+                elif ch == "L":  # Execute H and S on the target qubit to the beginning of the quantum program
                     clH = CircuitLine(data=H, qRegList=[qubit_idx])
                     clS = CircuitLine(data=S, qRegList=[qubit_idx])
                     prep_qp.circuit = [clH, clS] + prep_qp.circuit
@@ -770,18 +777,21 @@ class PauliOCPrepBasis(PreparationBasis):
         "R": :math:`\frac{1}{\sqrt{2}}\begin{bmatrix} 1 & j \\ -j & 1 \end{bmatrix}`}
 
     """
+
     def __init__(self):
         """
         Initializes the Pauli overcomplete preparation basis class.
         """
         super().__init__()
         self._name = "Single-Qubit Pauli Overcomplete Preparation Basis"
-        self._basis = {"0": np.array([[1, 0], [0, 0]]).astype(complex),
-                       "1": np.array([[0, 0], [0, 1]]).astype(complex),
-                       "A": np.array([[1, 1], [1, 1]]).astype(complex)/2,
-                       "D": np.array([[1, -1], [-1, 1]]).astype(complex)/2,
-                       "L": np.array([[1, -1j], [1j, 1]]).astype(complex)/2,
-                       "R": np.array([[1, 1j], [-1j, 1]]).astype(complex)/2}
+        self._basis = {
+            "0": np.array([[1, 0], [0, 0]]).astype(complex),
+            "1": np.array([[0, 0], [0, 1]]).astype(complex),
+            "A": np.array([[1, 1], [1, 1]]).astype(complex) / 2,
+            "D": np.array([[1, -1], [-1, 1]]).astype(complex) / 2,
+            "L": np.array([[1, -1j], [1j, 1]]).astype(complex) / 2,
+            "R": np.array([[1, 1j], [-1j, 1]]).astype(complex) / 2,
+        }
 
     def prep_circuits(self, qp: QProgram, qubits: List[int] = None) -> List[QProgram]:
         r"""
@@ -848,23 +858,23 @@ class PauliOCPrepBasis(PreparationBasis):
             for i, ch in enumerate(p_name):
                 # Calculate the qubit index under the LSB mode assumption
                 qubit_idx = qubits[n - i - 1]
-                if ch == '0':
+                if ch == "0":
                     pass
-                elif ch == '1':  # Execute X on the target qubit to the beginning of the quantum program
+                elif ch == "1":  # Execute X on the target qubit to the beginning of the quantum program
                     clX = CircuitLine(data=X, qRegList=[qubit_idx])
                     prep_qp.circuit = [clX] + prep_qp.circuit
-                elif ch == 'A':  # Execute H on the target qubit to the beginning of the quantum program
+                elif ch == "A":  # Execute H on the target qubit to the beginning of the quantum program
                     clH = CircuitLine(data=H, qRegList=[qubit_idx])
                     prep_qp.circuit = [clH] + prep_qp.circuit
-                elif ch == 'D':  # Execute X and H on the target qubit to the beginning of the quantum program
+                elif ch == "D":  # Execute X and H on the target qubit to the beginning of the quantum program
                     clX = CircuitLine(data=X, qRegList=[qubit_idx])
                     clH = CircuitLine(data=H, qRegList=[qubit_idx])
                     prep_qp.circuit = [clX, clH] + prep_qp.circuit
-                elif ch == 'L':  # Execute H and S on the target qubit to the beginning of the quantum program
+                elif ch == "L":  # Execute H and S on the target qubit to the beginning of the quantum program
                     clH = CircuitLine(data=H, qRegList=[qubit_idx])
                     clS = CircuitLine(data=S, qRegList=[qubit_idx])
                     prep_qp.circuit = [clH, clS] + prep_qp.circuit
-                elif ch == 'R':  # Execute X, H and S on the target qubit to the beginning of the quantum program
+                elif ch == "R":  # Execute X, H and S on the target qubit to the beginning of the quantum program
                     clX = CircuitLine(data=X, qRegList=[qubit_idx])
                     clH = CircuitLine(data=H, qRegList=[qubit_idx])
                     clS = CircuitLine(data=S, qRegList=[qubit_idx])
@@ -904,7 +914,7 @@ def init_preparation_basis(val: Union[str, PreparationBasis] = None) -> Preparat
         if val not in SUPPORTED_PREPARATION_BASIS:
             raise ArgumentError("in init_preparation_basis(): '{}' is not supported preparation basis!".format(val))
         else:
-            pb = getattr(sys.modules[__name__], val + 'PrepBasis')()
+            pb = getattr(sys.modules[__name__], val + "PrepBasis")()
     else:
         raise ArgumentError("in init_preparation_basis(): unsupported input value type {}!".format(type(val)))
 
@@ -939,7 +949,7 @@ def init_measurement_basis(val: Union[str, MeasurementBasis] = None) -> Measurem
         if val not in SUPPORTED_MEASUREMENT_BASIS:
             raise ArgumentError("in init_measurement_basis(): '{}' is not supported measurement basis!".format(val))
         else:
-            mb = getattr(sys.modules[__name__], val + 'MeasBasis')()
+            mb = getattr(sys.modules[__name__], val + "MeasBasis")()
     else:
         raise ArgumentError("in init_measurement_basis(): unsupported input value type {}!".format(type(val)))
 

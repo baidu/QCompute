@@ -20,18 +20,13 @@ Module for error correction protocols.
 """
 
 from abc import ABC
-from qcompute_qnet.protocols.protocol import Protocol
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol
 
-__all__ = [
-    "ErrorCorrection",
-    "Cascade",
-    "LDPC"
-]
+__all__ = ["ErrorCorrection", "Cascade", "LDPC"]
 
 
 class ErrorCorrection(Protocol, ABC):
-    r"""Class for error correction protocols.
-    """
+    r"""Class for error correction protocols."""
 
     def __init__(self, name: str):
         r"""Constructor for ErrorCorrection class.
@@ -43,8 +38,7 @@ class ErrorCorrection(Protocol, ABC):
 
 
 class Cascade(ErrorCorrection):
-    r"""Class for the cascade protocol.
-    """
+    r"""Class for the cascade protocol."""
 
     def __init__(self, name: str):
         r"""Constructor for Cascade class.
@@ -56,8 +50,7 @@ class Cascade(ErrorCorrection):
 
 
 class LDPC(ErrorCorrection):
-    r"""Class for the low-density parity-check protocol.
-    """
+    r"""Class for the low-density parity-check protocol."""
 
     def __init__(self, name: str):
         r"""Constructor for LDPC class.

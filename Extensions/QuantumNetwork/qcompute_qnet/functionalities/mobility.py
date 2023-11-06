@@ -21,10 +21,7 @@ Module for mobility of nodes.
 
 from abc import ABC, abstractmethod
 
-__all__ = [
-    "Mobility",
-    "Track"
-]
+__all__ = ["Mobility", "Track"]
 
 
 class Mobility:
@@ -37,8 +34,7 @@ class Mobility:
     """
 
     def __init__(self):
-        r"""Constructor for Mobility class.
-        """
+        r"""Constructor for Mobility class."""
         self.track = None
 
     def set_track(self, track: "Track") -> None:

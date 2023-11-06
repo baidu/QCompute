@@ -25,8 +25,8 @@ from .basic_circuit import BasicCircuit
 
 
 class ParameterizedCircuit(BasicCircuit):
-    r"""Parameterized Circuit class
-    """
+    r"""Parameterized Circuit class"""
+
     def __init__(self, num: int, parameters: np.ndarray):
         r"""The constructor of the BasicCircuit class
 

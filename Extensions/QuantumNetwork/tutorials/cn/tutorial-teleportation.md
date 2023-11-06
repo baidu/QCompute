@@ -5,11 +5,11 @@
 本教程中，我们将结合一个经典的量子网络协议——量子隐形传态对 QPU 模块的功能展开进一步详细的介绍。首先，我们将对量子隐形传态的原理和相关流程进行介绍；随后，我们将介绍如何借助 QNET 对该协议进行仿真，并获取量子电路运行后的返回结果。
 
 
-## 1. 背景介绍
+## 背景介绍
 
 在量子通信中，存在这样一个常见的场景：Alice 想要将她手中所持有的一份未知的单比特量子态 $| \psi \rangle$ 发送给与她相距很远的 Bob。然而他们之间并没有直接相连的量子信道，因此无法完成对量子态的直接传输。由于量子力学的性质，Alice 也无法像复制经典消息那样复制多份量子态，并通过统计分析的方式获得量子态的相关准确信息，从而通过经典信道告知 Bob 相关参数来还原这个量子态。因此，在这种情境下，如何实现量子态的远距离传输成为一个关键的问题。在 1993 年，Charles Bennett 及其合作者提出了量子隐形传态协议 [1]，通过引入量子力学的纠缠特性，成功解决了对未知量子态的远距离传输。
 
-## 2. 协议流程
+## 协议流程
 
 量子隐形传态是量子信息理论当中非常经典的一个量子协议，该协议的流程大致如下：
 
@@ -20,7 +20,7 @@
 
 接下来，我们使用 QNET 对量子隐形传态协议进行仿真，并借此向大家简单演示如何使用 QNET 的语法实现一个量子网络协议。
 
-## 3. 协议实现
+## 协议实现
 
 在 QPU 模块中，我们提供了 ``Teleportation`` 类用以对量子隐形传态协议进行仿真，在该协议中我们定义了三个子协议（``SubProtocol``），分别描述了该协议中的三种角色各自的行为：负责制备并分发纠缠粒子的纠缠源（``Source``）、对量子态进行传送的发送方（``Sender``）以及对量子态进行还原的接收方（``Receiver``）。该协议中，所有角色在收到量子比特后都将存储在本地的量子寄存器中，方便后续访问其量子态并执行操作。
 
@@ -197,7 +197,7 @@ class Teleportation(Protocol):
             self.node.qreg.measure(address_reception)
 ```
 
-## 4. 代码示例
+## 代码示例
 
 接下来，我们使用 QNET 对量子隐形传态的完整使用场景进行模拟。
 
@@ -205,7 +205,7 @@ class Teleportation(Protocol):
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # 创建一个仿真环境
 env = QuantumEnv("Teleportation", default=True)
@@ -219,9 +219,9 @@ env = QuantumEnv("Teleportation", default=True)
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import Teleportation
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import Teleportation
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # 创建装有量子寄存器的量子节点并指定其中预装的协议类型为 Teleportation
 alice = QuantumNode("Alice", qreg_size=2, protocol=Teleportation)
@@ -238,7 +238,7 @@ link_bc = Link("Link_bc", ends=(bob, charlie), distance=1e3)
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # 创建一个量子网络并将各节点和链路装入量子网络中
 network = Network("Teleportation network")
@@ -268,11 +268,11 @@ charlie.start(role="Source")
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # 初始化仿真环境并运行仿真
 env.init()
-results = env.run(shots=1024, backend=Backend.QCompute.LocalBaiduSim2, summary=False)
+results = env.run(shots=1024, backend=Backend.QCompute.LocalBaiduSim2)
 # 查看电路运行结果
 print(f"\nCircuit results:\n", results)  
 ```
@@ -295,7 +295,7 @@ Circuit results:
 为了查看最终接收方 Bob 所持量子比特的测量结果，可以调用 ``Circuit`` 的 ``reduce_results`` 方法，传入电路采样结果，并通过 ``indices`` 参数传入想要查看测量结果的量子比特在电路中的全局索引，来获取对应的返回结果。为了验证协议仿真的正确性，我们可以另行创建一个电路，输入与发送方 Alice 一致的量子态并进行测量，通过比对测量结果以验证本次协议仿真的正确性。
 
 ```python
-from qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
 
 # 查看接收方所持量子比特的测量结果
 reduced_indices = [2]

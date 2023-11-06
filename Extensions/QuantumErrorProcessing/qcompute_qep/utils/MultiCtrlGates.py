@@ -58,9 +58,12 @@ def func_find_borrowable_qubits(reg_work: List[QRegStorage], num_qubits_borrowed
     return reg_borrowed
 
 
-def circ_multictrl_X(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRegStorage]],
-                     num_qubit_ctrlling: Optional[int] = None,
-                     reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_multictrl_X(
+    qubit_target: QRegStorage,
+    reg_ctrlling: Optional[List[QRegStorage]],
+    num_qubit_ctrlling: Optional[int] = None,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""An :math:`O(n)` decomposition for multictrl :math:`X` gate (@ :math:`C^n(X)`) with several borrowed qubits.
 
     More information refers to [BBC+95]_ and [G05]_.
@@ -132,9 +135,12 @@ def circ_multictrl_X(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QReg
                     CCX(reg_ctrlling[idx], reg_borrowed[idx], reg_borrowed[idx - 1])
 
 
-def circ_multictrl_Y(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRegStorage]],
-                     num_qubit_ctrlling: Optional[int] = None,
-                     reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_multictrl_Y(
+    qubit_target: QRegStorage,
+    reg_ctrlling: Optional[List[QRegStorage]],
+    num_qubit_ctrlling: Optional[int] = None,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""An :math:`O(n)` decomposition for multictrl :math:`Y` gate (@ :math:`C^n(Y)`) with several borrowed qubits.
 
     In math, :math:`C^n(Y)` is defined as
@@ -174,14 +180,16 @@ def circ_multictrl_Y(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QReg
         CY(reg_ctrlling[0], qubit_target)
     else:  # for the case n >= 2, we implement CnY by CnX, S and SDG gates
         SDG(qubit_target)
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
         S(qubit_target)
 
 
-def circ_multictrl_Z(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRegStorage]],
-                     num_qubit_ctrlling: Optional[int] = None,
-                     reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_multictrl_Z(
+    qubit_target: QRegStorage,
+    reg_ctrlling: Optional[List[QRegStorage]],
+    num_qubit_ctrlling: Optional[int] = None,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""An :math:`O(n)` decomposition for multictrl :math:`Z` gate (@ :math:`C^n(Z)`) with several borrowed qubits.
 
     In math, :math:`C^n(Z)` is defined as
@@ -221,14 +229,17 @@ def circ_multictrl_Z(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QReg
         CZ(reg_ctrlling[0], qubit_target)
     else:  # for the case n >= 2, we implement CnZ by CnX and H gates
         H(qubit_target)
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
         H(qubit_target)
 
 
-def circ_multictrl_Pauli(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRegStorage]], char_Pauli: str,
-                         num_qubit_ctrlling: Optional[int] = None,
-                         reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_multictrl_Pauli(
+    qubit_target: QRegStorage,
+    reg_ctrlling: Optional[List[QRegStorage]],
+    char_Pauli: str,
+    num_qubit_ctrlling: Optional[int] = None,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""An :math:`O(n)` decomposition for multictrl :math:`P=X,Y\text{ or }Z` gate (@ :math:`C^n(P)`)
     with several borrowed qubits.
 
@@ -267,20 +278,21 @@ def circ_multictrl_Pauli(qubit_target: QRegStorage, reg_ctrlling: Optional[List[
         num_qubit_ctrlling = len(reg_ctrlling)  # count the number n in reg_ctrlling
     if reg_borrowed is None:
         reg_borrowed = []
-    if char_Pauli == 'X':  # we will operate a CnX gate
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
-    elif char_Pauli == 'Y':  # we will operate a CnY gate
-        circ_multictrl_Y(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
-    elif char_Pauli == 'Z':  # we will operate a CnZ gate
-        circ_multictrl_Z(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+    if char_Pauli == "X":  # we will operate a CnX gate
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
+    elif char_Pauli == "Y":  # we will operate a CnY gate
+        circ_multictrl_Y(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
+    elif char_Pauli == "Z":  # we will operate a CnZ gate
+        circ_multictrl_Z(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
 
 
-def circ_multictrl_ry(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRegStorage]],
-                      float_rotation_angle: float, num_qubit_ctrlling: Optional[int] = None,
-                      reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_multictrl_ry(
+    qubit_target: QRegStorage,
+    reg_ctrlling: Optional[List[QRegStorage]],
+    float_rotation_angle: float,
+    num_qubit_ctrlling: Optional[int] = None,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""An :math:`O(n)` decomposition for multictrl :math:`Ry` gate (@ :math:`C^n(Ry(a))`)
     with several borrowed qubits.
 
@@ -324,16 +336,18 @@ def circ_multictrl_ry(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRe
     else:  # for the case n >= 2
         # here is a decomposition: C^n(Ry) -> several CnX gates and Ry gates
         RY(float_rotation_angle / 2)(qubit_target)
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
         RY(-float_rotation_angle / 2)(qubit_target)
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
 
 
-def circ_multictrl_rz(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRegStorage]],
-                      float_rotation_angle: float, num_qubit_ctrlling: Optional[int] = None,
-                      reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_multictrl_rz(
+    qubit_target: QRegStorage,
+    reg_ctrlling: Optional[List[QRegStorage]],
+    float_rotation_angle: float,
+    num_qubit_ctrlling: Optional[int] = None,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""An :math:`O(n)` decomposition for multictrl :math:`Rz` gate (@ :math:`C^n(Rz(a))`)
     with several borrowed qubits.
 
@@ -375,8 +389,6 @@ def circ_multictrl_rz(qubit_target: QRegStorage, reg_ctrlling: Optional[List[QRe
     else:  # for the case n >= 2
         # here is a decomposition: C^n(Rz) -> several CnX gates and Rz gates
         RZ(float_rotation_angle / 2)(qubit_target)
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)
         RZ(-float_rotation_angle / 2)(qubit_target)
-        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling,
-                         reg_borrowed=reg_borrowed)
+        circ_multictrl_X(qubit_target, reg_ctrlling, num_qubit_ctrlling=num_qubit_ctrlling, reg_borrowed=reg_borrowed)

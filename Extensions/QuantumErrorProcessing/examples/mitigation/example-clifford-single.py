@@ -31,11 +31,11 @@ from qiskit.providers.fake_provider import FakeSantiago
 import numpy as np
 
 from QCompute import *
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.quantum import clifford
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.mitigation.utils import plot_zne_sequences
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.utils import plot_zne_sequences
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 
 def calculator(qp: QEnv = None, qc: BackendName = None) -> float:
@@ -58,8 +58,8 @@ num_seq = 10
 scale_factors = [1, 2]
 
 # Initialize different ZNE mitigators
-zne_linear = ZNEMitigator(folder="circuit", extrapolator='linear')
-zne_richard = ZNEMitigator(folder="circuit", extrapolator='richardson')
+zne_linear = ZNEMitigator(folder="circuit", extrapolator="linear")
+zne_richard = ZNEMitigator(folder="circuit", extrapolator="richardson")
 
 # Set the ideal quantum computer to `LocalBaiduSim2` and the noisy quantum computer to `CloudBaiduQPUQian`
 qc_ideal = BackendName.LocalBaiduSim2
@@ -103,11 +103,11 @@ for i in range(1, num_seq + 1):
     # Compute the noisy and mitigated expectation values using the noisy quantum computer
     val = zne_linear.mitigate(qp, qc_noisy, calculator, scale_factors=scale_factors)
     expvals_miti_linear.append(val)
-    expvals_noisy_linear.append(zne_linear.history['expectations'])
+    expvals_noisy_linear.append(zne_linear.history["expectations"])
 
     val = zne_richard.mitigate(qp, qc_noisy, calculator, scale_factors=scale_factors)
     expvals_miti_richard.append(val)
-    expvals_noisy_richard.append(zne_richard.history['expectations'])
+    expvals_noisy_richard.append(zne_richard.history["expectations"])
 
 # Visualize the data. Convert the data to the required format for visualization
 expvals_ideal = np.array(expvals_ideal).transpose()
@@ -117,15 +117,11 @@ expvals_miti_richard = np.array(expvals_miti_richard).transpose()
 expvals_noisy_richard = np.array(expvals_noisy_richard).transpose()
 
 # 1. Linear Extrapolation result
-plot_zne_sequences(expvals_ideal,
-                   expvals_miti_linear,
-                   expvals_noisy_linear,
-                   scale_factors,
-                   title='clifford-single-linear')
+plot_zne_sequences(
+    expvals_ideal, expvals_miti_linear, expvals_noisy_linear, scale_factors, title="clifford-single-linear"
+)
 
 # 2. Richardson Extrapolation result
-plot_zne_sequences(expvals_ideal,
-                   expvals_miti_richard,
-                   expvals_noisy_richard,
-                   scale_factors,
-                   title='clifford-single-richardson')
+plot_zne_sequences(
+    expvals_ideal, expvals_miti_richard, expvals_noisy_richard, scale_factors, title="clifford-single-richardson"
+)

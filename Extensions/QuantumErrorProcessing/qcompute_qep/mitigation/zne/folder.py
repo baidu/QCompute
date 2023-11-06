@@ -24,14 +24,23 @@ from typing import Any, List, Tuple
 import copy
 import numpy as np
 
-from qcompute_qep.utils.circuit import remove_measurement, remove_barrier, \
-    append_measurement, circuit_to_layers, group_gate_indices, \
-    inverse_layer, inverse_layers, layers_to_circuit, depth_of_circuit, print_circuit
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import (
+    remove_measurement,
+    remove_barrier,
+    append_measurement,
+    circuit_to_layers,
+    group_gate_indices,
+    inverse_layer,
+    inverse_layers,
+    layers_to_circuit,
+    depth_of_circuit,
+    print_circuit,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
 
-__SUPPORTED_FOLDERS__ = {'circuit', 'layer', 'gate'}
-__SUPPORTED_METHODS__ = {'left', 'right', 'random'}
+__SUPPORTED_FOLDERS__ = {"circuit", "layer", "gate"}
+__SUPPORTED_METHODS__ = {"left", "right", "random"}
 
 
 class Folder(abc.ABC):
@@ -47,16 +56,18 @@ class Folder(abc.ABC):
         :param method: folding indices selecting method; type: str; optional: left, right, random
         :param seed: random seed for randomly selecting folding indices
         """
-        qp = kwargs.get('qp', None)
-        self._scale_factor = kwargs.get('scale_factor', 1.0)
-        self._method = kwargs.get('method', 'right')
-        self._seed = kwargs['seed'] if 'seed' in kwargs.keys() else None
+        qp = kwargs.get("qp", None)
+        self._scale_factor = kwargs.get("scale_factor", 1.0)
+        self._method = kwargs.get("method", "right")
+        self._seed = kwargs["seed"] if "seed" in kwargs.keys() else None
 
         if self._scale_factor < 1:
             raise ArgumentError("in fold(): Requires scale_factor >= 1, but the input is {}".format(self._scale_factor))
         if self._method not in __SUPPORTED_METHODS__:
-            raise ArgumentError("in fold(): Supported supported folding parameter generating methods"
-                                "are {}, but the input is {}".format(__SUPPORTED_METHODS__, self._method))
+            raise ArgumentError(
+                "in fold(): Supported supported folding parameter generating methods"
+                "are {}, but the input is {}".format(__SUPPORTED_METHODS__, self._method)
+            )
 
         self._qp_origin = copy.deepcopy(qp)  # store the original quantum circuit for possible later reference
         self._qp_folded = None  # store the folded quantum circuit
@@ -106,21 +117,22 @@ class Folder(abc.ABC):
         raise NotImplementedError
 
     def _preprocess_params(self, **kwargs) -> None:
-        r"""Preprocess the parameters before folding the quantum circuit.
-        """
-        qp = kwargs.get('qp')
+        r"""Preprocess the parameters before folding the quantum circuit."""
+        qp = kwargs.get("qp")
         if qp is None:
             raise ArgumentError("in fold(): Input quantum circuit is None, cannot fold! Please check the input.")
         self._qp_origin = copy.deepcopy(qp)
-        self._scale_factor = kwargs.get('scale_factor', self._scale_factor)
-        self._method = kwargs.get('method', self._method)
-        self._seed = kwargs.get('seed', self._seed)
+        self._scale_factor = kwargs.get("scale_factor", self._scale_factor)
+        self._method = kwargs.get("method", self._method)
+        self._seed = kwargs.get("seed", self._seed)
 
         if self._scale_factor < 1:
             raise ArgumentError("in fold(): Requires scale_factor >= 1, but the input is {}".format(self._scale_factor))
         if self._method not in __SUPPORTED_METHODS__:
-            raise ArgumentError("in fold(): Supported supported folding parameter generating methods"
-                                "are {}, but the input is {}".format(__SUPPORTED_METHODS__, self._method))
+            raise ArgumentError(
+                "in fold(): Supported supported folding parameter generating methods"
+                "are {}, but the input is {}".format(__SUPPORTED_METHODS__, self._method)
+            )
 
         self._qp_folded = copy.deepcopy(qp)  # record the folded quantum circuit
         self._has_folded = True  # means it has the record of folding
@@ -129,15 +141,17 @@ class Folder(abc.ABC):
             return self._qp_folded
 
     def __str__(self) -> str:
-        s = 'A {} object. folding method: {}, has folding record: {}'.format(self.name, self.method, self.has_folded)
+        s = "A {} object. folding method: {}, has folding record: {}".format(self.name, self.method, self.has_folded)
         if self.has_folded:
-            s += ', with scaling factor: {}'.format(self.scale_factor)
+            s += ", with scaling factor: {}".format(self.scale_factor)
         return s
 
     def _config_folding_method(self, method: str):
         if method not in __SUPPORTED_METHODS__:
-            raise ArgumentError("'{}' is not a supported folding parameter generating method. "
-                                "Should be in {}.".format(method, __SUPPORTED_METHODS__))
+            raise ArgumentError(
+                "'{}' is not a supported folding parameter generating method. "
+                "Should be in {}.".format(method, __SUPPORTED_METHODS__)
+            )
         else:
             self._method = method
 
@@ -175,10 +189,10 @@ class Folder(abc.ABC):
         # obtain folding indices set from the partial folding parameter :math:`s`
         indices = np.arange(d)
 
-        if self._method == 'left':
+        if self._method == "left":
             indices = indices[:s]
-        elif self._method == 'right':
-            indices = indices[d - s:]
+        elif self._method == "right":
+            indices = indices[d - s :]
         else:  # random
             rand_state = np.random.RandomState(self._seed)
             rand_state.shuffle(indices)
@@ -196,7 +210,7 @@ class CircuitFolder(Folder):
     def __init__(self, *args, **kwargs):
         super(CircuitFolder, self).__init__(*args, **kwargs)
 
-    def fold(self, qp: QProgram, scale_factor: float, method: str = 'right', **kwargs: Any) -> QProgram:
+    def fold(self, qp: QProgram, scale_factor: float, method: str = "right", **kwargs: Any) -> QProgram:
         r"""Fold a given quantum circuit by the scale factor at the circuit level.
 
         Let :math:`U` represents the quantum circuit and assume its layer representation: :math:`U=[L_1,\cdots, L_d]`.
@@ -287,7 +301,7 @@ class LayerFolder(Folder):
     def __init__(self, *args, **kwargs):
         super(LayerFolder, self).__init__(*args, **kwargs)
 
-    def fold(self, qp: QProgram, scale_factor: float, method: str = 'left', **kwargs: Any) -> QProgram:
+    def fold(self, qp: QProgram, scale_factor: float, method: str = "left", **kwargs: Any) -> QProgram:
         r"""Fold a given quantum circuit by the scale factor at the layer level.
 
         More precisely,
@@ -386,7 +400,7 @@ class GateFolder(Folder):
     def __init__(self, *args, **kwargs):
         super(GateFolder, self).__init__(*args, **kwargs)
 
-    def fold(self, qp: QProgram, scale_factor: float, method: str = 'left', **kwargs: Any) -> QProgram:
+    def fold(self, qp: QProgram, scale_factor: float, method: str = "left", **kwargs: Any) -> QProgram:
         r"""Fold a given quantum circuit by the scale factor at the gate level.
 
         More precisely,

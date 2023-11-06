@@ -19,6 +19,4 @@ r"""
 Module for node functionalities.
 """
 
-__all__ = [
-    "mobility"
-]
+__all__ = ["mobility"]

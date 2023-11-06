@@ -23,8 +23,8 @@ import networkx as nx
 
 
 class MaxCut:
-    r"""Max Cut Problem class
-    """
+    r"""Max Cut Problem class"""
+
     def __init__(self, num_qubits: int = 0, hamiltonian: list = None):
         r"""The constructor of the MaxCut class
 
@@ -64,17 +64,17 @@ class MaxCut:
 
         """
         if not isinstance(graph, nx.Graph):
-            raise TypeError('Error EA02002(QAPP): Type of the input graph should be networkx.Graph.')
+            raise TypeError("Error EA02002(QAPP): Type of the input graph should be networkx.Graph.")
 
         edges = graph.edges()
 
         def convert_to_str(edge):
-            new_pauli = ['i'] * self._num_qubits
+            new_pauli = ["i"] * self._num_qubits
 
-            new_pauli[edge[0]] = 'z'
-            new_pauli[edge[1]] = 'z'
+            new_pauli[edge[0]] = "z"
+            new_pauli[edge[1]] = "z"
 
-            return ''.join(new_pauli)
+            return "".join(new_pauli)
 
         self._hamiltonian = [[-1.0, convert_to_str(edge)] for edge in edges]
 

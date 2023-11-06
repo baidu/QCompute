@@ -19,6 +19,4 @@ The function about optimization
 
 from .max_cut import MaxCut
 
-__all__ = [
-    'MaxCut'
-]
+__all__ = ["MaxCut"]

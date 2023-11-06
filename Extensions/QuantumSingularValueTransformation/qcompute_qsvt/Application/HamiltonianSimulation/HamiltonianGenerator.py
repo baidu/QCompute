@@ -41,10 +41,10 @@ def func_Hamiltonian_gen(num_qubits: int, num_terms: int) -> List[Tuple[float, s
         We could run the following program to generate and print
         a :math:`6` qubit Hamiltonian with :math:`2000` Pauli terms:
 
-        >>> from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianGenerator import func_Hamiltonian_gen
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianGenerator import func_Hamiltonian_gen
         >>> print(func_Hamiltonian_gen(num_qubits=6, num_terms=2000))
     """
-    int_dim = 4 ** num_qubits  # n qubits Hamiltonian should be regarded as a int_dim dimension vector in Pauli basis
+    int_dim = 4**num_qubits  # n qubits Hamiltonian should be regarded as a int_dim dimension vector in Pauli basis
 
     list_coor_Pauli = []  # a list to record which component is none-zero
     if num_terms < int_dim * 0.01:  # the sparse case
@@ -62,20 +62,20 @@ def func_Hamiltonian_gen(num_qubits: int, num_terms: int) -> List[Tuple[float, s
     # translate Pauli coordinate into Pauli string
     list_str = []
     for idx in range(num_terms):
-        str_Pauli = ''
+        str_Pauli = ""
         if list_coor_Pauli[idx] == 0:
-            str_Pauli = 'I'
+            str_Pauli = "I"
         else:
             idx_qubit = 0
             int_coor_Pauli = list_coor_Pauli[idx]
             while int_coor_Pauli > 0:
                 int_Pauli = int_coor_Pauli % 4
                 if int_Pauli == 1:
-                    str_Pauli += 'X{0}'.format(idx_qubit)
+                    str_Pauli += "X{0}".format(idx_qubit)
                 elif int_Pauli == 2:
-                    str_Pauli += 'Y{0}'.format(idx_qubit)
+                    str_Pauli += "Y{0}".format(idx_qubit)
                 elif int_Pauli == 3:
-                    str_Pauli += 'Z{0}'.format(idx_qubit)
+                    str_Pauli += "Z{0}".format(idx_qubit)
                 int_coor_Pauli //= 4
                 idx_qubit += 1
         list_str.append((list_coe[idx], str_Pauli))

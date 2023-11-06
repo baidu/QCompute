@@ -30,13 +30,13 @@ import itertools
 import warnings
 
 import QCompute
-from qcompute_qep.utils import expval_from_counts, execute
-from qcompute_qep.quantum import clifford
-from qcompute_qep.utils.types import QComputer, get_qc_name
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts, execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, get_qc_name
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError as QEPError
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 try:
     from matplotlib import pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -47,8 +47,8 @@ except ImportError:
 class StandardRB(rb.RandomizedBenchmarking):
     r"""The Standard Randomized Benchmarking class.
 
-        Standard Randomized Benchmarking aims to benchmark the complete set of Clifford gates
-        by a single parameter called EPC (Error Per Clifford).
+    Standard Randomized Benchmarking aims to benchmark the complete set of Clifford gates
+    by a single parameter called EPC (Error Per Clifford).
     """
 
     def __init__(self, qc: QComputer = None, qubits: List[int] = None, **kwargs):
@@ -75,11 +75,11 @@ class StandardRB(rb.RandomizedBenchmarking):
         super().__init__(**kwargs)
         self._qc = qc
         self._qubits = qubits
-        self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100])
-        self._repeats = kwargs.get('repeats', 6)
-        self._shots = kwargs.get('shots', 4096)
-        self._prep_circuit = kwargs.get('prep_circuit', rb.default_prep_circuit)
-        self._meas_circuit = kwargs.get('meas_circuit', rb.default_meas_circuit)
+        self._seq_lengths = kwargs.get("seq_lengths", [1, 10, 20, 50, 75, 100])
+        self._repeats = kwargs.get("repeats", 6)
+        self._shots = kwargs.get("shots", 4096)
+        self._prep_circuit = kwargs.get("prep_circuit", rb.default_prep_circuit)
+        self._meas_circuit = kwargs.get("meas_circuit", rb.default_meas_circuit)
 
         # Store the standard randomized benchmarking results. Initialize to an empty dictionary
         self._results = dict()
@@ -109,17 +109,16 @@ class StandardRB(rb.RandomizedBenchmarking):
 
     @property
     def params(self) -> dict:
-        r"""Parameters used in randomized benchmarking in a dictionary.
-        """
+        r"""Parameters used in randomized benchmarking in a dictionary."""
         if not self._params:
             rb_params = dict()
-            rb_params['qc'] = get_qc_name(self._qc)
-            rb_params['qubits'] = self._qubits
-            rb_params['seq_lengths'] = self._seq_lengths
-            rb_params['repeats'] = self._repeats
-            rb_params['shots'] = self._shots
-            rb_params['prep_circuit'] = self._prep_circuit
-            rb_params['meas_circuit'] = self._meas_circuit
+            rb_params["qc"] = get_qc_name(self._qc)
+            rb_params["qubits"] = self._qubits
+            rb_params["seq_lengths"] = self._seq_lengths
+            rb_params["repeats"] = self._repeats
+            rb_params["shots"] = self._shots
+            rb_params["prep_circuit"] = self._prep_circuit
+            rb_params["meas_circuit"] = self._meas_circuit
             self._params = rb_params
 
         return self._params
@@ -179,7 +178,7 @@ class StandardRB(rb.RandomizedBenchmarking):
 
             >>> import qiskit
             >>> from qiskit.providers.fake_provider import FakeSantiago
-            >>> from qcompute_qep.benchmarking.standardrb import StandardRB
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.standardrb import StandardRB
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
             >>> benchmarking = StandardRB()
             >>> rb_results = benchmarking.benchmark(qubits=[1], qc=qc)
@@ -189,11 +188,11 @@ class StandardRB(rb.RandomizedBenchmarking):
         # Parse the arguments from the key list. If not set, use default arguments from the init function
         self._qc = qc if qc is not None else self._qc
         self._qubits = qubits if qubits is not None else self._qubits
-        self._seq_lengths = kwargs.get('seq_lengths', self._seq_lengths)
-        self._repeats = kwargs.get('repeats', self._repeats)
-        self._shots = kwargs.get('shots', self._shots)
-        self._prep_circuit = kwargs.get('prep_circuit', self._prep_circuit)
-        self._meas_circuit = kwargs.get('meas_circuit', self._meas_circuit)
+        self._seq_lengths = kwargs.get("seq_lengths", self._seq_lengths)
+        self._repeats = kwargs.get("repeats", self._repeats)
+        self._shots = kwargs.get("shots", self._shots)
+        self._prep_circuit = kwargs.get("prep_circuit", self._prep_circuit)
+        self._meas_circuit = kwargs.get("meas_circuit", self._meas_circuit)
 
         if self._qc is None:
             raise QEPError.ArgumentError("SRB: the quantum computer for benchmarking is not specified!")
@@ -203,15 +202,16 @@ class StandardRB(rb.RandomizedBenchmarking):
         ###############################################################################################################
         # Step 1. Construct a list of benchmarking quantum circuits.
         ###############################################################################################################
-        pbar = tqdm(total=100, desc='SRB Step 1/4: Constructing benchmarking quantum circuits ...', initial=0)
+        pbar = tqdm(total=100, desc="SRB Step 1/4: Constructing benchmarking quantum circuits ...", initial=0)
 
         n = len(self._qubits)  # number of qubits
         num_of_register_qubits = max(x for x in self._qubits) + 1
         # Quantum programs and quantum observables list
         rb_qp_list = []
         rb_ob_list = []
-        seq_lengths = list(itertools.chain.from_iterable(itertools.repeat(seq, self._repeats)
-                                                         for seq in self._seq_lengths))
+        seq_lengths = list(
+            itertools.chain.from_iterable(itertools.repeat(seq, self._repeats) for seq in self._seq_lengths)
+        )
         for seq_m in seq_lengths:
             # Construct a random sequence of Clifford gates of length seq_m
             cliffords = clifford.random_clifford(n, seq_m)
@@ -262,7 +262,7 @@ class StandardRB(rb.RandomizedBenchmarking):
         # min_eig = min(np.diag(rb_ob))
         # max_eig = max(np.diag(rb_ob))
         # bounds = ([0, min_eig - max_eig, min_eig], [1, max_eig - min_eig, max_eig])
-        bounds = ([0, 0, 1 / 2 ** n], [1, 1, 1])
+        bounds = ([0, 0, 1 / 2**n], [1, 1, 1])
 
         # Use scipy's non-linear least squares to fit the data
         xdata = self._seq_lengths
@@ -271,12 +271,12 @@ class StandardRB(rb.RandomizedBenchmarking):
         if len(sigma) - np.count_nonzero(sigma) > 0:
             sigma = None
 
-        p0 = [0.99, 0.95, 1 / 2 ** n]
+        p0 = [0.99, 0.95, 1 / 2**n]
         alpha_guess = []
         for j in range(1, len(xdata)):
             if ydata[j] > p0[2]:
-                dx = (xdata[j] - xdata[0])
-                dy = ((ydata[j] - p0[2]) / (ydata[0] - p0[2]))
+                dx = xdata[j] - xdata[0]
+                dy = (ydata[j] - p0[2]) / (ydata[0] - p0[2])
                 alpha_guess.append(dy ** (1 / (2 * dx)))
         if alpha_guess:
             if np.mean(alpha_guess) < 1.0:
@@ -291,20 +291,27 @@ class StandardRB(rb.RandomizedBenchmarking):
             p0[1] = np.mean(tmp)
 
         # Must call `curve_fit` with `*_` to avoid the error "ValueError: too many values to unpack"
-        popt, pcov, *_ = curve_fit(f=self._fit_func, xdata=np.asarray(xdata), ydata=ydata,
-                                   p0=np.asarray(p0), sigma=sigma,
-                                   bounds=bounds, maxfev=500000, method='dogbox')
+        popt, pcov, *_ = curve_fit(
+            f=self._fit_func,
+            xdata=np.asarray(xdata),
+            ydata=ydata,
+            p0=np.asarray(p0),
+            sigma=sigma,
+            bounds=bounds,
+            maxfev=500000,
+            method="dogbox",
+        )
 
         # Store the randomized benchmarking results
         params_err = np.sqrt(np.diag(pcov))
-        self._results['expvals'] = expvals
-        self._results['f'] = popt[0]
-        self._results['A'] = popt[1]
-        self._results['B'] = popt[2]
-        self._results['f_err'] = params_err[0]
+        self._results["expvals"] = expvals
+        self._results["f"] = popt[0]
+        self._results["A"] = popt[1]
+        self._results["B"] = popt[2]
+        self._results["f_err"] = params_err[0]
         d = 2 ** len(self._qubits)
-        self._results['epc'] = (d - 1) / d * (1 - popt[0])
-        self._results['epc_err'] = (d - 1) / d * (1 - params_err[0])
+        self._results["epc"] = (d - 1) / d * (1 - popt[0])
+        self._results["epc_err"] = (d - 1) / d * (1 - params_err[0])
 
         pbar.desc = "SRB successfully finished!"
         pbar.update(100 - pbar.n)
@@ -324,48 +331,61 @@ class StandardRB(rb.RandomizedBenchmarking):
         fig, ax = plt.subplots(figsize=(12, 8))
 
         xdata = self._seq_lengths
-        expvals = self.results['expvals']
+        expvals = self.results["expvals"]
 
         # Plot the repeated estimates for each sequence
-        ax.plot(xdata, expvals, color='gray', linestyle='none', marker='x')
+        ax.plot(xdata, expvals, color="gray", linestyle="none", marker="x")
 
         # Plot the mean of the estimated expectation values
-        ax.plot(xdata, np.mean(expvals, axis=1), color='blue', linestyle='none', marker='v', markersize=13)
+        ax.plot(xdata, np.mean(expvals, axis=1), color="blue", linestyle="none", marker="v", markersize=13)
 
         # Plot the fitting function
-        ydata = [self._fit_func(x, self.results['f'], self.results['A'], self.results['B']) for x in xdata]
-        ax.plot(xdata, ydata, color='blue', linestyle='-', linewidth=2, label='fitting curve')
-        ax.tick_params(labelsize='medium')
+        ydata = [self._fit_func(x, self.results["f"], self.results["A"], self.results["B"]) for x in xdata]
+        ax.plot(xdata, ydata, color="blue", linestyle="-", linewidth=2, label="fitting curve")
+        ax.tick_params(labelsize="medium")
 
         # Plot the confidence interval of the fitting curve
-        low_CI_bound, high_CI_bound = st.t.interval(0.95, len(xdata), loc=np.mean(expvals, axis=1),
-                                                    scale=st.sem(expvals, axis=1))
-        plt.fill_between(xdata, y1=low_CI_bound, y2=high_CI_bound, color='cornflowerblue', alpha=0.3, )
+        low_CI_bound, high_CI_bound = st.t.interval(
+            0.95, len(xdata), loc=np.mean(expvals, axis=1), scale=st.sem(expvals, axis=1)
+        )
+        plt.fill_between(
+            xdata,
+            y1=low_CI_bound,
+            y2=high_CI_bound,
+            color="cornflowerblue",
+            alpha=0.3,
+        )
 
         # Set the labels
-        ax.set_xlabel('Clifford Length', fontsize='large')
-        ax.set_ylabel('Expectation Value', fontsize='large')
+        ax.set_xlabel("Clifford Length", fontsize="large")
+        ax.set_ylabel("Expectation Value", fontsize="large")
         ax.grid(True)
 
         # Set the x-axis locator always be integer
         plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
         # Show the legend
-        plt.legend(loc='lower left', fontsize='large')
+        plt.legend(loc="lower left", fontsize="large")
 
         # Add the estimated fidelity and EPC parameters
-        bbox_props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.5)
-        ax.text(0.8, 0.9,
-                "Average Gate Fidelity: {:.4f}({:.1e}) \n "
-                "Error Per Clifford: {:.4f}({:.1e})".format(self.results['f'],
-                                                            self.results['f_err'],
-                                                            self.results['epc'],
-                                                            self.results['epc_err']),
-                ha="center", va="center", fontsize='large', bbox=bbox_props, transform=ax.transAxes)
+        bbox_props = dict(boxstyle="round,pad=0.5", facecolor="wheat", alpha=0.5)
+        ax.text(
+            0.8,
+            0.9,
+            "Average Gate Fidelity: {:.4f}({:.1e}) \n "
+            "Error Per Clifford: {:.4f}({:.1e})".format(
+                self.results["f"], self.results["f_err"], self.results["epc"], self.results["epc_err"]
+            ),
+            ha="center",
+            va="center",
+            fontsize="large",
+            bbox=bbox_props,
+            transform=ax.transAxes,
+        )
 
         # Save the figure if `fname` is set
         if fname is not None:
-            plt.savefig(fname, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
+            plt.savefig(fname, format="png", dpi=600, bbox_inches="tight", pad_inches=0.1)
         # Show the figure if `show` is True
         if show:
             plt.show()

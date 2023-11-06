@@ -20,15 +20,34 @@ This is the init file for the "Quantum Error Correction" module.
 Please import all classes and functions within this module here,
 so that we can use `qcompute_qep.correction.xxx` to call the class or function `xxx` directly.
 """
-from qcompute_qep.correction.stabilizer import StabilizerCode
-from qcompute_qep.correction.basic import BasicCode, BitFlipCode, PhaseFlipCode, \
-                        FourOneTwoCode, FourTwoTwoCode, FiveQubitCode, SteaneCode, ShorCode
-from qcompute_qep.correction.utils import pauli_list_to_check_matrix, check_matrix_to_standard_form, ColorTable
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.stabilizer import StabilizerCode
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.basic import (
+    BasicCode,
+    BitFlipCode,
+    PhaseFlipCode,
+    FourOneTwoCode,
+    FourTwoTwoCode,
+    FiveQubitCode,
+    SteaneCode,
+    ShorCode,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.utils import (
+    pauli_list_to_check_matrix,
+    check_matrix_to_standard_form,
+    ColorTable,
+)
 
 __all__ = [
     "StabilizerCode",
     "BasicCode",
-    "BitFlipCode", "PhaseFlipCode", "FiveQubitCode", "SteaneCode", "ShorCode",
-    "FourOneTwoCode", "FourTwoTwoCode",
-    "pauli_list_to_check_matrix", "check_matrix_to_standard_form", "ColorTable"
+    "BitFlipCode",
+    "PhaseFlipCode",
+    "FiveQubitCode",
+    "SteaneCode",
+    "ShorCode",
+    "FourOneTwoCode",
+    "FourTwoTwoCode",
+    "pauli_list_to_check_matrix",
+    "check_matrix_to_standard_form",
+    "ColorTable",
 ]

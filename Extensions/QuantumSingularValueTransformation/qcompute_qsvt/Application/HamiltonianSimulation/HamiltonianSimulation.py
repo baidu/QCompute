@@ -33,12 +33,23 @@ import numpy as np
 from QCompute import H, RY, CU, QEnv, BackendName, MeasureZ, UnrollCircuitModule, CompressGateModule, CircuitToQasm
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.QSVT import circ_QSVT_from_BE, circ_QSVT_from_BE_inverse
-from qcompute_qsvt.Application.HamiltonianSimulation.SymmetricQSPHS import func_LBFGS_QSP_HS
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.QSVT import (
+    circ_QSVT_from_BE,
+    circ_QSVT_from_BE_inverse,
+)
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.SymmetricQSPHS import (
+    func_LBFGS_QSP_HS,
+)
 
 
-def circ_HS_QSVT(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], reg_ancilla: List[QRegStorage],
-                 list_str_Pauli_rep: List[Tuple[float, str]], float_tau: float, float_epsilon: float) -> None:
+def circ_HS_QSVT(
+    reg_sys: List[QRegStorage],
+    reg_blocking: List[QRegStorage],
+    reg_ancilla: List[QRegStorage],
+    list_str_Pauli_rep: List[Tuple[float, str]],
+    float_tau: float,
+    float_epsilon: float,
+) -> None:
     r"""A quantum circuit implementing the Hamiltonian time evolution operator :math:`e^{-i\check H\tau}` on system
     register :math:`|s\rangle` with precision :math:`\epsilon`.
 
@@ -66,8 +77,9 @@ def circ_HS_QSVT(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], re
     :return: **None**
     """
     float_norm_square = sum(abs(idx_cor) for (idx_cor, idx_str) in list_str_Pauli_rep)
-    list_float_target_state = list(np.sqrt(abs(idx_cor) / float_norm_square)
-                                   for (idx_cor, idx_str) in list_str_Pauli_rep)
+    list_float_target_state = list(
+        np.sqrt(abs(idx_cor) / float_norm_square) for (idx_cor, idx_str) in list_str_Pauli_rep
+    )
     # the evolution time should be multiplied by the normalised constant
     float_tau *= float_norm_square
 
@@ -92,8 +104,16 @@ def circ_HS_QSVT(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], re
 
     H(reg_ancilla[0])
     H(reg_ancilla[1])
-    circ_QSVT_from_BE(reg_sys, reg_blocking, reg_ancilla[1], reg_ancilla[0], list_str_Pauli_rep,
-                      list_float_target_state, list_re, list_im)
+    circ_QSVT_from_BE(
+        reg_sys,
+        reg_blocking,
+        reg_ancilla[1],
+        reg_ancilla[0],
+        list_str_Pauli_rep,
+        list_float_target_state,
+        list_re,
+        list_im,
+    )
 
     for idx in range(3):
         RY(np.pi / 2)(reg_ancilla[0])
@@ -102,24 +122,44 @@ def circ_HS_QSVT(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], re
         RY(-np.pi / 2)(reg_ancilla[0])
         RY(-np.pi / 2)(reg_ancilla[1])
 
-        circ_QSVT_from_BE_inverse(reg_sys, reg_blocking, reg_ancilla[1], reg_ancilla[0], list_str_Pauli_rep,
-                                  list_float_target_state, list_re, list_im)
+        circ_QSVT_from_BE_inverse(
+            reg_sys,
+            reg_blocking,
+            reg_ancilla[1],
+            reg_ancilla[0],
+            list_str_Pauli_rep,
+            list_float_target_state,
+            list_re,
+            list_im,
+        )
         RY(np.pi / 2)(reg_ancilla[0])
         RY(np.pi / 2)(reg_ancilla[1])
         CU(0, 0, vec_Phi_AA[-idx * 2 - 2])(reg_ancilla[0], reg_ancilla[1])
         RY(-np.pi / 2)(reg_ancilla[0])
         RY(-np.pi / 2)(reg_ancilla[1])
 
-        circ_QSVT_from_BE(reg_sys, reg_blocking, reg_ancilla[1], reg_ancilla[0], list_str_Pauli_rep,
-                          list_float_target_state, list_re, list_im)
+        circ_QSVT_from_BE(
+            reg_sys,
+            reg_blocking,
+            reg_ancilla[1],
+            reg_ancilla[0],
+            list_str_Pauli_rep,
+            list_float_target_state,
+            list_re,
+            list_im,
+        )
 
     H(reg_ancilla[0])
     H(reg_ancilla[1])
 
 
-def func_HS_QSVT(list_str_Pauli_rep: List[Tuple[float, str]], num_qubit_sys: int, float_tau: float,
-                 float_epsilon: float, circ_output: Union[str, bool] = False) -> \
-        Optional[Dict[str, Union[str, Dict[str, int]]]]:
+def func_HS_QSVT(
+    list_str_Pauli_rep: List[Tuple[float, str]],
+    num_qubit_sys: int,
+    float_tau: float,
+    float_epsilon: float,
+    circ_output: Union[str, bool] = False,
+) -> Optional[Dict[str, Union[str, Dict[str, int]]]]:
     r"""Operate the time evolution operator on initial state, and return the measurement of the final state.
 
     :param list_str_Pauli_rep: :math:`\check H`, `List[Tuple[float, str]]`,
@@ -163,6 +203,7 @@ def func_HS_QSVT(list_str_Pauli_rep: List[Tuple[float, str]], num_qubit_sys: int
 
     # not to draw the quantum circuit locally
     from QCompute.Define import Settings
+
     Settings.drawCircuitControl = []
 
     if not circ_output:
@@ -172,8 +213,8 @@ def func_HS_QSVT(list_str_Pauli_rep: List[Tuple[float, str]], num_qubit_sys: int
         if not isinstance(circ_output, str):
             circ_output = "circ_output"
 
-        env.module(UnrollCircuitModule({'disable': True}))
-        env.module(CompressGateModule({'disable': True}))
+        env.module(UnrollCircuitModule({"disable": True}))
+        env.module(CompressGateModule({"disable": True}))
         env.publish()
         with open(circ_output, "w") as file:
             file.write(CircuitToQasm().convert(env.program))

@@ -26,8 +26,8 @@ from .parameterized_circuit import ParameterizedCircuit
 
 
 class QAOAAnsatz(ParameterizedCircuit):
-    r"""QAOA Ansatz class
-    """
+    r"""QAOA Ansatz class"""
+
     def __init__(self, num: int, parameters: np.ndarray, hamiltonian: list, layer: int):
         r"""The constructor of the QAOAAnsatz class
 
@@ -54,17 +54,17 @@ class QAOAAnsatz(ParameterizedCircuit):
 
         for i in range(self._layer):
             for pauli in self._hamiltonian:
-                if pauli[1].count('i') == self._num:
+                if pauli[1].count("i") == self._num:
                     continue
                 pauli_list = []
                 ind_list = []
 
                 for j, k in enumerate(pauli[1]):
-                    if k == 'i':
+                    if k == "i":
                         continue
-                    elif k == 'x':
+                    elif k == "x":
                         H(q[j])
-                    elif k == 'y':
+                    elif k == "y":
                         RX(np.pi / 2)(q[j])
 
                     pauli_list.append(k)
@@ -78,10 +78,10 @@ class QAOAAnsatz(ParameterizedCircuit):
                     CX(q[ind_list[j - 1]], q[ind_list[j]])
 
                 for j, k in enumerate(pauli_list):
-                    if k == 'x':
+                    if k == "x":
                         H(q[ind_list[j]])
-                    elif k == 'y':
-                        RX(- np.pi / 2)(q[ind_list[j]])
+                    elif k == "y":
+                        RX(-np.pi / 2)(q[ind_list[j]])
 
             for j in range(self._num):
                 RX(self._parameters[2 * i + 1])(q[j])

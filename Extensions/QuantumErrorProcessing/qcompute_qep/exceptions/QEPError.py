@@ -34,15 +34,14 @@ class QEPError(Exception):
     error = None
 
     def __init__(self, message: str = None):
-        r"""Exceptions raised due to errors in result output.
-        """
+        r"""Exceptions raised due to errors in result output."""
         self.error = dict()
-        self.error['code'] = 0
-        self.error['message'] = message
+        self.error["code"] = 0
+        self.error["message"] = message
         super().__init__(message)
 
     def __str__(self):
-        return 'Error Code {}: {}'.format(self.error['code'], self.error['message'])
+        return "Error Code {}: {}".format(self.error["code"], self.error["message"])
 
 
 class ArgumentError(QEPError):
@@ -55,13 +54,14 @@ class ArgumentError(QEPError):
         error = {'code': 100,
                 'message': 'Argument error description.'}
     """
+
     def __init__(self, message: str = None):
         """
         Exceptions raised due to errors in result output.
         """
         super().__init__(message)
-        self.error['code'] = 100
-        self.error['message'] = message
+        self.error["code"] = 100
+        self.error["message"] = message
 
     def __str__(self):
-        return 'Error Code {}: {}'.format(self.error['code'], self.error['message'])
+        return "Error Code {}: {}".format(self.error["code"], self.error["message"])

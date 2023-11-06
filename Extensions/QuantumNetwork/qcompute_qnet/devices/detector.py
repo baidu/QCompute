@@ -21,13 +21,10 @@ Module for photon detectors.
 
 from typing import List, Tuple
 from numpy import random
-from qcompute_qnet.core.des import Entity, EventHandler
-from qcompute_qnet.devices.beamsplitter import PolarizationBeamSplitter
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.devices.beamsplitter import PolarizationBeamSplitter
 
-__all__ = [
-    "SinglePhotonDetector",
-    "PolarizationDetector"
-]
+__all__ = ["SinglePhotonDetector", "PolarizationDetector"]
 
 
 class SinglePhotonDetector(Entity):
@@ -63,21 +60,18 @@ class SinglePhotonDetector(Entity):
         self.__records = []
 
     def init(self) -> None:
-        r"""Detector initialization.
-        """
+        r"""Detector initialization."""
         assert self.owner != self, f"The single photon detector {self.name} has no owner!"
 
     def turn_on(self) -> None:
-        r"""Turn on the single photon detector.
-        """
+        r"""Turn on the single photon detector."""
         self._is_working = True
         if self.dark_count > 0:
             delay = round(random.exponential(1 / self.dark_count) * 1e12)
             self.scheduler.schedule_after(delay, EventHandler(self, "_receive_dark_count"))
 
     def turn_off(self) -> None:
-        r"""Turn off the single photon detector.
-        """
+        r"""Turn off the single photon detector."""
         self._is_working = False
         self.__records = []
 
@@ -90,8 +84,7 @@ class SinglePhotonDetector(Entity):
         return self.env.now >= self._valid_time
 
     def _receive_dark_count(self) -> None:
-        r"""Simulate the dark count events.
-        """
+        r"""Simulate the dark count events."""
         pass
 
     def set(self, **kwargs) -> None:
@@ -117,14 +110,15 @@ class SinglePhotonDetector(Entity):
                 raise TypeError(f"Setting {attr} is not allowed in {self.name}")
 
     def print_parameters(self) -> None:
-        r"""Print parameters of the single photon detector.
-        """
+        r"""Print parameters of the single photon detector."""
         print("-" * 50)
-        print(f"Details of Single Photon Detector: {self.name}\n"
-              f"efficiency: {self.efficiency}\n"
-              f"dark count: {self.dark_count} hertz\n"
-              f"count rate: {self.count_rate} hertz\n"
-              f"resolution: {self.resolution} picoseconds")
+        print(
+            f"Details of Single Photon Detector: {self.name}\n"
+            f"efficiency: {self.efficiency}\n"
+            f"dark count: {self.dark_count} hertz\n"
+            f"count rate: {self.count_rate} hertz\n"
+            f"resolution: {self.resolution} picoseconds"
+        )
 
     def receive(self, photon_index: int) -> None:
         r"""Receive an incoming photon and record its index and arrival time.
@@ -163,16 +157,14 @@ class PolarizationDetector(Entity):
             env (DESEnv): discrete-event simulation environment
         """
         super().__init__(name, env)
-        self.detectors = (SinglePhotonDetector(name + ".SPD0", env),
-                          SinglePhotonDetector(name + ".SPD1", env))
+        self.detectors = (SinglePhotonDetector(name + ".SPD0", env), SinglePhotonDetector(name + ".SPD1", env))
         self.beamsplitter = PolarizationBeamSplitter(name + ".PBS", env)
         self.install(list(self.detectors))
         self.install(self.beamsplitter)
         self.beamsplitter.set(receivers=self.detectors)
 
     def init(self) -> None:
-        r"""Detector initialization.
-        """
+        r"""Detector initialization."""
         assert self.owner != self, f"The polarization detector {self.name} has no owner!"
 
     def set_beamsplitter(self, **kwargs) -> None:
@@ -201,8 +193,7 @@ class PolarizationDetector(Entity):
         self.beamsplitter.receive(photon)
 
     def print_parameters(self) -> None:
-        r"""Print parameters of the polarization detector.
-        """
+        r"""Print parameters of the polarization detector."""
         self.detectors[0].print_parameters()
         self.detectors[1].print_parameters()
         self.beamsplitter.print_parameters()

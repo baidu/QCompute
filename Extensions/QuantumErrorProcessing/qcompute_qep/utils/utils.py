@@ -18,7 +18,7 @@
 """
 Utility functions used in the ``qcompute_qep`` module.
 """
-from qcompute_qep.utils.linalg import dagger
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import dagger
 from QCompute.QPlatform.QOperation.QProcedure import QProcedure
 import math
 import functools
@@ -34,14 +34,16 @@ Common usage:
 
 Reference: https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
 """
-COLOR_TABLE = {'red': '\33[31m',
-               'green': '\33[32m',
-               'yellow': '\33[33m',
-               'blue': '\33[34m',
-               'violet': '\33[35m',
-               'beige': '\33[36m',
-               'white': '\33[37m',
-               'end': '\033[0m'}
+COLOR_TABLE = {
+    "red": "\33[31m",
+    "green": "\33[32m",
+    "yellow": "\33[33m",
+    "blue": "\33[34m",
+    "violet": "\33[35m",
+    "beige": "\33[36m",
+    "white": "\33[37m",
+    "end": "\033[0m",
+}
 
 
 def global_phase(U: np.ndarray) -> float:
@@ -59,7 +61,7 @@ def global_phase(U: np.ndarray) -> float:
     """
     # Notice that the determinant of the unitary is given by :math:`e^{2i\alpha}`
     coe = np.linalg.det(U) ** (-0.5)
-    alpha = - np.angle(coe)
+    alpha = -np.angle(coe)
     return alpha
 
 
@@ -88,7 +90,7 @@ def decompose_yzy(U: np.ndarray) -> Tuple[float, float, float, float]:
         raise ValueError("in decompose_yzy(): input should be a 2x2 matrix!")
     # Remove the global phase
     alpha = global_phase(U)
-    U = U * np.exp(- 1j * alpha)
+    U = U * np.exp(-1j * alpha)
     U = U.round(10)
     # Compute theta
     theta = 2 * math.atan2(abs(U[1, 0]), abs(U[0, 0]))
@@ -135,11 +137,11 @@ def str_to_state(state_str: str, bits: int = None, LSB: bool = True) -> np.ndarr
                [0.+0.j, 0.+0.j, 0.+0.j, 0.+0.j]])
     """
     # convert 16-base to 2-base
-    if state_str[:2].lower() == '0x':
+    if state_str[:2].lower() == "0x":
         state_str = bin(int(state_str, 16))[2:]
     if bits is not None:
         if bits < len(state_str):
-            raise ValueError('bits can not be less than length of {}'.format(state_str))
+            raise ValueError("bits can not be less than length of {}".format(state_str))
         else:
             state_str = state_str.zfill(bits)
     # Map each binary character to qubit value 0 or 1
@@ -164,7 +166,7 @@ def expval_from_counts(A: np.ndarray, counts: dict) -> float:
     :return: float, the estimated expectation value
     """
     expects = []
-    if list(counts.keys())[0][:2].lower() == '0x':
+    if list(counts.keys())[0][:2].lower() == "0x":
         bits = len(bin(max(map(lambda x: int(x, 16), counts.keys())))[2:])
     else:
         bits = None
@@ -206,6 +208,6 @@ def limit_angle(theta: float) -> float:
         theta_abs = abs(theta)
         theta_abs = theta_abs % (2 * np.pi)
         if theta_abs > np.pi:
-            return - theta_abs + 2 * np.pi
+            return -theta_abs + 2 * np.pi
         else:
-            return - theta_abs
+            return -theta_abs

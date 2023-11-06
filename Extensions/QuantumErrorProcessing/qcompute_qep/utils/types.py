@@ -30,21 +30,22 @@ import qiskit
 from typing import Union, Any, get_args, Type, Callable
 import QCompute
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 QProgram: Type[Union[QCompute.QEnv, qiskit.QuantumCircuit]] = Union[QCompute.QEnv, qiskit.QuantumCircuit]
 r"""The Quantum Program data type in ``qcompute_qep``.
 """
 
-QComputer: Type[Union[str, QCompute.QPlatform.BackendName, qiskit.providers.Backend]] \
-    = Union[str, QCompute.QPlatform.BackendName, qiskit.providers.Backend, Callable]
+QComputer: Type[Union[str, QCompute.QPlatform.BackendName, qiskit.providers.Backend]] = Union[
+    str, QCompute.QPlatform.BackendName, qiskit.providers.Backend, Callable
+]
 r"""The Quantum Computer data type in ``qcompute_qep``.
 """
 
 __SUPPORTED_BACKENDS__ = []
 for backend in QCompute.QPlatform.BackendName.__members__.values():
     name = backend.__str__()
-    __SUPPORTED_BACKENDS__.append(name[name.index('.')+1:])
+    __SUPPORTED_BACKENDS__.append(name[name.index(".") + 1 :])
 
 __SUPPORTED_BACKENDS__ += ["Santiago", "Quito", "Vigo", "Yorktown", "Montreal", "Aer_Simulator"]
 r"""The supported quantum backends in ``qcompute_qep``.
@@ -125,7 +126,7 @@ def get_qc_name(qc: Any) -> str:
         if backend.lower() in qc_str:
             name = backend
             # Remove underscore if exists
-            name = re.sub(r'_', '', name)
+            name = re.sub(r"_", "", name)
             if "fake" in qc_str:
                 name = "Fake" + name
             break

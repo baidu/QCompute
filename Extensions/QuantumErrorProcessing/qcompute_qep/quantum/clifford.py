@@ -36,9 +36,9 @@ from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform.QOperation import FixedGate
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-import qcompute_qep.utils.circuit as circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 import QCompute
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 
 class Clifford:
@@ -82,8 +82,8 @@ class Clifford:
 
     **Examples**
 
-        >>> from qcompute_qep.quantum.clifford import Clifford
-        >>> import qcompute_qep.utils.circuit as cir
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as cir
         >>> import QCompute
         >>> n = 1
         >>> env = QCompute.QEnv()
@@ -106,13 +106,13 @@ class Clifford:
             pattern = random_pattern(n)
         else:
             if n > len(pattern):
-                raise ArgumentError('The pattern is wrong, should be checked out.')
+                raise ArgumentError("The pattern is wrong, should be checked out.")
         self._cir = None
         self._inv_cir = None
         self._norm_form = None
         self._n = n
         self._pattern = pattern
-        self._gateset_name = kwargs.get('gateset_name', 'peter_selinger')
+        self._gateset_name = kwargs.get("gateset_name", "peter_selinger")
         self._gateset = self._get_gateset()
 
     @property
@@ -125,7 +125,7 @@ class Clifford:
 
         **Example**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
             >>> n = 2
             >>> c = Clifford(n)  # randomly generate a Clifford
             >>> print(c.matrix)
@@ -141,7 +141,7 @@ class Clifford:
         if self.circuit:
             return circuit.layer_to_unitary(self.circuit, self._n)
         else:
-            return np.identity(2 ** self._n)
+            return np.identity(2**self._n)
 
     @property
     def circuit(self) -> List[CircuitLine]:
@@ -153,8 +153,8 @@ class Clifford:
 
         **Example**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
-            >>> from qcompute_qep.utils.circuit import print_circuit
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
             >>> n = 2
             >>> c = Clifford(n)  # randomly generate a Clifford
             >>> print_circuit(c.circuit)
@@ -170,7 +170,7 @@ class Clifford:
             self._cir = cir
         if not self._cir:
             cl = CircuitLine()
-            cl.data = FixedGate.getFixedGateInstance('ID')
+            cl.data = FixedGate.getFixedGateInstance("ID")
             cl.qRegList = list(range(self._n))
             self._cir.append(cl)
         return self._cir
@@ -185,7 +185,7 @@ class Clifford:
 
         **Examples**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
             >>> n = 2
             >>> c = Clifford(n)
             >>> print(c.normal_form)
@@ -203,7 +203,11 @@ class Clifford:
             self._norm_form = normal_form
         return self._norm_form
 
-    def __call__(self, qRegList: List['QRegStorage'], qubits: List[int] = None, ) -> None:
+    def __call__(
+        self,
+        qRegList: List["QRegStorage"],
+        qubits: List[int] = None,
+    ) -> None:
         env = qRegList[0].env
         if qubits is None:
             env.circuit += self.circuit
@@ -217,15 +221,17 @@ class Clifford:
                     env.circuit.append(cl)
 
     def __str__(self):
-        r"""Print the quantum circuit (in elementary quantum gates) that implements the Clifford.
-        """
+        r"""Print the quantum circuit (in elementary quantum gates) that implements the Clifford."""
         cir = self.circuit
         if cir:
             return circuit.print_circuit(cir, show=False)
         else:
             return circuit.print_circuit(cir, num_qubits=self._n, show=False)
 
-    def get_inverse_circuit(self, qubits: List[int] = None, ) -> List[CircuitLine]:
+    def get_inverse_circuit(
+        self,
+        qubits: List[int] = None,
+    ) -> List[CircuitLine]:
         r"""Compute the inverse circuit of the clifford.
 
         The inverse circuit of the clifford is obtained by reversing recursively the quantum circuit representing the
@@ -235,8 +241,8 @@ class Clifford:
 
         **Examples**
 
-            >>> from qcompute_qep.quantum.clifford import Clifford
-            >>> from qcompute_qep.utils.circuit import print_circuit
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
             >>> n = 2
             >>> c = Clifford(n)
             >>> print_circuit(c.circuit)
@@ -270,15 +276,14 @@ class Clifford:
         if self._inv_cir:
             return circuit.layer_to_unitary(self._inv_cir, self._n)
         else:
-            return np.identity(2 ** self._n)
+            return np.identity(2**self._n)
 
     def __print_normal_form(self):
-        r"""Print the normal form of the Clifford.
-        """
+        r"""Print the normal form of the Clifford."""
         # TODO: Will be implemented in the next version
         return
 
-    def _get_gateset(self) -> 'collections.defaultdict':
+    def _get_gateset(self) -> "collections.defaultdict":
         """Get the specified gate set by the given gateset name.
 
         For a valid gateset, the following gate names must be given:
@@ -294,55 +299,60 @@ class Clifford:
         # If index == 2, the control qubit is qubit 0 and the source qubit is qubit 1
         # If index == 3, the control qubit is qubit 1 and the source qubit is qubit 0
         # Notice that in this case, `index` can only be `2` or `3`.
-        if self._gateset_name == 'peter_selinger':
+        if self._gateset_name == "peter_selinger":
             # This gate set is described in Figure 1 of [S15].
             # A type gates
-            gate_set['A1'] = [(None, 0)]
-            gate_set['A2'] = [('H', 0)]
-            gate_set['A3'] = [('H', 0), ('S', 0), ('H', 0)]
+            gate_set["A1"] = [(None, 0)]
+            gate_set["A2"] = [("H", 0)]
+            gate_set["A3"] = [("H", 0), ("S", 0), ("H", 0)]
             # B type gates
-            gate_set['B1'] = [('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
-            gate_set['B2'] = [('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
-            gate_set['B3'] = [('H', 0), ('S', 0), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
-            gate_set['B4'] = [('H', 0), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2)]
+            gate_set["B1"] = [("H", 1), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2)]
+            gate_set["B2"] = [("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2)]
+            gate_set["B3"] = [("H", 0), ("S", 0), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2)]
+            gate_set["B4"] = [("H", 0), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2)]
             # C type gates
-            gate_set['C1'] = [(None, 0)]
-            gate_set['C2'] = [('H', 0), ('S', 0), ('S', 0), ('H', 0)]
+            gate_set["C1"] = [(None, 0)]
+            gate_set["C2"] = [("H", 0), ("S", 0), ("S", 0), ("H", 0)]
             # D type gates
-            gate_set['D1'] = [('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
-            gate_set['D2'] = [('H', 0), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
-            gate_set['D3'] = [('H', 0), ('H', 1), ('S', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
-            gate_set['D4'] = [('H', 0), ('H', 1), ('CZ', 2), ('H', 0), ('H', 1), ('CZ', 2), ('H', 1)]
+            gate_set["D1"] = [("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2), ("H", 1)]
+            gate_set["D2"] = [("H", 0), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2), ("H", 1)]
+            gate_set["D3"] = [("H", 0), ("H", 1), ("S", 1), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2), ("H", 1)]
+            gate_set["D4"] = [("H", 0), ("H", 1), ("CZ", 2), ("H", 0), ("H", 1), ("CZ", 2), ("H", 1)]
             # E type gates
-            gate_set['E1'] = [(None, 0)]
-            gate_set['E2'] = [('S', 0)]
-            gate_set['E3'] = [('S', 0), ('S', 0)]
-            gate_set['E4'] = [('S', 0), ('S', 0), ('S', 0)]
-        elif self._gateset_name == 'simplified':
+            gate_set["E1"] = [(None, 0)]
+            gate_set["E2"] = [("S", 0)]
+            gate_set["E3"] = [("S", 0), ("S", 0)]
+            gate_set["E4"] = [("S", 0), ("S", 0), ("S", 0)]
+        elif self._gateset_name == "simplified":
             # This gate set is a simplified version of the 'peter_selinger' gate set,
             # aiming to reduce the number of gates
             # A type gates
-            gate_set['A1'] = [(None, 0)]
-            gate_set['A2'] = [('H', 0)]
-            gate_set['A3'] = [('H', 0), ('S', 0), ('H', 0)]
+            gate_set["A1"] = [(None, 0)]
+            gate_set["A2"] = [("H", 0)]
+            gate_set["A3"] = [("H", 0), ("S", 0), ("H", 0)]
             # B type gates
-            gate_set['B1'] = [('CX', 2), ('CX', 3), ('CX', 2), ('H', 1)]
-            gate_set['B2'] = [('H', 1), ('CX', 2), ('CX', 3), ('H', 0)]
-            gate_set['B3'] = [('H', 0), ('H', 1), ('S', 0), ('CX', 2), ('CX', 3), ('H', 1)]
-            gate_set['B4'] = [('CX', 3), ('CX', 2), ('H', 1)]
+            gate_set["B1"] = [("CX", 2), ("CX", 3), ("CX", 2), ("H", 1)]
+            gate_set["B2"] = [("H", 1), ("CX", 2), ("CX", 3), ("H", 0)]
+            gate_set["B3"] = [("H", 0), ("H", 1), ("S", 0), ("CX", 2), ("CX", 3), ("H", 1)]
+            gate_set["B4"] = [("CX", 3), ("CX", 2), ("H", 1)]
             # C type gates
-            gate_set['C1'] = [(None, 0)]
-            gate_set['C2'] = [('X', 0)]
+            gate_set["C1"] = [(None, 0)]
+            gate_set["C2"] = [("X", 0)]
             # D type gates
-            gate_set['D1'] = [('H', 1), ('CX', 2), ('CX', 3), ('CX', 2)]
-            gate_set['D2'] = [('CX', 3), ('CX', 2)]
-            gate_set['D3'] = [('H', 1), ('S', 1), ('CX', 3), ('CX', 2), ]
-            gate_set['D4'] = [('H', 1), ('CX', 3), ('CX', 2)]
+            gate_set["D1"] = [("H", 1), ("CX", 2), ("CX", 3), ("CX", 2)]
+            gate_set["D2"] = [("CX", 3), ("CX", 2)]
+            gate_set["D3"] = [
+                ("H", 1),
+                ("S", 1),
+                ("CX", 3),
+                ("CX", 2),
+            ]
+            gate_set["D4"] = [("H", 1), ("CX", 3), ("CX", 2)]
             # E type gates
-            gate_set['E1'] = [(None, 0)]
-            gate_set['E2'] = [('S', 0)]
-            gate_set['E3'] = [('Z', 0)]
-            gate_set['E4'] = [('Z', 0), ('S', 0)]
+            gate_set["E1"] = [(None, 0)]
+            gate_set["E2"] = [("S", 0)]
+            gate_set["E3"] = [("Z", 0)]
+            gate_set["E4"] = [("Z", 0), ("S", 0)]
         else:
             raise ArgumentError("in _get_gateset(): undefined gateset name {}!".format(self._gateset_name))
         return gate_set
@@ -359,11 +369,11 @@ class Clifford:
         L = []
         for g_list in L_pattern:
             for i, g in enumerate(g_list):
-                if g[0] == 'A':
+                if g[0] == "A":
                     L.append((g, (m,)))
-                elif g[0] == 'C':
+                elif g[0] == "C":
                     L.append((g, (0,)))
-                elif g[0] == 'B':
+                elif g[0] == "B":
                     L.append((g, (m - i - 1, m - i)))
         return L
 
@@ -379,9 +389,9 @@ class Clifford:
         M = []
         for g_list in M_pattern:
             for i, g in enumerate(g_list):
-                if g[0] == 'E':
+                if g[0] == "E":
                     M.append((g, (n,)))
-                elif g[0] == 'D':
+                elif g[0] == "D":
                     M.append((g, (i, i + 1)))
         return M
 
@@ -400,7 +410,7 @@ class Clifford:
             cir = CircuitLine()
             if gate_name is not None:
                 cir.data = FixedGate.getFixedGateInstance(gate_name)
-                if gate_name == 'CX' or gate_name == 'CZ':
+                if gate_name == "CX" or gate_name == "CZ":
                     # Be careful about the control qubits and target qubits
                     if i == 2:
                         cir.qRegList = [idx[0], idx[1]]
@@ -429,7 +439,7 @@ def random_pattern(n: int) -> List[List[List[str]]]:
 
     **Examples**
 
-        >>> from qcompute_qep.quantum.clifford import random_pattern
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import random_pattern
         >>> n=2
         >>> pattern = random_pattern(n)
         >>> print(pattern)
@@ -437,12 +447,12 @@ def random_pattern(n: int) -> List[List[List[str]]]:
         ['E2']], [['A1'], [], ['C1'], [], ['E3']]]
     """
     if n <= 0:
-        raise ArgumentError('n should be larger than 0')
-    A_type = ['A1', 'A2', 'A3']
-    B_type = ['B1', 'B2', 'B3', 'B4']
-    C_type = ['C1', 'C2']
-    D_type = ['D1', 'D2', 'D3', 'D4']
-    E_type = ['E1', 'E2', 'E3', 'E4']
+        raise ArgumentError("n should be larger than 0")
+    A_type = ["A1", "A2", "A3"]
+    B_type = ["B1", "B2", "B3", "B4"]
+    C_type = ["C1", "C2"]
+    D_type = ["D1", "D2", "D3", "D4"]
+    E_type = ["E1", "E2", "E3", "E4"]
     pattern = []
     for j in range(n, 0, -1):
         k = np.random.randint(1, j + 1)
@@ -474,8 +484,8 @@ def random_clifford(n: int, m: int = 1, **kwargs) -> List[Clifford]:
 
     **Examples**
 
-        >>> from qcompute_qep.quantum.clifford import random_clifford
-        >>> from qcompute_qep.utils.circuit import print_circuit
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import random_clifford
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
         >>> n = 2
         >>> m = 2
         >>> cliffords = random_clifford(n, m)
@@ -489,7 +499,7 @@ def random_clifford(n: int, m: int = 1, **kwargs) -> List[Clifford]:
         1: ---H---S---H---H---Z---H---Z---H---Z---H---S---Z---H---Z---H---S-------------------
     """
     if m <= 0:
-        raise ArgumentError('m should not smaller than 0')
+        raise ArgumentError("m should not smaller than 0")
 
     clifford_list = []
 
@@ -501,7 +511,9 @@ def random_clifford(n: int, m: int = 1, **kwargs) -> List[Clifford]:
     return clifford_list
 
 
-def complete_cliffords(n: int, ) -> List[Clifford]:
+def complete_cliffords(
+    n: int,
+) -> List[Clifford]:
     r"""Generate the complete set of :math:`k`-qubit Clifford operators.
 
     .. note::
@@ -517,13 +529,13 @@ def complete_cliffords(n: int, ) -> List[Clifford]:
     :return: List[Clifford], the complete set of :math:`k`-qubit Clifford operators
     """
     if n > 2:
-        ArgumentError('n should not larger than 2!')
+        ArgumentError("n should not larger than 2!")
 
-    A = ['A1', 'A2', 'A3']
-    B = ['B1', 'B2', 'B3', 'B4']
-    C = ['C1', 'C2']
-    D = ['D1', 'D2', 'D3', 'D4']
-    E = ['E1', 'E2', 'E3', 'E4']
+    A = ["A1", "A2", "A3"]
+    B = ["B1", "B2", "B3", "B4"]
+    C = ["C1", "C2"]
+    D = ["D1", "D2", "D3", "D4"]
+    E = ["E1", "E2", "E3", "E4"]
 
     # List to store the matrix of gate
     complete_cliff = []

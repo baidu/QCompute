@@ -36,7 +36,7 @@ def _check_qwc(pauli1: str, pauli2: str) -> bool:
     for index in range(len(pauli1)):
         sigma1 = pauli1[index]
         sigma2 = pauli2[index]
-        if 'i' in [sigma1, sigma2]:
+        if "i" in [sigma1, sigma2]:
             continue
         elif sigma1 == sigma2:
             continue
@@ -79,7 +79,7 @@ def _generate_graph(h: list) -> nx.Graph:
     return g
 
 
-def grouping_hamiltonian(hamiltonian: list, coloring_strategy: str = 'largest_first') -> List[List[str]]:
+def grouping_hamiltonian(hamiltonian: list, coloring_strategy: str = "largest_first") -> List[List[str]]:
     r"""Finds the minimum clique cover of the Hamiltonian graph, which is used for simultaneous Pauli measurement
 
     Args:

@@ -33,12 +33,12 @@ import numpy as np
 
 from QCompute import *
 from QCompute.QPlatform.QOperation import FixedGate
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.quantum import clifford
-from qcompute_qep.mitigation.utils import plot_zne_sequences
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils.types import QProgram, QComputer
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.utils import plot_zne_sequences
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 
 def calculator(qp: QProgram = None, qc: QComputer = None) -> float:
@@ -61,7 +61,7 @@ num_seq = 10
 scale_factors = [1, 2]
 
 # Initialize the ZNE mitigator
-zne = ZNEMitigator(folder='circuit', extrapolator='richardson')
+zne = ZNEMitigator(folder="circuit", extrapolator="richardson")
 
 # Set the ideal quantum computer to `LocalBaiduSim2` and the noisy quantum computer to `CloudBaiduQPUQian`
 qc_ideal = BackendName.LocalBaiduSim2
@@ -80,7 +80,6 @@ expvals_noisy = []  # (num_seq, num_scales)
 
 # Construct the quantum programs
 for i in range(1, num_seq + 1):
-
     qp = QEnv()
     qp.Q.createList(2)
     qubits = [0, 1]
@@ -106,22 +105,18 @@ for i in range(1, num_seq + 1):
     # Compute the noisy and mitigated expectation values using the noisy quantum computer
     val = zne.mitigate(qp, qc_noisy, calculator, scale_factors=scale_factors)
     expvals_miti.append(val)
-    expvals_noisy.append(zne.history['expectations'])
+    expvals_noisy.append(zne.history["expectations"])
 
 # Visualize the data. Convert the data to the required format for visualization
 expvals_ideal = np.array(expvals_ideal).transpose()
 expvals_miti = np.array(expvals_miti).transpose()
 expvals_noisy = np.array(expvals_noisy).transpose()
 
-print('===' * 10, 'Quantum Results:', '===' * 10)
-print('Sequence size:\t', list(range(1, num_seq + 1)))
-print('Ideal expectation values:\t', expvals_ideal)
-print('Noisy expectation values:\t', expvals_noisy)
-print('Mitigated expectation values:\t,', expvals_miti)
+print("===" * 10, "Quantum Results:", "===" * 10)
+print("Sequence size:\t", list(range(1, num_seq + 1)))
+print("Ideal expectation values:\t", expvals_ideal)
+print("Noisy expectation values:\t", expvals_noisy)
+print("Mitigated expectation values:\t,", expvals_miti)
 
 # plot the results
-fig = plot_zne_sequences(expvals_ideal,
-                         expvals_miti,
-                         expvals_noisy,
-                         scale_factors=scale_factors,
-                         title='clifford-two')
+fig = plot_zne_sequences(expvals_ideal, expvals_miti, expvals_noisy, scale_factors=scale_factors, title="clifford-two")

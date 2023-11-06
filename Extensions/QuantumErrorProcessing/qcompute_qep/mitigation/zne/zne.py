@@ -21,20 +21,20 @@ Implementation of the Zero-Noise Extrapolation method in the Quantum Circuit Mod
 from typing import Callable, List, Union, Any
 from matplotlib.figure import Figure
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.mitigation import Mitigator
-import qcompute_qep.mitigation.zne as zne
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import Mitigator
+import Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.zne as zne
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 class ZNEMitigator(Mitigator):
     r"""
     Implementation of the Zero-Noise Extrapolation method in the Quantum Circuit Model.
     """
-    def __init__(self,
-                 folder: Union[zne.Folder, str] = None,
-                 extrapolator: Union[zne.Extrapolator, str] = None,
-                 **kwargs: Any) -> None:
+
+    def __init__(
+        self, folder: Union[zne.Folder, str] = None, extrapolator: Union[zne.Extrapolator, str] = None, **kwargs: Any
+    ) -> None:
         r"""
         Initialization function of the Zero-Noise Extrapolation method,
 
@@ -48,15 +48,15 @@ class ZNEMitigator(Mitigator):
 
         # Setup the folder instance from the input data
         if folder is None:  # set default folder instance
-            self._folder = zne.folder.CircuitFolder(method='right')
+            self._folder = zne.folder.CircuitFolder(method="right")
         elif isinstance(folder, zne.folder.Folder):
             self._folder = folder
         else:  # Construct the folder from its name
             folder = folder.lower()
             if folder not in zne.folder.__SUPPORTED_FOLDERS__:
-                raise ArgumentError('{} is not a supported folder type!'.format(folder))
+                raise ArgumentError("{} is not a supported folder type!".format(folder))
             else:
-                self._folder = getattr(zne.folder, folder.capitalize() + 'Folder')()
+                self._folder = getattr(zne.folder, folder.capitalize() + "Folder")()
 
         # Setup the extrapolator instance from the input data
         if extrapolator is None:
@@ -66,18 +66,16 @@ class ZNEMitigator(Mitigator):
         else:  # Construct the extrapolator from its name
             extrapolator = extrapolator.lower()
             if extrapolator not in zne.extrapolator.__SUPPORTED_EXTRAPOLATORS__:
-                raise ArgumentError('{} is not a supported extrapolator type!'.format(extrapolator))
+                raise ArgumentError("{} is not a supported extrapolator type!".format(extrapolator))
             else:
-                self._extrapolator = getattr(zne.extrapolator, extrapolator.capitalize() + 'Extrapolator')()
+                self._extrapolator = getattr(zne.extrapolator, extrapolator.capitalize() + "Extrapolator")()
 
-        self._scale_factors: List[float] = kwargs.get('scale_factors', self._config_default_scale_factors())
-        self._history: dict = {'folder': self._folder.name, 'extrapolator': self._extrapolator.name}
+        self._scale_factors: List[float] = kwargs.get("scale_factors", self._config_default_scale_factors())
+        self._history: dict = {"folder": self._folder.name, "extrapolator": self._extrapolator.name}
 
-    def mitigate(self,
-                 qp: QProgram,
-                 qc: QComputer,
-                 calculator: Callable,
-                 scale_factors: List[float] = None, **kwargs) -> float:
+    def mitigate(
+        self, qp: QProgram, qc: QComputer, calculator: Callable, scale_factors: List[float] = None, **kwargs
+    ) -> float:
         r"""Implement the Zero-Noise Extrapolation method.
 
         Using the Zero-Noise Extrapolation method to improve the computation accuracy of the quantum algorithm.
@@ -138,18 +136,20 @@ class ZNEMitigator(Mitigator):
             expvals.append(val)
 
         # Extrapolate these noisy values to obtain an error-mitigated expectation value
-        miti_value = self._extrapolator(scale_factors,
-                                        expvals,
-                                        order=kwargs.get('order', None),
-                                        asymptote=kwargs.get('asymptote', None),
-                                        ansatz=kwargs.get('ansatz', None),
-                                        init_paras=kwargs.get('init_paras', None))
+        miti_value = self._extrapolator(
+            scale_factors,
+            expvals,
+            order=kwargs.get("order", None),
+            asymptote=kwargs.get("asymptote", None),
+            ansatz=kwargs.get("ansatz", None),
+            init_paras=kwargs.get("init_paras", None),
+        )
 
         # Record the mitigation history
-        self._history['scale_factors'] = scale_factors
-        self._history['expectations'] = expvals
-        self._history['extrapolation_result'] = self._extrapolator.extrapolation_result
-        self._history['mitigated_value'] = miti_value
+        self._history["scale_factors"] = scale_factors
+        self._history["expectations"] = expvals
+        self._history["extrapolation_result"] = self._extrapolator.extrapolation_result
+        self._history["mitigated_value"] = miti_value
 
         return miti_value
 
@@ -170,10 +170,9 @@ class ZNEMitigator(Mitigator):
         return self._extrapolator.plot_extrapolation_results(save, fname)
 
     def __str__(self) -> str:
-        s = 'A {} object, with folder: {} and extrapolator: {}.'.format(
-            self.__class__.__name__,
-            self.history['folder'],
-            self.history['extrapolator'])
+        s = "A {} object, with folder: {} and extrapolator: {}.".format(
+            self.__class__.__name__, self.history["folder"], self.history["extrapolator"]
+        )
         return s
 
     @property

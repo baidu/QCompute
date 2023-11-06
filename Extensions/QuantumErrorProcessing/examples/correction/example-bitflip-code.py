@@ -37,14 +37,12 @@ is often used as a building block for more complex codes.
 
 import QCompute
 
-from qcompute_qep.correction import BasicCode, ColorTable
-import qcompute_qep.utils.circuit as circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction import BasicCode, ColorTable
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 
 
 # To construct the three-qubit bit-flip code, we need to specify its stabilizers and detectable error types.
-bitflip_code = BasicCode(stabilizers=['IZZ', 'ZZI'],
-                         error_types=['X'],
-                         name='Bit-Flip Code')
+bitflip_code = BasicCode(stabilizers=["IZZ", "ZZI"], error_types=["X"], name="Bit-Flip Code")
 
 # After we create the code, we can check its basic information
 print(bitflip_code)
@@ -67,12 +65,12 @@ QCompute.X(qp.Q[0])
 
 print("*******************************************************************************")
 print("The raw quantum circuit is:")
-circuit.print_circuit(qp.circuit, colors={'red': [0]})
+circuit.print_circuit(qp.circuit, colors={"red": [0]})
 
 # Step 1. Encode the quantum state
 enc_qp = bitflip_code.encode(qp=qp)
 print("After encoding, the quantum circuit is:")
-circuit.print_circuit(enc_qp.circuit, colors={'red': [0], 'blue': [1, 2]})
+circuit.print_circuit(enc_qp.circuit, colors={"red": [0], "blue": [1, 2]})
 
 ###########################################################
 # Any single bit-flip error happens here ...
@@ -81,19 +79,23 @@ circuit.print_circuit(enc_qp.circuit, colors={'red': [0], 'blue': [1, 2]})
 # Step 2. Detect single bit-flip error
 det_qp = bitflip_code.detect(qp=enc_qp)
 print("After detection, the quantum circuit is:")
-circuit.print_circuit(det_qp.circuit, colors={'red': [0], 'blue': [1, 2], 'yellow': [3, 4]})
+circuit.print_circuit(det_qp.circuit, colors={"red": [0], "blue": [1, 2], "yellow": [3, 4]})
 
 # Step 3. Correct the quantum error based on the detecting result
 cor_qp = bitflip_code.correct(qp=det_qp)
 print("After correction, the quantum circuit is:")
-circuit.print_circuit(cor_qp.circuit, colors={'red': [0], 'blue': [1, 2], 'yellow': [3, 4]})
+circuit.print_circuit(cor_qp.circuit, colors={"red": [0], "blue": [1, 2], "yellow": [3, 4]})
 
 # Step 4. Correct the quantum error based on the detecting result
 dec_qp = bitflip_code.decode(qp=cor_qp)
 print("After decoding, the quantum circuit is:")
-circuit.print_circuit(dec_qp.circuit, colors={'red': [0], 'blue': [1, 2], 'yellow': [3, 4]})
+circuit.print_circuit(dec_qp.circuit, colors={"red": [0], "blue": [1, 2], "yellow": [3, 4]})
 
 # Visualize the qubit order, as indicated by different colors
-print("Qubits Order: [{}][{}][{}]".format(ColorTable.ANCILLA + "Ancilla" + ColorTable.END,
-                                          ColorTable.PHYSICAL + "Physical" + ColorTable.END,
-                                          ColorTable.ORIGINAL + "Original" + ColorTable.END))
+print(
+    "Qubits Order: [{}][{}][{}]".format(
+        ColorTable.ANCILLA + "Ancilla" + ColorTable.END,
+        ColorTable.PHYSICAL + "Physical" + ColorTable.END,
+        ColorTable.ORIGINAL + "Original" + ColorTable.END,
+    )
+)

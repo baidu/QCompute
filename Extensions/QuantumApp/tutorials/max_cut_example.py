@@ -23,10 +23,10 @@ import networkx as nx
 import numpy as np
 from QCompute import Define
 from QCompute.QPlatform import BackendName
-from qcompute_qapp.algorithm import QAOA
-from qcompute_qapp.application.optimization import MaxCut
-from qcompute_qapp.circuit import QAOAAnsatz
-from qcompute_qapp.optimizer import SPSA
+from Extensions.QuantumApp.qcompute_qapp.algorithm import QAOA
+from Extensions.QuantumApp.qcompute_qapp.application.optimization import MaxCut
+from Extensions.QuantumApp.qcompute_qapp.circuit import QAOAAnsatz
+from Extensions.QuantumApp.qcompute_qapp.optimizer import SPSA
 
 
 # hyper-parameter setting
@@ -41,7 +41,7 @@ iteration_num = 100
 # backend = BackendName.CloudIoPCAS
 # backend = BackendName.CloudBaiduSim2Water
 backend = BackendName.LocalBaiduSim2
-measure = 'SimMeasure'  # Define pauli measurement method
+measure = "SimMeasure"  # Define pauli measurement method
 
 # Initialize the target graph
 G = nx.Graph()

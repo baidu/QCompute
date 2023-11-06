@@ -37,7 +37,7 @@ Here, we briefly introduce the key parts of the QPU module.
 
 ## Tutorials
 
-Next, we will introduce the QPU module through several basic quantum network protocols. Please refer to the following [tutorials](https://quantum-hub.baidu.com/qnet/tutorial-introduction) for more details.
+Next, we will introduce the QPU module through several basic quantum network protocols. Please refer to the following tutorials for more details.
 
 - Quantum teleportation
 - Quantum entanglement swapping

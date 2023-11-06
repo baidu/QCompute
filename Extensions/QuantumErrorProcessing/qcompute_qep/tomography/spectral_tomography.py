@@ -22,15 +22,15 @@ import numpy as np
 from copy import deepcopy
 from tqdm import tqdm
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.circuit import execute
-from qcompute_qep.quantum.pauli import complete_pauli_basis
-from qcompute_qep.quantum.channel import unitary_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import Tomography
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import unitary_to_ptm
 from typing import List, Union, Tuple
-from qcompute_qep.utils.utils import expval_from_counts
-from qcompute_qep.utils.linalg import permute_systems, expand
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import permute_systems, expand
 
 
 class SpectralTomography(Tomography):
@@ -39,6 +39,7 @@ class SpectralTomography(Tomography):
     Quantum Spectral Tomography deals with identifying the eigenvalues
     of an unknown quantum dynamical process in PTM form.
     """
+
     def __init__(self, qp: QProgram = None, qc: QComputer = None, **kwargs):
         """The init function of the Quantum Spectral Tomography class.
 
@@ -58,12 +59,12 @@ class SpectralTomography(Tomography):
         self._qp: QProgram = qp
         self._qc: QComputer = qc
         # self._method: str = kwargs.get('method', 'inverse')
-        self._shots: int = kwargs.get('shots', 4096)
-        self._K: int = kwargs.get('k', None)
-        self._L: int = kwargs.get('l', None)
-        self._N: int = kwargs.get('N', None)
-        self._amp = kwargs.get('a', False)
-        self._qubits: List[int] = kwargs.get('qubits', None)
+        self._shots: int = kwargs.get("shots", 4096)
+        self._K: int = kwargs.get("k", None)
+        self._L: int = kwargs.get("l", None)
+        self._N: int = kwargs.get("N", None)
+        self._amp = kwargs.get("a", False)
+        self._qubits: List[int] = kwargs.get("qubits", None)
         self._ideal_eigenvalues: np.ndarray = None
 
     def _repeat_channel(self) -> List[QProgram]:
@@ -83,7 +84,9 @@ class SpectralTomography(Tomography):
 
         return k_qps
 
-    def fit(self, qp: QProgram = None, qc: QComputer = None, **kwargs) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    def fit(
+        self, qp: QProgram = None, qc: QComputer = None, **kwargs
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """Execute the quantum spectral procedure for the quantum process
         specified by @qp on the quantum computer @qc.
 
@@ -112,7 +115,7 @@ class SpectralTomography(Tomography):
         **Examples**
 
             >>> import QCompute
-            >>> import qcompute_qep.tomography as tomography
+            >>> import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
             >>> qp = QCompute.QEnv()
             >>> qp.Q.createList(2)
             >>> QCompute.H(qp.Q[0])
@@ -125,11 +128,11 @@ class SpectralTomography(Tomography):
         # Parse the arguments. If not set, use the default arguments set by the init function
         self._qp = qp if qp is not None else self._qp
         self._qc = qc if qc is not None else self._qc
-        self._shots = kwargs.get('shots', self._shots)
-        self._K = kwargs.get('k', self._K)
-        self._L = kwargs.get('l', self._L)
-        self._amp = kwargs.get('a', self._amp)
-        self._qubits = kwargs.get('qubits', self._qubits)
+        self._shots = kwargs.get("shots", self._shots)
+        self._K = kwargs.get("k", self._K)
+        self._L = kwargs.get("l", self._L)
+        self._amp = kwargs.get("a", self._amp)
+        self._qubits = kwargs.get("qubits", self._qubits)
 
         # If the quantum program or the quantum computer is not set, the process tomography cannot be executed
         if self._qp is None:
@@ -147,22 +150,22 @@ class SpectralTomography(Tomography):
         n = len(self._qubits)
 
         # Consider the :math:`N` as a variable, default to :math:`4^n-1`
-        N = kwargs.get('N', 4**n-1) if self._N is None else kwargs.get('N', self._N)
+        N = kwargs.get("N", 4**n - 1) if self._N is None else kwargs.get("N", self._N)
         # Set the default parameter K and L
         self._K = 2 * N - 2 if self._K is None else self._K
         self._L = int(self._K / 2) if self._L is None else self._L
         meas_paulis = complete_pauli_basis(n)[1:]  # a list of string, Pauli basis
         # Step 1. construct a list of tomographic quantum circuits from the quantum program
-        pbar = tqdm(total=100, desc='SQT Step 1/3 : Constructing quantum circuits...', ncols=80)
+        pbar = tqdm(total=100, desc="SQT Step 1/3 : Constructing quantum circuits...", ncols=80)
         k_qps = self._repeat_channel()
-        g = np.zeros(self._K+1, dtype=float)
+        g = np.zeros(self._K + 1, dtype=float)
         pbar.update(100 / 3)
 
         # Step 2. run the tomographic quantum circuits on the quantum computer and estimate the expectation values
         pbar.desc = "SQT Step 2/3 : Running quantum circuits..."
         for k, k_qp in enumerate(k_qps):
             # Construct the measurement circuit for k-th circuit
-            pbar.update(100/3/int(len(k_qps)))
+            pbar.update(100 / 3 / int(len(k_qps)))
             for i, meas_pauli in enumerate(meas_paulis):
                 meas_qp, meas_ob = meas_pauli.meas_circuit(k_qp, qubits=self._qubits)
                 qps, eig_vals = meas_pauli.preps_circuits(meas_qp, qubits=self._qubits)
@@ -176,9 +179,9 @@ class SpectralTomography(Tomography):
         # Step 3. perform the fitting procedure to estimate the quantum state
         pbar.desc = "SQT Step 3/3 : Processing experimental data..."
         # Construct a (K-L+1) \times (L+1) dimensional data matrix Y
-        Y = np.zeros((self._K-self._L+1, self._L+1), dtype=float)
-        for i in range(self._L+1):
-            Y[:, i] = np.asarray(g[i:i+self._K-self._L+1].T)
+        Y = np.zeros((self._K - self._L + 1, self._L + 1), dtype=float)
+        for i in range(self._L + 1):
+            Y[:, i] = np.asarray(g[i : i + self._K - self._L + 1].T)
 
         # Construct a singular-value decomposition of the matrix Y
         _, sigma, vt = np.linalg.svd(Y)
@@ -189,7 +192,7 @@ class SpectralTomography(Tomography):
         vt1 = vt[:, 1:]
         self._ideal_eigenvalues, _ = np.linalg.eig(vt0 @ la.pinv(vt1))
 
-        pbar.update(100-pbar.n)
+        pbar.update(100 - pbar.n)
         pbar.desc = "Successfully finished SQT!"
         # Only calculate eigenvalues we estimate
         if self._amp is False:
@@ -217,8 +220,8 @@ class SpectralTomography(Tomography):
         :param qubits: List[int], the target qubits
         :return: np.ndarray, the ideal spectral of given quantum process
         """
-        _TWO_QUBIT_GATESET = {'CX', 'CY', 'CZ', 'CH', 'SWAP'}
-        _THREE_QUBIT_GATESET = {'CCX', 'CSWAP'}
+        _TWO_QUBIT_GATESET = {"CX", "CY", "CZ", "CH", "SWAP"}
+        _THREE_QUBIT_GATESET = {"CCX", "CSWAP"}
 
         if self._qp is None:
             raise ArgumentError("The quantum program characterizing the quantum spectral is not given!")
@@ -229,7 +232,7 @@ class SpectralTomography(Tomography):
         # Number of qubits in the quantum program
         n = len(self._qubits)
 
-        U = np.identity(2 ** n, dtype='complex')
+        U = np.identity(2**n, dtype="complex")
         # Process the circuit layer by layer, each layer corresponds to a :math:`2^n\times 2^n` unitary matrix
         for circuit in self._qp.circuit:
             indices = [self._qubits.index(i) for i in circuit.qRegList]
@@ -247,4 +250,3 @@ class SpectralTomography(Tomography):
         self._ideal_eigenvalues, _ = np.linalg.eig(unitary_to_ptm(U).data[1:, 1:])
 
         return self._ideal_eigenvalues
-

@@ -73,13 +73,24 @@ from typing import List, Optional, Tuple
 from QCompute import X
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_Z, circ_multictrl_Pauli
-from qcompute_qsvt.Oracle.StatePreparation import circ_state_pre, circ_state_pre_inverse
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import (
+    circ_multictrl_Z,
+    circ_multictrl_Pauli,
+)
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.StatePreparation import (
+    circ_state_pre,
+    circ_state_pre_inverse,
+)
 
 
-def circ_j_ctrl_multiPauli(reg_target: List[QRegStorage], reg_ctrlling: List[QRegStorage], int_j: int,
-                           str_Pauli_term: str, if_minus: bool,
-                           reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_j_ctrl_multiPauli(
+    reg_target: List[QRegStorage],
+    reg_ctrlling: List[QRegStorage],
+    int_j: int,
+    str_Pauli_term: str,
+    if_minus: bool,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""A quantum circuit implementing a multictrl multi-qubit Pauli gate.
 
     For such multictrl multi-qubit Pauli gate:
@@ -122,7 +133,7 @@ def circ_j_ctrl_multiPauli(reg_target: List[QRegStorage], reg_ctrlling: List[QRe
         The quantum gate :math:`C_5(X\otimes I\otimes Y\otimes Z)\in\mathbb C^{2^7\times 2^7}` could be called by
 
         >>> from QCompute import QEnv
-        >>> from qcompute_qsvt.Oracle.BlockEncoding import circ_j_ctrl_multiPauli
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.BlockEncoding import circ_j_ctrl_multiPauli
         >>> env = QEnv()
         >>> reg_c = [env.Q[0], env.Q[1], env.Q[2]]
         >>> reg_t = [env.Q[3], env.Q[4], env.Q[5], env.Q[6]]
@@ -132,24 +143,30 @@ def circ_j_ctrl_multiPauli(reg_target: List[QRegStorage], reg_ctrlling: List[QRe
     """
     if reg_borrowed is None:
         reg_borrowed = []
-    list_str_single_Pauli_term = re.split(r',\s*', str_Pauli_term.upper())
+    list_str_single_Pauli_term = re.split(r",\s*", str_Pauli_term.upper())
     # we can transform such j-ctrl gate into multictrl gate by conjugating operation with several X gates
     for int_k in range(len(reg_ctrlling)):
         if (int_j >> int_k) % 2 == 0:
             X(reg_ctrlling[-1 - int_k])
     for str_single_Pauli_term in list_str_single_Pauli_term:
-        match = re.match(r'([XYZ])([0-9]+)(\w+)', str_single_Pauli_term, flags=re.I)
+        match = re.match(r"([XYZ])([0-9]+)(\w+)", str_single_Pauli_term, flags=re.I)
         while match:
-            circ_multictrl_Pauli(reg_target[int(match.group(2))], reg_ctrlling, match.group(1).upper(),
-                                 reg_borrowed=reg_target[:int(match.group(2))] + reg_target[int(match.group(2)) + 1:] +
-                                 reg_borrowed)
+            circ_multictrl_Pauli(
+                reg_target[int(match.group(2))],
+                reg_ctrlling,
+                match.group(1).upper(),
+                reg_borrowed=reg_target[: int(match.group(2))] + reg_target[int(match.group(2)) + 1 :] + reg_borrowed,
+            )
             str_single_Pauli_term = match.group(3)
-            match = re.match(r'([XYZ])([0-9]+)(\w+)', str_single_Pauli_term, flags=re.I)
-        match = re.match(r'([XYZ])([0-9]+)', str_single_Pauli_term, flags=re.I)
+            match = re.match(r"([XYZ])([0-9]+)(\w+)", str_single_Pauli_term, flags=re.I)
+        match = re.match(r"([XYZ])([0-9]+)", str_single_Pauli_term, flags=re.I)
         if match:
-            circ_multictrl_Pauli(reg_target[int(match.group(2))], reg_ctrlling, match.group(1).upper(),
-                                 reg_borrowed=reg_target[:int(match.group(2))] + reg_target[int(match.group(2)) + 1:] +
-                                 reg_borrowed)
+            circ_multictrl_Pauli(
+                reg_target[int(match.group(2))],
+                reg_ctrlling,
+                match.group(1).upper(),
+                reg_borrowed=reg_target[: int(match.group(2))] + reg_target[int(match.group(2)) + 1 :] + reg_borrowed,
+            )
     # We need to implement a multictrl-(-ID) gate,
     # which just equals to a multictrl-Z gate operated on those ctrlling qubits.
     if if_minus and len(reg_ctrlling) > 0:
@@ -160,9 +177,13 @@ def circ_j_ctrl_multiPauli(reg_target: List[QRegStorage], reg_ctrlling: List[QRe
             X(reg_ctrlling[-1 - int_k])
 
 
-def circ_ctrl_Sel_multiPauli(reg_target: List[QRegStorage], qubit_ctrlling: Optional[QRegStorage],
-                             reg_ctrlling: List[QRegStorage], list_str_Pauli_rep: List[Tuple[float, str]],
-                             reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_ctrl_Sel_multiPauli(
+    reg_target: List[QRegStorage],
+    qubit_ctrlling: Optional[QRegStorage],
+    reg_ctrlling: List[QRegStorage],
+    list_str_Pauli_rep: List[Tuple[float, str]],
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""A quantum circuit implementing :math:`C(\operatorname{Sel})` with classical input :math:`\check H`.
 
     Since
@@ -210,18 +231,33 @@ def circ_ctrl_Sel_multiPauli(reg_target: List[QRegStorage], qubit_ctrlling: Opti
     for idx in range(len(list_str_Pauli_rep)):
         # regard two part of ctrlling qubits as a same class
         if qubit_ctrlling is None:
-            circ_j_ctrl_multiPauli(reg_target, reg_ctrlling, idx + int_deviation, list_str_Pauli_rep[idx][1],
-                                   list_str_Pauli_rep[idx][0] < 0, reg_borrowed=reg_borrowed)
+            circ_j_ctrl_multiPauli(
+                reg_target,
+                reg_ctrlling,
+                idx + int_deviation,
+                list_str_Pauli_rep[idx][1],
+                list_str_Pauli_rep[idx][0] < 0,
+                reg_borrowed=reg_borrowed,
+            )
         else:
-            circ_j_ctrl_multiPauli(reg_target, [qubit_ctrlling] + reg_ctrlling, idx + int_deviation,
-                                   list_str_Pauli_rep[idx][1], list_str_Pauli_rep[idx][0] < 0,
-                                   reg_borrowed=reg_borrowed)
+            circ_j_ctrl_multiPauli(
+                reg_target,
+                [qubit_ctrlling] + reg_ctrlling,
+                idx + int_deviation,
+                list_str_Pauli_rep[idx][1],
+                list_str_Pauli_rep[idx][0] < 0,
+                reg_borrowed=reg_borrowed,
+            )
 
 
-def circ_block_encoding(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage],
-                        qubit_ctrlling: Optional[QRegStorage], list_str_Pauli_rep: List[Tuple[float, str]],
-                        list_float_target_state: List[float],
-                        reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_block_encoding(
+    reg_sys: List[QRegStorage],
+    reg_blocking: List[QRegStorage],
+    qubit_ctrlling: Optional[QRegStorage],
+    list_str_Pauli_rep: List[Tuple[float, str]],
+    list_float_target_state: List[float],
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""A quantum circuit implementing a block-encoding for :math:`C(\check H)` with classical input :math:`\check H`.
 
     Reader may refer to [CW12]_ for more insights.
@@ -273,6 +309,7 @@ def circ_block_encoding(reg_sys: List[QRegStorage], reg_blocking: List[QRegStora
     :return: **None**
     """
     circ_state_pre(reg_blocking, [], list_float_target_state, reg_borrowed=reg_sys + reg_borrowed)
-    circ_ctrl_Sel_multiPauli(reg_sys, qubit_ctrlling, reg_blocking, list_str_Pauli_rep,
-                             reg_borrowed=reg_sys + reg_borrowed)
+    circ_ctrl_Sel_multiPauli(
+        reg_sys, qubit_ctrlling, reg_blocking, list_str_Pauli_rep, reg_borrowed=reg_sys + reg_borrowed
+    )
     circ_state_pre_inverse(reg_blocking, [], list_float_target_state, reg_borrowed=reg_sys + reg_borrowed)

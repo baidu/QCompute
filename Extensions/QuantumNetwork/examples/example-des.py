@@ -19,21 +19,16 @@ r"""
 An example of discrete-event simulation.
 """
 
-import sys
-sys.path.append('..')
-
-from qcompute_qnet.core.des import DESEnv, EventHandler, Entity
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv, EventHandler, Entity
 
 
 class Customer:
-
     def __init__(self, service_no, arrival_time):
         self.service_no = service_no  # service number of the customer
         self.arrival_time = arrival_time  # arrival time of the customer
 
 
 class ServiceCounter(Entity):
-
     def __init__(self, name, env=None):
         super().__init__(name, env)
         self.status = 0  # status of the clerk, 0 for idle and 1 for busy

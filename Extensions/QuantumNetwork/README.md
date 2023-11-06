@@ -1,6 +1,6 @@
 *Copyright (c) 2022 Institute for Quantum Computing, Baidu Inc. All Rights Reserved.*
 
-![](https://img.shields.io/badge/release-v1.1.0-blue)
+![](https://img.shields.io/badge/release-v1.4.0-blue)
 [![](https://img.shields.io/badge/docs-API-blue)](https://quantum-hub.baidu.com/docs/qnet/)
 [![](https://img.shields.io/badge/Python-3.8+-green)](https://www.python.org/)
 ![](https://img.shields.io/badge/OS-MacOS%20|%20Windows%20|%20Linux-green)
@@ -17,8 +17,8 @@ QNET is under active development and the latest version has the following key fe
 * discrete-event simulation framework that allows for both accurate and efficient system tracking;
 * quantum hardware interface that accelerates protocols testing and deployment;
 * physical devices modeling that supports the simulation of realistic experiments;
-* frequently-used templates that speed up the workflow of research and development.
-* modular design that is compatible with different quantum network architectures;
+* frequently-used templates that speed up the workflow of research and development;
+* modular design that is compatible with different quantum network architectures.
 
 ## Installation
 
@@ -52,8 +52,8 @@ This will install the QNET binaries as well as the QNET package. For those using
 
 Now, you can try to write a simple program to check whether QNET has been successfully installed. For example,
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology import Network, Node, Link
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology import Network, Node, Link
 
 # Create a simulation environment
 env = DESEnv("Simulation Environment", default=True)
@@ -82,11 +82,14 @@ We provide several [tutorials](https://quantum-hub.baidu.com/qnet/tutorial-intro
 * Tour guide to quantum network simulation
 * Micius quantum satellite experiment
 * Quantum network architecture simulation
+* Quantum network architecture with resource management
 * Quantum network protocols on quantum hardware devices
 * Quantum teleportation
 * Quantum entanglement swapping
 * CHSH game
 * Magic square game
+* Measurement-based quantum computation
+* Dynamic quantum circuit
 
 More tutorials and demonstrations will be included in the future release.
 

@@ -30,18 +30,18 @@ from .parameterized_circuit_template import UniversalCircuit, RealEntangledCircu
 from .parameterized_circuit_template import RealAlternatingLayeredCircuit, ComplexAlternatingLayeredCircuit
 
 __all__ = [
-    'BasicCircuit',
-    'IQPEncodingCircuit',
-    'BasisEncodingCircuit',
-    'KernelEstimationCircuit',
-    'ParameterizedCircuit',
-    'PauliMeasurementCircuit',
-    'PauliMeasurementCircuitWithAncilla',
-    'SimultaneousPauliMeasurementCircuit',
-    'QAOAAnsatz',
-    'UniversalCircuit',
-    'RealEntangledCircuit',
-    'ComplexEntangledCircuit',
-    'RealAlternatingLayeredCircuit',
-    'ComplexAlternatingLayeredCircuit'
+    "BasicCircuit",
+    "IQPEncodingCircuit",
+    "BasisEncodingCircuit",
+    "KernelEstimationCircuit",
+    "ParameterizedCircuit",
+    "PauliMeasurementCircuit",
+    "PauliMeasurementCircuitWithAncilla",
+    "SimultaneousPauliMeasurementCircuit",
+    "QAOAAnsatz",
+    "UniversalCircuit",
+    "RealEntangledCircuit",
+    "ComplexEntangledCircuit",
+    "RealAlternatingLayeredCircuit",
+    "ComplexAlternatingLayeredCircuit",
 ]

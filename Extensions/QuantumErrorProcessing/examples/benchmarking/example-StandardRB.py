@@ -20,8 +20,8 @@ An example to demonstrate the Standard Randomized Benchmarking protocol.
 """
 from QCompute import *
 
-import qcompute_qep.benchmarking as rb
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).
@@ -58,15 +58,12 @@ srb = rb.StandardRB()
 
 # Call the randomized benchmarking procedure and obtain estimated error rate
 qubits = [0, 1]
-srb.benchmark(qc=qc,
-              qubits=qubits,
-              seq_lengths=[1, 2, 3, 4, 5],
-              repeats=5)
+srb.benchmark(qc=qc, qubits=qubits, seq_lengths=[1, 2, 3, 4, 5], repeats=5)
 print("*******************************************************************************")
 print("* Standard RB on qubits: {}".format(qubits))
-print("* Estimated fidelity parameter: {}".format(srb.results['f']))
-print("* Estimated EPC parameter: {}".format(srb.results['epc']))
-print("* Standard deviation error of estimation: {}".format(srb.results['f_err']))
+print("* Estimated fidelity parameter: {}".format(srb.results["f"]))
+print("* Estimated EPC parameter: {}".format(srb.results["epc"]))
+print("* Standard deviation error of estimation: {}".format(srb.results["f_err"]))
 fname = "StandardRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* RB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results
@@ -75,15 +72,12 @@ print("*************************************************************************
 
 # You can also perform the randomized benchmarking procedure on other qubits, for example [q1, q3]
 qubits = [1, 3]
-srb.benchmark(qc=qc,
-              qubits=qubits,
-              seq_lengths=[1, 2, 3, 4, 5],
-              repeats=5)
+srb.benchmark(qc=qc, qubits=qubits, seq_lengths=[1, 2, 3, 4, 5], repeats=5)
 print("*******************************************************************************")
 print("* Standard RB on qubits: {}".format(qubits))
-print("* Estimated fidelity parameter: {}".format(srb.results['f']))
-print("* Estimated EPC parameter: {}".format(srb.results['epc']))
-print("* Standard deviation error of estimation: {}".format(srb.results['f_err']))
+print("* Estimated fidelity parameter: {}".format(srb.results["f"]))
+print("* Estimated EPC parameter: {}".format(srb.results["epc"]))
+print("* Standard deviation error of estimation: {}".format(srb.results["f_err"]))
 fname = "StandardRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* RB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results

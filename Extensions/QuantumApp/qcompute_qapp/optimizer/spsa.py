@@ -26,8 +26,8 @@ from .basic_optimizer import BasicOptimizer
 
 
 class SPSA(BasicOptimizer):
-    r"""SPSA Optimizer class
-    """
+    r"""SPSA Optimizer class"""
+
     def __init__(self, iterations: int, circuit: BasicCircuit, a: float = 1.0, c: float = 1.0):
         r"""The constructor of the SPSA class
 
@@ -43,9 +43,10 @@ class SPSA(BasicOptimizer):
         self._c = c
 
     def minimize(
-            self, shots: int,
-            loss_func: Callable[[np.ndarray, int], float],
-            grad_func: Callable[[np.ndarray, int], np.ndarray]
+        self,
+        shots: int,
+        loss_func: Callable[[np.ndarray, int], float],
+        grad_func: Callable[[np.ndarray, int], np.ndarray],
     ) -> None:
         r"""Minimizes the given loss function
 
@@ -58,6 +59,13 @@ class SPSA(BasicOptimizer):
         self._loss_history = []
         curr_param = self._circuit.parameters
         opt_res = minimizeSPSA(
-            loss_func, curr_param, args=(shots,), niter=self._iterations, paired=False, a=self._a,
-            c=self._c, callback=lambda xk: self._loss_history.append(loss_func(xk, shots)))
+            loss_func,
+            curr_param,
+            args=(shots,),
+            niter=self._iterations,
+            paired=False,
+            a=self._a,
+            c=self._c,
+            callback=lambda xk: self._loss_history.append(loss_func(xk, shots)),
+        )
         print(opt_res.message)

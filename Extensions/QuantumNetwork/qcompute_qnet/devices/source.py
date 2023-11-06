@@ -21,13 +21,11 @@ Module for photon sources.
 
 from typing import List
 from numpy import random
-from qcompute_qnet.core.des import Entity, EventHandler
-from qcompute_qnet.devices.photon import Photon
-from qcompute_qnet.quantum.state import MixedState
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.devices.photon import Photon
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import MixedState
 
-__all__ = [
-    "PhotonSource"
-]
+__all__ = ["PhotonSource"]
 
 
 class PhotonSource(Entity):
@@ -58,8 +56,7 @@ class PhotonSource(Entity):
         self.mean_photon_num = mean_photon_num
 
     def init(self) -> None:
-        r"""Photon source initialization.
-        """
+        r"""Photon source initialization."""
         assert self.owner != self, f"The photon source {self.name} has no owner!"
 
     def set(self, **kwargs) -> None:
@@ -101,8 +98,9 @@ class PhotonSource(Entity):
 
         for i, state in enumerate(states):
             # Number of photons in a pulse (Poisson distribution)
-            mean_photon_num_list = [self.mean_photon_num] * len(states) if mean_photon_num_list is None \
-                else mean_photon_num_list
+            mean_photon_num_list = (
+                [self.mean_photon_num] * len(states) if mean_photon_num_list is None else mean_photon_num_list
+            )
             photons_num = random.poisson(mean_photon_num_list[i])
             for _ in range(photons_num):
                 wavelength = self.bandwidth * random.randn() + self.wavelength
@@ -111,10 +109,11 @@ class PhotonSource(Entity):
                 self.scheduler.schedule_after(i * interval, handler)
 
     def print_parameters(self) -> None:
-        r"""Print parameters of the photon source.
-        """
-        print(f"Details of Photon Source: {self.name}\n"
-              f"frequency: {self.frequency} hertz\n"
-              f"wavelength: {self.wavelength} nanometers\n"
-              f"bandwidth: {self.bandwidth} nanometers\n"
-              f"mean photon number: {self.mean_photon_num}")
+        r"""Print parameters of the photon source."""
+        print(
+            f"Details of Photon Source: {self.name}\n"
+            f"frequency: {self.frequency} hertz\n"
+            f"wavelength: {self.wavelength} nanometers\n"
+            f"bandwidth: {self.bandwidth} nanometers\n"
+            f"mean photon number: {self.mean_photon_num}"
+        )

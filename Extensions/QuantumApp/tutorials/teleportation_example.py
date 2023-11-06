@@ -48,14 +48,14 @@ def prepare_state():
     # Initialize all qubits
     q = [env.Q[i] for i in range(qubit_num)]
 
-    # Prepare quantum state |psi> 
+    # Prepare quantum state |psi>
     U(angle[0], angle[1], angle[2])(q[0])
 
     # Measurements
     MeasureZ([q[0]], [0])
 
     taskResult = env.commit(shots, fetchMeasure=True)
-    return taskResult['counts']
+    return taskResult["counts"]
 
 
 def main():
@@ -88,9 +88,9 @@ def main():
     MeasureZ([q[2]], [2])
 
     taskResult = env.commit(shots, fetchMeasure=True)
-    return taskResult['counts']
+    return taskResult["counts"]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     prepare_state()
     main()

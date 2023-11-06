@@ -45,14 +45,17 @@ from typing import Any, List, Union, Callable
 import numpy as np
 from QCompute import *
 
-from qcompute_qep.exceptions import ArgumentError
-from qcompute_qep.utils.types import QProgram, number_of_qubits
-from qcompute_qep.utils.gate import CPauli
-from qcompute_qep.utils.circuit import enlarge_circuit, print_circuit
-from qcompute_qep.quantum.pauli import pauli2bsf, bsf2pauli, bsp, mutually_commute
-from qcompute_qep.correction.stabilizer import StabilizerCode
-from qcompute_qep.correction.utils import pauli_list_to_check_matrix, check_matrix_to_standard_form
-from qcompute_qep.utils.utils import COLOR_TABLE
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.gate import CPauli
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import enlarge_circuit, print_circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import pauli2bsf, bsf2pauli, bsp, mutually_commute
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.stabilizer import StabilizerCode
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction.utils import (
+    pauli_list_to_check_matrix,
+    check_matrix_to_standard_form,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import COLOR_TABLE
 
 
 class BasicCode(StabilizerCode):
@@ -88,6 +91,7 @@ class BasicCode(StabilizerCode):
                      partition: original qubits  | other physical qubits |  ancilla qubits
 
     """
+
     def __init__(self, stabilizers: List[str], error_types: List[str], **kwargs: Any):
         r"""init function of the `BasicCode` class.
 
@@ -117,9 +121,9 @@ class BasicCode(StabilizerCode):
         :param error_types: List[str], a list of detectable error types
         """
         super().__init__(stabilizers=stabilizers, **kwargs)
-        self._stabilizers = stabilizers         # A list of stabilizer generators of the code
-        self._error_types = error_types         # A list of detectable error types by the code
-        self._name = kwargs.get('name', None)   # The name of the code
+        self._stabilizers = stabilizers  # A list of stabilizer generators of the code
+        self._error_types = error_types  # A list of detectable error types by the code
+        self._name = kwargs.get("name", None)  # The name of the code
         # Number of physical qubits
         self._n = len(self._stabilizers[0])
         # Number of logical qubits, equals to the number of physical qubits minus the number of stabilizer generators
@@ -129,8 +133,9 @@ class BasicCode(StabilizerCode):
         self._check_matrix = pauli_list_to_check_matrix(self._stabilizers)
 
         # Convert the check matrix to standard form and construct logical operators
-        self._standard_form, self._logical_xs, self._logical_zs, self._r = \
-            check_matrix_to_standard_form(self._check_matrix)
+        self._standard_form, self._logical_xs, self._logical_zs, self._r = check_matrix_to_standard_form(
+            self._check_matrix
+        )
 
         # After successfully generating logical operators, perform **Sanity Check** on the stabilizer code.
         # Quantum Error Correction can be achieved only if these sanity checks are satisfied.
@@ -149,68 +154,57 @@ class BasicCode(StabilizerCode):
 
     @property
     def n(self):
-        r"""Number of physical qubits
-        """
+        r"""Number of physical qubits"""
         return self._n
 
     @property
     def k(self):
-        r"""Number of logical qubits
-        """
+        r"""Number of logical qubits"""
         return self._k
 
     @property
     def d(self):
-        r"""Distance of the stabilizer code.
-        """
+        r"""Distance of the stabilizer code."""
         return self._d
 
     @property
     def n_k_d(self):
-        r"""The triple [[n,k,d]] of the stabilizer code.
-        """
+        r"""The triple [[n,k,d]] of the stabilizer code."""
         return self._n, self._k, self._d
 
     @property
     def r(self):
-        r"""Rank of the X portion of the check matrix
-        """
+        r"""Rank of the X portion of the check matrix"""
         return self._r
 
     @property
     def detectable_errors(self):
-        r"""The set of detectable errors by the stabilizer code.
-        """
+        r"""The set of detectable errors by the stabilizer code."""
         return self._detectable_errors
 
     @property
     def syndrome_dict(self):
-        r"""The syndrome dictionary of the stabilizer code.
-        """
+        r"""The syndrome dictionary of the stabilizer code."""
         return self._syndrome_dict
 
     @property
     def stabilizers(self):
-        r"""The list of stabilizer generators in Pauli string, specified by the users.
-        """
+        r"""The list of stabilizer generators in Pauli string, specified by the users."""
         return self._stabilizers
 
     @property
     def error_types(self):
-        r"""The detectable error types, specified by the users.
-        """
+        r"""The detectable error types, specified by the users."""
         return self._error_types
 
     @property
     def check_matrix(self):
-        r"""The check matrix of the stabilizer generators.
-        """
+        r"""The check matrix of the stabilizer generators."""
         return self._check_matrix
 
     @property
     def name(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         if self._name is None:
             return "[[{}, {}, {}]] Stabilizer Code".format(self._n, self._k, self._d)
         else:
@@ -218,26 +212,28 @@ class BasicCode(StabilizerCode):
 
     @property
     def info(self):
-        r"""Detailed information of the stabilizer code.
-        """
-        info_str = ["*******************************************************************************",
-                    "Code Name: {}".format(self.name),
-                    "Parameters: {}".format(self.n_k_d),
-                    "Stabilizers: {}".format(self.stabilizers),
-                    "Standard Form: {}".format(self.standard_form(form='str')),
-                    "Rank: {}".format(self.r),
-                    "Logical X(s): {}".format(self.logical_xs(form='str')),
-                    "Logical Z(s): {}".format(self.logical_zs(form='str')),
-                    "Detectable Errors: {}".format(self.detectable_errors),
-                    "Syndrome Dictionary: ", pprint.pformat(self.syndrome_dict),
-                    "NOTE: For a Pauli string, the right most qubit represents 'q0'.",
-                    "*******************************************************************************"]
+        r"""Detailed information of the stabilizer code."""
+        info_str = [
+            "*******************************************************************************",
+            "Code Name: {}".format(self.name),
+            "Parameters: {}".format(self.n_k_d),
+            "Stabilizers: {}".format(self.stabilizers),
+            "Standard Form: {}".format(self.standard_form(form="str")),
+            "Rank: {}".format(self.r),
+            "Logical X(s): {}".format(self.logical_xs(form="str")),
+            "Logical Z(s): {}".format(self.logical_zs(form="str")),
+            "Detectable Errors: {}".format(self.detectable_errors),
+            "Syndrome Dictionary: ",
+            pprint.pformat(self.syndrome_dict),
+            "NOTE: For a Pauli string, the right most qubit represents 'q0'.",
+            "*******************************************************************************",
+        ]
         return "\n".join(info_str)
 
     def __str__(self):
         return self.info
 
-    def standard_form(self, form: str = 'bsf') -> Union[List[str], np.ndarray]:
+    def standard_form(self, form: str = "bsf") -> Union[List[str], np.ndarray]:
         r"""Return the standard form the check matrix.
 
         The form of the returned standard form is determined by the argument `@form`.
@@ -264,15 +260,17 @@ class BasicCode(StabilizerCode):
              [0 0 1 0 1 1 1 0 0 0]
              [0 0 0 1 1 1 0 1 1 1]]
         """
-        if form == 'str':
+        if form == "str":
             return [bsf2pauli(row) for row in self._standard_form]
-        elif form == 'bsf':
+        elif form == "bsf":
             return self._standard_form
         else:
-            raise ArgumentError("in standard_form(): undefined Pauli form! Supported "
-                                "forms are 'str' (string form) and 'bsf' (binary symplectic form)")
+            raise ArgumentError(
+                "in standard_form(): undefined Pauli form! Supported "
+                "forms are 'str' (string form) and 'bsf' (binary symplectic form)"
+            )
 
-    def logical_xs(self, form: str = 'bsf') -> Union[List[str], np.ndarray]:
+    def logical_xs(self, form: str = "bsf") -> Union[List[str], np.ndarray]:
         r"""Return the set of logical X operators with given form.
 
         The form the returned logical X operators is determined by the argument `@form`.
@@ -293,15 +291,17 @@ class BasicCode(StabilizerCode):
             >>> print("Logical X in BSF: {}".format(five_qubit_code.logical_xs(form='bsf')))
             Standard Form in BSF: [[0 0 0 0 1 1 0 0 1 0]]
         """
-        if form == 'str':
+        if form == "str":
             return [bsf2pauli(row) for row in self._logical_xs]
-        elif form == 'bsf':
+        elif form == "bsf":
             return self._logical_xs
         else:
-            raise ArgumentError("in logical_xs(): undefined Pauli form! Supported "
-                                "forms are 'str' (string form) and 'bsf' (binary symplectic form)")
+            raise ArgumentError(
+                "in logical_xs(): undefined Pauli form! Supported "
+                "forms are 'str' (string form) and 'bsf' (binary symplectic form)"
+            )
 
-    def logical_zs(self, form: str = 'bsf') -> Union[List[str], np.ndarray]:
+    def logical_zs(self, form: str = "bsf") -> Union[List[str], np.ndarray]:
         r"""Return the set of logical Z operators with given form.
 
         The form the returned logical Z operators is determined by the argument `@form`.
@@ -322,13 +322,15 @@ class BasicCode(StabilizerCode):
             >>> print("Logical Z in BSF: {}".format(five_qubit_code.logical_zs(form='bsf')))
             Logical Z in BSF: [[0 0 0 0 0 1 1 1 1 1]]
         """
-        if form == 'str':
+        if form == "str":
             return [bsf2pauli(row) for row in self._logical_zs]
-        elif form == 'bsf':
+        elif form == "bsf":
             return self._logical_zs
         else:
-            raise ArgumentError("in logical_zs(): undefined Pauli form! Supported "
-                                "forms are 'str' (string form) and 'bsf' (binary symplectic form)")
+            raise ArgumentError(
+                "in logical_zs(): undefined Pauli form! Supported "
+                "forms are 'str' (string form) and 'bsf' (binary symplectic form)"
+            )
 
     def sanity_check(self) -> bool:
         r"""Check if the stabilizer code is well-defined.
@@ -355,7 +357,7 @@ class BasicCode(StabilizerCode):
         """
         # Condition 1: The list of stabilizers must mutually commute.
         if not mutually_commute(self._stabilizers):
-            raise ArgumentError('{} Code: Stabilizers must mutually commute!'.format(self._name))
+            raise ArgumentError("{} Code: Stabilizers must mutually commute!".format(self._name))
         # Conditions 2 and 4: The list of logical X operators must mutually commute and
         # the list of stabilizers must mutually commute with the logical X operators.
         # if not mutually_commute(self._stabilizers + self.logical_xs(form='str')):
@@ -365,10 +367,11 @@ class BasicCode(StabilizerCode):
         # if not mutually_commute(self._stabilizers + self.logical_zs(form='str')):
         #     raise ArgumentError('{} Code: Stabilizers must commute with logical Z operators!'.format(self._name))
         # Condition 6: The logical X and Z operators operating on the same logical qubit must anti-commute.
-        for logical_x, logical_z in zip(self.logical_xs(form='str'), self.logical_zs(form='str')):
+        for logical_x, logical_z in zip(self.logical_xs(form="str"), self.logical_zs(form="str")):
             if mutually_commute([logical_x, logical_z]):
-                raise ArgumentError('{} Code: Logical X and Z operators '
-                                    'on the same qubit must anticommute!'.format(self._name))
+                raise ArgumentError(
+                    "{} Code: Logical X and Z operators " "on the same qubit must anticommute!".format(self._name)
+                )
 
     def _compute_code_distance(self):
         r"""Compute the code distance of the stabilizer code.
@@ -381,9 +384,9 @@ class BasicCode(StabilizerCode):
         #TODO# Compute the minimum distance by considering all logical operators.
         """
         # Construct the set of logical operators
-        logical_ops = self.logical_xs(form='str') + self.logical_zs(form='str')
+        logical_ops = self.logical_xs(form="str") + self.logical_zs(form="str")
         # Find the minimum weight
-        self._d = min([len(op) - op.upper().count('I') for op in logical_ops])
+        self._d = min([len(op) - op.upper().count("I") for op in logical_ops])
 
     def _construct_detectable_errors(self):
         r"""Compute the set of detectable errors of the stabilizer code.
@@ -403,9 +406,9 @@ class BasicCode(StabilizerCode):
 
         for error in self._error_types:
             # Detectable single-qubit Pauli error
-            if error in ['X', 'Y', 'Z']:
+            if error in ["X", "Y", "Z"]:
                 for pos in range(self.n):
-                    error_str = ['I'] * self._n
+                    error_str = ["I"] * self._n
                     error_str[self.n - 1 - pos] = error
                     self._detectable_errors.append("".join(map(str, error_str)))
             else:
@@ -521,10 +524,13 @@ class BasicCode(StabilizerCode):
         :param qp: QProgram, a quantum program to be encoded by the stabilizer code, which has :math:`k` qubits
         :return: QProgram, a new quantum program with encoding circuit, which has :math:`n` qubits
         """
-        assert self.k == number_of_qubits(qp), "encode(): The input quantum circuit for appending the encoding " \
-                                               "circuit must have {} qubits!".format(self.k)
+        assert self.k == number_of_qubits(
+            qp
+        ), "encode(): The input quantum circuit for appending the encoding " "circuit must have {} qubits!".format(
+            self.k
+        )
         # Step 0. Enlarge the original quantum circuit with :math:`n` physical qubits
-        enc_qp = enlarge_circuit(qp=copy.deepcopy(qp), extra=self._n-self._k)
+        enc_qp = enlarge_circuit(qp=copy.deepcopy(qp), extra=self._n - self._k)
 
         # Step 1. First prepare the logical 0 state. Based on Section 4.2 of [G97]_.
         for i in range(self.r):
@@ -538,9 +544,9 @@ class BasicCode(StabilizerCode):
             # Apply the i-th stabilizer generator conditioned on qubit idx.
             # Note that the idx-th qubit must be removed from the qubit list in order to achieve conditional Pauli
             pauli = bsf2pauli(self._standard_form[i])
-            pauli = pauli[:i] + pauli[i+1:]  # Remove the i-th bit (correspondingly, the idx-th qubit)
+            pauli = pauli[:i] + pauli[i + 1 :]  # Remove the i-th bit (correspondingly, the idx-th qubit)
             indices = list(reversed(range(self._n)))
-            del indices[i]                   # Remove the i-th bit (correspondingly, the idx-th qubit)
+            del indices[i]  # Remove the i-th bit (correspondingly, the idx-th qubit)
             CPauli(reg_c=[enc_qp.Q[idx]], reg_t=[enc_qp.Q[j] for j in indices], val=1, pauli=pauli)
 
         # Step 2. Conditionally flip the logical state using logical X operators.
@@ -594,11 +600,14 @@ class BasicCode(StabilizerCode):
         :param qp: QProgram, a quantum program to be detected by the stabilizer code, which has :math:`n` qubits
         :return: QProgram, a new quantum program with error detection circuit appended, which has :math:`2n-k` qubits
         """
-        assert self.n == number_of_qubits(qp), "detect(): The input quantum circuit for appending error detecting " \
-                                               "circuit must have {} qubits!".format(self.n)
+        assert self.n == number_of_qubits(
+            qp
+        ), "detect(): The input quantum circuit for appending error detecting " "circuit must have {} qubits!".format(
+            self.n
+        )
 
         # Step 0. Enlarge the input quantum circuit by appending :math:`n-k` extra ancilla qubits.
-        det_qp = enlarge_circuit(qp=copy.deepcopy(qp), extra=self._n-self._k)
+        det_qp = enlarge_circuit(qp=copy.deepcopy(qp), extra=self._n - self._k)
 
         # Measure all stabilizer generators, each controlled by an ancilla qubit.
         for i in range(self.n - self.k):
@@ -650,10 +659,12 @@ class BasicCode(StabilizerCode):
         :param qp: QProgram, a quantum circuit to be corrected by the stabilizer code, which has :math:`n` qubits
         :return: QProgram, a new quantum circuit with correction circuit appended, which has :math:`2n-k` qubits
         """
-        assert self.n * 2 - self.k == number_of_qubits(qp), "correct(): The input quantum circuit for appending "\
-                                                            "error correcting circuit must have {} " \
-                                                            "qubits!".format(self.n * 2 - self.k)
-        #TODO# Check if the stabilizer codes supports error correction
+        assert self.n * 2 - self.k == number_of_qubits(qp), (
+            "correct(): The input quantum circuit for appending "
+            "error correcting circuit must have {} "
+            "qubits!".format(self.n * 2 - self.k)
+        )
+        # TODO# Check if the stabilizer codes supports error correction
         cor_qp = copy.deepcopy(qp)
 
         # Apply correction operations based on syndromes.
@@ -690,9 +701,11 @@ class BasicCode(StabilizerCode):
         :param qp: QProgram, a quantum circuit to be corrected by the stabilizer code, which has :math:`n` qubits
         :return: QProgram, a new circuit with detection and correction circuits appended, which has :math:`2n-k` qubits
         """
-        assert self.n == number_of_qubits(qp), "detect_and_correct(): The input quantum circuit for appending " \
-                                               "error detecting and correcting circuits " \
-                                               "must have {} qubits!".format(self.n)
+        assert self.n == number_of_qubits(qp), (
+            "detect_and_correct(): The input quantum circuit for appending "
+            "error detecting and correcting circuits "
+            "must have {} qubits!".format(self.n)
+        )
 
         det_qp = self.detect(qp=qp)
         cor_qp = self.correct(qp=det_qp)
@@ -722,8 +735,10 @@ class BasicCode(StabilizerCode):
         :return: QProgram, a new quantum program with decoding circuit, which has the same number of
                     qubits as the input quantum circuit
         """
-        assert number_of_qubits(qp) >= self.n, "decode(): The input quantum circuit for appending " \
-                                               "the decoding circuit must have at least {} qubits!".format(self.n)
+        assert number_of_qubits(qp) >= self.n, (
+            "decode(): The input quantum circuit for appending "
+            "the decoding circuit must have at least {} qubits!".format(self.n)
+        )
 
         # We do not change the original quantum circuit
         dec_qp = copy.deepcopy(qp)
@@ -745,9 +760,9 @@ class BasicCode(StabilizerCode):
             # Apply the i-th stabilizer generator conditioned on qubit idx.
             # Note that the idx-th qubit must be removed from the qubit list in order to achieve conditional Pauli
             pauli = bsf2pauli(self._standard_form[i])
-            pauli = pauli[:i] + pauli[i+1:]  # Remove the i-th bit (correspondingly, the idx-th qubit)
+            pauli = pauli[:i] + pauli[i + 1 :]  # Remove the i-th bit (correspondingly, the idx-th qubit)
             indices = list(reversed(range(self._n)))
-            del indices[i]                   # Remove the i-th bit (correspondingly, the idx-th qubit)
+            del indices[i]  # Remove the i-th bit (correspondingly, the idx-th qubit)
             CPauli(reg_c=[dec_qp.Q[idx]], reg_t=[dec_qp.Q[j] for j in indices], val=1, pauli=pauli)
 
             # If there exists a Z_i factor in the i-th stabilizer, apply SDG gate
@@ -770,21 +785,27 @@ class BasicCode(StabilizerCode):
         qp = QEnv()
         qp.Q.createList(n)
         # Construct the corresponding circuit string for the circuit
-        circuit_str = print_circuit(method(qp).circuit,
-                                    show=False,
-                                    colors={'red': list(range(self.k)),
-                                            'blue': list(range(self.k, self.n)),
-                                            'yellow': list(range(self.n, self.n * 2 - self.k))})
+        circuit_str = print_circuit(
+            method(qp).circuit,
+            show=False,
+            colors={
+                "red": list(range(self.k)),
+                "blue": list(range(self.k, self.n)),
+                "yellow": list(range(self.n, self.n * 2 - self.k)),
+            },
+        )
 
         sep_str = "**********************************************"
         type_str = "{} Circuit of the '{}':".format(method_name, self.name)
-        info_str = "Qubits Category: [{}][{}][{}]\n".format(COLOR_TABLE['yellow'] + "Ancilla" + COLOR_TABLE['end'],
-                                                            COLOR_TABLE['blue'] + "Physical" + COLOR_TABLE['end'],
-                                                            COLOR_TABLE['red'] + "Original" + COLOR_TABLE['end'])
+        info_str = "Qubits Category: [{}][{}][{}]\n".format(
+            COLOR_TABLE["yellow"] + "Ancilla" + COLOR_TABLE["end"],
+            COLOR_TABLE["blue"] + "Physical" + COLOR_TABLE["end"],
+            COLOR_TABLE["red"] + "Original" + COLOR_TABLE["end"],
+        )
 
         # Concatenate the strings
         circuit_str = [type_str, sep_str, circuit_str, sep_str, info_str]
-        return '\n'.join(circuit_str)
+        return "\n".join(circuit_str)
 
     def print_encode_circuit(self, show=True) -> str:
         r"""Print the encoding quantum circuit in text string style.
@@ -811,7 +832,7 @@ class BasicCode(StabilizerCode):
         :param show: bool, if the encoding circuit will be shown in the terminal in form of texts
         :return: str, the encoding quantum circuit in simple text string style
         """
-        circuit_str = self._print_qec_circuit(method=self.encode, method_name='Encoding', n=self.k)
+        circuit_str = self._print_qec_circuit(method=self.encode, method_name="Encoding", n=self.k)
         if show:
             print(circuit_str)
 
@@ -850,7 +871,7 @@ class BasicCode(StabilizerCode):
         :param show: bool, if the detecting circuit will be shown in the terminal in form of texts
         :return: str, the detecting quantum circuit in simple text string style
         """
-        circuit_str = self._print_qec_circuit(method=self.detect, method_name='Detecting', n=self.n)
+        circuit_str = self._print_qec_circuit(method=self.detect, method_name="Detecting", n=self.n)
         if show:
             print(circuit_str)
 
@@ -889,7 +910,7 @@ class BasicCode(StabilizerCode):
         :param show: bool, if the correcting circuit will be shown in the terminal in form of texts
         :return: str, the correcting quantum circuit in simple text string style
         """
-        circuit_str = self._print_qec_circuit(method=self.correct, method_name='Correcting', n=self.n*2 - self.k)
+        circuit_str = self._print_qec_circuit(method=self.correct, method_name="Correcting", n=self.n * 2 - self.k)
         if show:
             print(circuit_str)
 
@@ -920,7 +941,7 @@ class BasicCode(StabilizerCode):
         :param show: bool, if the decoding quantum circuit will be shown in the terminal in form of texts
         :return: str, the decoding quantum circuit in simple text string style
         """
-        circuit_str = self._print_qec_circuit(method=self.decode, method_name='Decoding', n=self.n)
+        circuit_str = self._print_qec_circuit(method=self.decode, method_name="Decoding", n=self.n)
         if show:
             print(circuit_str)
 
@@ -951,14 +972,14 @@ class BasicCode(StabilizerCode):
         :param show: bool, if true the 'encoding➜decoding' quantum circuit will be shown in the terminal
         :return: str, the 'encoding➜decoding' quantum circuit in simple text string style
         """
+
         def _encode_decode(qp: QProgram) -> QProgram:
             enc_qp = self.encode(qp)
-            Barrier(*enc_qp.Q.registerMap.values())   # Add barrier for separation
+            Barrier(*enc_qp.Q.registerMap.values())  # Add barrier for separation
             dec_qp = self.decode(enc_qp)
             return dec_qp
 
-        circuit_str = self._print_qec_circuit(method=_encode_decode,
-                                              method_name='Encoding➜Decoding', n=self.k)
+        circuit_str = self._print_qec_circuit(method=_encode_decode, method_name="Encoding➜Decoding", n=self.k)
 
         if show:
             print(circuit_str)
@@ -990,15 +1011,14 @@ class BasicCode(StabilizerCode):
         :param show: bool, if true the 'detecting➜correcting' quantum circuit will be shown in the terminal
         :return: str, the 'detecting➜correcting' quantum circuit in simple text string style
         """
+
         def _detect_correct(qp: QProgram) -> QProgram:
             det_qp = self.detect(qp)
-            Barrier(*det_qp.Q.registerMap.values())   # Add barrier for separation
+            Barrier(*det_qp.Q.registerMap.values())  # Add barrier for separation
             cor_qp = self.correct(det_qp)
             return cor_qp
 
-        circuit_str = self._print_qec_circuit(method=_detect_correct,
-                                              method_name='Detecting➜Correcting',
-                                              n=self.n)
+        circuit_str = self._print_qec_circuit(method=_detect_correct, method_name="Detecting➜Correcting", n=self.n)
 
         if show:
             print(circuit_str)
@@ -1019,18 +1039,20 @@ class BasicCode(StabilizerCode):
                             will be shown in the terminal in form of texts
         :return: str, the 'encoding➜detecting➜correcting➜decoding' quantum circuit in simple text string style
         """
+
         def _encode_detect_correct_decode(qp: QProgram) -> QProgram:
             enc_qp = self.encode(qp)
-            Barrier(*enc_qp.Q.registerMap.values())     # Add barrier for separation
+            Barrier(*enc_qp.Q.registerMap.values())  # Add barrier for separation
             det_qp = self.detect(enc_qp)
-            Barrier(*det_qp.Q.registerMap.values())     # Add barrier for separation
+            Barrier(*det_qp.Q.registerMap.values())  # Add barrier for separation
             cor_qp = self.correct(det_qp)
-            Barrier(*cor_qp.Q.registerMap.values())     # Add barrier for separation
+            Barrier(*cor_qp.Q.registerMap.values())  # Add barrier for separation
             dec_qp = self.decode(cor_qp)
             return dec_qp
 
-        circuit_str = self._print_qec_circuit(method=_encode_detect_correct_decode,
-                                              method_name='Encoding➜Detecting➜Correcting➜Decoding', n=self.k)
+        circuit_str = self._print_qec_circuit(
+            method=_encode_detect_correct_decode, method_name="Encoding➜Detecting➜Correcting➜Decoding", n=self.k
+        )
 
         if show:
             print(circuit_str)
@@ -1041,12 +1063,13 @@ class BasicCode(StabilizerCode):
 class BitFlipCode(BasicCode):
     r"""The three-qubit bit-flip quantum error detection code class.
 
-        The stabilizer generators of the three-qubit bit-flip code are:
+    The stabilizer generators of the three-qubit bit-flip code are:
 
-        .. math:: \mathcal{S}_{\rm bf} = \{S_0=IZZ, S_1=ZZI\}.
+    .. math:: \mathcal{S}_{\rm bf} = \{S_0=IZZ, S_1=ZZI\}.
 
-        The bit-flip code can detect and correct arbitrary single-qubit X errors, but it cannot detect Y and Z errors.
+    The bit-flip code can detect and correct arbitrary single-qubit X errors, but it cannot detect Y and Z errors.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `BitFlipCode` class.
 
@@ -1061,18 +1084,19 @@ class BitFlipCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['IZZ', 'ZZI'], error_types=['X'], name='Bit-Flip Code', **kwargs)
+        super().__init__(stabilizers=["IZZ", "ZZI"], error_types=["X"], name="Bit-Flip Code", **kwargs)
 
 
 class PhaseFlipCode(BasicCode):
     r"""The three-qubit phase-flip quantum error detection code class.
 
-        The stabilizer generators of the three-qubit phase-flip code are:
+    The stabilizer generators of the three-qubit phase-flip code are:
 
-        .. math:: \mathcal{S}_{\rm pf} = \{S_0=IXX, S_1=XXI\}.
+    .. math:: \mathcal{S}_{\rm pf} = \{S_0=IXX, S_1=XXI\}.
 
-        The phase-flip code can detect and correct arbitrary single-qubit Z errors, but it cannot detect X and Y errors.
+    The phase-flip code can detect and correct arbitrary single-qubit Z errors, but it cannot detect X and Y errors.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `PhaseFlipCode` class.
 
@@ -1087,22 +1111,23 @@ class PhaseFlipCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['IXX', 'XXI'], error_types=['Z'], name='Phase-Flip Code', **kwargs)
+        super().__init__(stabilizers=["IXX", "XXI"], error_types=["Z"], name="Phase-Flip Code", **kwargs)
 
 
 class FourOneTwoCode(BasicCode):
     r"""The :math:`[[4, 1, 2]]` quantum error detection code class.
 
-        The stabilizer generators of the :math:`[[4, 1, 2]]` code are:
+    The stabilizer generators of the :math:`[[4, 1, 2]]` code are:
 
-        .. math::
+    .. math::
 
-            S_0=IZIZ, S_1=XXXX, S_2=ZIZI.
+        S_0=IZIZ, S_1=XXXX, S_2=ZIZI.
 
-        This code can detect but cannot correct arbitrary single-qubit X, Y, and Z errors.
+    This code can detect but cannot correct arbitrary single-qubit X, Y, and Z errors.
 
-        See the Supplementary Material of [CYK+22]_ for more details on the :math:`[[4, 1, 2]]` code.
+    See the Supplementary Material of [CYK+22]_ for more details on the :math:`[[4, 1, 2]]` code.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `FourOneTwoCode` class.
 
@@ -1117,24 +1142,25 @@ class FourOneTwoCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['IZIZ', 'XXXX', 'ZIZI'],
-                         error_types=['X', 'Y', 'Z'],
-                         name='[[4, 1, 2]] Code', **kwargs)
+        super().__init__(
+            stabilizers=["IZIZ", "XXXX", "ZIZI"], error_types=["X", "Y", "Z"], name="[[4, 1, 2]] Code", **kwargs
+        )
 
 
 class FourTwoTwoCode(BasicCode):
     r"""The :math:`[[4, 2, 2]]` quantum error detection code class.
 
-        The stabilizer generators of the :math:`[[4, 2, 2]]` code are:
+    The stabilizer generators of the :math:`[[4, 2, 2]]` code are:
 
-        .. math::
+    .. math::
 
-            S_0=XXXX, S_1=ZZZZ.
+        S_0=XXXX, S_1=ZZZZ.
 
-        This code can detect but cannot correct arbitrary single-qubit X, Y, and Z errors.
+    This code can detect but cannot correct arbitrary single-qubit X, Y, and Z errors.
 
-        See Section 4.3 of [R19]_ for more details on the :math:`[[4, 2, 2]]` error detection code.
+    See Section 4.3 of [R19]_ for more details on the :math:`[[4, 2, 2]]` error detection code.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `FourOneTwoCode` class.
 
@@ -1149,20 +1175,19 @@ class FourTwoTwoCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['XXXX', 'ZZZZ'],
-                         error_types=['X', 'Y', 'Z'],
-                         name='[[4, 2, 2]] Code', **kwargs)
+        super().__init__(stabilizers=["XXXX", "ZZZZ"], error_types=["X", "Y", "Z"], name="[[4, 2, 2]] Code", **kwargs)
 
 
 class FiveQubitCode(BasicCode):
     r"""The five-qubit quantum error correction code class.
 
-        The stabilizer generators of the five-qubit code are:
+    The stabilizer generators of the five-qubit code are:
 
-        .. math:: \mathcal{S}_{\rm 5q} = \{S_0=XZZXI, S_1=IXZZX, S_2=XIXZZ, S_3=ZXIXZ\}.
+    .. math:: \mathcal{S}_{\rm 5q} = \{S_0=XZZXI, S_1=IXZZX, S_2=XIXZZ, S_3=ZXIXZ\}.
 
-        The five-qubit code can detect and correct arbitrary single-qubit X, Y, and Z errors.
+    The five-qubit code can detect and correct arbitrary single-qubit X, Y, and Z errors.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `FiveQubitCode` class.
 
@@ -1177,24 +1202,28 @@ class FiveQubitCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['XZZXI', 'IXZZX', 'XIXZZ', 'ZXIXZ'],
-                         error_types=['X', 'Y', 'Z'],
-                         name='Five-Qubit Code', **kwargs)
+        super().__init__(
+            stabilizers=["XZZXI", "IXZZX", "XIXZZ", "ZXIXZ"],
+            error_types=["X", "Y", "Z"],
+            name="Five-Qubit Code",
+            **kwargs
+        )
 
 
 class SteaneCode(BasicCode):
     r"""The seven-qubit Steane quantum error correction code class.
 
-        The stabilizer generators of the Steane code are:
+    The stabilizer generators of the Steane code are:
 
-        .. math::
+    .. math::
 
-            S_0=XXXXIII, S_1=XXIIXXI, S_2=XIXIXIX,
+        S_0=XXXXIII, S_1=XXIIXXI, S_2=XIXIXIX,
 
-            S_3=ZZZZIII, S_4=ZZIIZZI, S_5=ZIZIZIZ.
+        S_3=ZZZZIII, S_4=ZZIIZZI, S_5=ZIZIZIZ.
 
-        The Steane code can detect and correct arbitrary single-qubit X, Y, and Z errors.
+    The Steane code can detect and correct arbitrary single-qubit X, Y, and Z errors.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `SteaneCode` class.
 
@@ -1209,28 +1238,32 @@ class SteaneCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['XXXXIII', 'XXIIXXI', 'XIXIXIX', 'ZZZZIII', 'ZZIIZZI', 'ZIZIZIZ'],
-                         error_types=['X', 'Y', 'Z'],
-                         name='Steane Code', **kwargs)
+        super().__init__(
+            stabilizers=["XXXXIII", "XXIIXXI", "XIXIXIX", "ZZZZIII", "ZZIIZZI", "ZIZIZIZ"],
+            error_types=["X", "Y", "Z"],
+            name="Steane Code",
+            **kwargs
+        )
 
 
 class ShorCode(BasicCode):
     r"""The nine-qubit Shor quantum error correction code class.
 
-        The stabilizer generators of the Shor code are:
+    The stabilizer generators of the Shor code are:
 
-        .. math::
+    .. math::
 
-            S_0=IIIIIIIZZ, S_1=IIIIIIZZI,
+        S_0=IIIIIIIZZ, S_1=IIIIIIZZI,
 
-            S_2=IIIIZZIII, S_3=IIIZZIIII,
+        S_2=IIIIZZIII, S_3=IIIZZIIII,
 
-            S_4=IZZIIIIII, S_5=ZZIIIIIII,
+        S_4=IZZIIIIII, S_5=ZZIIIIIII,
 
-            S_6=IIIXXXXXX, S_7=XXXXXXIII.
+        S_6=IIIXXXXXX, S_7=XXXXXXIII.
 
-        The Shor code can detect and correct arbitrary single-qubit X, Y, and Z errors.
+    The Shor code can detect and correct arbitrary single-qubit X, Y, and Z errors.
     """
+
     def __init__(self, **kwargs: Any):
         r"""init function of the `ShorCode` class.
 
@@ -1245,9 +1278,18 @@ class ShorCode(BasicCode):
 
                 qubits:         q[3]  q[2]   q[1]   q[0]
         """
-        super().__init__(stabilizers=['IIIIIIIZZ', 'IIIIIIZZI',
-                                      'IIIIZZIII', 'IIIZZIIII',
-                                      'IZZIIIIII', 'ZZIIIIIII',
-                                      'IIIXXXXXX', 'XXXXXXIII'],
-                         error_types=['X', 'Y', 'Z'],
-                         name='Shor Code', **kwargs)
+        super().__init__(
+            stabilizers=[
+                "IIIIIIIZZ",
+                "IIIIIIZZI",
+                "IIIIZZIII",
+                "IIIZZIIII",
+                "IZZIIIIII",
+                "ZZIIIIIII",
+                "IIIXXXXXX",
+                "XXXXXXIII",
+            ],
+            error_types=["X", "Y", "Z"],
+            name="Shor Code",
+            **kwargs
+        )

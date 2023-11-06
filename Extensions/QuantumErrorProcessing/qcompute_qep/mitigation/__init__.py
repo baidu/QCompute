@@ -19,5 +19,5 @@
 __init__ file of the `qcompute_qep.mitigation` module.
 """
 
-from qcompute_qep.mitigation.mitigation import Mitigator
-from qcompute_qep.mitigation.zne.zne import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.mitigation import Mitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation.zne.zne import ZNEMitigator

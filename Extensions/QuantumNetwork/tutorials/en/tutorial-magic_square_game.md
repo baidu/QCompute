@@ -22,7 +22,7 @@ The rules of the magic square game are as follows:
 
 **Note**: The players are allowed to negotiate a proper strategy before the magic square game starts to increase their winning probability. But no communication is allowed once the game starts.
 
-![Figure 1: One possible winning scheme when x=1, y=2](./figures/magic_square_game-example.png "Figure 1: One possible winning scheme when x=1, y=2")
+![Figure 1: One possible winning scheme when x=1, y=2](./figures/magic_square_game-example.png "Figure 1: A possible winning scheme when x=1, y=2")
 
 ### 2. Optimal classical strategy
 
@@ -30,7 +30,7 @@ To maximize the winning probability, Alice and Bob can negotiate the filling sch
 
 One possible classical optimal strategy is shown in Figure 2. We can easily find that when $x=2, y=2$, Alice and Bob can never reach an agreement on the value of the intersected cell. If filled with $-1$, then Bob will break the rule; If filled with $+1$, the product of elements of Alice's row is not equal to $+1$ and thus break the rule. Under such a scheme, the players can only achieve the winning probability of $\frac{8}{9}$. On the other hand, we can verify that no classical strategy can make the players achieve a winning probability higher than $\frac{8}{9}$, i.e., the strategy in Figure 2 is an optimal classical strategy.
 
-![Figure 2: A possible optimal classical strategy of the magic square game](./figures/magic_square_game-optimal_classical_strategy.png "Figure 2: A possible optimal classical strategy of the magic square game")
+![Figure 2: An optimal classical strategy of the magic square game](./figures/magic_square_game-optimal_classical_strategy.png "Figure 2: An optimal classical strategy of the magic square game")
 
 ### 3. Optimal quantum strategy
 
@@ -479,7 +479,7 @@ First, we create a simulation environment ``QuantumEnv``.
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # Create an environment for simulation
 env = QuantumEnv("Magic square game", default=True)
@@ -489,9 +489,9 @@ Then, we create the quantum nodes that correspond to the four roles in the proto
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import MagicSquareGame
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import MagicSquareGame
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # Create quantum nodes with quantum registers and specify their pre-installed protocols
 alice = QuantumNode("Alice", qreg_size=2, protocol=MagicSquareGame)
@@ -510,7 +510,7 @@ Next, we create a quantum network and install all the configured nodes and links
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a network, install the nodes and links
 network = Network("Magic square game network")
@@ -537,7 +537,7 @@ By calling the ``estimate_statistics`` method of ``Referee`` sub-protocol, we ca
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # Initialize the environment and run simulation
 env.init()

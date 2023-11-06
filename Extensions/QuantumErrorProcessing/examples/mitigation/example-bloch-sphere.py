@@ -38,15 +38,15 @@ from qiskit.providers.fake_provider import FakeSantiago
 
 from QCompute import *
 from QCompute.QPlatform.QOperation.RotationGate import RX, RZ
-from qcompute_qep.exceptions import ArgumentError
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils import execute, expval_z_from_counts
-from qcompute_qep.utils.circuit import remove_measurement
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import execute, expval_z_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import remove_measurement
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 # Define the Pauli operators
-__PAULI_OPERATORS__ = ['X', 'Y', 'Z']
+__PAULI_OPERATORS__ = ["X", "Y", "Z"]
 
 
 def pauli_meas(qp: QProgram, pauli: str) -> None:
@@ -71,11 +71,11 @@ def pauli_meas(qp: QProgram, pauli: str) -> None:
     # Remove the old measurement operations if exists
     remove_measurement(qp)
     # Add the Pauli basis transformation circuit
-    if pauli == 'I' or pauli == 'Z':
+    if pauli == "I" or pauli == "Z":
         pass
-    elif pauli == 'X':
+    elif pauli == "X":
         H(qp.Q[0])
-    elif pauli == 'Y':
+    elif pauli == "Y":
         SDG(qp.Q[0])
         H(qp.Q[0])
     else:
@@ -108,8 +108,8 @@ def xz_rotation(qp: QProgram, k: int, n: int) -> None:
         return
 
     # Apply the single-qubit XZ-rotation gate
-    RZ(-4 * (k-1) * math.pi / n)(qp.Q[0])
-    RX(- (k-1) * math.pi / n)(qp.Q[0])
+    RZ(-4 * (k - 1) * math.pi / n)(qp.Q[0])
+    RX(-(k - 1) * math.pi / n)(qp.Q[0])
     RX(k * math.pi / n)(qp.Q[0])
     RZ(4 * k * math.pi / n)(qp.Q[0])
 
@@ -133,8 +133,7 @@ def calculator(qp: QProgram, qc: QComputer) -> float:
     return expval_z_from_counts(counts)
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     # Set the period
     period = 100
 
@@ -154,7 +153,7 @@ if __name__ == '__main__':
     qc_noisy = FakeSantiago()
 
     # Initialize the ZNE mitigator
-    zne = ZNEMitigator(folder="circuit", extrapolator='richardson')
+    zne = ZNEMitigator(folder="circuit", extrapolator="richardson")
 
     # Set the scaling factors
     scale_factors = [1, 3, 5, 7]
@@ -165,12 +164,10 @@ if __name__ == '__main__':
     pauli_mitig = np.zeros((period, len(__PAULI_OPERATORS__)), dtype=float)
 
     for k in range(period):
-
         # Apply the single-qubit XZ-rotation gate of index k to the original quantum circuit
         xz_rotation(qp, k=k, n=period)
 
         for i, pauli in enumerate(__PAULI_OPERATORS__):
-
             # Use temporary quantum circuit to estimate expectation value of Pauli operator.
             # !!!WARNING!!! Do NOT forget to deepcopy the original quantum circuit otherwise it is only a reference.
             # The temporary quantum circuit will be destroyed after the Pauli measurement.
@@ -184,7 +181,6 @@ if __name__ == '__main__':
 
             # Estimate the noise-rescaled expectation value of the Pauli operator for each rescale factor
             for j, factor in enumerate(scale_factors):
-
                 # Rescale the quantum circuit and estimate the corresponding expectation value
                 qp_rescaled = zne.folder.fold(qp=qp_pauli, scale_factor=factor)
                 pauli_noisy[k][i][j] = calculator(qp_rescaled, qc_noisy)
@@ -197,7 +193,7 @@ if __name__ == '__main__':
     b = qutip.Bloch(fig=fig)
     b.view = [-40, 30]
     # Set the colors for different points
-    cm = pylab.get_cmap('Set1')  # Dark2, Accent, Paired, set1
+    cm = pylab.get_cmap("Set1")  # Dark2, Accent, Paired, set1
     b.point_color = [cm(i) for i in range(10)]
 
     # Add the ideal expectation values to the Bloch sphere
@@ -210,10 +206,6 @@ if __name__ == '__main__':
 
     b.render()  # render to the correct subplot
 
-    plt.savefig("Block-Sphere.png",
-                format='png',
-                dpi=600,
-                bbox_inches='tight',
-                pad_inches=0.1)
+    plt.savefig("Block-Sphere.png", format="png", dpi=600, bbox_inches="tight", pad_inches=0.1)
 
     plt.show()

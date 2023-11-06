@@ -36,8 +36,8 @@ Now, you can try to write a simple program to check whether QNET has been succes
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology import Network, Node, Link
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology import Network, Node, Link
 
 # Create a simulation environment
 env = DESEnv("Simulation Environment", default=True)

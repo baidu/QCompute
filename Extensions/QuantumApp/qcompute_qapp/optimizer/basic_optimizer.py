@@ -25,8 +25,8 @@ from ..circuit import ParameterizedCircuit
 
 
 class BasicOptimizer(ABC):
-    r"""Basic Optimizer class
-    """
+    r"""Basic Optimizer class"""
+
     def __init__(self, iterations: int, circuit: ParameterizedCircuit):
         r"""The constructor of the BasicOptimizer class
 
@@ -50,9 +50,10 @@ class BasicOptimizer(ABC):
 
     @abstractmethod
     def minimize(
-            self, shots: int,
-            loss_func: Callable[[np.ndarray, int], float],
-            grad_func: Callable[[np.ndarray, int], np.ndarray]
+        self,
+        shots: int,
+        loss_func: Callable[[np.ndarray, int], float],
+        grad_func: Callable[[np.ndarray, int], np.ndarray],
     ) -> None:
         r"""Minimizes the given loss function
 

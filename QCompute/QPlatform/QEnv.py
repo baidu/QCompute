@@ -37,6 +37,7 @@ from QCompute.QPlatform import Error, ModuleErrorCode, BackendName, getBackendFr
 from QCompute.QPlatform.CircuitTools import QEnvToProtobuf
 from QCompute.QPlatform.InteractiveModule import InteractiveModule
 from QCompute.QPlatform.ProcedureParameterPool import ProcedureParameterPool
+from QCompute.QPlatform.Processor.BackendFilter import filterCloudBackend
 from QCompute.QPlatform.Processor.ModuleFilter import filterModule, printModuleListDescription
 from QCompute.QPlatform.Processor.PostProcessor import formatMeasure
 from QCompute.QPlatform.QNoise import QNoise, QNoiseDefine
@@ -202,10 +203,11 @@ class QEnv:
             reversedEnv.circuit[index] = newLine
         return reversedEnv
 
-    def controlProcedure(self, name: str, cuFirst: bool = False) -> Tuple['QProcedure', str]:
+    def controlProcedure(self, name: str, cuFirst: bool = False) -> Tuple[str, 'QProcedure']:
         procedure = self.procedureMap.get(name)
         if procedure is None:
-            raise Error.ArgumentError(f"Don't have procedure name: {name}!", ModuleErrorCode, FileErrorCode, 4)
+            raise Error.ArgumentError(f"Don't have procedure name: {name}!", ModuleErrorCode, FileErrorCode,
+                                      4)
 
         controlledProcedureName = name + '__controlled'
         controlledProcedure = self.procedureMap.get(controlledProcedureName)
@@ -223,14 +225,15 @@ class QEnv:
             controlledProcedure.circuit.extend(newCircuitLineList)
         return controlledProcedure, controlledProcedureName
 
-    def publish(self, applyModule=True) -> List['ModuleImplement']:
+    def publish(self, applyModule=True, program: PBProgram = None) -> List['ModuleImplement']:
         """
         To protobuf.
         """
-        program = PBProgram()
+        if program is None:
+            program = PBProgram()
+            program.sdkVersion = Define.sdkVersion
+            QEnvToProtobuf(program, self)
         self.program = program
-        program.sdkVersion = Define.sdkVersion
-        QEnvToProtobuf(self.program, self)
 
         moduleStep = 0
         circuitToDrawTerminal = CircuitToDrawConsole()
@@ -257,11 +260,9 @@ class QEnv:
         else:
             return self.usingModuleList
 
-    def commit(self, shots: int, fetchMeasure=True, downloadResult=True,
+    def commit(self, shots: int, fetchMeasure=True, downloadResult=True, program: PBProgram = None,
                notes: Optional[str] = None
-               
-               ) -> Dict[
-        str, Union[str, Dict[str, int]]]:
+               ) -> Dict[str, Union[str, Dict[str, int]]]:
         """
         Switch local/cloud commitment by prefix of backend name
 
@@ -275,9 +276,15 @@ class QEnv:
 
         env.commit(1024, fetchMeasure=True, notes='Task 001')
 
+        env.commit(1024, fetchMeasure=True, program=program)
+
         :param shots: experiment counts
-        :param fetchMeasure: named param, default is True, means 'Extract data from measurement results', downloadResult must be True
+
+        :param fetchMeasure: named param, default is True, means 'Extract data from measurement results',
+        downloadResult must be True
+
         :param downloadResult: named param, default is True, means 'Download experiment results from the server'
+
         :return: local or cloud commit result
 
         Successful:
@@ -299,7 +306,7 @@ class QEnv:
 
         ret: Dict[str, Union[str, Dict[str, int]]] = None
         if self.backendName.value.startswith('local_'):
-            usedModuleList = self.publish()  # circuit in Protobuf format
+            usedModuleList = self.publish(program=program)  # circuit in Protobuf format
             moduleList = [{
                 'module': module.__class__.__name__,
                 'arguments': module.arguments
@@ -310,19 +317,18 @@ class QEnv:
             moduleList = [(module.__class__.__name__, module.arguments) for module in self.usingModuleList]
             moduleList.extend(self.usedServerModuleList)
 
-            ret = self._cloudCommit(fetchMeasure, downloadResult, moduleList, notes
-                                    
-                                    )
+            ret = self._cloudCommit(fetchMeasure, downloadResult, moduleList, notes)
         elif self.backendName.value.startswith('service_'):
-            usedModuleList = self.publish()  # circuit in Protobuf format
+            usedModuleList = self.publish(program=program)  # circuit in Protobuf format
             moduleList = [{
                 'module': module.__class__.__name__,
                 'arguments': module.arguments
             } for module in usedModuleList]
             ret = self._serviceCommit(fetchMeasure, moduleList)
         else:
-            raise Error.ArgumentError(f"Invalid backendName => {self.backendName.value}", ModuleErrorCode,
+            raise Error.ArgumentError(f'Invalid backendName => {self.backendName.value}', ModuleErrorCode,
                                       FileErrorCode, 5)
+
         if Settings.outputInfo and 'moduleList' in ret:
             moduleList: List[str] = [moduleSetting['module'] for moduleSetting in ret['moduleList']]
             interactiveModule = InteractiveModule(self)
@@ -472,7 +478,7 @@ class QEnv:
 
     def _cloudCommit(self, fetchMeasure: bool, downloadResult: bool, moduleList: List[Tuple[str, Any]],
                      notes: str
-                     
+
                      ) -> Dict[
         str, Union[str, Dict[str, int]]]:
         """
@@ -480,6 +486,8 @@ class QEnv:
 
         :return: task result
         """
+
+        filterCloudBackend(self)
 
         # the sequential bytes of the circuit which is already in PB
         programBuf: bytes = self.program.SerializeToString()
@@ -497,9 +505,7 @@ class QEnv:
         task.uploadCircuit(programBuf)
         backend = self.backendName.value[6:]  # omit the prefix `cloud_`
         task.createCircuitTask(self.shots, backend, len(self.program.head.usingQRegList), self.backendArgument,
-                               moduleList, notes
-                               
-                               )
+                               moduleList, notes)
 
         if Settings.outputInfo:
             print(f'Circuit upload successful, circuitId => {task.circuitId} taskId => {task.taskId}')

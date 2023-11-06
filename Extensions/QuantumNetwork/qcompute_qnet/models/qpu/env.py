@@ -22,11 +22,9 @@ Module for discrete-event simulation environment with extra functionalities.
 from enum import Enum
 from typing import List, Union
 
-from qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
 
-__all__ = [
-    "QuantumEnv"
-]
+__all__ = ["QuantumEnv"]
 
 
 class QuantumEnv(DESEnv):
@@ -48,12 +46,13 @@ class QuantumEnv(DESEnv):
         """
         super().__init__(name, default)
 
-    def run(self, shots=1, backend=None, token=None, print_cir=True,
-            end_time=None, logging=False, summary=True) -> Union[dict, List[dict]]:
+    def run(
+        self, shots=1, backend=None, token=None, print_cir=True, end_time=None, logging=False, summary=True
+    ) -> Union[dict, List[dict]]:
         r"""Run the simulation and the quantum circuit with a given backend.
 
         Args:
-            shots (int): number of circuit samples for a single circuit
+            shots (int): circuit sampling shots
             backend (Enum): backend to run the quantum circuit
             token (str): your token for QCompute backend
             print_cir (bool): whether to print the circuit

@@ -21,7 +21,7 @@ This file implements the Abstract Class of the `Quantum Estimation` method.
 import abc
 from typing import Any, List
 
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 class Estimation(abc.ABC):
@@ -33,6 +33,7 @@ class Estimation(abc.ABC):
     The implementations---``DFEState``, ``DFEProcess``, ``DFEMeasurement``,
     and ``CPEState``---must inherit this abstract class.
     """
+
     def __init__(self, qp: QProgram = None, qc: QComputer = None, **kwargs: Any):
         r"""Init function of the Quantum Estimation class.
 

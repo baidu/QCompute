@@ -30,7 +30,7 @@ __all__ = [
 
 
 class Message(ABC):
-    r"""Abstract class for the classical message in a network.
+    r"""Abstract class for the message in a network.
 
     Attributes:
         data: message content

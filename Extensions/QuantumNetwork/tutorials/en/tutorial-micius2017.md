@@ -123,7 +123,7 @@ First, we have collected data on the track of the Micius satellite from Ref. [1]
 
 ```python
 import pandas as pd
-from qcompute_qnet.functionalities.mobility import Track
+from Extensions.QuantumNetwork.qcompute_qnet.functionalities.mobility import Track
 
 # Load data of the Micius satellite
 micius_track = pd.read_csv("data/micius2017_track.csv")
@@ -158,8 +158,8 @@ Then we create the simulation environment and build the quantum network to simul
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
  # Create a simulation environment
 env = DESEnv("Micius Satellite Experiment Simulation", default=True)
@@ -176,7 +176,7 @@ Next, we set up the decoy-state BB84 protocol. Set `DecoyBB84` protocol to be th
 
 
 ```python
-from qcompute_qnet.models.qkd.node import QKDSatellite, QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDSatellite, QKDNode
 
 # Create QKD nodes
 micius = QKDSatellite("Micius")
@@ -207,8 +207,8 @@ xinglong.protocol_stack.build(decoy_bb84_xinglong)
 
 
 ```python
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFreeSpaceChannel, QuantumFreeSpaceChannel
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFreeSpaceChannel, QuantumFreeSpaceChannel
 
 # Create the link between the Micius satellite and the ground station and connect both nodes
 link_micius_xinglong = Link("Micius_Xinglong", ends=(micius, xinglong))
@@ -238,7 +238,7 @@ Here, we set the run time of the simulation environment to be 0.1s (interested r
 
 
 ```python
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
 
 # Start the protocol stack
 micius.protocol_stack.start(role=PrepareAndMeasure.Role.TRANSMITTER, key_num=float("inf"), key_length=256)

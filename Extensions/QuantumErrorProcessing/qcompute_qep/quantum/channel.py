@@ -41,9 +41,9 @@ import abc
 from typing import Union, List, Tuple
 import numpy as np
 import copy
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
-import qcompute_qep.utils.linalg as la
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg as la
 
 # define the abstract quantum channel data type
 QChannel = Union[np.ndarray, List[np.ndarray], List[Tuple[np.ndarray, np.ndarray]]]
@@ -51,6 +51,7 @@ QChannel = Union[np.ndarray, List[np.ndarray], List[Tuple[np.ndarray, np.ndarray
 
 class QuantumChannel(abc.ABC):
     """This is the abstract Quantum Channel class."""
+
     def __init__(self, data: QChannel = None, rep_type: str = None, shape: Tuple[int, int] = None, name: str = None):
         """The init function of quantum channel.
 
@@ -110,7 +111,7 @@ class QuantumChannel(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def tensor(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def tensor(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Tensor with other quantum channel. Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -121,7 +122,7 @@ class QuantumChannel(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def concat(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def concat(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Concatenate with other quantum channel.Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -139,6 +140,7 @@ class QuantumChannel(abc.ABC):
 
 class PTM(QuantumChannel):
     """This is the Pauli Transfer Matrix Representation class."""
+
     def __init__(self, data, name: str = None):
         """The init function fo PTM representation class.
 
@@ -198,11 +200,11 @@ class PTM(QuantumChannel):
             other = copy.copy(self)
         if not isinstance(other, type(self)):  # TODO: convert to PTM first, and use optional key words
             other = PTM(other)
-        times = kwargs.get('k', 1)  # default 1
+        times = kwargs.get("k", 1)  # default 1
         if times <= 0:
             raise ArgumentError("in channel.PTM.tensor(): the k has to > 0!")
         ret = np.kron(self.data, other.data)
-        for _ in range(times-1):
+        for _ in range(times - 1):
             ret = np.kron(ret, other.data)
         return PTM(ret)
 
@@ -218,7 +220,7 @@ class PTM(QuantumChannel):
             other = copy.copy(self)
         if not isinstance(other, type(self)):  # TODO: convert to PTM first, and use optional key words
             other = PTM(other)
-        times = kwargs.get('k', 1)  # default 1
+        times = kwargs.get("k", 1)  # default 1
         if times <= 0:
             raise ArgumentError("in channel.PTM.concat(): the k has to > 0!")
         ret = np.dot(other.data, self.data)
@@ -244,7 +246,7 @@ class Chi(QuantumChannel):
         """
         pass
 
-    def tensor(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def tensor(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Tensor with other quantum channel. Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -254,7 +256,7 @@ class Chi(QuantumChannel):
         """
         pass
 
-    def concat(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def concat(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Concatenate with other quantum channel.Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -271,6 +273,7 @@ class Chi(QuantumChannel):
 
 class Choi(QuantumChannel):
     """This is the Choi Representation class."""
+
     def __init__(self, data, name: str = None):
         pass
 
@@ -282,7 +285,7 @@ class Choi(QuantumChannel):
         """
         pass
 
-    def tensor(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def tensor(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Tensor with other quantum channel. Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -292,7 +295,7 @@ class Choi(QuantumChannel):
         """
         pass
 
-    def concat(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def concat(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Concatenate with other quantum channel.Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -321,7 +324,7 @@ class Kraus(QuantumChannel):
         """
         pass
 
-    def tensor(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def tensor(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Tensor with other quantum channel. Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -331,7 +334,7 @@ class Kraus(QuantumChannel):
         """
         pass
 
-    def concat(self, other: 'QuantumChannel' = None, **kwargs) -> 'QuantumChannel':
+    def concat(self, other: "QuantumChannel" = None, **kwargs) -> "QuantumChannel":
         """Concatenate with other quantum channel.Optional keywords list are:
 
         + `k`: default to 1, the times of tensor operate
@@ -480,7 +483,7 @@ def unitary_to_ptm(unitary: np.ndarray) -> QuantumChannel:
     return PTM(ptm)
 
 
-def ptm_to_process(ptm: QuantumChannel, type: str = 'kraus') -> QuantumChannel:
+def ptm_to_process(ptm: QuantumChannel, type: str = "kraus") -> QuantumChannel:
     r"""From the Pauli transfer matrix of a quantum process to the given representation.
 
     Convert a quantum process in the Pauli transfer matrix representation to the target representation.

@@ -23,8 +23,4 @@ from .network import Network
 from .node import Node, Satellite
 from .link import Link
 
-__all__ = [
-    "link",
-    "network",
-    "node"
-]
+__all__ = ["link", "network", "node"]

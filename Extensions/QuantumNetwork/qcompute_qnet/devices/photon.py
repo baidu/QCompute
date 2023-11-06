@@ -19,11 +19,9 @@ r"""
 Module for photons.
 """
 
-from qcompute_qnet.messages.message import QuantumMessage
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import QuantumMessage
 
-__all__ = [
-    "Photon"
-]
+__all__ = ["Photon"]
 
 
 class Photon(QuantumMessage):

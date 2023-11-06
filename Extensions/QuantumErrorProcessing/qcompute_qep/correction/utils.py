@@ -34,7 +34,7 @@ References:
 """
 import numpy as np
 from typing import List, Tuple
-from qcompute_qep.quantum.pauli import pauli2bsf
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import pauli2bsf
 
 
 class ColorTable:
@@ -47,10 +47,10 @@ class ColorTable:
     """
 
     # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
-    ORIGINAL = "\033[0;31m"     # Color code for the original qubits
-    PHYSICAL = "\033[0;34m"     # Color code for the physical qubits (exclude the original qubits)
-    ANCILLA = "\033[1;33m"      # Color code for the ancilla qubits
-    END = '\033[0m'             # Color code for the normal text
+    ORIGINAL = "\033[0;31m"  # Color code for the original qubits
+    PHYSICAL = "\033[0;34m"  # Color code for the physical qubits (exclude the original qubits)
+    ANCILLA = "\033[1;33m"  # Color code for the ancilla qubits
+    END = "\033[0m"  # Color code for the normal text
 
 
 def pauli_list_to_check_matrix(paulis: List[str]) -> np.ndarray:
@@ -134,43 +134,53 @@ def check_matrix_to_standard_form(check_matrix: np.ndarray) -> Tuple[np.ndarray,
     # Perform the first round Gaussian elimination to obtain Eq. (4.1) in [D97]_.
     r, operations = gaussian_elimination(std[:, :n])
     for op in operations:
-        if op[0] == 'SWAP-ROW':
+        if op[0] == "SWAP-ROW":
             std[[op[1], op[2]], :] = std[[op[2], op[1]], :]
-        elif op[0] == 'ADD-ROW':
+        elif op[0] == "ADD-ROW":
             std[op[1], :] = np.mod(std[op[1], :] + std[op[2], :], 2)
-        elif op[0] == 'SWAP-COL':
+        elif op[0] == "SWAP-COL":
             std[:, [op[1], op[2]]] = std[:, [op[2], op[1]]]
             std[:, [n + op[1], n + op[2]]] = std[:, [n + op[2], n + op[1]]]
 
     # Perform the second round Gaussian elimination to obtain Eq. (4.3) in [D97]_.
-    r_e, operations = gaussian_elimination(std[r:, -(n - r):])
+    r_e, operations = gaussian_elimination(std[r:, -(n - r) :])
     assert r_e == n - k - r
     for op in operations:
-        if op[0] == 'SWAP-ROW':
+        if op[0] == "SWAP-ROW":
             std[[r + op[1], r + op[2]], :] = std[[r + op[2], r + op[1]], :]
-        elif op[0] == 'ADD-ROW':
+        elif op[0] == "ADD-ROW":
             std[r + op[1], :] = np.mod(std[r + op[1], :] + std[r + op[2], :], 2)
-        elif op[0] == 'SWAP-COL':
+        elif op[0] == "SWAP-COL":
             std[:, [-(n - r) + op[1], -(n - r) + op[2]]] = std[:, [-(n - r) + op[2], -(n - r) + op[1]]]
             std[:, [-n - (n - r) + op[1], -n - (n - r) + op[2]]] = std[:, [-n - (n - r) + op[2], -n - (n - r) + op[1]]]
 
     # Record the submatrices for constructing the logical operators
-    e = std[r:, -k:]            # size n-k-r * k
-    c_1 = std[:r, -(n - r):-k]  # size r * n-k-r
-    c_2 = std[:r, -k:]          # size r * k
-    a_2 = std[:r, -n - k:-n]    # size r * k
+    e = std[r:, -k:]  # size n-k-r * k
+    c_1 = std[:r, -(n - r) : -k]  # size r * n-k-r
+    c_2 = std[:r, -k:]  # size r * k
+    a_2 = std[:r, -n - k : -n]  # size r * k
 
     # Construct the logical X and Z operators. See Section 4.1 of [D97]_ for more details.
-    x_bar = np.concatenate([np.zeros((k, r), dtype=np.uint),
-                            e.T,
-                            np.identity(k, dtype=np.uint),
-                            np.mod(np.dot(e.T, c_1.T) + c_2.T, 2),
-                            np.zeros((k, n - r), dtype=np.uint)], axis=1)
+    x_bar = np.concatenate(
+        [
+            np.zeros((k, r), dtype=np.uint),
+            e.T,
+            np.identity(k, dtype=np.uint),
+            np.mod(np.dot(e.T, c_1.T) + c_2.T, 2),
+            np.zeros((k, n - r), dtype=np.uint),
+        ],
+        axis=1,
+    )
 
-    z_bar = np.concatenate([np.zeros((k, n), dtype=np.uint),
-                            a_2.T,
-                            np.zeros((k, n - k - r), dtype=np.uint),
-                            np.identity(k, dtype=np.uint)], axis=1)
+    z_bar = np.concatenate(
+        [
+            np.zeros((k, n), dtype=np.uint),
+            a_2.T,
+            np.zeros((k, n - k - r), dtype=np.uint),
+            np.identity(k, dtype=np.uint),
+        ],
+        axis=1,
+    )
 
     return std, x_bar, z_bar, r
 
@@ -208,20 +218,20 @@ def gaussian_elimination(matrix: np.ndarray) -> Tuple[int, List]:
             for j in range(p_col + 1, n):
                 if np.count_nonzero(matrix[p_row:, j]) > 0:
                     matrix[:, [p_col, j]] = matrix[:, [j, p_col]]
-                    ops.append(('SWAP-COL', p_col, j))
+                    ops.append(("SWAP-COL", p_col, j))
 
         # first put a 1 at matrix[p_row, j] if not already
         if matrix[p_row, p_col] != 1:
             for i in range(p_row + 1, m):
                 if matrix[i, p_col] == 1:
                     matrix[[p_row, i], :] = matrix[[i, p_row], :]
-                    ops.append(('SWAP-ROW', p_row, i))
+                    ops.append(("SWAP-ROW", p_row, i))
 
         # Put zeros at each matrix[i, j] for i > p_col
         for i in range(p_row + 1, m):
             if matrix[i, p_col] == 1:
                 matrix[i, :] = np.mod(matrix[i, :] + matrix[p_row, :], 2)
-                ops.append(('ADD-ROW', i, p_row))
+                ops.append(("ADD-ROW", i, p_row))
 
         p_row += 1
         p_col += 1
@@ -239,6 +249,6 @@ def gaussian_elimination(matrix: np.ndarray) -> Tuple[int, List]:
         for i in range(j):
             if matrix[i, j] == 1:
                 matrix[i, :] = np.mod(matrix[i, :] + matrix[j, :], 2)
-                ops.append(('ADD-ROW', i, j))
+                ops.append(("ADD-ROW", i, j))
 
     return rank, ops

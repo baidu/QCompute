@@ -24,17 +24,14 @@ Liao, Sheng-Kai, et al.
 Nature 549.7670 (2017): 43-47.
 """
 
-import sys
-sys.path.append('..')
-
 import pandas as pd
-from qcompute_qnet.functionalities.mobility import Track
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qkd.node import QKDSatellite, QKDNode
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFreeSpaceChannel, QuantumFreeSpaceChannel
+from Extensions.QuantumNetwork.qcompute_qnet.functionalities.mobility import Track
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDSatellite, QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFreeSpaceChannel, QuantumFreeSpaceChannel
 
 
 # Load data of the Micius satellite
@@ -51,7 +48,7 @@ class MiciusOrbit(Track):
         micius_time = round((current_time - self.ref_time) * 1e-12, 1)
 
         global micius_track
-        index = micius_track.loc[micius_track['time'] == micius_time].index[0]
+        index = micius_track.loc[micius_track["time"] == micius_time].index[0]
 
         return micius_track.loc[index].distance
 
@@ -59,7 +56,7 @@ class MiciusOrbit(Track):
         distance = round(distance, 1)
 
         global micius_link_efficiency
-        index = micius_link_efficiency.loc[micius_link_efficiency['distance'] == distance].index[0]
+        index = micius_link_efficiency.loc[micius_link_efficiency["distance"] == distance].index[0]
 
         return micius_link_efficiency.loc[index].loss
 

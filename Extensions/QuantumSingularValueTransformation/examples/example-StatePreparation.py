@@ -25,7 +25,7 @@ import numpy as np
 from QCompute import QEnv, BackendName, MeasureZ
 from QCompute.Define import Settings as QC_Settings
 
-from qcompute_qsvt.Oracle.StatePreparation import circ_state_pre
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.StatePreparation import circ_state_pre
 
 # not to draw the quantum circuit locally
 QC_Settings.drawCircuitControl = []
@@ -61,13 +61,13 @@ def func_state_pre_test(list_float_target_state: List[float], int_shots: int) ->
     # measure the quantum state we have prepared
     MeasureZ(reg_sys, list(reversed(range(num_qubit_sys))))
 
-    task_result = env.commit(int_shots, fetchMeasure=True)['counts']  # commit to the task
+    task_result = env.commit(int_shots, fetchMeasure=True)["counts"]  # commit to the task
 
-    list_population = [0 for _ in range(2 ** num_qubit_sys)]  # register for finial populations
+    list_population = [0 for _ in range(2**num_qubit_sys)]  # register for finial populations
     for idx_key in task_result.keys():
         list_population[int(idx_key, base=2)] = task_result[idx_key]
     return list_population
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(func_state_pre_test([0.25, 0.25, -0.5, 0.5, 0.5, -0.25, 0.25], 16000))

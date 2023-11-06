@@ -32,13 +32,23 @@ import matplotlib.pyplot as plt
 from matplotlib import rc, pylab
 
 from QCompute import *
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement import InverseCorrector, LeastSquareCorrector, IBUCorrector, NeumannCorrector
-from qcompute_qep.measurement.correction import vector2dict, dict2vector
-from qcompute_qep.measurement.utils import plot_histograms
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits, get_qc_name
-from qcompute_qep.utils.circuit import execute, circuit_to_state
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement import (
+    InverseCorrector,
+    LeastSquareCorrector,
+    IBUCorrector,
+    NeumannCorrector,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import vector2dict, dict2vector
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import plot_histograms
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import (
+    QComputer,
+    QProgram,
+    number_of_qubits,
+    get_qc_name,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, circuit_to_state
 
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096
@@ -64,9 +74,7 @@ def calculator(qp: QEnv = None, qc: BackendName = None) -> Tuple[float, dict]:
     return expval_from_counts(o, counts), counts
 
 
-def corrected_calculator(qp: QEnv = None,
-                         qc: BackendName = None,
-                         method: str = 'least square') -> Tuple[float, dict]:
+def corrected_calculator(qp: QEnv = None, qc: BackendName = None, method: str = "least square") -> Tuple[float, dict]:
     """
     Run the quantum program on the quantum computer and estimate the expectation value.
     We use the MEM (measurement error mitigation) method to mitigate the quantum measurement noise
@@ -82,14 +90,14 @@ def corrected_calculator(qp: QEnv = None,
     counts = execute(qp, qc, shots=NUMBER_OF_SHOTS)
     n = number_of_qubits(qp)
     # Correct the counts
-    if method.lower() == 'inverse':  # Case-insensitive
-        corr = InverseCorrector(qc, calibrator='complete', qubits=range(n))
-    elif method.lower() == 'least square':  # Case-insensitive
-        corr = LeastSquareCorrector(qc, calibrator='complete', qubits=range(n))
-    elif method.lower() == 'ibu':  # Case-insensitive
-        corr = IBUCorrector(qc, calibrator='complete', qubits=range(n))
-    elif method.lower() == 'neu':  # Case-insensitive
-        corr = NeumannCorrector(qc, calibrator='complete', qubits=range(n))
+    if method.lower() == "inverse":  # Case-insensitive
+        corr = InverseCorrector(qc, calibrator="complete", qubits=range(n))
+    elif method.lower() == "least square":  # Case-insensitive
+        corr = LeastSquareCorrector(qc, calibrator="complete", qubits=range(n))
+    elif method.lower() == "ibu":  # Case-insensitive
+        corr = IBUCorrector(qc, calibrator="complete", qubits=range(n))
+    elif method.lower() == "neu":  # Case-insensitive
+        corr = NeumannCorrector(qc, calibrator="complete", qubits=range(n))
     else:
         raise ArgumentError("Corrector with name {} is not defined!".format(method))
 
@@ -141,7 +149,7 @@ def theo_mqc(n: int, phi: float) -> Tuple[float, dict]:
     :param phi: float, the rotation angle
     :return: float, the theoretically MQC value
     """
-    val = (1 + math.cos(n*phi))/2
+    val = (1 + math.cos(n * phi)) / 2
 
     # Compute the ideal counts
     qp = setup_mqc_circuit(n, phi)
@@ -174,10 +182,9 @@ def mqc(n: int, phi: float, qc: QComputer = BackendName.LocalBaiduSim2) -> Tuple
     return calculator(copy.deepcopy(qp), qc)
 
 
-def corrected_mqc(n: int,
-                  phi: float,
-                  qc: QComputer = BackendName.CloudBaiduQPUQian,
-                  method: str = 'least square') -> Tuple[float, dict]:
+def corrected_mqc(
+    n: int, phi: float, qc: QComputer = BackendName.CloudBaiduQPUQian, method: str = "least square"
+) -> Tuple[float, dict]:
     """
     Given the number of qubits of the GHZ state and the rotation angle,
     estimate its MQC on the given quantum computer.
@@ -195,8 +202,7 @@ def corrected_mqc(n: int,
     return corrected_calculator(copy.deepcopy(qp), qc, method=method)
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     n = 4
     START = 0
     STOP = 2 * math.pi / n
@@ -246,27 +252,27 @@ if __name__ == '__main__':
         noisy_val, noisy_counts = mqc(n, phi=phi, qc=qc)
         noisy_mqc_list.append(noisy_val)
         noisy_counts_list.append(noisy_counts)
-        noisy_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(noisy_counts))/NUMBER_OF_SHOTS))
+        noisy_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(noisy_counts)) / NUMBER_OF_SHOTS))
 
-        inv_val, inv_counts = corrected_mqc(n, phi=phi, qc=qc, method='inverse')
+        inv_val, inv_counts = corrected_mqc(n, phi=phi, qc=qc, method="inverse")
         inv_mqc_list.append(inv_val)
         inv_counts_list.append(inv_counts)
-        inv_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(inv_counts))/NUMBER_OF_SHOTS))
+        inv_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(inv_counts)) / NUMBER_OF_SHOTS))
 
-        ls_val, ls_counts = corrected_mqc(n, phi=phi, qc=qc, method='least square')
+        ls_val, ls_counts = corrected_mqc(n, phi=phi, qc=qc, method="least square")
         ls_mqc_list.append(ls_val)
         ls_counts_list.append(ls_counts)
-        ls_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(ls_counts))/NUMBER_OF_SHOTS))
+        ls_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(ls_counts)) / NUMBER_OF_SHOTS))
 
-        ibu_val, ibu_counts = corrected_mqc(n, phi=phi, qc=qc, method='ibu')
+        ibu_val, ibu_counts = corrected_mqc(n, phi=phi, qc=qc, method="ibu")
         ibu_mqc_list.append(ibu_val)
         ibu_counts_list.append(ibu_counts)
-        ibu_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(ibu_counts))/NUMBER_OF_SHOTS))
+        ibu_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(ibu_counts)) / NUMBER_OF_SHOTS))
 
-        neu_val, neu_counts = corrected_mqc(n, phi=phi, qc=qc, method='neu')
+        neu_val, neu_counts = corrected_mqc(n, phi=phi, qc=qc, method="neu")
         neu_mqc_list.append(neu_val)
         neu_counts_list.append(neu_counts)
-        neu_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(neu_counts))/NUMBER_OF_SHOTS))
+        neu_euc_list.append(np.linalg.norm((dict2vector(theo_counts) - dict2vector(neu_counts)) / NUMBER_OF_SHOTS))
 
     ###############################################################################################
     # The following plot visualizes the ideal, noisy, and corrected expectation values
@@ -277,99 +283,112 @@ if __name__ == '__main__':
         ax = plt.gca()
 
         NUM_COLORS = 8
-        cm = pylab.get_cmap('Paired')  # Dark2, Accent, Paired
+        cm = pylab.get_cmap("Paired")  # Dark2, Accent, Paired
         colors = {
-            'simulator': cm(1.*0/NUM_COLORS),
-            'hardware': cm(1.*1/NUM_COLORS),
-            'inverse': cm(1.*2/NUM_COLORS),
-            'least square': cm(1.*3/NUM_COLORS),
-            'ibu': cm(1.*4/NUM_COLORS),
-            'neu': cm(1. * 5 / NUM_COLORS)
+            "simulator": cm(1.0 * 0 / NUM_COLORS),
+            "hardware": cm(1.0 * 1 / NUM_COLORS),
+            "inverse": cm(1.0 * 2 / NUM_COLORS),
+            "least square": cm(1.0 * 3 / NUM_COLORS),
+            "ibu": cm(1.0 * 4 / NUM_COLORS),
+            "neu": cm(1.0 * 5 / NUM_COLORS),
         }
-        markers = {
-            'simulator': 'o',
-            'hardware': 'o',
-            'inverse': '<',
-            'least square': '>',
-            'ibu': '^',
-            'neu': '*'
-        }
+        markers = {"simulator": "o", "hardware": "o", "inverse": "<", "least square": ">", "ibu": "^", "neu": "*"}
 
         # Plot the theoretical reference line
-        plt.plot(phi_list, theo_mqc_list, '-', color='red', alpha=0.8, linewidth=1, label='Theoretical', zorder=1)
+        plt.plot(phi_list, theo_mqc_list, "-", color="red", alpha=0.8, linewidth=1, label="Theoretical", zorder=1)
 
         # Plot the noisy result
-        plt.scatter(phi_list, noisy_mqc_list,
-                    marker=markers['hardware'],
-                    color=colors['hardware'],
-                    edgecolors='none',
-                    alpha=0.8,
-                    label=qc_name,
-                    s=16,
-                    zorder=2)
+        plt.scatter(
+            phi_list,
+            noisy_mqc_list,
+            marker=markers["hardware"],
+            color=colors["hardware"],
+            edgecolors="none",
+            alpha=0.8,
+            label=qc_name,
+            s=16,
+            zorder=2,
+        )
 
         # Plot the mitigated result using the inverse approach
-        plt.scatter(phi_list, inv_mqc_list,
-                    marker=markers['inverse'],
-                    color=colors['inverse'],
-                    edgecolors='none',
-                    alpha=1.0,
-                    label="{} Inverse".format(qc_name),
-                    s=18,
-                    zorder=2)
+        plt.scatter(
+            phi_list,
+            inv_mqc_list,
+            marker=markers["inverse"],
+            color=colors["inverse"],
+            edgecolors="none",
+            alpha=1.0,
+            label="{} Inverse".format(qc_name),
+            s=18,
+            zorder=2,
+        )
 
         # Plot the mitigated result using the least square approach
-        plt.scatter(phi_list, ls_mqc_list,
-                    marker=markers['least square'],
-                    color=colors['least square'],
-                    edgecolors='none',
-                    alpha=1,
-                    label="{} LS".format(qc_name),
-                    s=18,
-                    zorder=2)
+        plt.scatter(
+            phi_list,
+            ls_mqc_list,
+            marker=markers["least square"],
+            color=colors["least square"],
+            edgecolors="none",
+            alpha=1,
+            label="{} LS".format(qc_name),
+            s=18,
+            zorder=2,
+        )
 
         # Plot the mitigated result using the ibu approach
-        plt.scatter(phi_list, ibu_mqc_list,
-                    marker=markers['ibu'],
-                    color=colors['ibu'],
-                    edgecolors='none',
-                    alpha=1,
-                    s=18,
-                    label="{} IBU".format(qc_name),
-                    zorder=2)
+        plt.scatter(
+            phi_list,
+            ibu_mqc_list,
+            marker=markers["ibu"],
+            color=colors["ibu"],
+            edgecolors="none",
+            alpha=1,
+            s=18,
+            label="{} IBU".format(qc_name),
+            zorder=2,
+        )
 
         # Plot the mitigated result using the Neumann approach
-        plt.scatter(phi_list, neu_mqc_list,
-                    marker=markers['neu'],
-                    color=colors['neu'],
-                    edgecolors='none',
-                    alpha=1,
-                    s=18,
-                    label="{} Neumann".format(qc_name),
-                    zorder=2)
+        plt.scatter(
+            phi_list,
+            neu_mqc_list,
+            marker=markers["neu"],
+            color=colors["neu"],
+            edgecolors="none",
+            alpha=1,
+            s=18,
+            label="{} Neumann".format(qc_name),
+            zorder=2,
+        )
 
         # Define the xticklables
         # https://stackoverflow.com/questions/40642061/how-to-set-axis-ticks-in-multiples-of-pi-python-matplotlib
         ax = plt.gca()
-        ax.set_xticks(np.arange(START, STOP+0.01, math.pi/16))
-        labels = ['$0$', r'$\pi/16$', r'$\pi/8$', r'$3\pi/16$', r'$\pi/4$',
-                  r'$5\pi/16$', r'$3\pi/8$', r'$7\pi/16$', r'$\pi/2$']
+        ax.set_xticks(np.arange(START, STOP + 0.01, math.pi / 16))
+        labels = [
+            "$0$",
+            r"$\pi/16$",
+            r"$\pi/8$",
+            r"$3\pi/16$",
+            r"$\pi/4$",
+            r"$5\pi/16$",
+            r"$3\pi/8$",
+            r"$7\pi/16$",
+            r"$\pi/2$",
+        ]
         ax.set_xticklabels(labels)
 
         # Add the y=0 reference line
-        plt.hlines(y=0, xmin=START, xmax=STOP, color='black', linestyles='dotted', linewidth=1)
+        plt.hlines(y=0, xmin=START, xmax=STOP, color="black", linestyles="dotted", linewidth=1)
 
         # Give x and y axis labels
-        plt.xlabel(r'Rotation Angle $\phi$', fontsize=14)
-        plt.ylabel(r'Multiple Quantum Coherence', fontsize=14)
+        plt.xlabel(r"Rotation Angle $\phi$", fontsize=14)
+        plt.ylabel(r"Multiple Quantum Coherence", fontsize=14)
         # Legend
-        plt.legend(loc='upper center')
+        plt.legend(loc="upper center")
 
-        plt.savefig("GHZ_MQC_N={}.png".format(n),
-                    format='png',
-                    dpi=600,
-                    bbox_inches='tight',
-                    pad_inches=0.1)
+        plt.savefig("GHZ_MQC_N={}.png".format(n), format="png", dpi=600, bbox_inches="tight", pad_inches=0.1)
 
         plt.show()
     pass
@@ -383,86 +402,90 @@ if __name__ == '__main__':
         ax = plt.gca()
 
         NUM_COLORS = 8
-        cm = pylab.get_cmap('Paired')  # Dark2, Accent, Paired
+        cm = pylab.get_cmap("Paired")  # Dark2, Accent, Paired
         colors = {
-            'simulator': cm(1. * 0 / NUM_COLORS),
-            'hardware': cm(1. * 1 / NUM_COLORS),
-            'inverse': cm(1. * 2 / NUM_COLORS),
-            'least square': cm(1. * 3 / NUM_COLORS),
-            'ibu': cm(1. * 4 / NUM_COLORS),
-            'neu': cm(1. * 5 / NUM_COLORS)
+            "simulator": cm(1.0 * 0 / NUM_COLORS),
+            "hardware": cm(1.0 * 1 / NUM_COLORS),
+            "inverse": cm(1.0 * 2 / NUM_COLORS),
+            "least square": cm(1.0 * 3 / NUM_COLORS),
+            "ibu": cm(1.0 * 4 / NUM_COLORS),
+            "neu": cm(1.0 * 5 / NUM_COLORS),
         }
-        markers = {
-            'simulator': 'o',
-            'hardware': 'o',
-            'inverse': '<',
-            'least square': '>',
-            'ibu': '^',
-            'neu': '*'
-        }
+        markers = {"simulator": "o", "hardware": "o", "inverse": "<", "least square": ">", "ibu": "^", "neu": "*"}
 
-        x_range = range(1, len(phi_list)+1)
+        x_range = range(1, len(phi_list) + 1)
         # Plot the noisy quantum computer result
-        plt.scatter(x_range, sorted(noisy_euc_list),
-                    marker=markers['hardware'],
-                    color=colors['hardware'],
-                    edgecolors='none',
-                    alpha=0.75,
-                    label=qc_name,
-                    s=16,
-                    zorder=2)
+        plt.scatter(
+            x_range,
+            sorted(noisy_euc_list),
+            marker=markers["hardware"],
+            color=colors["hardware"],
+            edgecolors="none",
+            alpha=0.75,
+            label=qc_name,
+            s=16,
+            zorder=2,
+        )
 
         # Plot the Inverse mitigated quantum computer result
-        plt.scatter(x_range, sorted(inv_euc_list),
-                    marker=markers['inverse'],
-                    color=colors['inverse'],
-                    edgecolors='none',
-                    alpha=1,
-                    label="{} Inverse".format(qc_name),
-                    s=18,
-                    zorder=2)
+        plt.scatter(
+            x_range,
+            sorted(inv_euc_list),
+            marker=markers["inverse"],
+            color=colors["inverse"],
+            edgecolors="none",
+            alpha=1,
+            label="{} Inverse".format(qc_name),
+            s=18,
+            zorder=2,
+        )
 
         # Plot the MEM mitigated quantum computer result
-        plt.scatter(x_range, sorted(ls_euc_list),
-                    marker=markers['least square'],
-                    color=colors['least square'],
-                    edgecolors='none',
-                    alpha=1,
-                    label="{} LS".format(qc_name),
-                    s=18,
-                    zorder=2)
+        plt.scatter(
+            x_range,
+            sorted(ls_euc_list),
+            marker=markers["least square"],
+            color=colors["least square"],
+            edgecolors="none",
+            alpha=1,
+            label="{} LS".format(qc_name),
+            s=18,
+            zorder=2,
+        )
 
         # Plot the IBU mitigated quantum computer result
-        plt.scatter(x_range, sorted(ibu_euc_list),
-                    marker=markers['ibu'],
-                    color=colors['ibu'],
-                    edgecolors='none',
-                    alpha=1,
-                    label="{} IBU".format(qc_name),
-                    s=18,
-                    zorder=2)
+        plt.scatter(
+            x_range,
+            sorted(ibu_euc_list),
+            marker=markers["ibu"],
+            color=colors["ibu"],
+            edgecolors="none",
+            alpha=1,
+            label="{} IBU".format(qc_name),
+            s=18,
+            zorder=2,
+        )
 
         # Plot the Neumann mitigated quantum computer result
-        plt.scatter(x_range, sorted(neu_euc_list),
-                    marker=markers['neu'],
-                    color=colors['neu'],
-                    edgecolors='none',
-                    alpha=1,
-                    label="{} Neumann".format(qc_name),
-                    s=18,
-                    zorder=2)
+        plt.scatter(
+            x_range,
+            sorted(neu_euc_list),
+            marker=markers["neu"],
+            color=colors["neu"],
+            edgecolors="none",
+            alpha=1,
+            label="{} Neumann".format(qc_name),
+            s=18,
+            zorder=2,
+        )
 
         # Give x and y axis labels
-        plt.xlabel(r'Rotation Angle $\phi$', fontsize=14)
-        plt.ylabel(r'Euclidean Distance', fontsize=14)
+        plt.xlabel(r"Rotation Angle $\phi$", fontsize=14)
+        plt.ylabel(r"Euclidean Distance", fontsize=14)
         # Legend
-        plt.legend(loc='best')
+        plt.legend(loc="best")
 
-        plt.savefig("GHZ_MQC2_N={}.png".format(n),
-                    format='png',
-                    dpi=600,
-                    bbox_inches='tight',
-                    pad_inches=0.1)
+        plt.savefig("GHZ_MQC2_N={}.png".format(n), format="png", dpi=600, bbox_inches="tight", pad_inches=0.1)
 
         plt.show()
     pass
@@ -479,16 +502,19 @@ if __name__ == '__main__':
         vals_diff[3, :] = np.asarray(theo_mqc_list) - np.asarray(ibu_mqc_list)
         vals_diff[4, :] = np.asarray(theo_mqc_list) - np.asarray(neu_mqc_list)
 
-        legends = ['Theo - Noisy', 'Theo - INV', 'Theo - LSC', 'Theo - IBU', 'Theo - Neumann']
-        plot_histograms(counts=vals_diff,
-                        legends=['Theo - Noisy', 'Theo - INV', 'Theo - LSC', 'Theo - IBU', 'Theo - Neumann'],
-                        binary_labels=False,
-                        fig_name="GHZ_MQC_{}_MEM2_N={}.png".format(qc_name, n))
+        legends = ["Theo - Noisy", "Theo - INV", "Theo - LSC", "Theo - IBU", "Theo - Neumann"]
+        plot_histograms(
+            counts=vals_diff,
+            legends=["Theo - Noisy", "Theo - INV", "Theo - LSC", "Theo - IBU", "Theo - Neumann"],
+            binary_labels=False,
+            fig_name="GHZ_MQC_{}_MEM2_N={}.png".format(qc_name, n),
+        )
 
         print("Euclidean distance between theoretical and noisy values: {}".format(np.linalg.norm(vals_diff[0, :])))
         print("Euclidean distance between theoretical and inverse values: {}".format(np.linalg.norm(vals_diff[1, :])))
-        print("Euclidean distance between theoretical and least square values: {}".format(
-            np.linalg.norm(vals_diff[2, :])))
+        print(
+            "Euclidean distance between theoretical and least square values: {}".format(np.linalg.norm(vals_diff[2, :]))
+        )
         print("Euclidean distance between theoretical and ibu values: {}".format(np.linalg.norm(vals_diff[3, :])))
         print("Euclidean distance between theoretical and neu values: {}".format(np.linalg.norm(vals_diff[4, :])))
     pass

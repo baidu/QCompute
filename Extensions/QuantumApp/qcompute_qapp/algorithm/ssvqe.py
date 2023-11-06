@@ -35,8 +35,14 @@ class SSVQE:
     """
 
     def __init__(
-            self, num: int, ex_num: int, hamiltonian: list, ansatz: ParameterizedCircuit,
-            optimizer: BasicOptimizer, backend: str, measurement: str = 'default'
+        self,
+        num: int,
+        ex_num: int,
+        hamiltonian: list,
+        ansatz: ParameterizedCircuit,
+        optimizer: BasicOptimizer,
+        backend: str,
+        measurement: str = "default",
     ):
         r"""The constructor of the SSVQE class
 
@@ -58,14 +64,14 @@ class SSVQE:
         self._optimizer = optimizer
         self._backend = backend
         self._measurement = measurement
-        if measurement == 'default':
+        if measurement == "default":
             self._measurement_circuit = PauliMeasurementCircuit
-        elif measurement == 'ancilla':
+        elif measurement == "ancilla":
             self._measurement_circuit = PauliMeasurementCircuitWithAncilla
-        elif measurement == 'SimMeasure':
+        elif measurement == "SimMeasure":
             self._measurement_circuit = SimultaneousPauliMeasurementCircuit
         else:
-            raise ValueError('Error EA01003(QAPP): Invalid measurement method!')
+            raise ValueError("Error EA01003(QAPP): Invalid measurement method!")
         self._minimum_eigenvalues = "Run SSVQE.run() first"
 
     def _pauli_expectation(self, position_string: str, shots: int) -> float:
@@ -104,7 +110,7 @@ class SSVQE:
             param_minus[i] -= np.pi / 2
             loss_plus = self._compute_loss(param_plus, shots)
             loss_minus = self._compute_loss(param_minus, shots)
-            gradient[i] = ((loss_plus - loss_minus) / 2)
+            gradient[i] = (loss_plus - loss_minus) / 2
         self._ansatz.set_parameters(parameters)
 
         return gradient
@@ -119,8 +125,10 @@ class SSVQE:
         """
         self._ansatz.set_parameters(parameters)
         loss = sum(
-            [(i + 1) * self._pauli_expectation(init_state, shots=shots)
-             for i, init_state in enumerate(self._subspace_basis)]
+            [
+                (i + 1) * self._pauli_expectation(init_state, shots=shots)
+                for i, init_state in enumerate(self._subspace_basis)
+            ]
         )
 
         return loss
@@ -150,8 +158,12 @@ class SSVQE:
 
         """
         loss = 0
-        loss = sum([(i + 1) * self._pauli_expectation(init_state, shots=shots)
-                    for i, init_state in enumerate(self._subspace_basis)])
+        loss = sum(
+            [
+                (i + 1) * self._pauli_expectation(init_state, shots=shots)
+                for i, init_state in enumerate(self._subspace_basis)
+            ]
+        )
 
         return loss
 

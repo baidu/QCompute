@@ -27,8 +27,8 @@ import re
 import QCompute
 from QCompute.QPlatform.QOperation import QOperation, CircuitLine
 
-import qcompute_qep.utils.MultiCtrlGates as multictrl
-from qcompute_qep.exceptions import ArgumentError
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.MultiCtrlGates as multictrl
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions import ArgumentError
 
 
 class CPauliOP(QOperation):
@@ -85,7 +85,7 @@ class CPauliOP(QOperation):
 
         The quantum gate :math:`C^{2,3}_0(XYZ)` could be called by
 
-        >>> from qcompute_qep.utils.circuit import print_circuit
+        >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
         >>> qp = QCompute.QEnv()
         >>> qp.Q.createList(5)
         >>> reg_c = [qp.Q[0], qp.Q[1]]
@@ -102,8 +102,9 @@ class CPauliOP(QOperation):
               |
         4: ---Z---
     """
+
     def __init__(self) -> None:
-        super().__init__(name='CPauli', bits=None, matrix=None)
+        super().__init__(name="CPauli", bits=None, matrix=None)
 
     def __call__(self, **kwargs) -> None:
         r"""
@@ -114,32 +115,39 @@ class CPauliOP(QOperation):
         :param pauli: str, a string such as 'XXIZ' specifies the Pauli gate
         :return: None
         """
-        self.reg_c = kwargs.get('reg_c')
-        self.reg_t = kwargs.get('reg_t')
-        self.val = kwargs.get('val')
-        self.pauli = kwargs.get('pauli')
+        self.reg_c = kwargs.get("reg_c")
+        self.reg_t = kwargs.get("reg_t")
+        self.val = kwargs.get("val")
+        self.pauli = kwargs.get("pauli")
         self.bits = len(self.reg_c) + len(self.reg_t)
 
         # Check the consistency of data
-        if not bool(re.match(r'^[IXYZ]+$', self.pauli)):
-            raise ArgumentError("CPauliOP: the Pauli string contains unrecognized Pauli character(s). "
-                                "Supported Pauli characters are: 'I', 'X', 'Y', 'Z'.")
+        if not bool(re.match(r"^[IXYZ]+$", self.pauli)):
+            raise ArgumentError(
+                "CPauliOP: the Pauli string contains unrecognized Pauli character(s). "
+                "Supported Pauli characters are: 'I', 'X', 'Y', 'Z'."
+            )
         if 2 ** len(self.reg_c) <= self.val:
-            raise ArgumentError("CPauliOP: the control value {} is larger than the "
-                                "maximal value that the control qubits can achieve.".format(self.val))
+            raise ArgumentError(
+                "CPauliOP: the control value {} is larger than the "
+                "maximal value that the control qubits can achieve.".format(self.val)
+            )
         if len(self.reg_t) != len(self.pauli):
-            raise ArgumentError("in CPauli(): the number of qubits in the target register is not equal to "
-                                "the number of qubits in the Pauli string.")
+            raise ArgumentError(
+                "in CPauli(): the number of qubits in the target register is not equal to "
+                "the number of qubits in the Pauli string."
+            )
 
         # The control and target registers must have the same quantum environment
         env = self.reg_c[0].env
         for qubit in self.reg_c:
             if qubit.env != env:
-                raise ArgumentError('CPauliOP(): The control qubits must belong to the same quantum environment!')
+                raise ArgumentError("CPauliOP(): The control qubits must belong to the same quantum environment!")
         for qubit in self.reg_t:
             if qubit.env != env:
-                raise ArgumentError('CPauliOP(): The control and target qubits must belong '
-                                    'to the same quantum environment!')
+                raise ArgumentError(
+                    "CPauliOP(): The control and target qubits must belong " "to the same quantum environment!"
+                )
 
         # Create a new CircuitLine instance
         qubits = [qubit.index for qubit in self.reg_c] + [qubit.index for qubit in self.reg_t]
@@ -225,7 +233,7 @@ def decompose_CPauli(cp: CPauli) -> List[CircuitLine]:
     pauli_list = [*cp.pauli]
     for qubit, single_pauli in zip(cp.reg_t, pauli_list):
         # We do not need to implement the controlled-I gate
-        if single_pauli == 'I':
+        if single_pauli == "I":
             continue
         else:
             multictrl.circ_multictrl_Pauli(qubit_target=qubit, reg_ctrlling=cp.reg_c, char_Pauli=single_pauli)

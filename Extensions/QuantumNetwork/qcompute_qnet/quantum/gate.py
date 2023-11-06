@@ -21,14 +21,11 @@ Module for quantum gates.
 
 import numpy
 
-__all__ = [
-    "Gate"
-]
+__all__ = ["Gate"]
 
 
 class Gate:
-    r"""Class to obtain the matrix of a quantum gate.
-    """
+    r"""Class to obtain the matrix of a quantum gate."""
 
     @classmethod
     def I(cls) -> numpy.ndarray:
@@ -97,31 +94,42 @@ class Gate:
     def Rx(cls, theta: float) -> numpy.ndarray:
         r"""Return the matrix of Rx gate.
 
+        Args:
+            theta (float): rotation angle
+
         Returns:
             numpy.ndarray: Rx gate
         """
-        return numpy.array([[numpy.cos(theta / 2), -1j * numpy.sin(theta / 2)],
-                            [-1j * numpy.sin(theta / 2), numpy.cos(theta / 2)]], dtype=complex)
+        return numpy.array(
+            [[numpy.cos(theta / 2), -1j * numpy.sin(theta / 2)], [-1j * numpy.sin(theta / 2), numpy.cos(theta / 2)]],
+            dtype=complex,
+        )
 
     @classmethod
     def Ry(cls, theta: float) -> numpy.ndarray:
         r"""Return the matrix of Ry gate.
 
+        Args:
+            theta (float): rotation angle
+
         Returns:
             numpy.ndarray: Ry gate
         """
-        return numpy.array([[numpy.cos(theta / 2), - numpy.sin(theta / 2)],
-                            [numpy.sin(theta / 2), numpy.cos(theta / 2)]], dtype=complex)
+        return numpy.array(
+            [[numpy.cos(theta / 2), -numpy.sin(theta / 2)], [numpy.sin(theta / 2), numpy.cos(theta / 2)]], dtype=complex
+        )
 
     @classmethod
     def Rz(cls, theta: float) -> numpy.ndarray:
         r"""Return the matrix of Rz gate.
 
+        Args:
+            theta (float): rotation angle
+
         Returns:
             numpy.ndarray: Rz gate
         """
-        return numpy.array([[numpy.exp(- 1j * theta / 2), 0],
-                            [0, numpy.exp(1j * theta / 2)]], dtype=complex)
+        return numpy.array([[numpy.exp(-1j * theta / 2), 0], [0, numpy.exp(1j * theta / 2)]], dtype=complex)
 
     @classmethod
     def U(cls, theta: float, phi: float, gamma: float) -> numpy.ndarray:
@@ -129,27 +137,7 @@ class Gate:
 
         .. math::
 
-            U (\theta, \phi, \gamma) = Rz(\phi) Ry(\theta) Rz(\gamma)
-
-        This is usually used in the measurement-based quantum computation.
-
-        Args:
-            theta (float): Ry rotation angle
-            phi (float): left Rz rotation angle
-            gamma (float): right Rz rotation angle
-
-        Returns:
-            numpy.ndarray: U gate
-        """
-        return Gate.Rz(phi) @ Gate.Ry(theta) @ Gate.Rz(gamma)
-
-    @classmethod
-    def U3(cls, theta: float, phi: float, gamma: float) -> numpy.ndarray:
-        r"""Return the matrix of U3 gate.
-
-        .. math::
-
-            U3 (\theta, \phi, \gamma) = Rz(\phi) Rx(\theta) Rz(\gamma)
+            U (\theta, \phi, \gamma) = Rz(\phi) Rx(\theta) Rz(\gamma)
 
         Args:
             theta (float): Rx rotation angle
@@ -157,33 +145,45 @@ class Gate:
             gamma (float): right Rz rotation angle
 
         Returns:
-            numpy.ndarray: U3 gate
+            numpy.ndarray: U gate
         """
         return Gate.Rz(phi) @ Gate.Rx(theta) @ Gate.Rz(gamma)
 
     @classmethod
-    def CZ(cls) -> numpy.ndarray:
-        r"""Return the matrix of control-Z gate.
+    def U3(cls, theta: float, phi: float, gamma: float) -> numpy.ndarray:
+        r"""Return the matrix of U3 gate.
+
+        .. math::
+
+            U3 (\theta, \phi, \gamma) = Rz(\phi) Ry(\theta) Rz(\gamma)
+
+        Args:
+            theta (float): Ry rotation angle
+            phi (float): left Rz rotation angle
+            gamma (float): right Rz rotation angle
 
         Returns:
-            numpy.ndarray: control-Z gate
+            numpy.ndarray: U3 gate
         """
-        return numpy.array([[1, 0, 0, 0],
-                            [0, 1, 0, 0],
-                            [0, 0, 1, 0],
-                            [0, 0, 0, -1]], dtype=complex)
+        return Gate.Rz(phi) @ Gate.Ry(theta) @ Gate.Rz(gamma)
+
+    @classmethod
+    def CZ(cls) -> numpy.ndarray:
+        r"""Return the matrix of controlled-Z gate.
+
+        Returns:
+            numpy.ndarray: controlled-Z gate
+        """
+        return numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]], dtype=complex)
 
     @classmethod
     def CNOT(cls) -> numpy.ndarray:
-        r"""Return the matrix of control-NOT gate.
+        r"""Return the matrix of controlled-NOT gate.
 
         Returns:
-            numpy.ndarray: control-CNOT gate
+            numpy.ndarray: controlled-NOT gate
         """
-        return numpy.array([[1, 0, 0, 0],
-                            [0, 1, 0, 0],
-                            [0, 0, 0, 1],
-                            [0, 0, 1, 0]], dtype=complex)
+        return numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex)
 
     @classmethod
     def SWAP(cls) -> numpy.ndarray:
@@ -192,7 +192,4 @@ class Gate:
         Returns:
             numpy.ndarray: SWAP gate
         """
-        return numpy.array([[1, 0, 0, 0],
-                            [0, 0, 1, 0],
-                            [0, 1, 0, 0],
-                            [0, 0, 0, 1]], dtype=complex)
+        return numpy.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=complex)

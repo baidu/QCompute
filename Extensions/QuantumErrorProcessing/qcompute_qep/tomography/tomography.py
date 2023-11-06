@@ -23,7 +23,7 @@ import abc
 from typing import Any
 import numpy as np
 
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 
 class Tomography(abc.ABC):
@@ -37,6 +37,7 @@ class Tomography(abc.ABC):
     The implementations---``StateTomography``, ``ProcessTomography``, ``GateSetTomography``, ``SpectralTomography``
     and ``DetectorTomography``---must inherit this abstract class.
     """
+
     def __init__(self, qp: QProgram = None, qc: QComputer = None, **kwargs: Any):
         """
         The init function of the Quantum State Tomography class.

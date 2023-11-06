@@ -121,7 +121,7 @@ def transmit(self, msg: "QuantumMessage", priority=None) -> None:
 
 ```python
 import pandas as pd
-from qcompute_qnet.functionalities.mobility import Track
+from Extensions.QuantumNetwork.qcompute_qnet.functionalities.mobility import Track
 
 # 导入量子卫星相关数据
 micius_track = pd.read_csv("data/micius2017_track.csv")
@@ -156,8 +156,8 @@ class MiciusOrbit(Track):
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # 创建仿真环境
 env = DESEnv("Micius Satellite Experiment Simulation", default=True)
@@ -174,7 +174,7 @@ network = Network("Satellite-to-ground QKD Network")
 
 
 ```python
-from qcompute_qnet.models.qkd.node import QKDSatellite, QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDSatellite, QKDNode
 
 # 创建 QKD 网络节点
 micius = QKDSatellite("Micius")
@@ -205,8 +205,8 @@ xinglong.protocol_stack.build(decoy_bb84_xinglong)
 
 
 ```python
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFreeSpaceChannel, QuantumFreeSpaceChannel
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFreeSpaceChannel, QuantumFreeSpaceChannel
 
 # 创建卫星和地面站之间的链路并连接节点
 link_micius_xinglong = Link("Micius_Xinglong", ends=(micius, xinglong))
@@ -236,7 +236,7 @@ network.install([micius, xinglong, link_micius_xinglong])
 
 
 ```python
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
 
 # 启动协议栈
 micius.protocol_stack.start(role=PrepareAndMeasure.Role.TRANSMITTER, key_num=float("inf"), key_length=256)

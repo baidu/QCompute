@@ -44,20 +44,27 @@ from copy import deepcopy
 import scipy.linalg as la
 from scipy.optimize import minimize, Bounds
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm, complete_pauli_basis
-from qcompute_qep.tomography import GateSet
-from qcompute_qep.utils.linalg import cholesky_matrix_to_vec, vec_to_cholesky_matrix, \
-    tensor, cholesky_decomposition, complex_matrix_to_vec
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import (
+    ptm_to_operator,
+    operator_to_ptm,
+    complete_pauli_basis,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import GateSet
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import (
+    cholesky_matrix_to_vec,
+    vec_to_cholesky_matrix,
+    tensor,
+    cholesky_decomposition,
+    complex_matrix_to_vec,
+)
 
 
 class GSTOptimizer(abc.ABC):
-    r"""The Gate Set Tomography Optimizer abstract class.
-    """
+    r"""The Gate Set Tomography Optimizer abstract class."""
 
     def __init__(self):
-        r"""init function of the `GSTOptimizer` abstract class.
-        """
+        r"""init function of the `GSTOptimizer` abstract class."""
         self._gateset: GateSet = None
         self._gateset_exp: Dict[str, np.ndarray] = None
         self._optimized_result = dict()
@@ -125,10 +132,10 @@ class LinearInversionOptimizer(GSTOptimizer):
 
         gateset_gram: Dict[str, np.ndarray] = dict()
         # Construct the Gram matrix transformed quantum state and measurement
-        gateset_gram.update({'rho': la.pinv(g) @ gateset_exp['rho']})
-        gateset_gram.update({'E': gateset_exp['E']})
-        gateset_exp.pop('rho', None)
-        gateset_exp.pop('E', None)
+        gateset_gram.update({"rho": la.pinv(g) @ gateset_exp["rho"]})
+        gateset_gram.update({"E": gateset_exp["E"]})
+        gateset_exp.pop("rho", None)
+        gateset_exp.pop("E", None)
         # delete the 'null' gate so that the Gram matrix transformed gate set does not contain it
         gateset_exp.pop(GateSet.NULL_GATE_NAME, None)
 
@@ -137,7 +144,7 @@ class LinearInversionOptimizer(GSTOptimizer):
             gateset_gram.update({key: la.pinv(g) @ val})
 
         # Record the Gram matrix transformed gate set
-        self._optimized_result.update({'gateset gram': gateset_gram})
+        self._optimized_result.update({"gateset gram": gateset_gram})
 
         return gateset_gram
 
@@ -149,15 +156,15 @@ class LinearInversionOptimizer(GSTOptimizer):
         :return: np.ndarray, the optimized gauge matrix P_opt
         """
         # The Gram matrix transformed gate set
-        gateset_gram = deepcopy(self._optimized_result['gateset gram'])
+        gateset_gram = deepcopy(self._optimized_result["gateset gram"])
         # Record the ideal gate set described by the PTM representation of the elements, excluding the 'null' gate
         gateset_ideal = deepcopy(self._gateset.gateset_ptm)
         # Construct the optimization arguments
         # Add the outer product of quantum state and measurement as arguments, cf. Eq. (3.25) in [G15]
-        args_gram = [gateset_gram['rho'] @ gateset_gram['E']]
-        args_ideal = [gateset_ideal['rho'] @ gateset_ideal['E']]
-        gateset_gram.pop('rho', None)
-        gateset_gram.pop('E', None)
+        args_gram = [gateset_gram["rho"] @ gateset_gram["E"]]
+        args_ideal = [gateset_ideal["rho"] @ gateset_ideal["E"]]
+        gateset_gram.pop("rho", None)
+        gateset_gram.pop("E", None)
 
         # Add Gram matrix transformed gates and ideal gates as arguments
         for key in gateset_gram.keys():
@@ -175,23 +182,24 @@ class LinearInversionOptimizer(GSTOptimizer):
             # Reshape the input to :math:`4^n\times 4^n`
             x = np.reshape(x, (4 ** args[2], -1))
 
-            return sum([la.norm(G_gram - np.asarray(la.pinv(x)) @ G @ x, 'fro')
-                        for G_gram, G in zip(args[0], args[1])])
+            return sum([la.norm(G_gram - np.asarray(la.pinv(x)) @ G @ x, "fro") for G_gram, G in zip(args[0], args[1])])
 
         # Number of qubits
         n = self._gateset.n
         # Obtain the minimization result
-        res = minimize(fun=_optimize_func,
-                       x0=np.reshape(self._gateset.trans_matrix_prep(full=False), (4 ** n * 4 ** n,)),
-                       args=(args_gram, args_ideal, n),
-                       bounds=Bounds(np.full(4 ** n * 4 ** n, - 1.0), np.full(4 ** n * 4 ** n, 1.0)),
-                       tol=1e-3,  # tolerance for termination
-                       method='Powell')
+        res = minimize(
+            fun=_optimize_func,
+            x0=np.reshape(self._gateset.trans_matrix_prep(full=False), (4**n * 4**n,)),
+            args=(args_gram, args_ideal, n),
+            bounds=Bounds(np.full(4**n * 4**n, -1.0), np.full(4**n * 4**n, 1.0)),
+            tol=1e-3,  # tolerance for termination
+            method="Powell",
+        )
 
         # Get the optimized gauge operator P_opt
         if res.success is True:
-            P_opt = np.reshape(res.x, (4 ** n, -1))
-            self._optimized_result.update({'P_opt': P_opt})
+            P_opt = np.reshape(res.x, (4**n, -1))
+            self._optimized_result.update({"P_opt": P_opt})
         else:
             raise ArgumentError(res.message)
 
@@ -216,16 +224,16 @@ class LinearInversionOptimizer(GSTOptimizer):
         """
         new_gateset_exp = dict()
         # Truncate the experimentally accessible :math:`\vert\rho\rangle\!\rangle`
-        rho = gateset_exp['rho']
-        new_gateset_exp.update({'rho': rho[0:4 ** self._gateset.n, :]})
-        gateset_exp.pop('rho', None)
+        rho = gateset_exp["rho"]
+        new_gateset_exp.update({"rho": rho[0 : 4**self._gateset.n, :]})
+        gateset_exp.pop("rho", None)
         # Truncate the experimentally accessible :math:`\langle\!\langle E\vert`
-        E = gateset_exp['E']
-        new_gateset_exp.update({'E': E[:, 0:4 ** self._gateset.n]})
-        gateset_exp.pop('E', None)
+        E = gateset_exp["E"]
+        new_gateset_exp.update({"E": E[:, 0 : 4**self._gateset.n]})
+        gateset_exp.pop("E", None)
         # Truncate the experimentally accessible :math:`\tilde{G}_k`
         for key, val in gateset_exp.items():
-            new_gateset_exp.update({key: val[0:4 ** self._gateset.n, 0:4 ** self._gateset.n]})
+            new_gateset_exp.update({key: val[0 : 4**self._gateset.n, 0 : 4**self._gateset.n]})
 
         return new_gateset_exp
 
@@ -256,20 +264,24 @@ class LinearInversionOptimizer(GSTOptimizer):
         :return: dict, a dictionary that records the optimized results
         """
         if gateset is None or gateset_exp is None:
-            raise ArgumentError("in LinearInversionOptimizer.optimize(): either the ideal gate set or "
-                                "the experimentally accessible gate set is 'None'!")
+            raise ArgumentError(
+                "in LinearInversionOptimizer.optimize(): either the ideal gate set or "
+                "the experimentally accessible gate set is 'None'!"
+            )
         self._gateset = gateset
 
         # Preprocess the experimentally accessible gate set data.
         # If there are more than `4^n` number of state preparation circuits and/or measurement circuits,
         # we use experimental data collected from the first `4**n` quantum circuits only.
         num_prep, num_meas = len(self._gateset.prep_gates), len(self._gateset.meas_gates)
-        if num_prep != 4 ** self._gateset.n or num_meas != 4 ** self._gateset.n:
+        if num_prep != 4**self._gateset.n or num_meas != 4**self._gateset.n:
             # Print warning message using ANSI code
-            print("\033[1;31m WARNING: You are using the linear inversion optimizer @LinearInversionOptimizer, but "
-                  "\n both the number of state preparation circuits and the number of measurement circuits "
-                  "\n are larger than `4**n` (including the 'null' circuit), where `n` is the number of qubits. "
-                  "\n In this case, we use experimental data collected from the first `4**n` quantum circuits only!")
+            print(
+                "\033[1;31m WARNING: You are using the linear inversion optimizer @LinearInversionOptimizer, but "
+                "\n both the number of state preparation circuits and the number of measurement circuits "
+                "\n are larger than `4**n` (including the 'null' circuit), where `n` is the number of qubits. "
+                "\n In this case, we use experimental data collected from the first `4**n` quantum circuits only!"
+            )
             self._gateset_exp = self._preprocess_gateset_exp(gateset_exp)
         else:
             self._gateset_exp = gateset_exp
@@ -280,21 +292,21 @@ class LinearInversionOptimizer(GSTOptimizer):
         P_opt = self._optimize_gauge_matrix()
         P_opt_inv = la.pinv(P_opt)
         # Compute the optimized quantum state, measurement, and gates
-        gateset_gram = deepcopy(self._optimized_result['gateset gram'])
+        gateset_gram = deepcopy(self._optimized_result["gateset gram"])
         gateset_opt: Dict[str, np.ndarray] = dict()
 
         # Optimized quantum state and measurement operator
-        gateset_opt.update({'rho': P_opt @ gateset_gram['rho']})
-        gateset_opt.update({'E': gateset_gram['E'] @ P_opt_inv})
-        gateset_gram.pop('rho', None)
-        gateset_gram.pop('E', None)
+        gateset_opt.update({"rho": P_opt @ gateset_gram["rho"]})
+        gateset_opt.update({"E": gateset_gram["E"] @ P_opt_inv})
+        gateset_gram.pop("rho", None)
+        gateset_gram.pop("E", None)
 
         # Optimized quantum gates
         for key, val in gateset_gram.items():
             gateset_opt.update({key: P_opt @ val @ P_opt_inv})
 
         # Record the optimized gate set
-        self._optimized_result.update({'gateset opt': gateset_opt})
+        self._optimized_result.update({"gateset opt": gateset_opt})
         self._gateset.gateset_opt = gateset_opt
 
         return self._optimized_result
@@ -349,8 +361,7 @@ class MLEOptimizer(GSTOptimizer):
     """
 
     def __init__(self):
-        r"""init function of the `GSTOptimizer` abstract class.
-        """
+        r"""init function of the `GSTOptimizer` abstract class."""
         super().__init__()
         self._gateset: GateSet = None
         self._gateset_exp: Dict[str, np.ndarray] = None
@@ -358,8 +369,9 @@ class MLEOptimizer(GSTOptimizer):
         self._optimized_result = dict()
         pass
 
-    def _compute_expval(self, rho: np.ndarray, E: np.ndarray, gates: dict,
-                        g_k: str, prep_idx: int, meas_idx: int) -> float:
+    def _compute_expval(
+        self, rho: np.ndarray, E: np.ndarray, gates: dict, g_k: str, prep_idx: int, meas_idx: int
+    ) -> float:
         r"""Compute the expectation value from the parametric gate set.
 
         The expectation value is computed from the parametric gate set via the equation
@@ -417,13 +429,13 @@ class MLEOptimizer(GSTOptimizer):
         :param x: np.array, a 1-D array with shape (n,) recording the new variables
         :return: np.ndarray, PTM representation of the quantum state
         """
-        num_of_vars_of_rho = 4 ** self._gateset.n
+        num_of_vars_of_rho = 4**self._gateset.n
         begin_idx = 0
         # Construct the corresponding Cholesky matrix
-        rho_T = vec_to_cholesky_matrix(x[begin_idx:begin_idx + num_of_vars_of_rho])
+        rho_T = vec_to_cholesky_matrix(x[begin_idx : begin_idx + num_of_vars_of_rho])
         # rho in matrix form
         rho = rho_T @ rho_T.T.conj()
-        return np.reshape(operator_to_ptm(rho), (4 ** self._gateset.n, 1))
+        return np.reshape(operator_to_ptm(rho), (4**self._gateset.n, 1))
 
     def _x_to_E(self, x) -> np.ndarray:
         r"""Construct the parametric measurement operator (in PTM form) from new variables x.
@@ -434,13 +446,13 @@ class MLEOptimizer(GSTOptimizer):
         :param x: np.array, a 1-D array with shape (n,) recording the new variables
         :return: np.ndarray, PTM representation of the measurement operator
         """
-        num_of_vars_of_E = 4 ** self._gateset.n
-        begin_idx = 4 ** self._gateset.n
+        num_of_vars_of_E = 4**self._gateset.n
+        begin_idx = 4**self._gateset.n
         # Construct the corresponding Cholesky matrix
-        E_T = vec_to_cholesky_matrix(x[begin_idx:begin_idx + num_of_vars_of_E])
+        E_T = vec_to_cholesky_matrix(x[begin_idx : begin_idx + num_of_vars_of_E])
         # E in matrix form
         E = E_T @ E_T.T.conj()
-        return np.reshape(operator_to_ptm(E), (1, 4 ** self._gateset.n))
+        return np.reshape(operator_to_ptm(E), (1, 4**self._gateset.n))
 
     def _x_to_gates(self, x) -> Dict[str, np.ndarray]:
         r"""Construct the parametric gates (in PTM form) from new variables x.
@@ -451,12 +463,12 @@ class MLEOptimizer(GSTOptimizer):
         :param x: np.array, a 1-D array with shape (n,) recording the new variables
         :return: List[np.ndarray], a list of PTM matrices characterizing the parametric gates
         """
-        num_of_vars_per_gate = 16 ** self._gateset.n
+        num_of_vars_per_gate = 16**self._gateset.n
         gates = dict()
         for k, g_k in enumerate(self._gateset.gate_names):
-            begin_idx = 2 * 4 ** self._gateset.n + num_of_vars_per_gate * k
+            begin_idx = 2 * 4**self._gateset.n + num_of_vars_per_gate * k
             # Construct the corresponding Cholesky matrix
-            G_T = vec_to_cholesky_matrix(x[begin_idx:begin_idx + num_of_vars_per_gate])
+            G_T = vec_to_cholesky_matrix(x[begin_idx : begin_idx + num_of_vars_per_gate])
             gates.update({g_k: choi_to_ptm(G_T @ G_T.T.conj())})
         return gates
 
@@ -482,22 +494,22 @@ class MLEOptimizer(GSTOptimizer):
         # Step 1. Compute likelihood value for the experimentally accessible data rho_tilde
         for i in range(num_meas):
             p_i = self._compute_expval(rho, E, gates, g_k=None, prep_idx=None, meas_idx=i)
-            m_i = gateset_exp['rho'][i, 0]
+            m_i = gateset_exp["rho"][i, 0]
             # Update the likelihood value
             sigma_i = m_i * (1 - m_i) / self._shots
-            likelihood = likelihood + (m_i - p_i) ** 2 / (sigma_i ** 2)
+            likelihood = likelihood + (m_i - p_i) ** 2 / (sigma_i**2)
 
         # Step 2. Compute likelihood value for the experimentally accessible data E_tilde
         for j in range(num_prep):
             p_j = self._compute_expval(rho, E, gates, g_k=None, prep_idx=j, meas_idx=None)
-            m_j = gateset_exp['E'][0, j]
+            m_j = gateset_exp["E"][0, j]
             # Update the likelihood value
             sigma_j = m_j * (1 - m_j) / self._shots
-            likelihood = likelihood + (m_j - p_j) ** 2 / (sigma_j ** 2)
+            likelihood = likelihood + (m_j - p_j) ** 2 / (sigma_j**2)
 
         # Delete experimentally accessible data rho_tilde and E_tilde
-        gateset_exp.pop('rho', None)
-        gateset_exp.pop('E', None)
+        gateset_exp.pop("rho", None)
+        gateset_exp.pop("E", None)
 
         # Step 3. Compute likelihood value for the experimentally accessible data G_k_tilde
         # Notice that here @i is the index for measurement and @j is the index for state
@@ -507,7 +519,7 @@ class MLEOptimizer(GSTOptimizer):
                 m_ij = gateset_exp[g_k][i, j]
                 # Update the likelihood value
                 sigma_ij = m_ij * (1 - m_ij) / self._shots
-                likelihood = likelihood + (m_ij - p_ij) ** 2 / (sigma_ij ** 2)
+                likelihood = likelihood + (m_ij - p_ij) ** 2 / (sigma_ij**2)
 
         return likelihood
 
@@ -520,7 +532,7 @@ class MLEOptimizer(GSTOptimizer):
             g_k_vec = complex_matrix_to_vec(g_k)
             for i in np.arange(start=d, stop=d**2, step=1, dtype=int):
                 cons_ineq.append(g_k_vec[i] + 1)
-                cons_ineq.append(- g_k_vec[i] + 1)
+                cons_ineq.append(-g_k_vec[i] + 1)
         return cons_ineq
 
     # Add trace-preserving constraint on quantum gates
@@ -553,7 +565,7 @@ class MLEOptimizer(GSTOptimizer):
         for i in range(rho.size):
             rho_real = rho.real
             cons_ineq.append(rho_real[i, 0] + 1)
-            cons_ineq.append(- rho_real[i, 0] + 1)
+            cons_ineq.append(-rho_real[i, 0] + 1)
         return cons_ineq
 
     def _constraints(self) -> List[Dict]:
@@ -575,7 +587,7 @@ class MLEOptimizer(GSTOptimizer):
 
         :return: List[Dict], a list of constraints, each constraint is a dictionary type
         """
-        cons = [{'type': 'ineq', 'fun': self._gates_cp_constraint}]
+        cons = [{"type": "ineq", "fun": self._gates_cp_constraint}]
 
         # {'type': 'ineq', 'fun': self._gates_cp_constraint}
         # {'type': 'eq', 'fun': self._gates_tp_constraint}
@@ -597,19 +609,19 @@ class MLEOptimizer(GSTOptimizer):
         """
         # Perform Linear Inversion Optimization and use the optimized gate set as the starting point
         opt_res = LinearInversionOptimizer().optimize(gateset=self._gateset, gateset_exp=self._gateset_exp)
-        gateset_init = opt_res['gateset opt']
+        gateset_init = opt_res["gateset opt"]
 
         x_init = np.array([], dtype=float)
         # Add the initial parameters for rho
-        rho_T = cholesky_decomposition(ptm_to_operator(gateset_init['rho']))
+        rho_T = cholesky_decomposition(ptm_to_operator(gateset_init["rho"]))
         x_init = np.concatenate((x_init, cholesky_matrix_to_vec(rho_T)), axis=0)
         # Add the initial parameters for E
-        E_T = cholesky_decomposition(ptm_to_operator(gateset_init['E']))
+        E_T = cholesky_decomposition(ptm_to_operator(gateset_init["E"]))
         x_init = np.concatenate((x_init, cholesky_matrix_to_vec(E_T)), axis=0)
 
         # Delete experimentally accessible data rho_tilde and E_tilde
-        gateset_init.pop('rho', None)
-        gateset_init.pop('E', None)
+        gateset_init.pop("rho", None)
+        gateset_init.pop("E", None)
         # Add the initial parameters for G_k. Remove the 'null' gate if it exists
         gateset_init.pop(GateSet.NULL_GATE_NAME, None)
         for g_k in gateset_init.keys():
@@ -640,19 +652,23 @@ class MLEOptimizer(GSTOptimizer):
         self._gateset = gateset
         self._gateset_exp = deepcopy(gateset_exp)
         if self._gateset is None or self._gateset_exp is None:
-            raise ArgumentError("in MLEOptimizer.optimize(): either the ideal gate set or "
-                                "the experimentally accessible gate set is 'None'!")
+            raise ArgumentError(
+                "in MLEOptimizer.optimize(): either the ideal gate set or "
+                "the experimentally accessible gate set is 'None'!"
+            )
         self._shots = shots
         if self._shots is None:
             raise ArgumentError("in MLEOptimizer.optimize(): to use the MLE optimizer, parameter 'shots' must be set!")
 
         np.set_printoptions(precision=3, threshold=5, edgeitems=4, suppress=True)
         # Step 2. Call the MLE optimization
-        res = minimize(fun=self._likelihood_func,
-                       x0=self._initialize_x(),
-                       method='SLSQP',
-                       constraints=self._constraints(),
-                       options={'disp': True})
+        res = minimize(
+            fun=self._likelihood_func,
+            x0=self._initialize_x(),
+            method="SLSQP",
+            constraints=self._constraints(),
+            options={"disp": True},
+        )
 
         # Get the optimized variable x_opt
         if res.success is True:
@@ -664,14 +680,14 @@ class MLEOptimizer(GSTOptimizer):
         # Step 3. obtain the optimized gate set from the optimal variables
         gateset_opt: Dict[str, np.ndarray] = dict()
         # Obtain optimized quantum state and measurement operator (in PTM form)
-        gateset_opt.update({'rho': self._x_to_rho(x_opt)})
-        gateset_opt.update({'E': self._x_to_E(x_opt)})
+        gateset_opt.update({"rho": self._x_to_rho(x_opt)})
+        gateset_opt.update({"E": self._x_to_E(x_opt)})
 
         # Obtain optimized quantum gates (in PTM form) by concatenating dictionary
         gateset_opt.update(self._x_to_gates(x_opt))
 
         # Record the optimized gate set
-        self._optimized_result.update({'gateset opt': gateset_opt})
+        self._optimized_result.update({"gateset opt": gateset_opt})
         self._gateset.gateset_opt = gateset_opt
 
         return self._optimized_result

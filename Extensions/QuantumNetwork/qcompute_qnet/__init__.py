@@ -19,20 +19,10 @@ r"""
 Quantum Network Toolkit.
 """
 
-__all__ = [
-    "EPSILON",
-    "core",
-    "devices",
-    "functionalities",
-    "messages",
-    "models",
-    "protocols",
-    "quantum",
-    "topology"
-]
+__all__ = ["EPSILON", "core", "devices", "functionalities", "messages", "models", "protocols", "quantum", "topology"]
 
 
 EPSILON = 1e-14  # error tolerance
 
-name = 'qcompute_qnet'
-__version__ = '1.1.0'
+name = "qcompute_qnet"
+__version__ = "1.4.0"

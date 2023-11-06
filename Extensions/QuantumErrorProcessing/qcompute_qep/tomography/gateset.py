@@ -42,13 +42,13 @@ from copy import deepcopy
 import itertools
 
 import QCompute
-from qcompute_qep.utils.circuit import circuit_to_unitary, circuit_to_state
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm
-from qcompute_qep.quantum.channel import unitary_to_ptm
-from qcompute_qep.utils.linalg import basis, vec_to_operator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_unitary, circuit_to_state
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import ptm_to_operator, operator_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel import unitary_to_ptm
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import basis, vec_to_operator
 from QCompute.QPlatform.QOperation import CircuitLine
-import qcompute_qep.quantum.metrics as metrics
+import Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics as metrics
 
 
 class GateSet(abc.ABC):
@@ -94,12 +94,11 @@ class GateSet(abc.ABC):
         :math:`F_1\vert 0\rangle = \vert 1\rangle`.
     """
     # Declare the null gate name
-    NULL_GATE_NAME = 'G_null'
+    NULL_GATE_NAME = "G_null"
 
-    def __init__(self, gates: Dict[str, CircuitLine],
-                 prep_gates: List[List[str]],
-                 meas_gates: List[List[str]],
-                 **kwargs):
+    def __init__(
+        self, gates: Dict[str, CircuitLine], prep_gates: List[List[str]], meas_gates: List[List[str]], **kwargs
+    ):
         r"""The init function of the Gate Set class.
 
         In our implementation of gate set,
@@ -132,7 +131,7 @@ class GateSet(abc.ABC):
         **Examples**
 
             >>> import numpy
-            >>> from qcompute_qep.tomography import GateSet
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import GateSet
             >>> from QCompute.QPlatform.QOperation import CircuitLine
             >>> gate_set = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(numpy.pi / 2), [0]),
             >>>                           'G_ry90': CircuitLine(QCompute.RY(numpy.pi / 2), [0])},
@@ -148,7 +147,7 @@ class GateSet(abc.ABC):
         self._gates.update(gates)
         self._prep_gates = [[self.NULL_GATE_NAME]] + prep_gates  # add the 'null' gate in the beginning
         self._meas_gates = [[self.NULL_GATE_NAME]] + meas_gates  # add the 'null' gate in the beginning
-        self._name = kwargs.get('name', 'GateSet')
+        self._name = kwargs.get("name", "GateSet")
         self._gateset_ptm: Dict[str, np.ndarray] = dict()
         # Verify if the input state preparation and measurement circuits are complete
         self.verify_completeness()
@@ -160,8 +159,7 @@ class GateSet(abc.ABC):
 
     @property
     def gate_names(self) -> List[str]:
-        r"""Return the full list of gate names, excluding the 'null' gate.
-        """
+        r"""Return the full list of gate names, excluding the 'null' gate."""
         names = list(self._gates.keys())
         # Remove the 'null' gate if exists
         names.remove(self.NULL_GATE_NAME) if self.NULL_GATE_NAME in names else None
@@ -169,38 +167,32 @@ class GateSet(abc.ABC):
 
     @property
     def n(self) -> int:
-        r"""Number of qubits in the gate set.
-        """
+        r"""Number of qubits in the gate set."""
         return self._n
 
     @property
     def name(self) -> str:
-        r"""Name of the gate set.
-        """
+        r"""Name of the gate set."""
         return self._name
 
     @name.setter
     def name(self, val):
-        r"""Set the gate set's name.
-        """
+        r"""Set the gate set's name."""
         self._name = val
 
     @property
     def gates(self) -> Dict[str, CircuitLine]:
-        r"""The list of quantum gates characterized by CircuitLine.
-        """
+        r"""The list of quantum gates characterized by CircuitLine."""
         return self._gates
 
     @property
     def prep_gates(self):
-        r"""The list of state preparation quantum circuits.
-        """
+        r"""The list of state preparation quantum circuits."""
         return self._prep_gates
 
     @property
     def meas_gates(self):
-        r"""The list of measurement quantum circuits.
-        """
+        r"""The list of measurement quantum circuits."""
         return self._meas_gates
 
     @property
@@ -217,8 +209,8 @@ class GateSet(abc.ABC):
             gateset_ptm: Dict[str, np.ndarray] = dict()
             for key in self.gate_names:  # gate_names does not contain the 'null' gate
                 gateset_ptm.update({key: self.get_ideal_matrix(key)})
-            gateset_ptm.update({'rho': self.get_ideal_matrix('rho')})
-            gateset_ptm.update({'E': self.get_ideal_matrix('E')})
+            gateset_ptm.update({"rho": self.get_ideal_matrix("rho")})
+            gateset_ptm.update({"E": self.get_ideal_matrix("E")})
             self._gateset_ptm = gateset_ptm
         return self._gateset_ptm
 
@@ -234,8 +226,7 @@ class GateSet(abc.ABC):
 
     @gateset_opt.setter
     def gateset_opt(self, val: dict):
-        r"""Set the optimized gate set.
-        """
+        r"""Set the optimized gate set."""
         self._gateset_opt = val
 
     @property
@@ -251,7 +242,7 @@ class GateSet(abc.ABC):
         """
         if not self.verify_completeness():
             return False
-        if len(self.prep_gates) > 4 ** self._n or len(self.meas_gates) > 4 ** self._n:
+        if len(self.prep_gates) > 4 ** self._n or len(self.meas_gates) > 4**self._n:
             return False
         return True
 
@@ -273,14 +264,14 @@ class GateSet(abc.ABC):
         if full:
             num_prep = len(self.prep_gates)
         else:
-            num_prep = 4 ** self._n
+            num_prep = 4**self._n
 
-        P = np.zeros((4 ** self._n, num_prep), dtype=float)
+        P = np.zeros((4**self._n, num_prep), dtype=float)
         for j in range(num_prep):
             qp = QCompute.QEnv()
             qp.Q.createList(self._n)
             qp.circuit += self.create_prep_circuit(gate_idx=j)
-            P[:, j] = np.asarray(operator_to_ptm(circuit_to_state(qp))).reshape((4 ** self._n, )).real
+            P[:, j] = np.asarray(operator_to_ptm(circuit_to_state(qp))).reshape((4**self._n,)).real
 
         return P
 
@@ -302,16 +293,16 @@ class GateSet(abc.ABC):
         if full:
             num_meas = len(self.meas_gates)
         else:
-            num_meas = 4 ** self._n
+            num_meas = 4**self._n
 
-        M = np.zeros((num_meas, 4 ** self._n), dtype=float)
+        M = np.zeros((num_meas, 4**self._n), dtype=float)
         for i in range(num_meas):
             qp = QCompute.QEnv()
             qp.Q.createList(self._n)
             qp.circuit += self.create_meas_circuit(gate_idx=i)
             u = unitary_to_ptm(circuit_to_unitary(qp)).data
-            state = self.gateset_ptm['E'] @ u
-            M[i, :] = np.asarray(state).reshape((4 ** self._n, )).real
+            state = self.gateset_ptm["E"] @ u
+            M[i, :] = np.asarray(state).reshape((4**self._n,)).real
 
         return M
 
@@ -329,23 +320,31 @@ class GateSet(abc.ABC):
         trans_matrix_prep = self.trans_matrix_prep()
         trans_matrix_meas = self.trans_matrix_meas()
 
-        if num_prep < 4 ** self._n or np.linalg.matrix_rank(trans_matrix_prep) < 4 ** self._n:
-            raise ArgumentError("in GateSet(): The given list of state preparation quantum circuits "
-                                "does not satisfy the completeness requirement!")
+        if num_prep < 4 ** self._n or np.linalg.matrix_rank(trans_matrix_prep) < 4**self._n:
+            raise ArgumentError(
+                "in GateSet(): The given list of state preparation quantum circuits "
+                "does not satisfy the completeness requirement!"
+            )
 
-        if np.linalg.matrix_rank(trans_matrix_prep[:, 0:4 ** self._n]) < 4 ** self._n < num_prep:
-            raise ArgumentError("in GateSet(): The number of state preparation circuits is larger than `4**n`."
-                                "\n It is required that the first `4**n` quantum circuits "
-                                "(including the 'null' gate) must satisfy the completeness requirement!")
+        if np.linalg.matrix_rank(trans_matrix_prep[:, 0 : 4**self._n]) < 4**self._n < num_prep:
+            raise ArgumentError(
+                "in GateSet(): The number of state preparation circuits is larger than `4**n`."
+                "\n It is required that the first `4**n` quantum circuits "
+                "(including the 'null' gate) must satisfy the completeness requirement!"
+            )
 
-        if num_meas < 4 ** self._n or np.linalg.matrix_rank(trans_matrix_meas) < 4 ** self._n:
-            raise ArgumentError("in GateSet(): The given list of measurement quantum circuits "
-                                "does not satisfy the completeness requirement!")
+        if num_meas < 4 ** self._n or np.linalg.matrix_rank(trans_matrix_meas) < 4**self._n:
+            raise ArgumentError(
+                "in GateSet(): The given list of measurement quantum circuits "
+                "does not satisfy the completeness requirement!"
+            )
 
-        if np.linalg.matrix_rank(trans_matrix_meas[:, 0:4 ** self._n]) < 4 ** self._n < num_prep:
-            raise ArgumentError("in GateSet(): The number of measurement quantum circuits is larger than `4**n`. "
-                                "\n It is required that the first `4**n` quantum circuits "
-                                "(including the 'null' gate) must satisfy the completeness requirement!")
+        if np.linalg.matrix_rank(trans_matrix_meas[:, 0 : 4**self._n]) < 4**self._n < num_prep:
+            raise ArgumentError(
+                "in GateSet(): The number of measurement quantum circuits is larger than `4**n`. "
+                "\n It is required that the first `4**n` quantum circuits "
+                "(including the 'null' gate) must satisfy the completeness requirement!"
+            )
 
         return True
 
@@ -367,23 +366,29 @@ class GateSet(abc.ABC):
         :return: bool, True if the :math:`2^n` measurement circuits form an orthogonal basis
         """
         orthogonal_basis = []
-        for j in range(2 ** self._n):
+        for j in range(2**self._n):
             qp = QCompute.QEnv()
             qp.Q.createList(self._n)
             qp.circuit += self.create_meas_circuit(gate_idx=j)
-            orthogonal_basis.append(circuit_to_state(qp, vector=True).reshape(2 ** self._n, ))
+            orthogonal_basis.append(
+                circuit_to_state(qp, vector=True).reshape(
+                    2**self._n,
+                )
+            )
 
         # Compute the inner products
-        indices = range(2 ** self._n)
+        indices = range(2**self._n)
         mutual_indices = itertools.combinations_with_replacement(indices, 2)
         mutual_indices = [pair for pair in mutual_indices if list(pair)[0] != list(pair)[1]]
 
         for pair in mutual_indices:
             if not np.isclose(abs(np.dot(orthogonal_basis[pair[0]], orthogonal_basis[pair[1]])), 0.0):
-                raise ArgumentError("in GateSet(): the given 'meas_gates' is invalid! "
-                                    "we require that the states generated by the first {} gates in 'meas_gates' "
-                                    "together with the measurement operator |0><0|, "
-                                    "must form the computational basis.".format(2 ** self._n - 1))
+                raise ArgumentError(
+                    "in GateSet(): the given 'meas_gates' is invalid! "
+                    "we require that the states generated by the first {} gates in 'meas_gates' "
+                    "together with the measurement operator |0><0|, "
+                    "must form the computational basis.".format(2**self._n - 1)
+                )
         return True
 
     def get_gate(self, gate_name: str = None, ideal: bool = True) -> Union[np.ndarray, CircuitLine]:
@@ -447,16 +452,18 @@ class GateSet(abc.ABC):
         :param name: str, the gate name or 'rho' (state) or 'E' (measurement operator)
         :return: np.ndarray, the PTM representation of the target quantity
         """
-        if name == 'rho':
+        if name == "rho":
             return np.asarray(operator_to_ptm(vec_to_operator(basis(self._n, 0))), dtype=float).reshape(
-                (4 ** self._n, 1))
-        elif name == 'E':
+                (4**self._n, 1)
+            )
+        elif name == "E":
             return np.asarray(operator_to_ptm(vec_to_operator(basis(self._n, 0))), dtype=float).reshape(
-                (1, 4 ** self._n))
+                (1, 4**self._n)
+            )
         elif name == self.NULL_GATE_NAME:
             # NOTICE! For the simplicity of analysis,
             # we assume that the unitary representation of the 'null' gate is the identity.
-            return np.asarray(unitary_to_ptm(np.identity(2 ** self._n)).data, dtype=float)
+            return np.asarray(unitary_to_ptm(np.identity(2**self._n)).data, dtype=float)
         elif name in self.gate_names:
             qp = QCompute.QEnv()
             qp.Q.createList(self._n)
@@ -490,15 +497,16 @@ class GateSet(abc.ABC):
         if self.gateset_opt is None:
             raise ArgumentError("in GateSet.fidelity: the optimized gate set is not assigned yet!")
 
-        if name == 'rho':
-            fid = metrics.state_fidelity(ptm_to_operator(self.gateset_opt['rho']),
-                                         ptm_to_operator(self.get_ideal_matrix(name='rho')))
-        elif name == 'meas':   # Compute the fidelity of the computational basis measurement.
+        if name == "rho":
+            fid = metrics.state_fidelity(
+                ptm_to_operator(self.gateset_opt["rho"]), ptm_to_operator(self.get_ideal_matrix(name="rho"))
+            )
+        elif name == "meas":  # Compute the fidelity of the computational basis measurement.
             fid = 0.0
-            for i in range(2 ** self._n):
+            for i in range(2**self._n):
                 # Compute the noisy and ideal version of the i-th measurement operator
-                M_i_noisy = np.identity(4 ** self._n, dtype=float)  # the i-th noisy measurement circuit
-                M_i_ideal = np.identity(4 ** self._n, dtype=float)  # the i-th ideal measurement circuit
+                M_i_noisy = np.identity(4**self._n, dtype=float)  # the i-th noisy measurement circuit
+                M_i_ideal = np.identity(4**self._n, dtype=float)  # the i-th ideal measurement circuit
                 gate_names = self.meas_gates[i]
                 # remove the 'null' gate if exists
                 gate_names.remove(self.NULL_GATE_NAME) if self.NULL_GATE_NAME in gate_names else None
@@ -507,11 +515,11 @@ class GateSet(abc.ABC):
                     M_i_ideal = M_i_ideal @ self.get_ideal_matrix(name=gate_name)
 
                 # Compute the i-th noisy and ideal measurement operator :math:`E_i`
-                E_i_noisy = self.gateset_opt['E'] @ M_i_noisy
-                E_i_ideal = self.get_ideal_matrix(name='E') @ M_i_ideal
+                E_i_noisy = self.gateset_opt["E"] @ M_i_noisy
+                E_i_ideal = self.get_ideal_matrix(name="E") @ M_i_ideal
                 # Compute the fidelity of the i-th measurement operator
                 fid += metrics.state_fidelity(ptm_to_operator(E_i_noisy), ptm_to_operator(E_i_ideal))
-            fid = fid / 2 ** self._n  # normalization
+            fid = fid / 2**self._n  # normalization
         elif name in self.gates.keys():
             fid = metrics.average_gate_fidelity(self.gateset_opt[name], self.get_ideal_matrix(name=name))
         else:
@@ -524,102 +532,183 @@ class GateSet(abc.ABC):
 # Standard single- and two-qubit gate sets.
 #######################################################################################################################
 # The following single-qubit standard gate set is from Section 3.4.1 of [G15]_
-STD1Q_GATESET_RXRY = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(np.pi / 2), [0]),
-                                    'G_ry90': CircuitLine(QCompute.RY(np.pi / 2), [0])},
-                             prep_gates=[['G_rx90', 'G_rx90'], ['G_rx90'], ['G_ry90']],
-                             meas_gates=[['G_rx90', 'G_rx90'], ['G_rx90'], ['G_ry90']],
-                             name='STD1Q_GATESET_RXRY')
+STD1Q_GATESET_RXRY = GateSet(
+    gates={"G_rx90": CircuitLine(QCompute.RX(np.pi / 2), [0]), "G_ry90": CircuitLine(QCompute.RY(np.pi / 2), [0])},
+    prep_gates=[["G_rx90", "G_rx90"], ["G_rx90"], ["G_ry90"]],
+    meas_gates=[["G_rx90", "G_rx90"], ["G_rx90"], ["G_ry90"]],
+    name="STD1Q_GATESET_RXRY",
+)
 
 # The following single-qubit standard gate set is from Section 3.4.1 of [G15]_
-STD1Q_GATESET_RXRYRX = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(np.pi / 2), [0]),
-                                      'G_ry90': CircuitLine(QCompute.RY(np.pi / 2), [0]),
-                                      'G_rx180': CircuitLine(QCompute.RX(np.pi), [0])},
-                               prep_gates=[['G_rx180'], ['G_rx90'], ['G_ry90']],
-                               meas_gates=[['G_rx180'], ['G_rx90'], ['G_ry90']],
-                               name='STD1Q_GATESET_RXRYRX')
+STD1Q_GATESET_RXRYRX = GateSet(
+    gates={
+        "G_rx90": CircuitLine(QCompute.RX(np.pi / 2), [0]),
+        "G_ry90": CircuitLine(QCompute.RY(np.pi / 2), [0]),
+        "G_rx180": CircuitLine(QCompute.RX(np.pi), [0]),
+    },
+    prep_gates=[["G_rx180"], ["G_rx90"], ["G_ry90"]],
+    meas_gates=[["G_rx180"], ["G_rx90"], ["G_ry90"]],
+    name="STD1Q_GATESET_RXRYRX",
+)
 
 # The following single-qubit standard gate set is from Figure 6 of [NGR+21]_
-STD1Q_GATESET_RXRYID = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(np.pi / 2), [0]),
-                                      'G_ry90': CircuitLine(QCompute.RY(np.pi / 2), [0]),
-                                      'id': CircuitLine(QCompute.ID, [0])},
-                               prep_gates=[['G_rx90', 'G_rx90'],
-                                           ['G_rx90'], ['G_ry90'],
-                                           ['G_rx90', 'G_rx90', 'G_rx90'],
-                                           ['G_ry90', 'G_ry90', 'G_ry90']],
-                               meas_gates=[['G_rx90', 'G_rx90'],
-                                           ['G_rx90'], ['G_ry90'],
-                                           ['G_rx90', 'G_rx90', 'G_rx90'],
-                                           ['G_ry90', 'G_ry90', 'G_ry90']],
-                               name='STD1Q_GATESET_RXRYID')
+STD1Q_GATESET_RXRYID = GateSet(
+    gates={
+        "G_rx90": CircuitLine(QCompute.RX(np.pi / 2), [0]),
+        "G_ry90": CircuitLine(QCompute.RY(np.pi / 2), [0]),
+        "id": CircuitLine(QCompute.ID, [0]),
+    },
+    prep_gates=[
+        ["G_rx90", "G_rx90"],
+        ["G_rx90"],
+        ["G_ry90"],
+        ["G_rx90", "G_rx90", "G_rx90"],
+        ["G_ry90", "G_ry90", "G_ry90"],
+    ],
+    meas_gates=[
+        ["G_rx90", "G_rx90"],
+        ["G_rx90"],
+        ["G_ry90"],
+        ["G_rx90", "G_rx90", "G_rx90"],
+        ["G_ry90", "G_ry90", "G_ry90"],
+    ],
+    name="STD1Q_GATESET_RXRYID",
+)
 
 # The following two-qubit standard gate set is from http://www.pygsti.info/tutorials/13_GST_on_2_qubits.html
-STD2Q_GATESET_RXRYCX = GateSet(gates={'G_id_rx90': CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0]),
-                                      'G_rx90_id': CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1]),
-                                      'G_id_ry90': CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0]),
-                                      'G_ry90_id': CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1]),
-                                      'G_cx': CircuitLine(data=QCompute.CX, qRegList=[0, 1])},
-                               prep_gates=[['G_id_rx90', 'G_id_rx90'], ['G_rx90_id', 'G_rx90_id'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_id_rx90'], ['G_id_ry90'], ['G_rx90_id'], ['G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_id_ry90'], ['G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_ry90_id'], ['G_ry90_id', 'G_id_rx90'], ['G_ry90_id', 'G_id_ry90'],
-                                           ['G_ry90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_ry90']],
-                               meas_gates=[['G_id_rx90', 'G_id_rx90'], ['G_rx90_id', 'G_rx90_id'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_id_rx90'], ['G_id_ry90'], ['G_rx90_id'], ['G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_id_ry90'], ['G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_ry90_id'], ['G_ry90_id', 'G_id_rx90'], ['G_ry90_id', 'G_id_ry90'],
-                                           ['G_ry90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_ry90']],
-                               name='STD2Q_GATESET_RXRYCX')
+STD2Q_GATESET_RXRYCX = GateSet(
+    gates={
+        "G_id_rx90": CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0]),
+        "G_rx90_id": CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1]),
+        "G_id_ry90": CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0]),
+        "G_ry90_id": CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1]),
+        "G_cx": CircuitLine(data=QCompute.CX, qRegList=[0, 1]),
+    },
+    prep_gates=[
+        ["G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_id_rx90"],
+        ["G_id_ry90"],
+        ["G_rx90_id"],
+        ["G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_id_ry90"],
+        ["G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_ry90_id"],
+        ["G_ry90_id", "G_id_rx90"],
+        ["G_ry90_id", "G_id_ry90"],
+        ["G_ry90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_ry90"],
+    ],
+    meas_gates=[
+        ["G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_id_rx90"],
+        ["G_id_ry90"],
+        ["G_rx90_id"],
+        ["G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_id_ry90"],
+        ["G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_ry90_id"],
+        ["G_ry90_id", "G_id_rx90"],
+        ["G_ry90_id", "G_id_ry90"],
+        ["G_ry90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_ry90"],
+    ],
+    name="STD2Q_GATESET_RXRYCX",
+)
 
 # two-qubit standard gate set using CZ gate
-STD2Q_GATESET_RXRYCZ = GateSet(gates={'G_id_rx90': CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0]),
-                                      'G_rx90_id': CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1]),
-                                      'G_id_ry90': CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0]),
-                                      'G_ry90_id': CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1]),
-                                      'G_cz': CircuitLine(data=QCompute.CZ, qRegList=[0, 1])},
-                               prep_gates=[['G_id_rx90', 'G_id_rx90'], ['G_rx90_id', 'G_rx90_id'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_id_rx90'], ['G_id_ry90'], ['G_rx90_id'], ['G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_id_ry90'], ['G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_ry90_id'], ['G_ry90_id', 'G_id_rx90'], ['G_ry90_id', 'G_id_ry90'],
-                                           ['G_ry90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_ry90']],
-                               meas_gates=[['G_id_rx90', 'G_id_rx90'], ['G_rx90_id', 'G_rx90_id'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_id_rx90'], ['G_id_ry90'], ['G_rx90_id'], ['G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_id_ry90'], ['G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_ry90_id'], ['G_ry90_id', 'G_id_rx90'], ['G_ry90_id', 'G_id_ry90'],
-                                           ['G_ry90_id', 'G_id_rx90', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_rx90'],
-                                           ['G_rx90_id', 'G_rx90_id', 'G_id_ry90']],
-                               name='STD2Q_GATESET_RXRYCZ')
+STD2Q_GATESET_RXRYCZ = GateSet(
+    gates={
+        "G_id_rx90": CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0]),
+        "G_rx90_id": CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1]),
+        "G_id_ry90": CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0]),
+        "G_ry90_id": CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1]),
+        "G_cz": CircuitLine(data=QCompute.CZ, qRegList=[0, 1]),
+    },
+    prep_gates=[
+        ["G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_id_rx90"],
+        ["G_id_ry90"],
+        ["G_rx90_id"],
+        ["G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_id_ry90"],
+        ["G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_ry90_id"],
+        ["G_ry90_id", "G_id_rx90"],
+        ["G_ry90_id", "G_id_ry90"],
+        ["G_ry90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_ry90"],
+    ],
+    meas_gates=[
+        ["G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_id_rx90"],
+        ["G_id_ry90"],
+        ["G_rx90_id"],
+        ["G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_id_ry90"],
+        ["G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_ry90_id"],
+        ["G_ry90_id", "G_id_rx90"],
+        ["G_ry90_id", "G_id_ry90"],
+        ["G_ry90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_ry90"],
+    ],
+    name="STD2Q_GATESET_RXRYCZ",
+)
 
 # two-qubit standard gate set using SWAP gate
-STD2Q_GATESET_RXRYSWAP = GateSet(gates={'G_id_rx90': CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0]),
-                                        'G_rx90_id': CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1]),
-                                        'G_id_ry90': CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0]),
-                                        'G_ry90_id': CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1]),
-                                        'G_swap': CircuitLine(data=QCompute.SWAP, qRegList=[0, 1])},
-                                 prep_gates=[['G_id_rx90', 'G_id_rx90'], ['G_rx90_id', 'G_rx90_id'],
-                                             ['G_rx90_id', 'G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                             ['G_id_rx90'], ['G_id_ry90'], ['G_rx90_id'], ['G_rx90_id', 'G_id_rx90'],
-                                             ['G_rx90_id', 'G_id_ry90'], ['G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                             ['G_ry90_id'], ['G_ry90_id', 'G_id_rx90'], ['G_ry90_id', 'G_id_ry90'],
-                                             ['G_ry90_id', 'G_id_rx90', 'G_id_rx90'],
-                                             ['G_rx90_id', 'G_rx90_id', 'G_id_rx90'],
-                                             ['G_rx90_id', 'G_rx90_id', 'G_id_ry90']],
-                                 meas_gates=[['G_id_rx90', 'G_id_rx90'], ['G_rx90_id', 'G_rx90_id'],
-                                             ['G_rx90_id', 'G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                             ['G_id_rx90'], ['G_id_ry90'], ['G_rx90_id'], ['G_rx90_id', 'G_id_rx90'],
-                                             ['G_rx90_id', 'G_id_ry90'], ['G_rx90_id', 'G_id_rx90', 'G_id_rx90'],
-                                             ['G_ry90_id'], ['G_ry90_id', 'G_id_rx90'], ['G_ry90_id', 'G_id_ry90'],
-                                             ['G_ry90_id', 'G_id_rx90', 'G_id_rx90'],
-                                             ['G_rx90_id', 'G_rx90_id', 'G_id_rx90'],
-                                             ['G_rx90_id', 'G_rx90_id', 'G_id_ry90']],
-                                 name='STD2Q_GATESET_RXRYSWAP')
+STD2Q_GATESET_RXRYSWAP = GateSet(
+    gates={
+        "G_id_rx90": CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[0]),
+        "G_rx90_id": CircuitLine(data=QCompute.RX(np.pi / 2), qRegList=[1]),
+        "G_id_ry90": CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[0]),
+        "G_ry90_id": CircuitLine(data=QCompute.RY(np.pi / 2), qRegList=[1]),
+        "G_swap": CircuitLine(data=QCompute.SWAP, qRegList=[0, 1]),
+    },
+    prep_gates=[
+        ["G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_id_rx90"],
+        ["G_id_ry90"],
+        ["G_rx90_id"],
+        ["G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_id_ry90"],
+        ["G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_ry90_id"],
+        ["G_ry90_id", "G_id_rx90"],
+        ["G_ry90_id", "G_id_ry90"],
+        ["G_ry90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_ry90"],
+    ],
+    meas_gates=[
+        ["G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_id_rx90"],
+        ["G_id_ry90"],
+        ["G_rx90_id"],
+        ["G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_id_ry90"],
+        ["G_rx90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_ry90_id"],
+        ["G_ry90_id", "G_id_rx90"],
+        ["G_ry90_id", "G_id_ry90"],
+        ["G_ry90_id", "G_id_rx90", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_rx90"],
+        ["G_rx90_id", "G_rx90_id", "G_id_ry90"],
+    ],
+    name="STD2Q_GATESET_RXRYSWAP",
+)

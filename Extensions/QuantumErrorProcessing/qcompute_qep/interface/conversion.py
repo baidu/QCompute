@@ -27,8 +27,8 @@ import qiskit
 import QCompute
 from QCompute.QPlatform.QOperation import CircuitLine
 from QCompute.QPlatform import QOperation
-from qcompute_qep.utils import limit_angle
-import qcompute_qep.utils.circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import limit_angle
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit
 
 # Currently supported quantum gates in OpenQASM 2.0
 __QASM_SUPPORTED_GATES__ = {
@@ -93,7 +93,7 @@ class QASMStringIO(StringIO):
         :return: number of characters
         """
         val_content = super(QASMStringIO, self).write(__s)
-        val_tail = super(QASMStringIO, self).write(';\n')
+        val_tail = super(QASMStringIO, self).write(";\n")
         return val_content + val_tail
 
     def write_operation(self, opr: str, qreg_name: str, *args) -> int:
@@ -104,34 +104,34 @@ class QASMStringIO(StringIO):
         :param args: indices of qubits
         """
         if len(args) == 0:
-            line = opr + ' ' + qreg_name + ';\n'
+            line = opr + " " + qreg_name + ";\n"
         else:
             line_list_qubits = []
             for idx in args:
-                line_list_qubits.append(qreg_name + '[{}]'.format(idx))
-            line = opr + ' ' + ', '.join(line_list_qubits) + ';\n'
+                line_list_qubits.append(qreg_name + "[{}]".format(idx))
+            line = opr + " " + ", ".join(line_list_qubits) + ";\n"
         n = super(QASMStringIO, self).write(line)
         return n
 
     def write_line_gap(self, n: int = 1) -> int:
         """Write one or more blank line(s)."""
-        n = super(QASMStringIO, self).write('\n' * n)
+        n = super(QASMStringIO, self).write("\n" * n)
         return n
 
     def write_comment(self, __s: str) -> int:
         """Conveniently add comment into QASM string."""
-        n = super(QASMStringIO, self).write('// ' + __s + '\n')
+        n = super(QASMStringIO, self).write("// " + __s + "\n")
         return n
 
     def write_header(self) -> int:
         """Write file header, including information of our QEP project and
         predefined information for QASM text."""
-        n1 = super(QASMStringIO, self).write('// Generated from QEP v0.1.0\n')
-        n2 = super(QASMStringIO, self).write('// Time: {}\n'.format(datetime.datetime.now()))
-        n3 = super(QASMStringIO, self).write('\n')
-        n4 = super(QASMStringIO, self).write('OPENQASM 2.0;\n')
+        n1 = super(QASMStringIO, self).write("// Generated from QEP v0.1.0\n")
+        n2 = super(QASMStringIO, self).write("// Time: {}\n".format(datetime.datetime.now()))
+        n3 = super(QASMStringIO, self).write("\n")
+        n4 = super(QASMStringIO, self).write("OPENQASM 2.0;\n")
         n5 = super(QASMStringIO, self).write('include "qelib1.inc";\n')
-        n6 = super(QASMStringIO, self).write('\n' * 2)
+        n6 = super(QASMStringIO, self).write("\n" * 2)
         return n1 + n2 + n3 + n4 + n5 + n6
 
 
@@ -148,23 +148,23 @@ def parse_to_tuples(circuit: List[CircuitLine]) -> List[Tuple[str, List[int]]]:
     for cl in circuit:
         gname = cl.data.name.lower()
         if gname not in __QASM_SUPPORTED_GATES__:
-            raise ValueError('{} is not a supported gate type in OpenQSAM 2.0'.format(gname))
+            raise ValueError("{} is not a supported gate type in OpenQSAM 2.0".format(gname))
         if isinstance(cl.data, QOperation.FixedGate.FixedGateOP):
             parsed_list.append((gname, cl.qRegList))
         elif isinstance(cl.data, QOperation.RotationGate.RotationGateOP):
-            if gname in {'rx', 'ry', 'rz', 'crx', 'cry', 'crz'}:
+            if gname in {"rx", "ry", "rz", "crx", "cry", "crz"}:
                 angle = limit_angle(cl.data.argumentList[0])
-                opr = '{}({:.2f})'.format(gname, angle)
+                opr = "{}({:.2f})".format(gname, angle)
                 parsed_list.append((opr, cl.qRegList))
             else:  # u3, cu3
-                gname += '3'
+                gname += "3"
                 angles = list(map(limit_angle, cl.data.argumentList))
-                opr = '{}({:.2f}, {:.2f}, {:.2f})'.format(gname, *angles)
+                opr = "{}({:.2f}, {:.2f}, {:.2f})".format(gname, *angles)
                 parsed_list.append((opr, cl.qRegList))
         elif isinstance(cl.data, QOperation.Barrier.BarrierOP):
             parsed_list.append((gname, cl.qRegList))
         else:
-            raise TypeError('{} is not a supported gate type to print'.format(type(cl.data)))
+            raise TypeError("{} is not a supported gate type to print".format(type(cl.data)))
 
     return parsed_list
 
@@ -183,7 +183,7 @@ def to_qasm(circuit: List[CircuitLine], fname: str = None) -> str:
     output.write_header()
 
     # Number of qubits in the quantum circuit
-    n = qcompute_qep.utils.circuit.num_qubits_of_circuit(circuit)
+    n = Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit.num_qubits_of_circuit(circuit)
     qubit_indices = []
     for cl in circuit:
         qubit_indices.extend(cl.qRegList)
@@ -191,38 +191,38 @@ def to_qasm(circuit: List[CircuitLine], fname: str = None) -> str:
     num_of_register_qubits = max(x for x in qubit_indices) + 1
 
     # Pop the last measurement operation if exists
-    measurement = qcompute_qep.utils.circuit.remove_measurement(circuit)
+    measurement = Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit.remove_measurement(circuit)
 
     if measurement is not None:
-        output.write_comment('Qubits: {}, Bits: {}'.format(qubit_indices, list(range(n))))
-        output.write('qreg q[{}]'.format(num_of_register_qubits))
-        output.write('creg c[{}]'.format(n))
+        output.write_comment("Qubits: {}, Bits: {}".format(qubit_indices, list(range(n))))
+        output.write("qreg q[{}]".format(num_of_register_qubits))
+        output.write("creg c[{}]".format(n))
     else:
-        output.write_comment('Qubits: {}'.format(qubit_indices))
-        output.write('qreg q[{}]'.format(num_of_register_qubits))
+        output.write_comment("Qubits: {}".format(qubit_indices))
+        output.write("qreg q[{}]".format(num_of_register_qubits))
     output.write_line_gap()
 
     # Add barrier and computational gates
     tuples_parsed = parse_to_tuples(circuit)
-    output.write_comment('Quantum gate operations')
+    output.write_comment("Quantum gate operations")
     for opr, idx in tuples_parsed:
         if idx == n:
-            output.write_operation(opr, 'q')
+            output.write_operation(opr, "q")
         else:
-            output.write_operation(opr, 'q', *idx)
+            output.write_operation(opr, "q", *idx)
 
     # Add measurement back if we have popped out before
     if measurement is not None:
         output.write_line_gap()
-        output.write_comment('Final measurement')
+        output.write_comment("Final measurement")
         for i in range(len(qubit_indices)):
-            output.write('measure q[{}] -> c[{}]'.format(qubit_indices[i], i))
+            output.write("measure q[{}] -> c[{}]".format(qubit_indices[i], i))
 
     qasm_str = output.getvalue()
     output.close()
 
     if fname is not None:
-        with open(fname, 'w') as f:
+        with open(fname, "w") as f:
             f.write(qasm_str)
 
     return qasm_str

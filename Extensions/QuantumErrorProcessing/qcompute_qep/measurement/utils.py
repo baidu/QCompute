@@ -21,7 +21,7 @@ Utility functions used in the `qcompute_qep.measurement` package.
 **Examples preparation**
 
     >>> import numpy as np
-    >>> from qcompute_qep.measurement.utils import extract_substr, init_cal_data, dict2vector, vector2dict, state_labels
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import extract_substr, init_cal_data, dict2vector, vector2dict, state_labels
 
 """
 import copy
@@ -29,7 +29,7 @@ import json
 import math
 import itertools
 from typing import List, Dict, Union, Iterable, Tuple, Any
-from qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer, get_qc_name
 from scipy.linalg import logm
 import networkx as nx
 
@@ -37,11 +37,12 @@ import networkx as nx
 import numpy as np
 from collections import OrderedDict
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 try:
     from matplotlib import pyplot as plt
     import pylab
+
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
@@ -49,6 +50,7 @@ except ImportError:
 try:
     import pandas
     import seaborn
+
     HAS_SEABORN = True
 except ImportError:
     HAS_SEABORN = False
@@ -87,8 +89,8 @@ def extract_substr(target_str: str, indices: Iterable) -> Tuple[str, str]:
     if (max(indices) >= n) or (min(indices) < 0):
         raise ArgumentError("in extract_substr(): the extracting indices exceed the range!")
 
-    str_e: str = ''
-    str_r = ''
+    str_e: str = ""
+    str_r = ""
     target_str = target_str[::-1]  # reverse the target string order
     for i in range(n):
         if i in indices:
@@ -130,14 +132,14 @@ def init_cal_data(n: int, layer: int, init_value: int) -> Union[Dict[str, int], 
     if (init_value != 0) and (init_value != 1):
         raise ArgumentError("init_value should be 0 or 1")
 
-    for i in range(2 ** n):
-        a1.append(bin(i).split('b')[1].zfill(n))
+    for i in range(2**n):
+        a1.append(bin(i).split("b")[1].zfill(n))
         b1[a1[i]] = init_value
 
     if layer == 1:
         return b1
     else:
-        for i in range(2 ** n):
+        for i in range(2**n):
             c1[a1[i]] = copy.deepcopy(b1)
         return c1
 
@@ -179,7 +181,7 @@ def dict2vector(origin_d: dict) -> np.ndarray:
         [0. 0. 0. 0.]
     """
     nqubits = len(next(iter(origin_d)))
-    raw_data = np.zeros(2 ** nqubits)
+    raw_data = np.zeros(2**nqubits)
 
     #  We use a new_raw_data to guarantee a complete basis no matter what kind of input is.
     new_raw_data = init_cal_data(n=nqubits, layer=1, init_value=0)
@@ -206,7 +208,7 @@ def preprocess_cal_data(cal_data: Union[str, Dict[str, Dict[str, int]]]) -> Dict
     # If the input is a file, load the calibration data from the file
     if isinstance(cal_data, str):
         file_name = cal_data
-        with open(file_name, 'r') as f:
+        with open(file_name, "r") as f:
             cal_data = json.load(f)
 
     # Sort increasingly the calibration data according to the input states (converted to int value)
@@ -219,7 +221,7 @@ def preprocess_cal_data(cal_data: Union[str, Dict[str, Dict[str, int]]]) -> Dict
 
     # If the input is the file, write the processed calibration data back
     if file_name is not None:
-        with open(file_name, 'w') as fp:
+        with open(file_name, "w") as fp:
             json.dump(cal_data, fp, indent=4)
 
     return cal_data
@@ -280,16 +282,13 @@ def state_labels(n: int) -> List[str]:
         ['000', '001', '010', '011', '100', '101', '110', '111']
     """
     labels = list()
-    for i in range(2 ** n):
+    for i in range(2**n):
         s = str(bin(i))[2:]
         labels.append(s.zfill(n))
     return labels
 
 
-def plot_cal_matrix(A: np.ndarray,
-                    show_labels: bool = False,
-                    title: str = None,
-                    fig_name: str = None) -> None:
+def plot_cal_matrix(A: np.ndarray, show_labels: bool = False, title: str = None, fig_name: str = None) -> None:
     r"""
     Visualize the calibration matrix.
 
@@ -315,9 +314,9 @@ def plot_cal_matrix(A: np.ndarray,
     # For [0, 1], use RdPu, OrRd
     # For [-1, 1], use RdBu, cool, Reds, GnBu
     if min_value < 0:
-        im = ax.imshow(A, cmap='RdBu')
+        im = ax.imshow(A, cmap="RdBu")
     else:
-        im = ax.imshow(A, cmap='RdPu')
+        im = ax.imshow(A, cmap="RdPu")
 
     # Add the colorbar
     fig.colorbar(im, ax=ax)
@@ -344,10 +343,9 @@ def plot_cal_matrix(A: np.ndarray,
     plt.show()
 
 
-def plot_histograms(counts: Union[np.ndarray, List[List[float]]],
-                    legends: List[str] = None,
-                    binary_labels: bool = True,
-                    **kwargs) -> None:
+def plot_histograms(
+    counts: Union[np.ndarray, List[List[float]]], legends: List[str] = None, binary_labels: bool = True, **kwargs
+) -> None:
     r"""
     Plot the histograms of a set of counts.
     Assume there are :math:`K` sets of count instances and each instance has :math:`N` elements, then
@@ -366,12 +364,13 @@ def plot_histograms(counts: Union[np.ndarray, List[List[float]]],
     :param binary_labels:
     """
     if not HAS_SEABORN:
-        raise ImportError('Function "plot_histograms" requires pandas and seaborn. '
-                          'Please run "pip install pandas, seaborn" first.')
+        raise ImportError(
+            'Function "plot_histograms" requires pandas and seaborn. ' 'Please run "pip install pandas, seaborn" first.'
+        )
 
-    labels = kwargs.get('labels', None)
-    title = kwargs.get('title', None)
-    fig_name = kwargs.get('fig_name', None)
+    labels = kwargs.get("labels", None)
+    title = kwargs.get("title", None)
+    fig_name = kwargs.get("fig_name", None)
 
     # If the input @counts is a list of counts, convert it to the array type
     if isinstance(counts, list):
@@ -396,15 +395,15 @@ def plot_histograms(counts: Union[np.ndarray, List[List[float]]],
 
     multi_legends = []
     for l in legends:
-        multi_legends.extend([l]*N)
-    df = pandas.DataFrame(zip(labels*K, multi_legends, counts.flatten()),
-                          columns=["Output Sequences", "Category", "Counts"])
+        multi_legends.extend([l] * N)
+    df = pandas.DataFrame(
+        zip(labels * K, multi_legends, counts.flatten()), columns=["Output Sequences", "Category", "Counts"]
+    )
 
     # https://seaborn.pydata.org/generated/seaborn.color_palette.html#seaborn.color_palette
     # http://man.hubwiz.com/docset/Seaborn.docset/Contents/Resources/Documents/tutorial/color_palettes.html
     # `color_palette` candidates: Set2, Paired, hls, husl
-    seaborn.barplot(x="Output Sequences", hue="Category", y="Counts", data=df,
-                    palette=seaborn.color_palette("husl"))
+    seaborn.barplot(x="Output Sequences", hue="Category", y="Counts", data=df, palette=seaborn.color_palette("husl"))
     # Rotate the tick labels and set their alignment
     if binary_labels:
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
@@ -412,7 +411,7 @@ def plot_histograms(counts: Union[np.ndarray, List[List[float]]],
         plt.setp(ax.get_xticklabels())
     # Put the legend out of the figure
     # https://stackoverflow.com/questions/30490740/move-legend-outside-figure-in-seaborn-tsplot
-    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+    plt.legend(bbox_to_anchor=(1.02, 1), loc="upper left", borderaxespad=0)
     plt.tight_layout()
 
     # Add figure title
@@ -463,24 +462,30 @@ def get_qc_topo(qc: Any) -> nx.Graph:
 
     G = None
     qc_dict = {}
-    qc_dict['class1'] = ['lima', 'quito', 'belem']
-    qc_dict['class2'] = ['oslo', 'nairobi', 'jakarta', 'lagos', 'perth', ]
-    qc_dict['Baidu'] = ['BaiduQian']
+    qc_dict["class1"] = ["lima", "quito", "belem"]
+    qc_dict["class2"] = [
+        "oslo",
+        "nairobi",
+        "jakarta",
+        "lagos",
+        "perth",
+    ]
+    qc_dict["Baidu"] = ["BaiduQian"]
     a = None
     for key, value in qc_dict.items():
         for i in value:
             if qc_name.__contains__(i):
                 a = key
 
-    if a == 'class1':
+    if a == "class1":
         G = nx.Graph()
         G.add_nodes_from([0, 1, 2, 3, 4])
         G.add_edges_from([(0, 1), (1, 2), (1, 3), (3, 4)])
-    elif a == 'class2':
+    elif a == "class2":
         G = nx.Graph()
         G.add_nodes_from([0, 1, 2, 3, 4, 5, 6])
         G.add_edges_from([(0, 1), (1, 2), (1, 3), (3, 5), (4, 5), (5, 6)])
-    elif a == 'Baidu':
+    elif a == "Baidu":
         G = nx.Graph()
         G.add_nodes_from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         G.add_edges_from([(0, 1), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)])

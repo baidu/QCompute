@@ -30,6 +30,7 @@ class SMO(BasicOptimizer):
 
     Please see https://arxiv.org/abs/1903.12166 for details on this optimization method.
     """
+
     def __init__(self, iterations: int, circuit: BasicCircuit):
         r"""The constructor of the SMO class
 
@@ -41,9 +42,10 @@ class SMO(BasicOptimizer):
         super().__init__(iterations, circuit)
 
     def minimize(
-            self, shots: int,
-            loss_func: Callable[[np.ndarray, int], float],
-            grad_func: Callable[[np.ndarray, int], np.ndarray]
+        self,
+        shots: int,
+        loss_func: Callable[[np.ndarray, int], float],
+        grad_func: Callable[[np.ndarray, int], np.ndarray],
     ) -> None:
         r"""Minimizes the given loss function
 
@@ -76,7 +78,7 @@ class SMO(BasicOptimizer):
                 B = np.arctan((v1 - C) / (v2 - C))
                 A = (v1 - C) / np.sin(B)
                 if A > 0:
-                    x_new = - 0.5 * np.pi - B
+                    x_new = -0.5 * np.pi - B
                 else:
                     x_new = 0.5 * np.pi - B
                 curr_param[j] = x_new

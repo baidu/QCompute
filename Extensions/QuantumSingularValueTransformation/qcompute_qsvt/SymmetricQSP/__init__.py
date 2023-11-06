@@ -19,14 +19,30 @@
 __init__ file of the `qcompute_qsvt.SymmetricQSP` module.
 """
 
-from qcompute_qsvt.SymmetricQSP.SymmetricQSPExternal import __func_Wx_map, __func_L, __func_gradL, __func_LBFGS_QSP, \
-    __func_LBFGS_QSP_backtracking, __func_LBFGS_QSP_scipy, __func_LBFGS_QSP_interpolation
-from qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalPy import __func_expiZ_map, func_symQSP_A_map, func_symQSP_gradA_map
-from qcompute_qsvt.SymmetricQSP.Settings import INTERNAL
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.SymmetricQSP.SymmetricQSPExternal import (
+    __func_Wx_map,
+    __func_L,
+    __func_gradL,
+    __func_LBFGS_QSP,
+    __func_LBFGS_QSP_backtracking,
+    __func_LBFGS_QSP_scipy,
+    __func_LBFGS_QSP_interpolation,
+)
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalPy import (
+    __func_expiZ_map,
+    func_symQSP_A_map,
+    func_symQSP_gradA_map,
+)
 
 __all__ = [
-    '__func_Wx_map', '__func_L', '__func_gradL', '__func_LBFGS_QSP',
-    '__func_LBFGS_QSP_backtracking', '__func_LBFGS_QSP_scipy', '__func_LBFGS_QSP_interpolation',
-    '__func_expiZ_map', 'func_symQSP_A_map', 'func_symQSP_gradA_map',
-    'INTERNAL'
+    "__func_Wx_map",
+    "__func_L",
+    "__func_gradL",
+    "__func_LBFGS_QSP",
+    "__func_LBFGS_QSP_backtracking",
+    "__func_LBFGS_QSP_scipy",
+    "__func_LBFGS_QSP_interpolation",
+    "__func_expiZ_map",
+    "func_symQSP_A_map",
+    "func_symQSP_gradA_map",
 ]

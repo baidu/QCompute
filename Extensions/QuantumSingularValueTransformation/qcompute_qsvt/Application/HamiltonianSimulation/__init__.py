@@ -19,10 +19,16 @@
 __init__ file of the `qcompute_qsvt.Application.HamiltonianSimulation` module.
 """
 
-from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianGenerator import func_Hamiltonian_gen
-from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import circ_HS_QSVT, func_HS_QSVT
-from qcompute_qsvt.Application.HamiltonianSimulation.SymmetricQSPHS import __HS_approx_data, func_LBFGS_QSP_HS
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianGenerator import (
+    func_Hamiltonian_gen,
+)
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import (
+    circ_HS_QSVT,
+    func_HS_QSVT,
+)
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.SymmetricQSPHS import (
+    __HS_approx_data,
+    func_LBFGS_QSP_HS,
+)
 
-__all__ = [
-    'func_Hamiltonian_gen', 'circ_HS_QSVT', 'func_HS_QSVT', '__HS_approx_data', 'func_LBFGS_QSP_HS'
-]
+__all__ = ["func_Hamiltonian_gen", "circ_HS_QSVT", "func_HS_QSVT", "__HS_approx_data", "func_LBFGS_QSP_HS"]

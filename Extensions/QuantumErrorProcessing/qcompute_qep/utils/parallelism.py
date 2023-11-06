@@ -23,8 +23,8 @@ This greatly saves the running time and the quantum computer resource.
 
 from typing import List, Optional
 
-from qcompute_qep.utils import execute
-from qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
 
 from QCompute import *
 
@@ -84,5 +84,3 @@ from QCompute import *
 #     counts_list = execute([pp_1.parallel_qp, pp_2.parallel_qp], shots=1024)
 #
 #     list[dict[str, int]] = pp_1.split_counts(counts)
-
-

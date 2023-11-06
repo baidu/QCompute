@@ -175,7 +175,7 @@ def receive_upper(self, upper_protocol: type, **kwargs) -> None:
         # Forward the 'ACCEPT' message to the upstream node
         self.node.send_classical_msg(dst=self.upstream_node, msg=msg)  
 
-        # Create an instance for key generation and wait for sifting keys with his upstream node
+        # Create an instance for key generation and wait for generating keys with his upstream node
         self.node.set_key_generation(self.upstream_node)
         self.send_lower(PrepareAndMeasure, 
                         peer=self.upstream_node, 
@@ -401,7 +401,7 @@ def receive_lower(self, lower_protocol: type, **kwargs) -> None:
 
 ### 9. Bob: Decrypt and obtain end-to-end keys
 
-Bob checks if he has received all the ciphertexts from the repeater nodes. If he has, he will use his locally saved key $k_{AB} = k_{BR_n}$ to jointly decrypt all the ciphertexts and obtain the shared keys with Alice $k_{AB} = k_{BR_n} \oplus (k_{AR_1} \oplus k_{R_1R_2}) \oplus \ldots \oplus (k_{R_{n-1}R_n} \oplus k_{R_nB}) = k_{AR_1}$. At the same time, he will send a `DONE` message back to Alice to inform her of generating the end-to-end keys successfully. 
+Bob checks if he has received all the ciphertexts from the repeater nodes. If he has, he will use his locally saved key $k_{BR_n}$ to jointly decrypt all the ciphertexts and obtain the shared keys with Alice $k_{AB} = k_{BR_n} \oplus (k_{AR_1} \oplus k_{R_1R_2}) \oplus \ldots \oplus (k_{R_{n-1}R_n} \oplus k_{R_nB}) = k_{AR_1}$. At the same time, he will send a `DONE` message back to Alice to inform her of generating the end-to-end keys successfully. 
 
 
 ```python
@@ -467,8 +467,8 @@ First, we create the simulation environment, set it to default and build the qua
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a simulation environment
 env = DESEnv("QKD Network Architecture", default=True)  

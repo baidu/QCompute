@@ -67,7 +67,7 @@ After installation, you can try the following simple program to check whether QE
 
 ```python
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 # Step 1. Initialize a quantum program for preparing the Bell state

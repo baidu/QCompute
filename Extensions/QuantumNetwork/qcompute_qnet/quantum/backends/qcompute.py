@@ -28,14 +28,16 @@ __all__ = [
     "get_qcompute_default_backend",
     "set_qcompute_default_token",
     "get_qcompute_default_token",
-    "run_circuit"
+    "run_circuit",
 ]
 
 
-DEFAULT_BACKEND = 'local_baidu_sim2'
+DEFAULT_BACKEND = "local_baidu_sim2"
 DEFAULT_TOKEN = None
 QCompute.Define.Settings.outputInfo = False
 QCompute.Define.Settings.drawCircuitControl = []
+QCompute.Define.Settings.autoClearOutputDirAfterFetchMeasure = True
+QCompute.Define.Settings.cloudTaskDoNotWriteFile = True
 
 
 def set_qcompute_default_backend(backend: str) -> None:
@@ -101,23 +103,41 @@ def run_circuit(circuit: "Circuit", shots: int, backend=None, token=None) -> dic
         from QCompute is given by ``{'01': 5, '00': 3}``, then our return gives ``{'10': 5, '00': 3}``.
     """
     single_qubit_gates = {
-        'id': QCompute.ID, 's': QCompute.S, 't': QCompute.T,
-        'h': QCompute.H, 'x': QCompute.X, 'y': QCompute.Y, 'z': QCompute.Z,
-        'rx': QCompute.RX, 'ry': QCompute.RY, 'rz': QCompute.RZ, 'u3': QCompute.U,
-        'm': QCompute.MeasureZ
+        "id": QCompute.ID,
+        "s": QCompute.S,
+        "sdg": QCompute.SDG,
+        "t": QCompute.T,
+        "tdg": QCompute.TDG,
+        "h": QCompute.H,
+        "x": QCompute.X,
+        "y": QCompute.Y,
+        "z": QCompute.Z,
+        "rx": QCompute.RX,
+        "ry": QCompute.RY,
+        "rz": QCompute.RZ,
+        "u3": QCompute.U,
+        "u": None,
+        "m": QCompute.MeasureZ,
     }
     multi_qubits_gates = {
-        'ch': QCompute.CH, 'cx': QCompute.CX, 'cy': QCompute.CY, 'cz': QCompute.CZ,
-        'crx': QCompute.CRX, 'cry': QCompute.CRY, 'crz': QCompute.CRZ, 'cu3': QCompute.CU,
-        'swap': QCompute.SWAP
+        "ch": QCompute.CH,
+        "cx": QCompute.CX,
+        "cy": QCompute.CY,
+        "cz": QCompute.CZ,
+        "crx": QCompute.CRX,
+        "cry": QCompute.CRY,
+        "crz": QCompute.CRZ,
+        "cu3": QCompute.CU,
+        "swap": QCompute.SWAP,
     }
     backend = QCompute.BackendName(get_qcompute_default_backend()) if backend is None else backend.value
     QCompute.Define.hubToken = get_qcompute_default_token() if token is None else token
 
     if backend != QCompute.BackendName.LocalBaiduSim2:
-        assert QCompute.Define.hubToken is not None, \
-            "A valid QCompute token is required to use the cloud backend. " \
+        assert QCompute.Define.hubToken is not None, (
+            "A valid QCompute token is required to use the cloud backend. "
             "Please set a QCompute token by calling `set_qcompute_default_token`."
+        )
 
     qcompute_env = QCompute.QEnv()
     qcompute_env.backend(backendName=backend)
@@ -129,35 +149,39 @@ def run_circuit(circuit: "Circuit", shots: int, backend=None, token=None) -> dic
         circuit = new_circuit
 
     for gate in circuit.gate_history:
-        name = gate['name']
-        which_qubit = gate['which_qubit']
+        name = gate["name"]
+        which_qubit = gate["which_qubit"]
 
         if name in single_qubit_gates:
             gate_func = single_qubit_gates[name]
-            if name in ['id', 's', 't', 'h', 'x', 'y', 'z']:
+            if name in ["id", "s", "t", "h", "x", "y", "z"]:
                 gate_func(qcompute_env.Q[which_qubit[0]])
-            elif name in ['rx', 'ry', 'rz']:
-                gate_func(gate['angle'])(qcompute_env.Q[which_qubit[0]])
-            elif name in ['u3']:
-                gate_func(*gate['angles'])(qcompute_env.Q[which_qubit[0]])
-            elif name in ['m']:
+            elif name in ["rx", "ry", "rz"]:
+                gate_func(gate["angle"])(qcompute_env.Q[which_qubit[0]])
+            elif name in ["u3"]:
+                gate_func(*gate["angles"])(qcompute_env.Q[which_qubit[0]])
+            elif name in ["u"]:
+                QCompute.S(qcompute_env.Q[which_qubit[0]])
+                QCompute.U(*gate["angles"])(qcompute_env.Q[which_qubit[0]])
+                QCompute.SDG(qcompute_env.Q[which_qubit[0]])
+            elif name in ["m"]:
                 gate_func([qcompute_env.Q[which_qubit[0]]], [which_qubit[0]])
 
         elif name in multi_qubits_gates:
             gate_func = multi_qubits_gates[name]
-            if name in ['ch', 'cx', 'cy', 'cz', 'swap']:
+            if name in ["ch", "cx", "cy", "cz", "swap"]:
                 gate_func(qcompute_env.Q[which_qubit[0]], qcompute_env.Q[which_qubit[1]])
-            elif name in ['crx', 'cry', 'crz']:
-                gate_func(gate['angle'])(qcompute_env.Q[which_qubit[0]], qcompute_env.Q[which_qubit[1]])
-            elif name in ['cu3']:
-                gate_func(*gate['angles'])(qcompute_env.Q[which_qubit[0]], qcompute_env.Q[which_qubit[1]])
+            elif name in ["crx", "cry", "crz"]:
+                gate_func(gate["angle"])(qcompute_env.Q[which_qubit[0]], qcompute_env.Q[which_qubit[1]])
+            elif name in ["cu3"]:
+                gate_func(*gate["angles"])(qcompute_env.Q[which_qubit[0]], qcompute_env.Q[which_qubit[1]])
 
         else:
             raise NotImplementedError
 
     results = qcompute_env.commit(shots, fetchMeasure=True)
-    if results['status'] == 'success':
-        origin_counts = results['counts']
+    if results["status"] == "success":
+        origin_counts = results["counts"]
         counts = {}
         for key in origin_counts:
             key_reverse = key[::-1]  # reverse the bit string

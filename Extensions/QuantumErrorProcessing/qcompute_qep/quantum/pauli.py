@@ -29,17 +29,19 @@ import random
 import functools
 
 from QCompute import *
-from qcompute_qep.utils.types import QProgram
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.linalg import tensor
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor
 from copy import deepcopy
 from QCompute.QPlatform.QOperation import CircuitLine
 
 # The qubit Pauli basis. Notice that these operators are properly normalized.
-QUBIT_PAULI_BASIS = {"I": np.array([[1, 0], [0, 1]]).astype(complex) / np.sqrt(2),
-                     "X": np.array([[0, 1], [1, 0]]).astype(complex) / np.sqrt(2),
-                     "Y": np.array([[0, -1j], [1j, 0]]).astype(complex) / np.sqrt(2),
-                     "Z": np.array([[1, 0], [0, -1]]).astype(complex) / np.sqrt(2)}
+QUBIT_PAULI_BASIS = {
+    "I": np.array([[1, 0], [0, 1]]).astype(complex) / np.sqrt(2),
+    "X": np.array([[0, 1], [1, 0]]).astype(complex) / np.sqrt(2),
+    "Y": np.array([[0, -1j], [1j, 0]]).astype(complex) / np.sqrt(2),
+    "Z": np.array([[1, 0], [0, -1]]).astype(complex) / np.sqrt(2),
+}
 
 
 class Pauli:
@@ -66,6 +68,7 @@ class Pauli:
                                       = \begin{bmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix}.
 
     """
+
     def __init__(self, name: str, sparse: bool = False):
         r"""
         init function of the Pauli operator class.
@@ -144,8 +147,8 @@ class Pauli:
         """
         p = self.name
         ps = np.array(list(p))
-        xs = (ps == 'X') + (ps == 'Y')
-        zs = (ps == 'Z') + (ps == 'Y')
+        xs = (ps == "X") + (ps == "Y")
+        zs = (ps == "Z") + (ps == "Y")
         return np.hstack((xs, zs)).astype(int)
 
     def sub_pauli(self, indices: List[int]) -> Pauli:
@@ -162,7 +165,7 @@ class Pauli:
         indices = np.unique(indices)
         indices = sorted(indices)
 
-        sub_name = ''.join([self._name[i] for i in indices])
+        sub_name = "".join([self._name[i] for i in indices])
         return Pauli(sub_name)
 
     def eigenvalues(self) -> np.ndarray:
@@ -170,7 +173,7 @@ class Pauli:
 
         :return: np.ndarray, a diagonalized matrix storing the eigenvalues
         """
-        eigs = [np.diag([1, 1]) if ch == 'I' else np.diag([1, -1]) for ch in self._name.upper()]
+        eigs = [np.diag([1, 1]) if ch == "I" else np.diag([1, -1]) for ch in self._name.upper()]
         return tensor(eigs)
 
     def meas_circuit(self, qp: QProgram, qubits: List[int] = None) -> Tuple[QProgram, np.ndarray]:
@@ -188,21 +191,20 @@ class Pauli:
         qp_new = deepcopy(qp)
         for i, s in enumerate(reversed(self.name)):
             qubit_idx = qubits[i]
-            if s == 'X':
+            if s == "X":
                 H(qp_new.Q[qubit_idx])
-            elif s == 'Y':
+            elif s == "Y":
                 SDG(qp_new.Q[qubit_idx])
                 H(qp_new.Q[qubit_idx])
 
         # Measurement in the Z basis
         qreglist, indexlist = qp_new.Q.toListPair()
-        MeasureZ(qRegList=[qreglist[x] for x in qubits],
-                 cRegList=[indexlist[x] for x in qubits])
+        MeasureZ(qRegList=[qreglist[x] for x in qubits], cRegList=[indexlist[x] for x in qubits])
 
         temp_list = []
 
         for i in self.name:
-            if i == 'I':
+            if i == "I":
                 temp = np.diag([1, 1])
             else:
                 temp = np.diag([1, -1])
@@ -228,16 +230,19 @@ class Pauli:
             # copy all prepare circuit
             qubit_idx = qubits[i]
             copy_qps = deepcopy(new_qps)
-            if s == 'I' or s == 'Z':
+            if s == "I" or s == "Z":
                 new_gate1 = []
                 new_gate2 = [CircuitLine(data=X, qRegList=[qubit_idx])]
-            elif s == 'X':
+            elif s == "X":
                 new_gate1 = [CircuitLine(data=H, qRegList=[qubit_idx])]
                 new_gate2 = [CircuitLine(data=X, qRegList=[qubit_idx]), CircuitLine(data=H, qRegList=[qubit_idx])]
-            elif s == 'Y':
+            elif s == "Y":
                 new_gate1 = [CircuitLine(data=H, qRegList=[qubit_idx]), CircuitLine(data=S, qRegList=[qubit_idx])]
-                new_gate2 = [CircuitLine(data=X, qRegList=[qubit_idx]), CircuitLine(data=H, qRegList=[qubit_idx]),
-                             CircuitLine(data=S, qRegList=[qubit_idx])]
+                new_gate2 = [
+                    CircuitLine(data=X, qRegList=[qubit_idx]),
+                    CircuitLine(data=H, qRegList=[qubit_idx]),
+                    CircuitLine(data=S, qRegList=[qubit_idx]),
+                ]
             else:
                 raise ArgumentError("in prep_circuits(): illegal preparation basis name {}!".format(s))
 
@@ -249,7 +254,7 @@ class Pauli:
 
         temp_list = []
         for i in self.name:
-            if i == 'I':
+            if i == "I":
                 temp = np.array([1, 1])
             else:
                 temp = np.array([1, -1])
@@ -329,7 +334,7 @@ def random_pauli_operator(n: int) -> Pauli:
     :param n: int, number of qubits of the generated Pauli operator
     :return: Pauli, a Pauli operator instance
     """
-    name = ''
+    name = ""
     for i in range(n):
         name = name + random.choice(list(QUBIT_PAULI_BASIS.keys()))
     return Pauli(name)
@@ -387,11 +392,11 @@ def ptm_to_operator(coes: Union[List[float], np.ndarray]) -> np.ndarray:
     if isinstance(coes, List):
         coes = np.asarray(coes)
     # Reshape to column vector
-    coes = coes.reshape((coes.size, ))
+    coes = coes.reshape((coes.size,))
     # Number of qubits
     n = int(log(coes.size, 4))
     pauli_basis = complete_pauli_basis(n)
-    op = np.zeros((2 ** n, 2 ** n))
+    op = np.zeros((2**n, 2**n))
 
     for i in range(coes.size):
         op = op + coes[i] * pauli_basis[i].matrix
@@ -419,10 +424,10 @@ def bsp(a: np.ndarray, b: np.ndarray) -> Union[int, np.array]:
                 If a and b are 1d, the return value type is ``int``;
                 If a and b are 2d, the return value type is ``np.array``.
     """
-    assert np.array_equal(a % 2, a), 'BSF {} is not in binary form'.format(a)
-    assert np.array_equal(b % 2, b), 'BSF {} is not in binary form'.format(b)
+    assert np.array_equal(a % 2, a), "BSF {} is not in binary form".format(a)
+    assert np.array_equal(b % 2, b), "BSF {} is not in binary form".format(b)
     a1, a2 = np.hsplit(a, 2)
-    return (np.hstack((a2, a1)).dot(b) % 2).astype('int')
+    return (np.hstack((a2, a1)).dot(b) % 2).astype("int")
 
 
 def bsf2pauli(bsf: np.ndarray) -> Union[str, List[str]]:
@@ -453,12 +458,12 @@ def bsf2pauli(bsf: np.ndarray) -> Union[str, List[str]]:
         >>> print(bsf2pauli(bsf))
         ['XZ', 'IY']
     """
-    assert np.array_equal(bsf % 2, bsf), 'BSF {} is not in binary form'.format(bsf)
+    assert np.array_equal(bsf % 2, bsf), "BSF {} is not in binary form".format(bsf)
 
     def _2pauli(bsf_single):
         xs, zs = np.hsplit(bsf_single, 2)
         ps = (xs + zs * 2).astype(str)
-        return ''.join(ps).translate(str.maketrans('0123', 'IXZY'))
+        return "".join(ps).translate(str.maketrans("0123", "IXZY"))
 
     if bsf.ndim == 1:
         return _2pauli(bsf)
@@ -491,10 +496,11 @@ def pauli2bsf(paulis: Union[str, List[str]]) -> np.array:
         [[1 0 0 1]
          [0 1 0 1]]
     """
+
     def _2bsf(pauli):
         ps = np.array(list(pauli))
-        xs = (ps == 'X') + (ps == 'Y')
-        zs = (ps == 'Z') + (ps == 'Y')
+        xs = (ps == "X") + (ps == "Y")
+        zs = (ps == "Z") + (ps == "Y")
         return np.hstack((xs, zs)).astype(int)
 
     if isinstance(paulis, str):
@@ -523,8 +529,8 @@ def mutually_commute(paulis: Union[List[str], np.ndarray]) -> bool:
     **Examples**
 
         >>> # Use the [[4, 2, 2]] code as test: Its stabilizers mutually commute, while its logical operators do not.
-        >>> import qcompute_qep.correction
-        >>> qec_code = qcompute_qep.correction.FourTwoTwoCode()
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.correction
+        >>> qec_code = Extensions.QuantumErrorProcessing.qcompute_qep.correction.FourTwoTwoCode()
         >>> print("The stabilizers are: {}".format(qec_code.stabilizers))
         The stabilizers are: ['XXXX', 'ZZZZ']
         >>> print("The stabilizers mutually commute? {}".format(mutually_commute(qec_code.stabilizers)))
@@ -568,8 +574,8 @@ def mutually_anticommute(paulis: Union[List[str], np.ndarray]) -> bool:
     **Examples**
 
         >>> # Use the five qubit code as test: Its logical operators mutually anticommute.
-        >>> import qcompute_qep.correction
-        >>> qec_code = qcompute_qep.correction.FiveQubitCode()
+        >>> import Extensions.QuantumErrorProcessing.qcompute_qep.correction
+        >>> qec_code = Extensions.QuantumErrorProcessing.qcompute_qep.correction.FiveQubitCode()
         >>> logical_operators = qec_code.logical_xs(form='str') + qec_code.logical_zs(form='str')
         >>> print("The logical operators are: {}".format(logical_operators))
         The logical operators are: ['ZIIZX', 'ZZZZZ']

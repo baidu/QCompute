@@ -20,11 +20,9 @@ Module for beam splitters.
 """
 
 from typing import Tuple
-from qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
 
-__all__ = [
-    "PolarizationBeamSplitter"
-]
+__all__ = ["PolarizationBeamSplitter"]
 
 
 class PolarizationBeamSplitter(Entity):
@@ -51,8 +49,7 @@ class PolarizationBeamSplitter(Entity):
         self.receivers = ()
 
     def init(self) -> None:
-        r"""Polarization beam splitter initialization.
-        """
+        r"""Polarization beam splitter initialization."""
         assert self.owner != self, f"The polarization beam splitter {self.name} has no owner!"
 
     def set(self, **kwargs) -> None:
@@ -66,15 +63,17 @@ class PolarizationBeamSplitter(Entity):
                 assert isinstance(kwargs[attr], int), "'clock' should be an int value."
                 self.__setattr__(attr, kwargs[attr])
             elif attr == "frequency":
-                assert isinstance(kwargs[attr], float) or isinstance(kwargs[attr], int), \
-                    "'frequency' should be a float or int value."
+                assert isinstance(kwargs[attr], float) or isinstance(
+                    kwargs[attr], int
+                ), "'frequency' should be a float or int value."
                 self.__setattr__(attr, kwargs[attr])
             elif attr == "bases":
                 assert isinstance(kwargs[attr], list), "'bases' should be a list."
                 self.__setattr__(attr, kwargs[attr])
             elif attr == "receivers":
-                assert isinstance(kwargs[attr], tuple) and len(kwargs[attr]) == 2, \
-                    f"'receivers' should be a tuple of length 2."
+                assert (
+                    isinstance(kwargs[attr], tuple) and len(kwargs[attr]) == 2
+                ), f"'receivers' should be a tuple of length 2."
                 self.__setattr__(attr, kwargs[attr])
             else:
                 raise TypeError(f"Setting {attr} is not allowed in {self.name}")
@@ -86,13 +85,11 @@ class PolarizationBeamSplitter(Entity):
             photon (Photon): received photon
         """
         assert self.frequency != 0, "Should set a frequency first."
-        outcome = photon.state.measure(self.bases[photon.index])
+        outcome = photon.state.measure(0, self.bases[photon.index], mid=photon.index)
         self.receivers[outcome].receive(photon.index)
 
     def print_parameters(self) -> None:
-        r"""Print parameters of the polarization beam splitter.
-        """
+        r"""Print parameters of the polarization beam splitter."""
         print("-" * 50)
         print(f"Details of Polarization BeamSplitter: {self.name}")
-        print(f"frequency: {self.frequency}\n"
-              f"receivers: {self.receivers}")
+        print(f"frequency: {self.frequency}\n" f"receivers: {self.receivers}")

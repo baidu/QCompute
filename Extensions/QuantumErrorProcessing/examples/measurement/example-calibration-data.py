@@ -27,7 +27,7 @@ from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
 Define.hubToken = "Token"
 
 # The quantum machine to be calibrated.
-device = 'iopcas'
+device = "iopcas"
 
 # Obtain the latest calibration data and store in the local directory.
 CalibrationUpdate(device)

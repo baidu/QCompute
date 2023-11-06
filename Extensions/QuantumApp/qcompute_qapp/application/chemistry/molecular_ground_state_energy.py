@@ -24,8 +24,8 @@ from ...utils import pauli_terms_to_matrix
 
 
 class MolecularGroundStateEnergy:
-    r"""Molecular Ground State Energy class
-    """
+    r"""Molecular Ground State Energy class"""
+
     def __init__(self, num_qubits: int = 0, hamiltonian: list = None):
         r"""The constructor of the MolecularGroundStateEnergy class
 
@@ -69,7 +69,7 @@ class MolecularGroundStateEnergy:
 
         return min(eigval.real)
 
-    def load_hamiltonian_from_file(self, filename: str, separator: str = ', ') -> None:
+    def load_hamiltonian_from_file(self, filename: str, separator: str = ", ") -> None:
         r"""Loads Hamiltonian from a file
 
         Args:
@@ -78,7 +78,7 @@ class MolecularGroundStateEnergy:
 
         """
         if not isinstance(filename, str):
-            raise TypeError('Error EA02001(QAPP): The input filename should be a string.')
+            raise TypeError("Error EA02001(QAPP): The input filename should be a string.")
         self._hamiltonian = []
         with open(filename) as f:
             for line in f:

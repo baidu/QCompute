@@ -131,13 +131,16 @@ def func_symQSP_A_map(vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarr
     else:
         for idx_x in range(int_n):
             mat_half0 = list_symQSP_half[idx_x][0]
-            vec_A[idx_x] = ((mat_half0[0] ** 2 + mat_half0[1] ** 2) * list_Wx[idx_x][0, 0] +
-                            2 * mat_half0[0] * mat_half0[1] * list_Wx[idx_x][0, 1]).real
+            vec_A[idx_x] = (
+                (mat_half0[0] ** 2 + mat_half0[1] ** 2) * list_Wx[idx_x][0, 0]
+                + 2 * mat_half0[0] * mat_half0[1] * list_Wx[idx_x][0, 1]
+            ).real
     return vec_A
 
 
-def func_symQSP_gradA_map(vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarray,
-                          bool_parity: int) -> Tuple[np.ndarray, np.ndarray]:
+def func_symQSP_gradA_map(
+    vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarray, bool_parity: int
+) -> Tuple[np.ndarray, np.ndarray]:
     r"""Compute :math:`\nabla\vec A` (**@mat_gradA**) and :math:`\vec A` (**@vec_A**).
 
     For signal parameter :math:`x\in[-1,1]`, processing parameter
@@ -221,7 +224,8 @@ def func_symQSP_gradA_map(vec_phi: Union[List[float], np.ndarray], list_Wx: np.n
             reg_mat_front[idx_x, 0] = np.eye(2)
             for idx_phi in range(int_d - 1):
                 reg_mat_front[idx_x, idx_phi + 1] = reg_mat_front[idx_x, idx_phi] @ (
-                        list_expiZ[idx_phi] @ list_Wx[idx_x])
+                    list_expiZ[idx_phi] @ list_Wx[idx_x]
+                )
 
             reg_mat_QSP[idx_x] = np.inner(reg_mat_front[idx_x, -1] @ list_expiZ[-1], reg_mat_front[idx_x, -1])
 
@@ -232,7 +236,8 @@ def func_symQSP_gradA_map(vec_phi: Union[List[float], np.ndarray], list_Wx: np.n
             reg_mat_front[idx_x, 0] = np.eye(2)
             for idx_phi in range(int_d - 1):
                 reg_mat_front[idx_x, idx_phi + 1] = reg_mat_front[idx_x, idx_phi] @ (
-                        list_expiZ[idx_phi] @ list_Wx[idx_x])
+                    list_expiZ[idx_phi] @ list_Wx[idx_x]
+                )
 
             mat_temp = reg_mat_front[idx_x, -1] @ list_expiZ[-1]
             reg_mat_QSP[idx_x] = np.inner(mat_temp @ list_Wx[idx_x], mat_temp)

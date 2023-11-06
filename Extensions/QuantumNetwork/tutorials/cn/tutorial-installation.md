@@ -32,8 +32,8 @@ pip install qcompute-qnet
 
 
 ```python
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology import Network, Node, Link
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology import Network, Node, Link
 
 # 创建模拟环境
 env = DESEnv("Simulation Environment", default=True)

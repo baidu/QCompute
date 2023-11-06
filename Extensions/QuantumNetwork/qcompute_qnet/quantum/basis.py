@@ -22,17 +22,14 @@ Module for quantum measurement bases.
 from argparse import ArgumentTypeError
 import numpy
 from numpy import pi
-from qcompute_qnet.quantum.gate import Gate
-from qcompute_qnet.quantum.state import One, Zero, Plus, Minus
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import One, Zero, Plus, Minus
 
-__all__ = [
-    "Basis"
-]
+__all__ = ["Basis"]
 
 
 class Basis:
-    r"""Class to obtain a measurement basis.
-    """
+    r"""Class to obtain a measurement basis."""
 
     @classmethod
     def X(cls) -> numpy.ndarray:
@@ -51,7 +48,7 @@ class Basis:
             numpy.ndarray: Y basis
         """
         return numpy.array([Gate.Rz(pi / 2) @ Plus.SV, Gate.Rz(pi / 2) @ Minus.SV])
-    
+
     @classmethod
     def Z(cls) -> numpy.ndarray:
         r"""Return Z basis.
@@ -80,13 +77,13 @@ class Basis:
         Returns:
             numpy.ndarray: measurement basis
         """
-        if plane == 'XY':  # XY plane measurement basis
+        if plane == "XY":  # XY plane measurement basis
             return numpy.array([Gate.Rz(theta) @ Plus.SV, Gate.Rz(theta) @ Minus.SV])
 
-        elif plane == 'YZ':  # YZ plane measurement basis
+        elif plane == "YZ":  # YZ plane measurement basis
             return numpy.array([Gate.Rx(theta) @ Zero.SV, Gate.Rx(theta) @ One.SV])
 
-        elif plane == 'XZ':  # XZ plane measurement basis
+        elif plane == "XZ":  # XZ plane measurement basis
             return numpy.array([Gate.Ry(theta) @ Zero.SV, Gate.Ry(theta) @ One.SV])
 
         else:

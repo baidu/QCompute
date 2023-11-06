@@ -30,9 +30,9 @@ We verify the decompositions for {CNOT, Toffoli, SWAP, CSWAP} in the auxiliary f
 import typing
 
 from QCompute import *
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.types as types
-import qcompute_qep.exceptions as exceptions
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions as exceptions
 
 
 def process_tomography(qp: types.QProgram, qc: types.QComputer, gate_name: str):
@@ -48,16 +48,18 @@ def process_tomography(qp: types.QProgram, qc: types.QComputer, gate_name: str):
     # Step 1. Perform quantum process tomography
     st = tomography.ProcessTomography()
     # Call the tomography procedure and obtain the noisy gate
-    noisy_ptm = st.fit(qp, qc, prep_basis='Pauli', meas_basis='Pauli', method='inverse', shots=4096, ptm=True).data
+    noisy_ptm = st.fit(qp, qc, prep_basis="Pauli", meas_basis="Pauli", method="inverse", shots=4096, ptm=True).data
 
     # Step 3. Analyze the data: compute the average gate fidelity of two quantum maps
     print("****** The average gate fidelity of quantum gate {} is: {:.5f}".format(gate_name, st.fidelity))
 
     # Visualize these PTMs
-    tomography.compare_process_ptm(ptms=[st.ideal_ptm, noisy_ptm, st.ideal_ptm - noisy_ptm],
-                                   titles=['Theoretical', qc_name, 'Difference'],
-                                   show_labels=True,
-                                   fig_name="QPT-{}-{}.png".format(qc_name, gate_name))
+    tomography.compare_process_ptm(
+        ptms=[st.ideal_ptm, noisy_ptm, st.ideal_ptm - noisy_ptm],
+        titles=["Theoretical", qc_name, "Difference"],
+        show_labels=True,
+        fig_name="QPT-{}-{}.png".format(qc_name, gate_name),
+    )
 
     print("*** Tomography the quantum gate {} in the quantum computer '{}' DONE!".format(gate_name, qc_name))
 
@@ -159,8 +161,7 @@ def toffoli(qp: types.QProgram, indices: typing.List[int]):
     H(qp.Q[t])
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     ###################################################################################################################
     # Set the quantum hardware in process tomography
     ###################################################################################################################
@@ -186,7 +187,7 @@ if __name__ == '__main__':
     Z(qp.Q[0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='Z')
+    process_tomography(qp, qc, gate_name="Z")
 
     ###################################################################################################################
     # Example 2. Calibrating the H gate
@@ -198,7 +199,7 @@ if __name__ == '__main__':
     H(qp.Q[0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='H')
+    process_tomography(qp, qc, gate_name="H")
 
     ###################################################################################################################
     # Example 3. Calibrating the CZ gate
@@ -211,7 +212,7 @@ if __name__ == '__main__':
     CZ(qp.Q[0], qp.Q[1])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='CZ')
+    process_tomography(qp, qc, gate_name="CZ")
 
     ###################################################################################################################
     # Example 4. Calibrating the CNOT gate
@@ -224,7 +225,7 @@ if __name__ == '__main__':
     cnot(qp, [1, 0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='CNOT')
+    process_tomography(qp, qc, gate_name="CNOT")
 
     ###################################################################################################################
     # Example 5. Calibrating the CNOT gate without manually decomposing it
@@ -237,7 +238,7 @@ if __name__ == '__main__':
     CX(qp.Q[0], qp.Q[1])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='CNOT-Mapping')
+    process_tomography(qp, qc, gate_name="CNOT-Mapping")
 
     ###################################################################################################################
     # Example 6. Calibrating the Toffoli gate
@@ -251,7 +252,7 @@ if __name__ == '__main__':
     toffoli(qp, [2, 1, 0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='Toffoli')
+    process_tomography(qp, qc, gate_name="Toffoli")
 
     ###################################################################################################################
     # Example 7. Calibrating the Toffoli gate without manually decomposing it
@@ -265,7 +266,7 @@ if __name__ == '__main__':
     CCX(qp.Q[2], qp.Q[1], qp.Q[0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='Toffoli-Mapping')
+    process_tomography(qp, qc, gate_name="Toffoli-Mapping")
 
     ###################################################################################################################
     # Example 8. Calibrating the SWAP gate
@@ -284,7 +285,7 @@ if __name__ == '__main__':
     cnot(qp, [1, 0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='SWAP')
+    process_tomography(qp, qc, gate_name="SWAP")
 
     ###################################################################################################################
     # Example 9. Calibrating the SWAP gate without manually decomposing it
@@ -298,7 +299,7 @@ if __name__ == '__main__':
     SWAP(qp.Q[0], qp.Q[1])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='SWAP-Mapping')
+    process_tomography(qp, qc, gate_name="SWAP-Mapping")
 
     ###################################################################################################################
     # Example 10. Calibrating the CSWAP gate (controlled-SWAP gate)
@@ -324,7 +325,7 @@ if __name__ == '__main__':
     cnot(qp, [0, 1])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='CSWAP')
+    process_tomography(qp, qc, gate_name="CSWAP")
 
     ###################################################################################################################
     # Example 11. Calibrating the CSWAP gate without manually decomposing it
@@ -339,4 +340,4 @@ if __name__ == '__main__':
     CSWAP(qp.Q[2], qp.Q[1], qp.Q[0])
 
     # Quantum process tomography
-    process_tomography(qp, qc, gate_name='CSWAP-Mapping')
+    process_tomography(qp, qc, gate_name="CSWAP-Mapping")

@@ -21,8 +21,8 @@ implemented in the Zero-Noise Extrapolation method.
 """
 
 from QCompute import *
-import qcompute_qep.mitigation as mitigation
-import qcompute_qep.utils.circuit as circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.mitigation as mitigation
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 
 ##########################################################################################
 # Step 1. Setup the quantum program for preparing the Bell state
@@ -44,38 +44,38 @@ circuit.print_circuit(qp.circuit)
 print("*****************************************************************************")
 print("Illustrating the circuit-level folder in the Zero-Noise Extrapolation method.")
 # Initialize a ZNEMitigator instance with circuit-level folder
-zne = mitigation.ZNEMitigator(folder='circuit', extrapolator='linear')
+zne = mitigation.ZNEMitigator(folder="circuit", extrapolator="linear")
 
-folded_qp = zne.folder.fold(qp=qp, scale_factor=3, method='left')
+folded_qp = zne.folder.fold(qp=qp, scale_factor=3, method="left")
 
 circuit.print_circuit(folded_qp.circuit)
 
-folded_qp = zne.folder.fold(qp=qp, scale_factor=5, method='left')
+folded_qp = zne.folder.fold(qp=qp, scale_factor=5, method="left")
 
 circuit.print_circuit(folded_qp.circuit)
 
 print("*****************************************************************************")
 print("Illustrating the layer-level folder in the Zero-Noise Extrapolation method.")
 # Initialize a ZNEMitigator instance with layer-level folder
-zne = mitigation.ZNEMitigator(folder='layer', extrapolator='linear')
+zne = mitigation.ZNEMitigator(folder="layer", extrapolator="linear")
 
-folded_qp = zne.folder.fold(qp=qp, scale_factor=3, method='left')
+folded_qp = zne.folder.fold(qp=qp, scale_factor=3, method="left")
 
 circuit.print_circuit(folded_qp.circuit)
 
-folded_qp = zne.folder.fold(qp=qp, scale_factor=5, method='left')
+folded_qp = zne.folder.fold(qp=qp, scale_factor=5, method="left")
 
 circuit.print_circuit(folded_qp.circuit)
 
 print("*****************************************************************************")
 print("Illustrating the gate-level folder in the Zero-Noise Extrapolation method.")
 # Initialize a ZNEMitigator instance with gate-level folder
-zne = mitigation.ZNEMitigator(folder='gate', extrapolator='linear')
+zne = mitigation.ZNEMitigator(folder="gate", extrapolator="linear")
 
-folded_qp = zne.folder.fold(qp=qp, scale_factor=3, method='left')
+folded_qp = zne.folder.fold(qp=qp, scale_factor=3, method="left")
 
 circuit.print_circuit(folded_qp.circuit)
 
-folded_qp = zne.folder.fold(qp=qp, scale_factor=5, method='left')
+folded_qp = zne.folder.fold(qp=qp, scale_factor=5, method="left")
 
 circuit.print_circuit(folded_qp.circuit)

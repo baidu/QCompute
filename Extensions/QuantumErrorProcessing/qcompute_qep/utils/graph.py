@@ -52,14 +52,19 @@ def connected_subgraphs(G: nx.Graph, k: int) -> List[nx.Graph]:
 
         for i in range(len(extension)):
             current_node = extension[i]
-            dfs(selected_nodes + [current_node],
-                extension[i + 1:] + [nxt_node
-                                     for nxt_node in G.neighbors(current_node)
-                                     if nxt_node > start and
-                                     nxt_node not in selected_nodes and
-                                     nxt_node not in removed
-                                     and nxt_node not in extension],
-                removed + [current_node], )
+            dfs(
+                selected_nodes + [current_node],
+                extension[i + 1 :]
+                + [
+                    nxt_node
+                    for nxt_node in G.neighbors(current_node)
+                    if nxt_node > start
+                    and nxt_node not in selected_nodes
+                    and nxt_node not in removed
+                    and nxt_node not in extension
+                ],
+                removed + [current_node],
+            )
             removed.append(current_node)
 
     for node in G.nodes:

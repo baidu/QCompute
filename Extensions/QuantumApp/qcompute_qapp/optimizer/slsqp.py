@@ -26,8 +26,8 @@ from .basic_optimizer import BasicOptimizer
 
 
 class SLSQP(BasicOptimizer):
-    r"""SLSQP Optimizer class
-    """
+    r"""SLSQP Optimizer class"""
+
     def __init__(self, iterations: int, circuit: BasicCircuit):
         r"""The constructor of the SLSQP class
 
@@ -39,9 +39,10 @@ class SLSQP(BasicOptimizer):
         super().__init__(iterations, circuit)
 
     def minimize(
-            self, shots: int,
-            loss_func: Callable[[np.ndarray, int], float],
-            grad_func: Callable[[np.ndarray, int], np.ndarray]
+        self,
+        shots: int,
+        loss_func: Callable[[np.ndarray, int], float],
+        grad_func: Callable[[np.ndarray, int], np.ndarray],
     ) -> None:
         r"""Minimizes the given loss function
 
@@ -54,7 +55,11 @@ class SLSQP(BasicOptimizer):
         self._loss_history = []
         curr_param = self._circuit.parameters
         opt_res = optimize.minimize(
-            loss_func, curr_param, args=(shots,), method='SLSQP',
-            options={'maxiter': self._iterations},
-            callback=lambda xk: self._loss_history.append(loss_func(xk, shots)))
+            loss_func,
+            curr_param,
+            args=(shots,),
+            method="SLSQP",
+            options={"maxiter": self._iterations},
+            callback=lambda xk: self._loss_history.append(loss_func(xk, shots)),
+        )
         print(opt_res.message)

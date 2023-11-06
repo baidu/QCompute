@@ -33,25 +33,19 @@ def choose_backend():
 
 
 # Create a dictionary to record the measurement results of the first term
-result1 = {'QS': [],
-           'QT': [],
-           'RS': [],
-           'RT': []}
+result1 = {"QS": [], "QT": [], "RS": [], "RT": []}
 
 # Create a dictionary to record the measurement results of the second term
-result2 = {'QS': [],
-           'QT': [],
-           'RS': [],
-           'RT': []}
+result2 = {"QS": [], "QT": [], "RS": [], "RT": []}
 
 # run 100 times
 times = 100
 for i in range(times):
     # Alice randomly chooses between 'Q' and 'R' for measurement
-    ranA = choice(['Q', 'R'])
+    ranA = choice(["Q", "R"])
     # Bob randomly chooses between 'S' and 'T' for measurement
-    ranB = choice(['S', 'T'])
-    ran = str(ranA)+str(ranB)
+    ranB = choice(["S", "T"])
+    ran = str(ranA) + str(ranB)
 
     # Every measurement only has one shot
     shots = 1
@@ -65,11 +59,11 @@ for i in range(times):
     H(q[0])
     CX(q[0], q[1])
 
-    if ran[0] == 'R':
+    if ran[0] == "R":
         H(q[0])
 
     MeasureZ(q, range(2))
-    taskResult = env.commit(shots, fetchMeasure=True)['counts']
+    taskResult = env.commit(shots, fetchMeasure=True)["counts"]
     # Record the measurement result of the first term
     for key, value in taskResult.items():
         if value == 1:
@@ -88,25 +82,25 @@ for i in range(times):
     CX(q[0], q[1])
     H(q[1])
 
-    if ran[0] == 'R':
+    if ran[0] == "R":
         H(q[0])
 
     MeasureZ(q, range(2))
-    taskResult = env.commit(shots, fetchMeasure=True)['counts']
+    taskResult = env.commit(shots, fetchMeasure=True)["counts"]
     # Record the measurement result of the second term
     for key, value in taskResult.items():
         if value == 1:
             result2[ran].append(key)
 
 # Post-process experiment results
-QS1 = Counter(result1['QS'])
-QS2 = Counter(result2['QS'])
-RS1 = Counter(result1['RS'])
-RS2 = Counter(result2['RS'])
-RT1 = Counter(result1['RT'])
-RT2 = Counter(result2['RT'])
-QT1 = Counter(result1['QT'])
-QT2 = Counter(result2['QT'])
+QS1 = Counter(result1["QS"])
+QS2 = Counter(result2["QS"])
+RS1 = Counter(result1["RS"])
+RS2 = Counter(result2["RS"])
+RT1 = Counter(result1["RT"])
+RT2 = Counter(result2["RT"])
+QT1 = Counter(result1["QT"])
+QT2 = Counter(result2["QT"])
 
 
 def exp(Measure):
@@ -132,9 +126,9 @@ RS = -exp(RS1) - exp(RS2)
 RT = exp(RT1) - exp(RT2)
 QT = exp(QT1) - exp(QT2)
 
-print('E(QS)=', QS)
-print('E(RS)=', RS)
-print('E(RT)=', RT)
-print('E(QT)=', QT)
+print("E(QS)=", QS)
+print("E(RS)=", RS)
+print("E(RT)=", RT)
+print("E(QT)=", QT)
 
-print('Expected value: E(QS)+E(RS)+E(RT)-E(QT)=', QS + RS + RT - QT)
+print("Expected value: E(QS)+E(RS)+E(RT)-E(QT)=", QS + RS + RT - QT)

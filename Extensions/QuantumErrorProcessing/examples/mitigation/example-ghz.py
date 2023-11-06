@@ -25,10 +25,10 @@ import copy
 from qiskit.providers.fake_provider import FakeSantiago
 
 from QCompute import *
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils import expval_from_counts
-from qcompute_qep.utils.types import QProgram, QComputer
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096
@@ -87,7 +87,7 @@ val_noisy = calculator(copy.deepcopy(qp), qc=qc_noisy)
 
 # Initialize a ZNEMitigator instance to mitigate the expectation values
 # You can change the `folder` and `extrapolator` parameters to obtain better results.
-zne = ZNEMitigator(folder='circuit', extrapolator='richardson')
+zne = ZNEMitigator(folder="circuit", extrapolator="richardson")
 val_miti = zne.mitigate(copy.deepcopy(qp), qc_noisy, calculator, scale_factors=[1, 3, 5, 7, 9])
 
 print("The ideal expectation value is: {}".format(val_ideal))

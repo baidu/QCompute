@@ -20,16 +20,19 @@ QNET is under active development and the latest version has the following key fe
 
 ## Tutorials
 
-We provide several [tutorials](https://quantum-hub.baidu.com/qnet/tutorial-introduction) to help users get started with QNET. These include:
+We provide several tutorials to help users get started with QNET. These include:
 * Introduction to discrete-event simulation
 * Tour guide to quantum network simulation
 * Micius quantum satellite experiment
 * Quantum network architecture simulation
+* Quantum network architecture with resource management
 * Quantum network protocols on quantum hardware devices
 * Quantum teleportation
 * Quantum entanglement swapping
 * CHSH game
 * Magic square game
+* Measurement-based quantum computation
+* Dynamic quantum circuit
 
 More tutorials and demonstrations will be included in the future release.
 

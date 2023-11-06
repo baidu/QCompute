@@ -22,12 +22,10 @@ Module for random number generators.
 import math
 from enum import Enum
 from typing import List, Optional
-from qcompute_qnet.core.des import Entity
-from qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
 
-__all__ = [
-    "RandomNumberGenerator"
-]
+__all__ = ["RandomNumberGenerator"]
 
 
 class RandomNumberGenerator(Entity):
@@ -50,8 +48,7 @@ class RandomNumberGenerator(Entity):
         super().__init__(name, env)
 
     def init(self) -> None:
-        r"""Random number generator initialization.
-        """
+        r"""Random number generator initialization."""
         assert self.owner != self, f"The random number generator {self.name} has no owner!"
 
     @staticmethod
@@ -87,5 +84,5 @@ class RandomNumberGenerator(Entity):
         results = []
         for _ in range(length):
             result = cir.run(shots=1, backend=backend)
-            results.append(int(list(result['counts'].keys())[0]))
+            results.append(int(list(result["counts"].keys())[0]))
         return results

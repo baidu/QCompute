@@ -27,16 +27,6 @@ Reader may refer to following references for more insights.
 .. [DMW+21] Dong, Yulong, et al. "Efficient phase-factor evaluation in quantum signal processing."
     Physical Review A 103.4 (2021): 042419.
 
-Here cpp version for **SymmetricQSPInternalPy** is supplied, and used defaultly. If users want to use python
-version, please introduce following codes
-
-.. code-block:: python
-
-    from　qcompute_qsvt.SymmetricQSP import Settings as SQSPSettings
-    SQSPSettings.INTERNAL = "python"
-
-before using this module.
-
 .. note::
 
     In module `SymmetricQSP`, Variables with the same meaning will be named uniformly:
@@ -72,12 +62,7 @@ from typing import List, Tuple, Union
 import numpy as np
 from scipy import optimize as opt
 
-from qcompute_qsvt.SymmetricQSP import Settings as SQSP_Settings
-
-if SQSP_Settings.INTERNAL == "cpp":
-    import qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalCpp as SymmetricQSPInternal
-else:
-    import qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalPy as SymmetricQSPInternal
+import Extensions.QuantumSingularValueTransformation.qcompute_qsvt.SymmetricQSP.SymmetricQSPInternalPy as SymmetricQSPInternal
 
 
 def __func_Wx_map(vec_x: Union[List[float], np.ndarray]) -> np.ndarray:
@@ -95,13 +80,17 @@ def __func_Wx_map(vec_x: Union[List[float], np.ndarray]) -> np.ndarray:
     """
     list_mat = []
     for float_x in vec_x:
-        comp_y = 1j * np.sqrt(1 - float_x ** 2)
+        comp_y = 1j * np.sqrt(1 - float_x**2)
         list_mat.append(np.array([[float_x, comp_y], [comp_y, float_x]]))
     return np.array(list_mat)
 
 
-def __func_L(vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarray, vec_fx: Union[List[float], np.ndarray],
-             bool_parity: int) -> float:
+def __func_L(
+    vec_phi: Union[List[float], np.ndarray],
+    list_Wx: np.ndarray,
+    vec_fx: Union[List[float], np.ndarray],
+    bool_parity: int,
+) -> float:
     r"""Compute the value of the loss function :math:`L_{f,\vec x}(\vec \phi)` (**@float_L**).
 
     The loss function is defined as
@@ -131,8 +120,12 @@ def __func_L(vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarray, vec_f
     return float_L
 
 
-def __func_gradL(vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarray, vec_fx: Union[List[float], np.ndarray],
-                 bool_parity: int) -> Tuple[np.ndarray, float]:
+def __func_gradL(
+    vec_phi: Union[List[float], np.ndarray],
+    list_Wx: np.ndarray,
+    vec_fx: Union[List[float], np.ndarray],
+    bool_parity: int,
+) -> Tuple[np.ndarray, float]:
     r"""Compute the gradient :math:`\nabla L_{f,\vec x}(\vec \phi)` (**@vec_gradL**) and value
     :math:`L_{f,\vec x}(\vec \phi)` (**@float_L**) simultaneously.
 
@@ -176,10 +169,18 @@ def __func_gradL(vec_phi: Union[List[float], np.ndarray], list_Wx: np.ndarray, v
     return vec_gradL, float_L
 
 
-def __func_LBFGS_QSP_backtracking(int_deg: int, list_Wx: np.ndarray, vec_fx: Union[List[float], np.ndarray],
-                                  bool_parity: int, int_m: int = 300, float_gamma: float = 0.5,
-                                  float_accuracy_rate: float = 1e-3, float_minstep: float = 1e-5,
-                                  float_criteria: float = 1e-14, int_maxiter: int = 50000) -> np.ndarray:
+def __func_LBFGS_QSP_backtracking(
+    int_deg: int,
+    list_Wx: np.ndarray,
+    vec_fx: Union[List[float], np.ndarray],
+    bool_parity: int,
+    int_m: int = 300,
+    float_gamma: float = 0.5,
+    float_accuracy_rate: float = 1e-3,
+    float_minstep: float = 1e-5,
+    float_criteria: float = 1e-14,
+    int_maxiter: int = 50000,
+) -> np.ndarray:
     r"""Using L-BFGS algorithm to minimize loss function :math:`L_{f,\vec x}(\vec \phi)`, here the linear searching
     method is backtracking with Armijo rule.
 
@@ -283,16 +284,22 @@ def __func_LBFGS_QSP_backtracking(int_deg: int, list_Wx: np.ndarray, vec_fx: Uni
         if idx_t >= int_maxiter:
             print("Max iteration reached.")
             break
-        if float_L < float_criteria ** 2:
+        if float_L < float_criteria**2:
             print("Stop criteria satisfied.")
             break
 
     return vec_phi
 
 
-def __func_LBFGS_QSP_interpolation(int_deg: int, list_Wx: np.ndarray, vec_fx: Union[List[float], np.ndarray],
-                                   bool_parity: int, int_m: int = 300, float_criteria: float = 1e-14,
-                                   int_maxiter: int = 50000) -> np.ndarray:
+def __func_LBFGS_QSP_interpolation(
+    int_deg: int,
+    list_Wx: np.ndarray,
+    vec_fx: Union[List[float], np.ndarray],
+    bool_parity: int,
+    int_m: int = 300,
+    float_criteria: float = 1e-14,
+    int_maxiter: int = 50000,
+) -> np.ndarray:
     r"""Using L-BFGS algorithm to minimize loss function :math:`L_{f,\vec x}(\vec \phi)`, here the linear searching
     method is quadratic interpolation.
 
@@ -363,9 +370,9 @@ def __func_LBFGS_QSP_interpolation(int_deg: int, list_Wx: np.ndarray, vec_fx: Un
         # use quadratic interpolation for calculate the step size based on experience.
 
         if idx_t == 0:
-            float_step = 1.
+            float_step = 1.0
         else:
-            float_b = - vec_q @ vec_g
+            float_b = -vec_q @ vec_g
             float_a = __func_L(vec_phi - vec_q, list_Wx, vec_fx, bool_parity) - float_L - float_b
             float_step = float_b / (-2 * float_a)
 
@@ -391,16 +398,22 @@ def __func_LBFGS_QSP_interpolation(int_deg: int, list_Wx: np.ndarray, vec_fx: Un
         if idx_t >= int_maxiter:
             print("Max iteration reached.")
             break
-        if float_L < float_criteria ** 2:
+        if float_L < float_criteria**2:
             # print("Stop criteria satisfied.")
             break
 
     return vec_phi
 
 
-def __func_LBFGS_QSP_scipy(int_deg: int, list_Wx: np.ndarray, vec_fx: Union[List[float], np.ndarray],
-                           bool_parity: int, m: int = 300, pgtol: float = 1e-24,
-                           factr: float = 1e-12) -> np.ndarray:
+def __func_LBFGS_QSP_scipy(
+    int_deg: int,
+    list_Wx: np.ndarray,
+    vec_fx: Union[List[float], np.ndarray],
+    bool_parity: int,
+    m: int = 300,
+    pgtol: float = 1e-24,
+    factr: float = 1e-12,
+) -> np.ndarray:
     r"""Using the implement `scipy.optimize.fmin_l_bfgs_b` for L-BFGS-B algorithm to minimize loss function
     :math:`L_{f,\vec x}(\vec \phi)`.
 
@@ -430,14 +443,25 @@ def __func_LBFGS_QSP_scipy(int_deg: int, list_Wx: np.ndarray, vec_fx: Union[List
     vec_phi = np.zeros(int_d)
     vec_phi[0] = np.pi / 4
 
-    vec_phi = opt.fmin_l_bfgs_b(func=lambda arg: __func_L(arg, list_Wx, vec_fx, bool_parity), x0=vec_phi,
-                                fprime=lambda arg: __func_gradL(arg, list_Wx, vec_fx, bool_parity)[0],
-                                m=m, pgtol=pgtol, factr=factr, iprint=1)[0]
+    vec_phi = opt.fmin_l_bfgs_b(
+        func=lambda arg: __func_L(arg, list_Wx, vec_fx, bool_parity),
+        x0=vec_phi,
+        fprime=lambda arg: __func_gradL(arg, list_Wx, vec_fx, bool_parity)[0],
+        m=m,
+        pgtol=pgtol,
+        factr=factr,
+        iprint=1,
+    )[0]
     return vec_phi
 
 
-def __func_LBFGS_QSP(int_deg: int, list_Wx: np.ndarray, vec_fx: Union[List[float], np.ndarray],
-                     bool_parity: int, method: str = "interpolation") -> np.ndarray:
+def __func_LBFGS_QSP(
+    int_deg: int,
+    list_Wx: np.ndarray,
+    vec_fx: Union[List[float], np.ndarray],
+    bool_parity: int,
+    method: str = "interpolation",
+) -> np.ndarray:
     r"""Pack up three `__func_LBFGS_QSP` functions together.
 
     Other parameters used in L-BFGS or L-BFGS-B algorithm are set as default values.
@@ -461,4 +485,4 @@ def __func_LBFGS_QSP(int_deg: int, list_Wx: np.ndarray, vec_fx: Union[List[float
     elif method == "scipy":
         return __func_LBFGS_QSP_scipy(int_deg, list_Wx, vec_fx, bool_parity)
     else:
-        raise Exception("LBFGS method error, should be \"interpolation\", \"backtracking\" or \"scipy\".")
+        raise Exception('LBFGS method error, should be "interpolation", "backtracking" or "scipy".')

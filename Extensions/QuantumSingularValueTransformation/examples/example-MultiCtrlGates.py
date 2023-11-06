@@ -22,7 +22,7 @@ This script contains a simple example for showing the implement for CnX remains 
 from QCompute import QEnv, H, CX, BackendName, MeasureZ
 from QCompute.Define import Settings as QC_Settings
 
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
 
 # not to draw the quantum circuit locally
 QC_Settings.drawCircuitControl = []
@@ -72,6 +72,7 @@ def func_multictrl_X_test_local(num_qubit_test: int, int_shots: int = 10000):
 
     # not to draw the quantum circuit locally
     from QCompute.Define import Settings
+
     Settings.drawCircuitControl = []
     Settings.outputInfo = False
     Settings.autoClearOutputDirAfterFetchMeasure = True
@@ -79,13 +80,13 @@ def func_multictrl_X_test_local(num_qubit_test: int, int_shots: int = 10000):
 
     taskResult = env.commit(int_shots, fetchMeasure=True)
     taskResult_part = {}
-    for idx_key, idx_value in taskResult['counts'].items():
+    for idx_key, idx_value in taskResult["counts"].items():
         bin_test = int(idx_key[: num_qubit_test - 1] + idx_key[-num_qubit_test] + idx_key[-1], 2)
         if bin_test != 0:
             taskResult_part[idx_key] = idx_value
     if taskResult_part == {}:
         print("\nCnX gate test passed.")
-        print("Counts", taskResult['counts'])
+        print("Counts", taskResult["counts"])
         return taskResult
     else:
         print("\nCnX gate test failed.")

@@ -19,12 +19,9 @@ r"""
 An example of quantum network architecture simulation.
 """
 
-import sys
-sys.path.append('..')
-
 import os
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 
 # Create an environment for simulation

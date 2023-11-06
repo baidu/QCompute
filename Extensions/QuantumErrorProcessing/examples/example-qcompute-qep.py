@@ -20,7 +20,7 @@ This is a simple example to test if you have successfully installed the QEP modu
 """
 
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 # Step 1. Initialize the quantum program for preparing the Bell state
@@ -50,12 +50,12 @@ st = tomography.StateTomography()
 # st = StateTomography(qp, qc, method='inverse', shots=4096)
 
 # Call the tomography procedure and obtain the noisy quantum state
-st.fit(qp, qc, method='inverse', shots=4096)
+st.fit(qp, qc, method="inverse", shots=4096)
 
 print("***********************************************************************")
 print("Testing whether 'qcompute-qep' is successfully installed or not now ...\n")
 
-print('Fidelity of the Bell state is: F = {:.5f}'.format(st.fidelity))
+print("Fidelity of the Bell state is: F = {:.5f}".format(st.fidelity))
 print("Please change 'qc' to other quantum computers for more tests.\n")
 
 print("Package 'qcompute-qep' is successfully installed! Please enjoy!")

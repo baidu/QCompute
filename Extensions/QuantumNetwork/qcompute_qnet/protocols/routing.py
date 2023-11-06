@@ -20,7 +20,7 @@ Module for the routing protocol.
 """
 
 from abc import ABC
-from qcompute_qnet.protocols.protocol import Protocol
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol
 
 __all__ = [
     "Routing",
@@ -28,8 +28,7 @@ __all__ = [
 
 
 class Routing(Protocol, ABC):
-    r"""Class for the routing protocol.
-    """
+    r"""Class for the routing protocol."""
 
     def __init__(self, name: str):
         r"""Constructor for Routing class.

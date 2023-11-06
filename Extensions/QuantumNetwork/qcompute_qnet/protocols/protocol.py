@@ -23,13 +23,9 @@ from abc import ABC
 from typing import List, Union
 import networkx as nx
 import matplotlib.pyplot as plt
-from qcompute_qnet.core.des import Event, Scheduler, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Event, Scheduler, EventHandler
 
-__all__ = [
-    "Protocol",
-    "SubProtocol",
-    "ProtocolStack"
-]
+__all__ = ["Protocol", "SubProtocol", "ProtocolStack"]
 
 
 class Protocol(ABC):
@@ -51,7 +47,7 @@ class Protocol(ABC):
             name (str): name of the protocol
         """
 
-        self.name = 'Protocol' if name is None else name
+        self.name = "Protocol" if name is None else name
         self.owner = self
         self.node = None
         self.scheduler = Scheduler(owner=self)
@@ -169,14 +165,12 @@ class Protocol(ABC):
         pass
 
     def print_agenda(self) -> None:
-        r"""Print the events scheduled for the protocol.
-        """
+        r"""Print the events scheduled for the protocol."""
         df = Event.events_to_dataframe(self.agenda)
         print(f"\nAgenda of {self.name} (unsorted):\n{df.to_string()}")
 
     def print_signed_events(self) -> None:
-        r"""Print the events scheduled by the protocol.
-        """
+        r"""Print the events scheduled by the protocol."""
         df = Event.events_to_dataframe(self.signed_events)
         print(f"\nSigned events by {self.name} (unsorted):\n{df.to_string()}")
 
@@ -230,7 +224,7 @@ class ProtocolStack:
             name (str): name of the ProtocolStack
         """
 
-        self.name = 'Protocol Stack' if name is None else name
+        self.name = "Protocol Stack" if name is None else name
         self.owner = self
         self.stack = nx.DiGraph()
         self.config = {}
@@ -255,7 +249,9 @@ class ProtocolStack:
         Returns:
             Protocol: protocol of the given type
         """
-        assert any(isinstance(proto, proto_type) for proto in self.protocols), "Cannot find a protocol with the given type."
+        assert any(
+            isinstance(proto, proto_type) for proto in self.protocols
+        ), "Cannot find a protocol with the given type."
         for proto in self.protocols:
             if isinstance(proto, proto_type):
                 return proto
@@ -284,7 +280,8 @@ class ProtocolStack:
             self.__update_from_relations(relation)
         else:
             raise TypeError("Should input a single protocol or a list of protocol relations!")
-        from qcompute_qnet.topology.node import Node
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+
         if isinstance(self.owner, Node):
             self.sync_env(self.owner)
 
@@ -320,10 +317,12 @@ class ProtocolStack:
             upper_protocols (List[Protocol]): upper protocols of the protocol
             lower_protocols (List[Protocol]): lower protocols of the protocol
         """
-        assert upper_protocols is not None or lower_protocols is not None,\
-            f"Should assign at least an upper protocol or a lower protocol!"
+        assert (
+            upper_protocols is not None or lower_protocols is not None
+        ), f"Should assign at least an upper protocol or a lower protocol!"
 
-        from qcompute_qnet.topology.node import Node
+        from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+
         if isinstance(self.owner, Node):
             protocol.node = self.owner
             protocol.scheduler.env = self.owner.env
@@ -337,11 +336,10 @@ class ProtocolStack:
         self.__update_from_relations(relation)
 
     def print_stack(self) -> None:
-        r"""Print the stack relation as a graph.
-        """
+        r"""Print the stack relation as a graph."""
         labels = {proto: proto.name for proto in self.protocols}
         pos = nx.spring_layout(self.stack)
-        nx.draw(self.stack, pos=pos, labels=labels, with_labels=True, edge_color='r', arrowsize=20)
+        nx.draw(self.stack, pos=pos, labels=labels, with_labels=True, edge_color="r", arrowsize=20)
         plt.show()
 
     def start(self, **kwargs) -> None:

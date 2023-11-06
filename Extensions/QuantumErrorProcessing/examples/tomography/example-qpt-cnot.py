@@ -19,8 +19,8 @@
 Example to demonstrate quantum process tomography on the CNOT gate.
 """
 from QCompute import *
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 # Step 1. Set the quantum program for the CNOT gate.
@@ -53,24 +53,30 @@ qpt = tomography.ProcessTomography()
 
 # Perform quantum process tomography on qubits [q0, q1]
 qubits = [0, 1]
-noisy_ptm = qpt.fit(qp, qc, qubits=qubits, prep_basis='Pauli', meas_basis='Pauli',
-                    method='inverse', shots=4096, ptm=True).data
-print('Fidelity of the CNOT gate on qubits {} is: F = {:.5f}'.format(qubits, qpt.fidelity))
+noisy_ptm = qpt.fit(
+    qp, qc, qubits=qubits, prep_basis="Pauli", meas_basis="Pauli", method="inverse", shots=4096, ptm=True
+).data
+print("Fidelity of the CNOT gate on qubits {} is: F = {:.5f}".format(qubits, qpt.fidelity))
 
 # Visualize the Pauli transfer matrices of the theoretical and noisy quantum gates
-tomography.compare_process_ptm(ptms=[qpt.ideal_ptm, noisy_ptm.data, qpt.ideal_ptm - noisy_ptm],
-                               titles=['Theoretical', qc_name, 'Difference'],
-                               show_labels=True,
-                               fig_name="QPT-CNOT-qubits{}-{}.png".format(qubits, qc_name))
+tomography.compare_process_ptm(
+    ptms=[qpt.ideal_ptm, noisy_ptm.data, qpt.ideal_ptm - noisy_ptm],
+    titles=["Theoretical", qc_name, "Difference"],
+    show_labels=True,
+    fig_name="QPT-CNOT-qubits{}-{}.png".format(qubits, qc_name),
+)
 
 # You can also perform quantum process tomography on other qubits, for example [q1, q2]
 qubits = [1, 2]
-noisy_ptm = qpt.fit(qp, qc, qubits=qubits, prep_basis='Pauli', meas_basis='Pauli',
-                    method='inverse', shots=4096, ptm=True).data
-print('Fidelity of the CNOT gate on qubits {} is: F = {:.5f}'.format(qubits, qpt.fidelity))
+noisy_ptm = qpt.fit(
+    qp, qc, qubits=qubits, prep_basis="Pauli", meas_basis="Pauli", method="inverse", shots=4096, ptm=True
+).data
+print("Fidelity of the CNOT gate on qubits {} is: F = {:.5f}".format(qubits, qpt.fidelity))
 
 # Visualize the Pauli transfer matrices of the theoretical and noisy quantum gates
-tomography.compare_process_ptm(ptms=[qpt.ideal_ptm, noisy_ptm.data, qpt.ideal_ptm - noisy_ptm],
-                               titles=['Theoretical', qc_name, 'Difference'],
-                               show_labels=True,
-                               fig_name="QPT-CNOT-qubits{}-{}.png".format(qubits, qc_name))
+tomography.compare_process_ptm(
+    ptms=[qpt.ideal_ptm, noisy_ptm.data, qpt.ideal_ptm - noisy_ptm],
+    titles=["Theoretical", qc_name, "Difference"],
+    show_labels=True,
+    fig_name="QPT-CNOT-qubits{}-{}.png".format(qubits, qc_name),
+)

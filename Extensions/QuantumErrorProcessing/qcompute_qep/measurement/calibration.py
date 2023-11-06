@@ -29,13 +29,13 @@ and performs a noisy measurement of each qubit, keeping the record of the measur
     >>> from QCompute import BackendName
     >>>
     >>> from qiskit.test.mock import FakeSantiago
-    >>> from qcompute_qep.measurement.calibration import CompleteCalibrator
-    >>> from qcompute_qep.measurement.calibration import TPCalibrator
-    >>> from qcompute_qep.measurement.calibration import init_complete_cal_circuits
-    >>> from qcompute_qep.measurement.calibration import init_tp_cal_circuits
-    >>> from qcompute_qep.measurement.calibration import extract_cal_data
-    >>> from qcompute_qep.measurement.calibration import load_cal_data
-    >>> from qcompute_qep.utils.circuit import print_circuit
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import CompleteCalibrator
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import TPCalibrator
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import init_complete_cal_circuits
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import init_tp_cal_circuits
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import extract_cal_data
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import load_cal_data
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit
     >>>
     >>> # Set the default maximal number of measurement shots
     >>> MAX_SHOTS = 4096
@@ -56,12 +56,17 @@ from scipy.linalg import expm
 
 from QCompute import *
 from QCompute.Calibration import CalibrationUpdate, CalibrationReadData
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement.utils import extract_substr, init_cal_data, special_log, get_qc_topo
-from qcompute_qep.utils.types import QProgram, QComputer
-from qcompute_qep.utils.linalg import tensor, normalize
-from qcompute_qep.utils.circuit import execute
-from qcompute_qep.utils.graph import connected_subgraphs
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import (
+    extract_substr,
+    init_cal_data,
+    special_log,
+    get_qc_topo,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram, QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import tensor, normalize
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.graph import connected_subgraphs
 
 
 class Calibrator(ABC):
@@ -164,8 +169,7 @@ class Calibrator(ABC):
     def get_noise_resistance(self):
         min_diag = min(np.diagonal(self.cal_matrix))
         if min_diag < 0.5:
-            raise ArgumentError(
-                "The calibration matrix is invalid! Minimal diagonal element should bigger than 0.5!")
+            raise ArgumentError("The calibration matrix is invalid! Minimal diagonal element should bigger than 0.5!")
 
         return 2 * (1 - min_diag)
 
@@ -185,9 +189,11 @@ class Calibrator(ABC):
                 if len(self._qubits) <= n:
                     self._cal_data = extract_cal_data(self._cal_data, self._qubits)
                 else:
-                    raise ArgumentError("In Calibrator._preprocess_inputs(): "
-                                        "the number of qubits in @qubits is larger than "
-                                        "the number of qubits in @cal_data!")
+                    raise ArgumentError(
+                        "In Calibrator._preprocess_inputs(): "
+                        "the number of qubits in @qubits is larger than "
+                        "the number of qubits in @cal_data!"
+                    )
             else:  # If @self._qubits is not set, set the default qubits list
                 self._qubits = list(range(n))
 
@@ -197,13 +203,14 @@ class Calibrator(ABC):
             if self._qubits is None:
                 raise ArgumentError("In Calibrator._preprocess_inputs(): specify the number of qubits in @qubits!")
             else:
-                if self.__class__.__name__ == 'CompleteCalibrator':
+                if self.__class__.__name__ == "CompleteCalibrator":
                     self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync)
-                elif self.__class__.__name__ == 'TPCalibrator':
-                    self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync, method='tp')
-                elif self.__class__.__name__ == 'CTMPCalibrator':
-                    self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync, method='ctmp',
-                                                   crosstak_order=self._k)
+                elif self.__class__.__name__ == "TPCalibrator":
+                    self._cal_data = load_cal_data(qc=self._qc, qubits=self._qubits, sync=self._sync, method="tp")
+                elif self.__class__.__name__ == "CTMPCalibrator":
+                    self._cal_data = load_cal_data(
+                        qc=self._qc, qubits=self._qubits, sync=self._sync, method="ctmp", crosstak_order=self._k
+                    )
 
 
 class CompleteCalibrator(Calibrator):
@@ -211,11 +218,13 @@ class CompleteCalibrator(Calibrator):
     Calibrator based on complete model.
     """
 
-    def __init__(self,
-                 qc: QComputer = None,
-                 cal_data: Dict[str, Dict[str, int]] = None,
-                 qubits: List[int] = None,
-                 sync: bool = True):
+    def __init__(
+        self,
+        qc: QComputer = None,
+        cal_data: Dict[str, Dict[str, int]] = None,
+        qubits: List[int] = None,
+        sync: bool = True,
+    ):
         """
         The init function of the Complete Calibrator.
 
@@ -282,20 +291,20 @@ class CompleteCalibrator(Calibrator):
              [0.         0.01473477 0.01178782 0.96252465]]
         """
         # Parse the arguments. If not set, use the default arguments set by the init function.
-        self._qc = kwargs.get('qc', self._qc)
-        self._cal_data = kwargs.get('cal_data', self._cal_data)
-        self._qubits = kwargs.get('qubits', self._qubits)
-        self._sync = kwargs.get('sync', self._sync)
+        self._qc = kwargs.get("qc", self._qc)
+        self._cal_data = kwargs.get("cal_data", self._cal_data)
+        self._qubits = kwargs.get("qubits", self._qubits)
+        self._sync = kwargs.get("sync", self._sync)
 
         self._preprocess_inputs()
 
         # Construct the calibration matrix
         n = len(self._qubits)
-        dim = 2 ** n
+        dim = 2**n
         self._cal_matrix = np.zeros((dim, dim), dtype=float)
 
         # Learn the elements of the calibration matrix from the calibration data
-        pbar = tqdm(total=100, desc='Step 3/3: Constructing calibration matrix!', ncols=80)
+        pbar = tqdm(total=100, desc="Step 3/3: Constructing calibration matrix!", ncols=80)
         for x, output_info in self._cal_data.items():  # iterate over input states
             pbar.update(100 / len(self._cal_data))
             for y, cnt in output_info.items():  # iterate over output states
@@ -310,11 +319,13 @@ class TPCalibrator(Calibrator):
     Calibrator based on tensor product model.
     """
 
-    def __init__(self,
-                 qc: QComputer = None,
-                 cal_data: Dict[str, Dict[str, int]] = None,
-                 qubits: List[int] = None,
-                 sync: bool = True):
+    def __init__(
+        self,
+        qc: QComputer = None,
+        cal_data: Dict[str, Dict[str, int]] = None,
+        qubits: List[int] = None,
+        sync: bool = True,
+    ):
         """
         The init function of the Complete Calibrator.
 
@@ -379,9 +390,9 @@ class TPCalibrator(Calibrator):
              [1.37039082e-04 1.16284413e-02 1.12118278e-02 9.51378828e-01]]
         """
         # Parse the arguments. If not set, use the default arguments set by the init function.
-        self._qc = kwargs.get('qc', self._qc)
-        self._cal_data = kwargs.get('cal_data', self._cal_data)
-        self._qubits = kwargs.get('qubits', self._qubits)
+        self._qc = kwargs.get("qc", self._qc)
+        self._cal_data = kwargs.get("cal_data", self._cal_data)
+        self._qubits = kwargs.get("qubits", self._qubits)
         self._preprocess_inputs()
 
         # Construct the calibration matrix
@@ -390,7 +401,7 @@ class TPCalibrator(Calibrator):
 
         # TODO: The following learning procedure is brute-force. Need more efficient algorithm.
         # Learn the local calibration matrices one by one from the calibration data
-        pbar = tqdm(total=100, desc='Step 3/3: Constructing calibration matrix!', ncols=80)
+        pbar = tqdm(total=100, desc="Step 3/3: Constructing calibration matrix!", ncols=80)
         for k in range(n):
             pbar.update(100 / n)
             local_A = np.zeros((2, 2), dtype=float)
@@ -457,13 +468,15 @@ class CTMPCalibrator(Calibrator):
     Calibrator based on CTMP model.
     """
 
-    def __init__(self,
-                 qc: QComputer = None,
-                 cal_data: Dict[str, Dict[str, int]] = None,
-                 qubits: List[int] = None,
-                 k: int = 2,
-                 topo: nx.Graph = None,
-                 sync: bool = True):
+    def __init__(
+        self,
+        qc: QComputer = None,
+        cal_data: Dict[str, Dict[str, int]] = None,
+        qubits: List[int] = None,
+        k: int = 2,
+        topo: nx.Graph = None,
+        sync: bool = True,
+    ):
         """
         The init function of the CTMP Calibrator.
 
@@ -533,14 +546,14 @@ class CTMPCalibrator(Calibrator):
              [1.37039082e-04 1.16284413e-02 1.12118278e-02 9.51378828e-01]]
         """
         # Parse the arguments. If not set, use the default arguments set by the init function.
-        self._qc = kwargs.get('qc', self._qc)
-        self._cal_data = kwargs.get('cal_data', self._cal_data)
-        self._qubits = kwargs.get('qubits', self._qubits)
-        self._k = kwargs.get('k', self._k)
+        self._qc = kwargs.get("qc", self._qc)
+        self._cal_data = kwargs.get("cal_data", self._cal_data)
+        self._qubits = kwargs.get("qubits", self._qubits)
+        self._k = kwargs.get("k", self._k)
         self._topo = get_qc_topo(self._qc)
         self._preprocess_inputs()
         if self._topo is None:
-            print('User should prepare the topology of the quantum computer using the package networkx!')
+            print("User should prepare the topology of the quantum computer using the package networkx!")
             raise ArgumentError("In CTMPCalibrator: must specify the topology of the quantum computer!")
         sub_graphs = connected_subgraphs(self._topo, self._k)
         target_index_list = []
@@ -551,17 +564,17 @@ class CTMPCalibrator(Calibrator):
         for i in range(n_qubit):
             target_index_list.append([i])
 
-        dim = 2 ** n_qubit
+        dim = 2**n_qubit
         self._G = np.zeros((dim, dim), dtype=float)
         self._cal_matrix = np.zeros((dim, dim), dtype=float)
         G = np.zeros((dim, dim), dtype=float)
-        pbar = tqdm(total=100, desc='Step 3/3: Constructing calibration matrix!', ncols=80)
+        pbar = tqdm(total=100, desc="Step 3/3: Constructing calibration matrix!", ncols=80)
         for k in target_index_list:
             pbar.update(100 / len(target_index_list))
             n_cross = len(k)
             # For example, consider index = [1, 2, 3], which corresponds to 3-order crosstalk noise,
             # would have 8*8 dimension matrix.
-            local_A = np.zeros((2 ** n_cross, 2 ** n_cross), dtype=float)
+            local_A = np.zeros((2**n_cross, 2**n_cross), dtype=float)
 
             for x, output_info in self._cal_data.items():  # iterate over input states
                 for y, cnt in output_info.items():  # iterate over output states
@@ -574,14 +587,14 @@ class CTMPCalibrator(Calibrator):
             local_A = normalize(local_A, axis=0)
             local_A = special_log(local_A)
 
-            init_state = [bin(i).split('b')[1].zfill(n_cross) for i in range(2 ** n_cross)]
-            output_state = [bin(i).split('b')[1].zfill(n_cross) for i in range(2 ** n_cross)][::-1]
+            init_state = [bin(i).split("b")[1].zfill(n_cross) for i in range(2**n_cross)]
+            output_state = [bin(i).split("b")[1].zfill(n_cross) for i in range(2**n_cross)][::-1]
 
             error_rate[str(k)] = {}
             for element in zip(output_state, init_state):
                 r = local_A[int(element[0], 2), int(element[1], 2)]
                 error_rate[str(k)][str(element)] = r
-                G += r*generator_matrix(qubits=self._qubits, target_index=k, target_state=element)
+                G += r * generator_matrix(qubits=self._qubits, target_index=k, target_state=element)
         self._G = G
         self._cal_matrix = expm(G)
         return self._cal_matrix
@@ -635,9 +648,9 @@ def init_complete_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
 
     # Circuit of state |0...0>.
     state_str_0 = (str(bin(0)[2:])).zfill(size)
-    pbar = tqdm(total=100, desc='Step 1/3: Constructing calibration circuit!', ncols=80)
-    for state in range(0, 2 ** target_qubit):
-        pbar.update(100 / (2 ** target_qubit))
+    pbar = tqdm(total=100, desc="Step 1/3: Constructing calibration circuit!", ncols=80)
+    for state in range(0, 2**target_qubit):
+        pbar.update(100 / (2**target_qubit))
         # Compute the binary string and reverse the order: We assume the LSB represents q[0], i.e.,
         #                   "1        0        1"
         #                   q[2]    q[1]      q[0]
@@ -649,7 +662,7 @@ def init_complete_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
             for idx, val in enumerate(state_str_0[::-1]):
                 # Flip the qubit(s) according to the list of indices.
                 if idx in state_all[state]:
-                    val = '1'
+                    val = "1"
                 # Collect the qubits state.
                 state_str_temp.append(val)
             # Reverse the qubits state.
@@ -661,7 +674,7 @@ def init_complete_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
         qp.Q.createList(size)
         state_final = []
         for idx, val in enumerate(state_str[::-1]):
-            if val == '1':
+            if val == "1":
                 X(qp.Q[idx])
             if idx in qubits:
                 state_final.append(val)
@@ -669,8 +682,7 @@ def init_complete_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
         state_final = "".join(state_final)
 
         qreglist, indexlist = qp.Q.toListPair()
-        MeasureZ(qRegList=[qreglist[x] for x in qubits],
-                 cRegList=[indexlist[x] for x in qubits])
+        MeasureZ(qRegList=[qreglist[x] for x in qubits], cRegList=[indexlist[x] for x in qubits])
 
         result[state_final] = qp
     return result
@@ -712,7 +724,7 @@ def init_tp_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
 
     # # Circuit of state |0...0>.
     state_str_0 = (str(bin(0)[2:])).zfill(size)
-    pbar = tqdm(total=100, desc='Step 1/3: Constructing calibration circuit!', ncols=80)
+    pbar = tqdm(total=100, desc="Step 1/3: Constructing calibration circuit!", ncols=80)
     for state in range(0, 2):
         pbar.update(100 / 2)
         # Compute the binary string and reverse the order: We assume the LSB represents q[0], i.e.,
@@ -726,7 +738,7 @@ def init_tp_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
             for idx, val in enumerate(state_str_0[::-1]):
                 # Flip the qubit(s) according to the list of indices.
                 if idx in state_all[state]:
-                    val = '1'
+                    val = "1"
                 # Collect the qubits state.
                 state_str_temp.append(val)
             # Reverse the qubits state.
@@ -738,7 +750,7 @@ def init_tp_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
         qp.Q.createList(size)
         state_final = []
         for idx, val in enumerate(state_str[::-1]):
-            if val == '1':
+            if val == "1":
                 X(qp.Q[idx])
             if idx in qubits:
                 state_final.append(val)
@@ -746,8 +758,7 @@ def init_tp_cal_circuits(qubits: List[int] = None) -> Dict[str, QProgram]:
         state_final = "".join(state_final)
 
         qreglist, indexlist = qp.Q.toListPair()
-        MeasureZ(qRegList=[qreglist[x] for x in qubits],
-                 cRegList=[indexlist[x] for x in qubits])
+        MeasureZ(qRegList=[qreglist[x] for x in qubits], cRegList=[indexlist[x] for x in qubits])
 
         result[state_final] = qp
 
@@ -790,18 +801,18 @@ def init_ctmp_cal_circuits(qubits: List[int] = None, order: int = None) -> Dict[
     n_qubit = max(qubits) + 1
     if order > n_qubit:
         raise ArgumentError("in init_ctmp_cal_circuits(): the order should not larger than number of qubits!")
-    index1 = [i for i in range(2 ** n_qubit)]
+    index1 = [i for i in range(2**n_qubit)]
     index_dict = {}
     weight_list = [i for i in range(order)]
     weight_list.append(n_qubit)
     for i in index1:
-        key = bin(i).split('b')[1].zfill(n_qubit)
+        key = bin(i).split("b")[1].zfill(n_qubit)
         value = hamming_weight(i)
         if value in weight_list:
             index_dict[key] = value
 
     result = {}
-    pbar = tqdm(total=100, desc='Step 1/3: Constructing calibration circuit!', ncols=80)
+    pbar = tqdm(total=100, desc="Step 1/3: Constructing calibration circuit!", ncols=80)
     for state_str in index_dict.keys():
         pbar.update(100 / len(index_dict))
         # Step 1. Setup the calibration quantum circuit for the basis state @i
@@ -809,7 +820,7 @@ def init_ctmp_cal_circuits(qubits: List[int] = None, order: int = None) -> Dict[
         qp.Q.createList(n_qubit)
 
         for idx, val in enumerate(state_str[::-1]):
-            if val == '1':
+            if val == "1":
                 X(qp.Q[idx])
 
         MeasureZ(*qp.Q.toListPair())
@@ -834,7 +845,7 @@ def extract_cal_data(raw_cal_data: Dict[str, Dict[str, int]], qubits: List[int] 
         qubits = list(range(n))
 
     cal_data = init_cal_data(n=len(qubits), layer=2, init_value=0)
-    pbar = tqdm(total=100, desc='Extracting calibration data', ncols=80)
+    pbar = tqdm(total=100, desc="Extracting calibration data", ncols=80)
     for x, output_info in raw_cal_data.items():
         pbar.update(100 / len(raw_cal_data))
         x_e, x_r = extract_substr(x, qubits)
@@ -846,11 +857,9 @@ def extract_cal_data(raw_cal_data: Dict[str, Dict[str, int]], qubits: List[int] 
     return cal_data
 
 
-def load_cal_data(qc: QComputer = None,
-                  qubits: List[int] = None,
-                  sync: bool = True,
-                  method: str = 'complete',
-                  crosstak_order: int = 2) -> Dict[str, Dict[str, int]]:
+def load_cal_data(
+    qc: QComputer = None, qubits: List[int] = None, sync: bool = True, method: str = "complete", crosstak_order: int = 2
+) -> Dict[str, Dict[str, int]]:
     """
     Load calibration data of @qubits for the Quantum Computer specified by @qc.
     By default **sync = True**, the program would generate and run calibration circuits to obtain calibration data.
@@ -884,22 +893,22 @@ def load_cal_data(qc: QComputer = None,
         '10': {'00': 18, '01': 1, '10': 988, '11': 11}, '11': {'00': 2, '01': 29, '10': 19, '11': 964}}
     """
     if sync is True:
-        if method == 'complete':
+        if method == "complete":
             cir = init_complete_cal_circuits(qubits=qubits)
-        elif method == 'tp':
+        elif method == "tp":
             cir = init_tp_cal_circuits(qubits=qubits)
         else:
             cir = init_ctmp_cal_circuits(qubits=qubits, order=crosstak_order)
         cal_data = {}
-        pbar = tqdm(total=100, desc='Step 2/3: Collecting calibration data!', ncols=80)
+        pbar = tqdm(total=100, desc="Step 2/3: Collecting calibration data!", ncols=80)
         for key, value in cir.items():
             pbar.update(100 / len(cir))
             cal_data[key] = execute(qp=value, qc=qc)
         pbar.close()
     else:
         qc_name = qc.name.lower()
-        if qc_name.endswith('iopcas'):
-            qc_name = 'iopcas'
+        if qc_name.endswith("iopcas"):
+            qc_name = "iopcas"
             # Update local calibration data.
             CalibrationUpdate(qc_name)
             # Load raw calibration data.
@@ -929,7 +938,7 @@ def manipulate_bits(bit1: Tuple[str, str], bit2: List[str], idx_list: List[int])
     for element in idx_bit:
         bit_0.insert(element[0], element[1])
         bit_1.insert(element[0], element[1])
-    final_bit = (''.join(bit_0)[::-1], ''.join(bit_1)[::-1])
+    final_bit = ("".join(bit_0)[::-1], "".join(bit_1)[::-1])
     final_bit_list.append(final_bit)
 
     return final_bit_list
@@ -956,7 +965,7 @@ def generator_matrix(qubits: List[int], target_index: Tuple[int, int], target_st
     remain_bit_len = len(remain_index)
     n_qubit = len(qubits)
     # Obtain the states for the remaining bits
-    remain_state = [bin(i).split('b')[1].zfill(remain_bit_len) for i in range(2**remain_bit_len)]
+    remain_state = [bin(i).split("b")[1].zfill(remain_bit_len) for i in range(2**remain_bit_len)]
 
     local_matrix_list = []
     for remain_bit in remain_state:

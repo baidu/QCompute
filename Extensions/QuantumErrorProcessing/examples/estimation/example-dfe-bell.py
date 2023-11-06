@@ -20,7 +20,7 @@ An example to demonstrate the Direct Fidelity Estimation protocol on the Bell st
 """
 import time
 import QCompute
-import qcompute_qep.estimation as estimation
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
 
 
 # Step 1. Set up the quantum program for preparing the Bell state
@@ -45,7 +45,7 @@ qc = QCompute.BackendName.LocalBaiduSim2
 # from qiskit.providers.fake_provider import FakeSantiago
 # qc = FakeSantiago()
 
-print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
 
 # Step 3. Execute direct fidelity estimation,
 # check how well the Bell state is implemented in the QuantumComputer.
@@ -54,16 +54,16 @@ dfe = estimation.DFEState()
 # Call the fidelity estimation procedure and obtain the noisy quantum state
 qubits = [0, 1]
 dfe.estimate(qp, qc, qubits=qubits)
-print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, dfe.fidelity))
+print("Fidelity of the Bell state on qubits {} is: F = {:.5f}".format(qubits, dfe.fidelity))
 
 # You can also perform the fidelity estimation procedure on other qubits, for example [q1, q2]
 qubits = [1, 2]
 dfe.estimate(qp, qc, qubits=qubits)
-print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, dfe.fidelity))
+print("Fidelity of the Bell state on qubits {} is: F = {:.5f}".format(qubits, dfe.fidelity))
 
 # You can also set the estimation error and failure probability
 qubits = [0, 2]
 dfe.estimate(qp, qc, qubits=qubits, eps=0.025, delta=0.025)
-print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, dfe.fidelity))
+print("Fidelity of the Bell state on qubits {} is: F = {:.5f}".format(qubits, dfe.fidelity))
 
-print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))

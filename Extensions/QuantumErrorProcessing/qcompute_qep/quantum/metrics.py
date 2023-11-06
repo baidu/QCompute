@@ -22,8 +22,8 @@ import math
 
 import numpy as np
 import scipy.linalg as la
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.linalg import vec_to_operator
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import vec_to_operator
 
 
 def state_fidelity(rho: np.ndarray, sigma: np.ndarray) -> float:
@@ -119,7 +119,7 @@ def frobenius_distance(A: np.ndarray, B: np.ndarray) -> float:
     if A.shape != B.shape:
         raise ArgumentError("The shape of A: {} mismatches the shape of B: {}.".format(A.shape, B.shape))
 
-    return np.linalg.norm(A - B, 'fro')
+    return np.linalg.norm(A - B, "fro")
 
 
 def process_fidelity(proc_M: np.ndarray, proc_N: np.ndarray) -> float:
@@ -229,4 +229,4 @@ def average_gate_fidelity(proc_M: np.ndarray, proc_N: np.ndarray) -> float:
     # First compute the entanglement fidelity
     fid = entanglement_fidelity(proc_M, proc_N)
 
-    return (d*fid + 1) / (d + 1)
+    return (d * fid + 1) / (d + 1)

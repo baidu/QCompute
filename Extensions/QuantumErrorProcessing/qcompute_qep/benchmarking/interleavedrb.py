@@ -29,13 +29,13 @@ from tqdm import tqdm
 import warnings
 
 import QCompute
-from qcompute_qep.utils import expval_from_counts, execute
-from qcompute_qep.quantum import clifford
-from qcompute_qep.utils.types import QComputer, get_qc_name
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts, execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum import clifford
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, get_qc_name
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError as QEPError
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 try:
     from matplotlib import pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -76,11 +76,11 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         self._target_gate = target_gate
         self._qc = qc
         self._qubits = qubits
-        self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100])
-        self._repeats = kwargs.get('repeats', 6)
-        self._shots = kwargs.get('shots', 4096)
-        self._prep_circuit = kwargs.get('prep_circuit', rb.default_prep_circuit)
-        self._meas_circuit = kwargs.get('meas_circuit', rb.default_meas_circuit)
+        self._seq_lengths = kwargs.get("seq_lengths", [1, 10, 20, 50, 75, 100])
+        self._repeats = kwargs.get("repeats", 6)
+        self._shots = kwargs.get("shots", 4096)
+        self._prep_circuit = kwargs.get("prep_circuit", rb.default_prep_circuit)
+        self._meas_circuit = kwargs.get("meas_circuit", rb.default_meas_circuit)
 
         # Store the standard randomized benchmarking results. Initialize to an empty dictionary
         self._results = dict()
@@ -94,7 +94,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         Return the target gate of Interleaved randomized benchmarking.
         """
         if self._target_gate is None:
-            raise QEPError.ArgumentError('Interleaved RB: The target gate is not set yet')
+            raise QEPError.ArgumentError("Interleaved RB: The target gate is not set yet")
         return self._target_gate
 
     @property
@@ -130,18 +130,17 @@ class InterleavedRB(rb.RandomizedBenchmarking):
 
     @property
     def params(self) -> dict:
-        r"""Return the used parameters in randomized benchmarking in a dictionary.
-        """
+        r"""Return the used parameters in randomized benchmarking in a dictionary."""
         if not self._params:
             rb_params = dict()
-            rb_params['qc'] = get_qc_name(self._qc)
-            rb_params['qubits'] = self._qubits
-            rb_params['seq_lengths'] = self._seq_lengths
-            rb_params['repeats'] = self._repeats
-            rb_params['shots'] = self._shots
-            rb_params['prep_circuit'] = self._prep_circuit
-            rb_params['meas_circuit'] = self._meas_circuit
-            rb_params['target_gate'] = self._target_gate
+            rb_params["qc"] = get_qc_name(self._qc)
+            rb_params["qubits"] = self._qubits
+            rb_params["seq_lengths"] = self._seq_lengths
+            rb_params["repeats"] = self._repeats
+            rb_params["shots"] = self._shots
+            rb_params["prep_circuit"] = self._prep_circuit
+            rb_params["meas_circuit"] = self._meas_circuit
+            rb_params["target_gate"] = self._target_gate
             self._params = rb_params
 
         return self._params
@@ -208,8 +207,8 @@ class InterleavedRB(rb.RandomizedBenchmarking):
 
             >>> import qiskit
             >>> from qiskit.providers.fake_provider import FakeSantiago
-            >>> from qcompute_qep.benchmarking.interleavedrb import InterleavedRB
-            >>> from qcompute_qep.quantum.clifford import Clifford
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.interleavedrb import InterleavedRB
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford import Clifford
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeParis())
             >>> target_gate=Clifford(1)
             >>> irb = InterleavedRB()
@@ -221,30 +220,29 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         self._target_gate = target_gate if target_gate is not None else self._target_gate
         self._qc = qc if qc is not None else self._qc
         self._qubits = qubits if qubits is not None else self._qubits
-        self._seq_lengths = kwargs.get('seq_lengths', self._seq_lengths)
-        self._repeats = kwargs.get('repeats', self._repeats)
-        self._shots = kwargs.get('shots', self._shots)
-        self._prep_circuit = kwargs.get('prep_circuit', self._prep_circuit)
-        self._meas_circuit = kwargs.get('meas_circuit', self._meas_circuit)
+        self._seq_lengths = kwargs.get("seq_lengths", self._seq_lengths)
+        self._repeats = kwargs.get("repeats", self._repeats)
+        self._shots = kwargs.get("shots", self._shots)
+        self._prep_circuit = kwargs.get("prep_circuit", self._prep_circuit)
+        self._meas_circuit = kwargs.get("meas_circuit", self._meas_circuit)
 
         if self._target_gate is None:
-            raise QEPError.ArgumentError('Interleaved RB: the target gate is not specified')
+            raise QEPError.ArgumentError("Interleaved RB: the target gate is not specified")
         else:
             if not isinstance(target_gate, clifford.Clifford):
                 raise QEPError.ArgumentError(
-                    'Interleaved RB: the target gate should be class Clifford, but received {}. For more details'
-                    'see qcoumpute_qep.quantum.clifford.Clifford'.format(type(target_gate)))
+                    "Interleaved RB: the target gate should be class Clifford, but received {}. For more details"
+                    "see qcoumpute_qep.quantum.clifford.Clifford".format(type(target_gate))
+                )
         if self._qc is None:
             raise QEPError.ArgumentError("Interleaved RB: the quantum computer for benchmarking is not specified!")
         if self._qubits is None:
             raise QEPError.ArgumentError("Interleaved RB: the qubits for benchmarking are not specified!")
-        print('There are two steps to run')
+        print("There are two steps to run")
         # First implement the Standard Randomized Benchmarking
         srb = rb.StandardRB()
-        srb.benchmark(qc=self._qc,
-                      qubits=self._qubits,
-                      **kwargs)
-        self._results['StandardRB'] = srb.results
+        srb.benchmark(qc=self._qc, qubits=self._qubits, **kwargs)
+        self._results["StandardRB"] = srb.results
 
         ###############################################################################################################
         # Step 1. Data Collection Phase.
@@ -257,7 +255,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         expvals = np.empty([len(self._seq_lengths), self._repeats], dtype=float)
         n = len(self._qubits)  # number of qubits
         num_of_register_qubits = max(x for x in self._qubits) + 1
-        pbar = tqdm(total=100, desc='Step 2/2 : Implement the IRB...', ncols=100)
+        pbar = tqdm(total=100, desc="Step 2/2 : Implement the IRB...", ncols=100)
         for m, seq_m in enumerate(self._seq_lengths):
             for r in range(self._repeats):
                 # Construct a random sequence of Clifford gates of length seq_m
@@ -292,7 +290,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         #   Fit the list of averaged expectation values to the exponential model and extract the fitting results.
         ###############################################################################################################
         # Set the bounds for the parameters tuple: :math:`(f, A, B)`
-        bounds = ([0, 0, 1 / 2 ** n], [1, 1, 1])
+        bounds = ([0, 0, 1 / 2**n], [1, 1, 1])
 
         # Use scipy's non-linear least squares to fit the data
         xdata = self._seq_lengths
@@ -301,13 +299,13 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         if len(sigma) - np.count_nonzero(sigma) > 0:
             sigma = None
 
-        p0 = [0.99, 0.95, 1 / 2 ** n]
+        p0 = [0.99, 0.95, 1 / 2**n]
 
         alpha_guess = []
         for j in range(1, len(xdata)):
             if ydata[j] > p0[2]:
-                dx = (xdata[j] - xdata[0])
-                dy = ((ydata[j] - p0[2]) / (ydata[0] - p0[2]))
+                dx = xdata[j] - xdata[0]
+                dy = (ydata[j] - p0[2]) / (ydata[0] - p0[2])
                 alpha_guess.append(dy ** (1 / (2 * dx)))
         if alpha_guess:
             if np.mean(alpha_guess) < 1.0:
@@ -322,37 +320,38 @@ class InterleavedRB(rb.RandomizedBenchmarking):
             if np.mean(tmp) < 1.0:
                 p0[1] = np.mean(tmp)
 
-        popt, pcov = curve_fit(self._fit_func, xdata, ydata,
-                               p0=p0, sigma=sigma, maxfev=500000,
-                               bounds=bounds, method='dogbox')
+        popt, pcov = curve_fit(
+            self._fit_func, xdata, ydata, p0=p0, sigma=sigma, maxfev=500000, bounds=bounds, method="dogbox"
+        )
 
         # Store the Interleaved randomized benchmarking results in results['InterleavedRB']
         params_err = np.sqrt(np.diag(pcov))
         _results = dict()
-        _results['expvals'] = expvals
-        _results['f'] = popt[0]
-        _results['A'] = popt[1]
-        _results['B'] = popt[2]
-        _results['f_err'] = params_err[0]
+        _results["expvals"] = expvals
+        _results["f"] = popt[0]
+        _results["A"] = popt[1]
+        _results["B"] = popt[2]
+        _results["f_err"] = params_err[0]
         d = 2 ** len(self._qubits)
-        _results['epc'] = (d - 1) / d * (1 - popt[0])
-        _results['epc_err'] = (d - 1) / d * (1 - params_err[0])
-        self._results['InterleavedRB'] = _results
+        _results["epc"] = (d - 1) / d * (1 - popt[0])
+        _results["epc_err"] = (d - 1) / d * (1 - params_err[0])
+        self._results["InterleavedRB"] = _results
 
         # target gate results
         _results = dict()
-        alpha_c = self._results['InterleavedRB']['f']
-        alpha_c_err = self._results['InterleavedRB']['f_err']
-        alpha = self._results['StandardRB']['f']
-        alpha_err = self._results['StandardRB']['f_err']
+        alpha_c = self._results["InterleavedRB"]["f"]
+        alpha_c_err = self._results["InterleavedRB"]["f_err"]
+        alpha = self._results["StandardRB"]["f"]
+        alpha_err = self._results["StandardRB"]["f_err"]
 
         # Calculate r_target (=r_c^est) Ref.[1] - Eq. (4):
         r_target = (d - 1) * (1 - alpha_c / alpha) / d
 
         # Calculate the systematic error bounds Ref.[1] - Eq. (5):
         bound_1 = (d - 1) * (abs(alpha - alpha_c / alpha) + (1 - alpha)) / d
-        bound_2 = 2 * (d * d - 1) * (1 - alpha) / (alpha * d * d) \
-                  + 2 * (np.sqrt(1 - alpha)) * (np.sqrt(d * d - 1)) / alpha
+        bound_2 = (
+            2 * (d * d - 1) * (1 - alpha) / (alpha * d * d) + 2 * (np.sqrt(1 - alpha)) * (np.sqrt(d * d - 1)) / alpha
+        )
 
         bound = min(bound_1, bound_2)
         Lower = r_target - bound
@@ -364,15 +363,19 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         r_target_err = ((d - 1) / d) * (alpha_c / alpha) * (np.sqrt(alpha_err_sq + alpha_c_err_sq))
 
         # Store the target_gate results in results['target_gate']
-        _results['r'] = r_target
-        _results['r_err'] = r_target_err
-        _results['r_lower_bound'] = Lower
-        _results['r_upper_bound'] = Upper
-        _results['bound'] = bound
-        self._results['target_gate'] = _results
+        _results["r"] = r_target
+        _results["r_err"] = r_target_err
+        _results["r_lower_bound"] = Lower
+        _results["r_upper_bound"] = Upper
+        _results["bound"] = bound
+        self._results["target_gate"] = _results
         return self._results
 
-    def plot_results(self, show: bool = True, fname: str = None, ):
+    def plot_results(
+        self,
+        show: bool = True,
+        fname: str = None,
+    ):
         r"""Plot randomized benchmarking results.
 
         Commonly, we visualize the sampled and averaged expectation values for each given length,
@@ -381,63 +384,86 @@ class InterleavedRB(rb.RandomizedBenchmarking):
         :param show: bool, default to True, show the plot figure or not
         :param fname: figure name for saving. If fname is None, do not save the figure
         """
-        srb_results = self.results['StandardRB']
-        irb_results = self.results['InterleavedRB']
-        target_gate_results = self.results['target_gate']
+        srb_results = self.results["StandardRB"]
+        irb_results = self.results["InterleavedRB"]
+        target_gate_results = self.results["target_gate"]
 
         xdata = self._seq_lengths
-        srb_expvals = srb_results['expvals']
-        irb_expvals = irb_results['expvals']
+        srb_expvals = srb_results["expvals"]
+        irb_expvals = irb_results["expvals"]
         srb_mean = np.mean(srb_expvals, axis=1)
         irb_mean = np.mean(irb_expvals, axis=1)
         fig, ax = plt.subplots(figsize=(12, 8))
 
         # Plot the repeated estimates for each sequence
-        ax.plot(xdata, srb_expvals, color='gray', linestyle='none', marker='x')
-        ax.plot(xdata, irb_expvals, color='gray', linestyle='none', marker='o')
+        ax.plot(xdata, srb_expvals, color="gray", linestyle="none", marker="x")
+        ax.plot(xdata, irb_expvals, color="gray", linestyle="none", marker="o")
 
         # Plot the fitting function
-        ydata_srb = [self._fit_func(x, srb_results['f'], srb_results['A'], srb_results['B']) for x in xdata]
-        ydata_irb = [self._fit_func(x, irb_results['f'], irb_results['A'], irb_results['B']) for x in xdata]
-        ax.plot(xdata, ydata_srb, color='blue', linestyle='-', linewidth=2, label='StandardRB fitting curve')
-        ax.plot(xdata, ydata_irb, color='green', linestyle='-', linewidth=2, label='InterleavedRB fitting curve')
+        ydata_srb = [self._fit_func(x, srb_results["f"], srb_results["A"], srb_results["B"]) for x in xdata]
+        ydata_irb = [self._fit_func(x, irb_results["f"], irb_results["A"], irb_results["B"]) for x in xdata]
+        ax.plot(xdata, ydata_srb, color="blue", linestyle="-", linewidth=2, label="StandardRB fitting curve")
+        ax.plot(xdata, ydata_irb, color="green", linestyle="-", linewidth=2, label="InterleavedRB fitting curve")
 
         # Plot the confidence interval of the fitting curve
-        srb_low_CI_bound, srb_high_CI_bound = st.t.interval(0.95, len(xdata), loc=srb_mean,
-                                                            scale=st.sem(srb_expvals, axis=1))
-        irb_low_CI_bound, irb_high_CI_bound = st.t.interval(0.95, len(xdata), loc=irb_mean,
-                                                            scale=st.sem(irb_expvals, axis=1))
-        plt.fill_between(xdata, y1=srb_low_CI_bound, y2=srb_high_CI_bound, color='cornflowerblue', alpha=0.3, )
-        plt.fill_between(xdata, y1=irb_low_CI_bound, y2=irb_high_CI_bound, color='lightgreen', alpha=0.3, )
+        srb_low_CI_bound, srb_high_CI_bound = st.t.interval(
+            0.95, len(xdata), loc=srb_mean, scale=st.sem(srb_expvals, axis=1)
+        )
+        irb_low_CI_bound, irb_high_CI_bound = st.t.interval(
+            0.95, len(xdata), loc=irb_mean, scale=st.sem(irb_expvals, axis=1)
+        )
+        plt.fill_between(
+            xdata,
+            y1=srb_low_CI_bound,
+            y2=srb_high_CI_bound,
+            color="cornflowerblue",
+            alpha=0.3,
+        )
+        plt.fill_between(
+            xdata,
+            y1=irb_low_CI_bound,
+            y2=irb_high_CI_bound,
+            color="lightgreen",
+            alpha=0.3,
+        )
 
         # Plot the mean data for each lengths
-        ax.plot(xdata, srb_mean, color='blue', linestyle='none', marker='v', markersize=13)
-        ax.plot(xdata, irb_mean, color='green', linestyle='none', marker='*', markersize=13)
+        ax.plot(xdata, srb_mean, color="blue", linestyle="none", marker="v", markersize=13)
+        ax.plot(xdata, irb_mean, color="green", linestyle="none", marker="*", markersize=13)
 
-        ax.tick_params(labelsize='medium')
+        ax.tick_params(labelsize="medium")
 
         # Show the legend
-        plt.legend(loc='lower left', fontsize=16)
+        plt.legend(loc="lower left", fontsize=16)
 
         # Add the fidelity of StandardRB and InterleavedRB
         # and estimated EPC parameters of target gate
-        bbox_props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.5)
-        ax.text(0.7, 0.9,
-                "StandardRB average gate fidelity: {:.4f}({:.3e}) \n "
-                "InterleavedRB average gate fidelity: {:.4f}({:.3e})\n "
-                "Target gate error rate: {:.4f}({:.3e}) \n"
-                "Systematic error bound: {:.4f}".format(srb_results['f'],
-                                                        srb_results['f_err'],
-                                                        irb_results['f'],
-                                                        irb_results['f_err'],
-                                                        target_gate_results['r'],
-                                                        target_gate_results['r_err'],
-                                                        target_gate_results['bound']),
-                ha="center", va="center", fontsize=12, bbox=bbox_props, transform=ax.transAxes)
+        bbox_props = dict(boxstyle="round,pad=0.5", facecolor="wheat", alpha=0.5)
+        ax.text(
+            0.7,
+            0.9,
+            "StandardRB average gate fidelity: {:.4f}({:.3e}) \n "
+            "InterleavedRB average gate fidelity: {:.4f}({:.3e})\n "
+            "Target gate error rate: {:.4f}({:.3e}) \n"
+            "Systematic error bound: {:.4f}".format(
+                srb_results["f"],
+                srb_results["f_err"],
+                irb_results["f"],
+                irb_results["f_err"],
+                target_gate_results["r"],
+                target_gate_results["r_err"],
+                target_gate_results["bound"],
+            ),
+            ha="center",
+            va="center",
+            fontsize=12,
+            bbox=bbox_props,
+            transform=ax.transAxes,
+        )
 
         # Set the labels
-        ax.set_xlabel('Clifford Length', fontsize='large')
-        ax.set_ylabel('Expectation Value', fontsize='large')
+        ax.set_xlabel("Clifford Length", fontsize="large")
+        ax.set_ylabel("Expectation Value", fontsize="large")
         ax.grid(True)
 
         # Set the x-axis locator always be integer
@@ -445,7 +471,7 @@ class InterleavedRB(rb.RandomizedBenchmarking):
 
         # Save the figure if `fname` is set
         if fname is not None:
-            plt.savefig(fname, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
+            plt.savefig(fname, format="png", dpi=600, bbox_inches="tight", pad_inches=0.1)
         # Show the figure if `show==True`
         if show:
             plt.show()

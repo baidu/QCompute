@@ -19,7 +19,7 @@
 Example to demonstrate quantum state tomography on the Bell state.
 """
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 # Step 1. Set up the quantum program for preparing the Bell state
@@ -50,15 +50,15 @@ st = tomography.StateTomography()
 
 # Call the tomography procedure and obtain the noisy quantum state
 qubits = [0, 1]
-st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
-print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
+st.fit(qp, qc, qubits=qubits, method="lstsq", shots=4096, ptm=False)
+print("Fidelity of the Bell state on qubits {} is: F = {:.5f}".format(qubits, st.fidelity))
 
 # You can also perform quantum state tomography on other qubits, for example [q1, q2]
 qubits = [1, 2]
-st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
-print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
+st.fit(qp, qc, qubits=qubits, method="lstsq", shots=4096, ptm=False)
+print("Fidelity of the Bell state on qubits {} is: F = {:.5f}".format(qubits, st.fidelity))
 
 # You can also perform quantum state tomography on other qubits, for example [q0, q2]
 qubits = [0, 2]
-st.fit(qp, qc, qubits=qubits, method='lstsq', shots=4096, ptm=False)
-print('Fidelity of the Bell state on qubits {} is: F = {:.5f}'.format(qubits, st.fidelity))
+st.fit(qp, qc, qubits=qubits, method="lstsq", shots=4096, ptm=False)
+print("Fidelity of the Bell state on qubits {} is: F = {:.5f}".format(qubits, st.fidelity))

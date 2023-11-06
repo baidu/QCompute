@@ -19,13 +19,19 @@ r"""
 Module for communication links in a network.
 """
 
-from qcompute_qnet.core.des import Entity
-from qcompute_qnet.devices.channel import ClassicalChannel, QuantumChannel, DuplexClassicalFiberChannel
-from qcompute_qnet.devices.channel import DuplexQuantumFiberChannel, ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import (
+    ClassicalChannel,
+    QuantumChannel,
+    DuplexClassicalFiberChannel,
+)
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import (
+    DuplexQuantumFiberChannel,
+    ClassicalFiberChannel,
+    QuantumFiberChannel,
+)
 
-__all__ = [
-    "Link"
-]
+__all__ = ["Link"]
 
 
 class Link(Entity):
@@ -143,8 +149,9 @@ class Link(Entity):
             node1 (Node): one end of the link
             node2 (Node): the other end of the link
         """
-        assert self.ends[0] is None and self.ends[1] is None, \
-            f"Link has been connected to '{self.ends[0].name}' and '{self.ends[1].name}'."
+        assert (
+            self.ends[0] is None and self.ends[1] is None
+        ), f"Link has been connected to '{self.ends[0].name}' and '{self.ends[1].name}'."
 
         self.ends = (node1, node2)
         node1.links[node2] = self

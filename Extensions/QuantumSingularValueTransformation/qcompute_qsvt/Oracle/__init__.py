@@ -19,10 +19,20 @@
 __init__ file of the `qcompute_qsvt.Oracle` module.
 """
 
-from qcompute_qsvt.Oracle.BlockEncoding import circ_block_encoding, circ_ctrl_Sel_multiPauli, circ_j_ctrl_multiPauli
-from qcompute_qsvt.Oracle.StatePreparation import circ_state_pre, circ_state_pre_inverse
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.BlockEncoding import (
+    circ_block_encoding,
+    circ_ctrl_Sel_multiPauli,
+    circ_j_ctrl_multiPauli,
+)
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.StatePreparation import (
+    circ_state_pre,
+    circ_state_pre_inverse,
+)
 
 __all__ = [
-    'circ_block_encoding', 'circ_ctrl_Sel_multiPauli', 'circ_j_ctrl_multiPauli',
-    'circ_state_pre', 'circ_state_pre_inverse'
+    "circ_block_encoding",
+    "circ_ctrl_Sel_multiPauli",
+    "circ_j_ctrl_multiPauli",
+    "circ_state_pre",
+    "circ_state_pre_inverse",
 ]

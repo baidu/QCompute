@@ -25,8 +25,8 @@ import numpy as np
 import QCompute
 import functools
 
-from qcompute_qep.utils.types import QProgram
-import qcompute_qep.utils.circuit as circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
 
 
 class RandomizedBenchmarking(abc.ABC):
@@ -164,8 +164,7 @@ def default_meas_circuit(qp: QProgram) -> Tuple[QProgram, np.ndarray]:
 
     if not circuit.contain_measurement(qp):
         qreglist, indexlist = qp.Q.toListPair()
-        QCompute.MeasureZ(qRegList=[qreglist[x] for x in qubit_indices],
-                          cRegList=[indexlist[x] for x in qubit_indices])
+        QCompute.MeasureZ(qRegList=[qreglist[x] for x in qubit_indices], cRegList=[indexlist[x] for x in qubit_indices])
 
     # Set the quantum observable observable to :math:`\vert 0\cdots 0\rangle\!\langle 0\cdots 0\vert`
     n = len(qubit_indices)

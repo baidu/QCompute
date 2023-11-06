@@ -16,21 +16,18 @@
 # limitations under the License.
 
 r"""
-Module for quantum noises.
+Module for quantum noise.
 """
 
 from typing import List
 import numpy
-from qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
 
-__all__ = [
-    "Noise"
-]
+__all__ = ["Noise"]
 
 
 class Noise:
-    r"""Class to obtain quantum noise models.
-    """
+    r"""Class to obtain quantum noise models."""
 
     @classmethod
     def BitFlip(cls, prob: float) -> List[numpy.ndarray]:
@@ -118,8 +115,10 @@ class Noise:
             List[numpy.ndarray]: a list of kraus operators for the noise
         """
         assert 0 <= prob <= 1, "`prob` should be between 0 and 1."
-        return [numpy.array([[1, 0], [0, numpy.sqrt(1 - prob)]], dtype=complex),
-                numpy.array([[0, numpy.sqrt(prob)], [0, 0]], dtype=complex)]
+        return [
+            numpy.array([[1, 0], [0, numpy.sqrt(1 - prob)]], dtype=complex),
+            numpy.array([[0, numpy.sqrt(prob)], [0, 0]], dtype=complex),
+        ]
 
     @classmethod
     def PhaseDamping(cls, prob: float) -> List[numpy.ndarray]:
@@ -147,8 +146,10 @@ class Noise:
             List[numpy.ndarray]: a list of kraus operators for the noise
         """
         assert 0 <= prob <= 1, "`prob` should be between 0 and 1."
-        return [numpy.array([[1, 0], [0, numpy.sqrt(1 - prob)]], dtype=complex),
-                numpy.array([[0, 0], [0, numpy.sqrt(prob)]], dtype=complex)]
+        return [
+            numpy.array([[1, 0], [0, numpy.sqrt(1 - prob)]], dtype=complex),
+            numpy.array([[0, 0], [0, numpy.sqrt(prob)]], dtype=complex),
+        ]
 
     @classmethod
     def Depolarizing(cls, prob: float) -> List[numpy.ndarray]:
@@ -170,7 +171,9 @@ class Noise:
             List[numpy.ndarray]: a list of kraus operators for the noise
         """
         assert 0 <= prob <= 1, "`prob` should be between 0 and 1."
-        return [numpy.sqrt(1 - prob) * Gate.I(),
-                numpy.sqrt(prob / 3) * Gate.X(),
-                numpy.sqrt(prob / 3) * Gate.Y(),
-                numpy.sqrt(prob / 3) * Gate.Z()]
+        return [
+            numpy.sqrt(1 - prob) * Gate.I(),
+            numpy.sqrt(prob / 3) * Gate.X(),
+            numpy.sqrt(prob / 3) * Gate.Y(),
+            numpy.sqrt(prob / 3) * Gate.Z(),
+        ]

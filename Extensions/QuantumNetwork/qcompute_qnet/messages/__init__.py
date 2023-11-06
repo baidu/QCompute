@@ -19,6 +19,4 @@ r"""
 Module for messages.
 """
 
-__all__ = [
-    "message"
-]
+__all__ = ["message"]

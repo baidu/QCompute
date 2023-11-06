@@ -32,8 +32,8 @@ from .basic_circuit import BasicCircuit
 
 
 class PauliMeasurementCircuit(BasicCircuit):
-    r""" Pauli Measurement Circuit class
-    """
+    r"""Pauli Measurement Circuit class"""
+
     def __init__(self, num: int, pauli_terms: str):
         r"""The constructor of the PauliMeasurementCircuit class
 
@@ -55,9 +55,9 @@ class PauliMeasurementCircuit(BasicCircuit):
         """
         for i in range(self._num):
             # Set up Pauli measurement circuit
-            if pauli_str[i] == 'x':
+            if pauli_str[i] == "x":
                 RY(-np.pi / 2)(q[i])
-            elif pauli_str[i] == 'y':
+            elif pauli_str[i] == "y":
                 RX(np.pi / 2)(q[i])
         # Measure all qubits
         MeasureZ(q, list(range(len(q))))
@@ -77,10 +77,10 @@ class PauliMeasurementCircuit(BasicCircuit):
         expectation = 0
         for coeff, pauli_str in self._pauli_terms:
             # Return coeff if all Pauli operators are I
-            if pauli_str.lower().count('i') == len(pauli_str):
+            if pauli_str.lower().count("i") == len(pauli_str):
                 expectation += coeff
                 continue
-            active_qubits = [i for i, c in enumerate(pauli_str) if c != 'i']
+            active_qubits = [i for i, c in enumerate(pauli_str) if c != "i"]
             env = QEnv()
             env.backend(backend)
             q = env.Q.createList(self._num)
@@ -89,18 +89,18 @@ class PauliMeasurementCircuit(BasicCircuit):
                 circuit.add_circuit(q)
             self.add_circuit(q, pauli_str.lower())
             # Submit job
-            counts = env.commit(shots, fetchMeasure=True)['counts']
+            counts = env.commit(shots, fetchMeasure=True)["counts"]
             # Expectation
             filtered_counts = [(counts[key], [key[-i - 1] for i in active_qubits]) for key in counts]
-            expecval = sum([((-1) ** key.count('1')) * val / shots for val, key in filtered_counts])
+            expecval = sum([((-1) ** key.count("1")) * val / shots for val, key in filtered_counts])
             expectation += coeff * expecval
 
         return expectation
 
 
 class PauliMeasurementCircuitWithAncilla(BasicCircuit):
-    r"""Pauli Measurement Circuit with Ancilla class
-    """
+    r"""Pauli Measurement Circuit with Ancilla class"""
+
     def __init__(self, num: int, pauli_terms: str):
         r"""The constructor of the PauliMeasurementCircuitWithAncilla class
 
@@ -122,14 +122,14 @@ class PauliMeasurementCircuitWithAncilla(BasicCircuit):
         """
         for i in range(self._num):
             # Set up Pauli measurement circuit
-            if pauli_str[i] == 'x':
+            if pauli_str[i] == "x":
                 H(q[i])
                 CX(q[i], q[-1])
-            elif pauli_str[i] == 'y':
+            elif pauli_str[i] == "y":
                 S(q[i])
                 H(q[i])
                 CX(q[i], q[-1])
-            elif pauli_str[i] == 'z':
+            elif pauli_str[i] == "z":
                 CX(q[i], q[-1])
         # Measure the ancilla qubit
         MeasureZ([q[-1]], [0])
@@ -149,7 +149,7 @@ class PauliMeasurementCircuitWithAncilla(BasicCircuit):
         expectation = 0
         for coeff, pauli_str in self._pauli_terms:
             # Return coeff if all Pauli operators are I
-            if pauli_str.lower().count('i') == len(pauli_str):
+            if pauli_str.lower().count("i") == len(pauli_str):
                 expectation += coeff
                 continue
             env = QEnv()
@@ -157,20 +157,20 @@ class PauliMeasurementCircuitWithAncilla(BasicCircuit):
             q = env.Q.createList(self._num + 1)
             # Add circuit
             for circuit in preceding_circuits:
-                circuit.add_circuit(q[:self._num])
+                circuit.add_circuit(q[: self._num])
             self.add_circuit(q, pauli_str.lower())
             # Submit job
-            counts = env.commit(shots, fetchMeasure=True)['counts']
+            counts = env.commit(shots, fetchMeasure=True)["counts"]
             # Expectation
-            expecval = (counts.get('0', 0) - counts.get('1', 0)) / shots
+            expecval = (counts.get("0", 0) - counts.get("1", 0)) / shots
             expectation += coeff * expecval
 
         return expectation
 
 
 class SimultaneousPauliMeasurementCircuit(BasicCircuit):
-    r"""Simultaneous Pauli Measurement Circuit for Qubitwise Commute Pauli Terms
-    """
+    r"""Simultaneous Pauli Measurement Circuit for Qubitwise Commute Pauli Terms"""
+
     def __init__(self, num: int, pauli_terms: list):
         r"""The constructor of the SimultaneousPauliMeasurementCircuit class
 
@@ -182,7 +182,7 @@ class SimultaneousPauliMeasurementCircuit(BasicCircuit):
         super().__init__(num)
         self._pauli_terms = pauli_terms
 
-    def add_circuit(self, q: 'QRegPool', clique: list) -> None:
+    def add_circuit(self, q: "QRegPool", clique: list) -> None:
         r"""Adds the simultaneous pauli measurement circuit to the register
 
         Args:
@@ -193,9 +193,9 @@ class SimultaneousPauliMeasurementCircuit(BasicCircuit):
         for index in range(self._num):
             # Set up Pauli measurement circuit
             term = [pauli[index] for _, pauli in clique]
-            if 'x' in term:
+            if "x" in term:
                 RY(-np.pi / 2)(q[index])
-            elif 'y' in term:
+            elif "y" in term:
                 RX(np.pi / 2)(q[index])
         # Measure all qubits
         MeasureZ(q, range(self._num))
@@ -212,7 +212,7 @@ class SimultaneousPauliMeasurementCircuit(BasicCircuit):
             float: expectation value
         """
         # Reformulate the measurement counts in the form of a probability list
-        basis = [''.join(x) for x in itertools.product('01', repeat=self._num)]
+        basis = ["".join(x) for x in itertools.product("01", repeat=self._num)]
         prob = [counts.get(key, 0) / shots for key in basis]
         # Calculate the expectation value of each term in the pauli_clique according to the same measured results
         expecval = 0
@@ -220,10 +220,10 @@ class SimultaneousPauliMeasurementCircuit(BasicCircuit):
             first = True
             for operator in pauli_str:
                 if first:
-                    eigenvalues = np.array([1.0, 1.0 if operator == 'i' else -1.0])
+                    eigenvalues = np.array([1.0, 1.0 if operator == "i" else -1.0])
                     first = False
                 else:
-                    eigenvalues = np.kron(np.array([1.0, 1.0 if operator == 'i' else -1.0]), eigenvalues)
+                    eigenvalues = np.kron(np.array([1.0, 1.0 if operator == "i" else -1.0]), eigenvalues)
             expecval_index = np.dot(eigenvalues, prob)
             expecval += coeff * expecval_index
 
@@ -253,7 +253,7 @@ class SimultaneousPauliMeasurementCircuit(BasicCircuit):
                 circuit.add_circuit(q)
             self.add_circuit(q, pauli_clique)
             # Submit job
-            counts = env.commit(shots, fetchMeasure=True)['counts']
+            counts = env.commit(shots, fetchMeasure=True)["counts"]
             # Expectation
             result = self._single_clique_expectation(pauli_clique, counts, shots)
             expectation += result

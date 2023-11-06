@@ -29,7 +29,7 @@ from cmath import *
 import numpy as np
 
 from QCompute import *
-import qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
 
 
 #######################################################################################################################
@@ -85,7 +85,7 @@ for i, val in enumerate(noisy_eigvals):
 for i, val in enumerate(ideal_eigvals):
     ideal_data[:, i] = np.asarray(polar(val))
 
-ax.scatter(noisy_data[1, :], noisy_data[0, :], c='blue', label='noisy')
-ax.scatter(ideal_data[1, :], ideal_data[0, :], c='red', label='ideal')
+ax.scatter(noisy_data[1, :], noisy_data[0, :], c="blue", label="noisy")
+ax.scatter(ideal_data[1, :], ideal_data[0, :], c="red", label="ideal")
 plt.legend()
 plt.show()

@@ -19,8 +19,6 @@
 __init__ file of the `qcompute_qsvt.Application` module.
 """
 
-from qcompute_qsvt.Application import HamiltonianSimulation
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application import HamiltonianSimulation
 
-__all__ = [
-    'HamiltonianSimulation'
-]
+__all__ = ["HamiltonianSimulation"]

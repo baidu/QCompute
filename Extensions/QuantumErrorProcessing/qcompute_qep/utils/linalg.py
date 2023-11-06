@@ -24,7 +24,7 @@ from collections.abc import Iterable
 import numpy as np
 import scipy.linalg as la
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
 
 
 def normalize(A: np.ndarray, axis: int = 0) -> np.ndarray:
@@ -128,7 +128,7 @@ def basis(n: int, i: int) -> np.ndarray:
                [0.+0.j]])
     """
     # the dimension of the Hilbert space
-    dim = 2 ** n
+    dim = 2**n
     if i not in range(dim):
         raise ValueError("The computational basis {} must be in the range [0, {}].".format(i, dim - 1))
 
@@ -214,7 +214,7 @@ def expand(local_matrix: np.ndarray, indices: Iterable, n: int, dim: int = 2) ->
     # Generate the subsystem permutation indices
     indices = sorted(indices)
     perm = np.repeat(-1, n)
-    for (i, idx) in enumerate(indices):
+    for i, idx in enumerate(indices):
         perm[idx] = i
     perm[perm < 0] = range(k, n)
 
@@ -243,15 +243,15 @@ def permute_systems(A: np.ndarray, perm: Iterable, dim: int = 2):
     """
     # Number of local systems
     n = len(perm)
-    if (A.shape[0] != dim ** n) or (A.shape[1] != dim ** n):
-        raise ValueError("Input matrix A must be square and have dimension {}!".format(dim ** n))
+    if (A.shape[0] != dim**n) or (A.shape[1] != dim**n):
+        raise ValueError("Input matrix A must be square and have dimension {}!".format(dim**n))
     # Step 1. Reshape the matrix to a vector
     A_p = A.reshape([dim] * 2 * n)
     # Step 2. Permute the system
     perm_col = [idx + n for idx in perm]
     A_p = np.transpose(A_p, list(itertools.chain(perm, perm_col)))
     # Step 3. Reshape back
-    A_p = A_p.reshape([dim ** n, dim ** n])
+    A_p = A_p.reshape([dim**n, dim**n])
 
     return A_p
 
@@ -272,22 +272,21 @@ def partial_trace(A: np.ndarray, indices: Iterable, n: int, dim: int) -> np.ndar
     if not indices:
         return A
     if len(indices) > n:
-        raise ArgumentError('The length of indices should not be larger than n.')
-    if dim ** n != A.shape[0]:
-        raise ArgumentError('The local systems dimension is wrong.')
+        raise ArgumentError("The length of indices should not be larger than n.")
+    if dim**n != A.shape[0]:
+        raise ArgumentError("The local systems dimension is wrong.")
 
     k = len(indices)
     indices.sort()
     qubit_axis = [(i, n + i) for i in indices]
     minus_factor = [(i, dim * i) for i in range(k)]
-    minus_qubit_axis = [(q[0] - m[0], q[1] - m[1])
-                        for q, m in zip(qubit_axis, minus_factor)]
+    minus_qubit_axis = [(q[0] - m[0], q[1] - m[1]) for q, m in zip(qubit_axis, minus_factor)]
     res = np.reshape(A, [dim, dim] * n)
     num_preserve = n - k
     for i, j in minus_qubit_axis:
         res = np.trace(res, axis1=i, axis2=j)
     if num_preserve > 1:
-        res = np.reshape(res, [dim ** num_preserve] * 2)
+        res = np.reshape(res, [dim**num_preserve] * 2)
     return res
 
 
@@ -344,15 +343,15 @@ def cholesky_matrix_to_vec(mat: np.ndarray) -> np.array:
     :return: np.array, a 1-D array recording the matrix variables
     """
     d = mat.shape[0]  # dimension of the Cholesky matrix
-    vec = np.zeros((d**2, ), dtype=float)
+    vec = np.zeros((d**2,), dtype=float)
     for i in range(d):
-        for j in range(i+1):
-            idx = i**2 + 2*j
+        for j in range(i + 1):
+            idx = i**2 + 2 * j
             if i == j:
                 vec[idx] = np.real(mat[i][j])
             else:
                 vec[idx] = np.real(mat[i][j])
-                vec[idx+1] = np.imag(mat[i][j])
+                vec[idx + 1] = np.imag(mat[i][j])
 
     return vec
 
@@ -386,12 +385,12 @@ def vec_to_cholesky_matrix(vec: np.array) -> np.array:
     vec = np.reshape(vec, (vec.size, -1))
     mat = np.zeros((d, d), dtype=complex)
     for i in range(d):
-        for j in range(i+1):
-            idx = i**2 + 2*j
+        for j in range(i + 1):
+            idx = i**2 + 2 * j
             if i == j:
                 mat[i][j] = vec[idx]
             else:
-                mat[i][j] = vec[idx] + 1j*vec[idx+1]
+                mat[i][j] = vec[idx] + 1j * vec[idx + 1]
     return mat
 
 
@@ -428,5 +427,7 @@ def complex_matrix_to_vec(mat: np.ndarray) -> np.array:
     :param mat: np.ndarray, the target matrix
     :return: np.array, a 1-D array recording the matrix variables
     """
-    mat = mat.reshape(mat.size, )
+    mat = mat.reshape(
+        mat.size,
+    )
     return list(np.concatenate([mat.real, mat.imag]))

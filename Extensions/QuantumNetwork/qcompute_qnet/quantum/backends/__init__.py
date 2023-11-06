@@ -16,22 +16,24 @@
 # limitations under the License.
 
 r"""
-Module for different quantum circuit backends.
+Module for quantum computation backends.
 """
 
 from enum import Enum
 import QCompute
 
-__all__ = [
-    "mbqc",
-    "qcompute",
-    "Backend"
-]
+__all__ = ["mbqc", "qcompute", "Backend"]
+
+
+class _QNETBackend(Enum):
+    r"""QNET backends."""
+    StateVector = "StateVector"
+    DensityMatrix = "DensityMatrix"
+    MBQC = "MBQC"
 
 
 class _QComputeBackend(Enum):
-    r"""QCompute backends.
-    """
+    r"""QCompute backends."""
 
     LocalBaiduSim2 = QCompute.BackendName.LocalBaiduSim2
     CloudBaiduSim2Water = QCompute.BackendName.CloudBaiduSim2Water
@@ -41,21 +43,13 @@ class _QComputeBackend(Enum):
     CloudBaiduSim2Wind = QCompute.BackendName.CloudBaiduSim2Wind
     CloudBaiduSim2Lake = QCompute.BackendName.CloudBaiduSim2Lake
     CloudAerAtBD = QCompute.BackendName.CloudAerAtBD
+    CloudBaiduQPUQian = QCompute.BackendName.CloudBaiduQPUQian
     CloudIoPCAS = QCompute.BackendName.CloudIoPCAS
     CloudIonAPM = QCompute.BackendName.CloudIonAPM
-    CloudBaiduQPUQian = QCompute.BackendName.CloudBaiduQPUQian
-
-
-class _MBQCBackend(Enum):
-    r"""MBQC backends.
-    """
-
-    StateVector = "StateVector"
 
 
 class Backend:
-    r"""Backends for quantum circuit implementation.
-    """
+    r"""Backends for quantum circuit implementation."""
 
+    QNET = _QNETBackend
     QCompute = _QComputeBackend
-    MBQC = _MBQCBackend

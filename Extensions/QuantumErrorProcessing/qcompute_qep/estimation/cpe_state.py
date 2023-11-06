@@ -41,11 +41,11 @@ import json
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-import qcompute_qep.estimation as estimation
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.utils import decompose_yzy
-from qcompute_qep.utils.circuit import print_circuit, execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import decompose_yzy
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import print_circuit, execute
 
 
 class QuantumSnapshot(abc.ABC):
@@ -53,6 +53,7 @@ class QuantumSnapshot(abc.ABC):
 
     Used to record all information of a quantum circuit and quantum computer.
     """
+
     def __init__(self, qc_name: str, qc: QComputer = None, **kwargs):
         """The init function of the Quantum Snapshot class.
 
@@ -74,9 +75,9 @@ class QuantumSnapshot(abc.ABC):
         """
         self._qc_name = qc_name
         self._qc = qc
-        self._qubits: List[int] = kwargs.get('qubits', None)
-        self._counts: List[str] = kwargs.get('counts', [])
-        self._unitaries: Dict[str, List[List[float]]] = kwargs.get('unitaries', dict())
+        self._qubits: List[int] = kwargs.get("qubits", None)
+        self._counts: List[str] = kwargs.get("counts", [])
+        self._unitaries: Dict[str, List[List[float]]] = kwargs.get("unitaries", dict())
         self._qp: str = ""
 
     def save_data(self, file_name: str = None):
@@ -86,12 +87,9 @@ class QuantumSnapshot(abc.ABC):
         """
         if file_name is None:
             file_name = self._qc_name + datetime.now().strftime("_%m_%d_%H") + ".devinf"
-        file_data = {'qubits': self._qubits,
-                     'counts': self._counts,
-                     'unitaries': self._unitaries,
-                     'qp': self._qp}
-        with open(file_name, 'w') as f:
-            json.dump(file_data, f, separators=(',', ':'), indent=4)
+        file_data = {"qubits": self._qubits, "counts": self._counts, "unitaries": self._unitaries, "qp": self._qp}
+        with open(file_name, "w") as f:
+            json.dump(file_data, f, separators=(",", ":"), indent=4)
 
     @property
     def qc(self):
@@ -141,6 +139,7 @@ class CPEState(estimation.Estimation):
 
         F_{\rm max}(\rho_1, \rho_2) = \frac{{\rm Tr}[\rho_1 \rho_2]}{{\rm max}({\rm Tr}[\rho_1^2], {\rm Tr}[\rho_2^2])}.
     """
+
     def __init__(self, qc_list: List[QuantumSnapshot] = None, qp: QProgram = None, **kwargs):
         r"""The init function of the Cross Platform Estimation class.
 
@@ -156,8 +155,8 @@ class CPEState(estimation.Estimation):
         super().__init__(qp, **kwargs)
         self._qc_list = qc_list
         self._unitaries: Dict[str, List[List[float]]] = {}
-        self._shots = kwargs.get('shots', 512)
-        self._samples = kwargs.get('samples', 100)
+        self._shots = kwargs.get("shots", 512)
+        self._samples = kwargs.get("samples", 100)
         self._result: np.ndarray = None
 
     def estimate(self, qc_list: List[QuantumSnapshot] = None, qp: QProgram = None, **kwargs):
@@ -202,7 +201,7 @@ class CPEState(estimation.Estimation):
         **Examples**
 
             >>> import QCompute
-            >>> from qcompute_qep.estimation.cpe_state import QuantumSnapshot, CPEState
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.estimation.cpe_state import QuantumSnapshot, CPEState
             >>> ideal_baidu1 = QuantumSnapshot(qc_name='Baidu ideal1',
             >>>                                 qc=QCompute.BackendName.LocalBaiduSim2,
             >>>                                 qubits=[0])
@@ -218,8 +217,8 @@ class CPEState(estimation.Estimation):
         """
         self._qc_list = qc_list if qc_list is not None else self._qc_list
         self._qp = qp if qp is not None else self._qp
-        self._shots = kwargs.get('shots', self._shots)
-        self._samples = kwargs.get('samples', self._samples)
+        self._shots = kwargs.get("shots", self._shots)
+        self._samples = kwargs.get("samples", self._samples)
         self._result = np.identity(len(self._qc_list), dtype=float)
 
         if self._qp is None:
@@ -229,7 +228,7 @@ class CPEState(estimation.Estimation):
         if self._pre_verify() is False:
             raise ArgumentError("in CPEState.estimate(): the input qc_list is illegal!")
 
-        pbar = tqdm(total=100, desc='CPEState Step 1/3 : Sampling unitaries...', ncols=80)
+        pbar = tqdm(total=100, desc="CPEState Step 1/3 : Sampling unitaries...", ncols=80)
         # Step 1. Generate or read unitaries and construct a list of circuit
         if len(self._unitaries.keys()) != self._samples:
             self._unitaries.clear()
@@ -239,8 +238,7 @@ class CPEState(estimation.Estimation):
 
         # Step 2. Run circuits on all quantum computer and collect experiment data
         for quantum_snapshot in qc_list:
-            pbar.desc = "CPEState Step 2/3 : Running circuits on {}..."\
-                .format(quantum_snapshot.qc_name)
+            pbar.desc = "CPEState Step 2/3 : Running circuits on {}...".format(quantum_snapshot.qc_name)
             pbar.update(100 / 3 / len(qc_list))
             # Save the circuit information to quantum_snapshot
             quantum_snapshot.qp = print_circuit(self._qp.circuit, show=False, num_qubits=number_of_qubits(self._qp))
@@ -248,13 +246,13 @@ class CPEState(estimation.Estimation):
 
             # The counts are None or samples less than required
             if len(quantum_snapshot.counts) < self._samples * self._shots:
-
                 qc = quantum_snapshot.qc
                 qubits = quantum_snapshot.qubits
                 for i, qp in enumerate(qp_list):
                     qp_new = _mapping_qubits(qp, qubits)
-                    quantum_snapshot.counts += [list(execute(qp=qp_new, qc=qc, shots=1).keys())[0]
-                                                for _ in range(self._shots)]
+                    quantum_snapshot.counts += [
+                        list(execute(qp=qp_new, qc=qc, shots=1).keys())[0] for _ in range(self._shots)
+                    ]
                 # quantum_snapshot.save_data()
 
         pbar.desc = "CPEState Step 3/3 : Processing experimental data..."
@@ -271,24 +269,24 @@ class CPEState(estimation.Estimation):
                 if j > i:
                     purity_dev1 = self._compute_fidelity(dev1.counts, dev1.counts)
                     purity_dev2 = self._compute_fidelity(dev2.counts, dev2.counts)
-                    self._result[i, j] = self._compute_fidelity(dev1.counts, dev2.counts)/max(purity_dev1, purity_dev2)
+                    self._result[i, j] = self._compute_fidelity(dev1.counts, dev2.counts) / max(
+                        purity_dev1, purity_dev2
+                    )
                     # self._result[j, i] = self._result[i, j]
         pbar.update(100 - pbar.n)
         pbar.desc = "Successfully finished CPEState!"
 
         # Step 4. Visualize experiment result
-        file_name = kwargs.get('filename', None)
-        if kwargs.get('show', False) is True or file_name is not None:
+        file_name = kwargs.get("filename", None)
+        if kwargs.get("show", False) is True or file_name is not None:
             self.visualize(file_name)
 
         return self._result
 
     def visualize(self, file_name: str = None):
-        """Visualize the results of Cross-Platform Estimation.
-
-        """
+        """Visualize the results of Cross-Platform Estimation."""
         fig, ax = plt.subplots()
-        im = ax.imshow(self._result, cmap='Greens', vmin=0, vmax=3)
+        im = ax.imshow(self._result, cmap="Greens", vmin=0, vmax=3)
 
         device_name = [snap.qc_name for snap in self._qc_list]
 
@@ -297,24 +295,21 @@ class CPEState(estimation.Estimation):
         if len(self._qc_list) > 4:
             ax.set_xticklabels(device_name, rotation=45)
 
-        ax.xaxis.set_ticks_position('top')
+        ax.xaxis.set_ticks_position("top")
         plt.yticks(np.arange(len(device_name)), device_name)
-        ax.yaxis.set_ticks_position('right')
+        ax.yaxis.set_ticks_position("right")
         for i in range(len(device_name)):
             for j in range(i, len(device_name)):
-                text = ax.text(j, i, '{:.4f}'.format(self._result[i, j]),
-                               ha='center', va='center', color='black')
+                text = ax.text(j, i, "{:.4f}".format(self._result[i, j]), ha="center", va="center", color="black")
 
         fig.tight_layout()
         if file_name is None:
             plt.show()
         else:
-            plt.savefig(file_name, bbox_inches='tight', dpi=500)
+            plt.savefig(file_name, bbox_inches="tight", dpi=500)
 
     def _pre_verify(self) -> bool:
-        """Verify if the input qc_list and qp is legal.
-
-        """
+        """Verify if the input qc_list and qp is legal."""
         for quantum_snapshot in self._qc_list:
             # Verify the input unitaries is legal
             if len(quantum_snapshot.unitaries) == self._samples:
@@ -335,9 +330,7 @@ class CPEState(estimation.Estimation):
         return True
 
     def _generate_random_unitaries(self):
-        """Generate a list of random unitaries.
-
-        """
+        """Generate a list of random unitaries."""
 
         n = number_of_qubits(self._qp)
         for i in range(self._samples):
@@ -346,25 +339,21 @@ class CPEState(estimation.Estimation):
                 u = unitary_group.rvs(2)
                 alpha, theta, phi, lam = decompose_yzy(u)
                 unitaries_list.append([theta, phi, lam])
-            self._unitaries.update({'sample_{}'.format(i): unitaries_list})
+            self._unitaries.update({"sample_{}".format(i): unitaries_list})
 
     def _construct_circuits(self) -> List[QProgram]:
-        """Construct a list of random measurement circuit.
-
-        """
+        """Construct a list of random measurement circuit."""
         qp_list = []
         for u3_list in self._unitaries.values():
             qp = deepcopy(self._qp)
             for i, u3_param in enumerate(u3_list):
-                u3 = RotationGate.createRotationGateInstance('U', *u3_param)
+                u3 = RotationGate.createRotationGateInstance("U", *u3_param)
                 u3(qp.Q[i])
             qp_list.append(qp)
         return qp_list
 
     def _compute_fidelity(self, counts1: List[str], counts2: List[str]) -> float:
-        """Input two outcomes of quantum devices, and return the fidelity between two devices.
-
-        """
+        """Input two outcomes of quantum devices, and return the fidelity between two devices."""
         fidelity = 0
         n = number_of_qubits(self._qp)
 
@@ -375,16 +364,14 @@ class CPEState(estimation.Estimation):
         for key, value in outcomes_dict.items():
             key1 = key[:n]
             key2 = key[n:]
-            fidelity += (-2)**(-hamming_distance(key1, key2)) * (value / self._shots / self._samples)
+            fidelity += (-2) ** (-hamming_distance(key1, key2)) * (value / self._shots / self._samples)
 
         fidelity = fidelity * (2**n)
         return fidelity if fidelity < 1.0 else 1.0
 
 
 def _mapping_qubits(qp: QProgram, qubits: List[int] = None) -> QProgram:
-    """Remap the qubits which we are interested in.
-
-    """
+    """Remap the qubits which we are interested in."""
     if qubits is None:
         MeasureZ(*qp.Q.toListPair())
         return qp
@@ -396,8 +383,7 @@ def _mapping_qubits(qp: QProgram, qubits: List[int] = None) -> QProgram:
     for gate in qp.circuit:
         qp_new.circuit.append(CircuitLine(gate.data, [qubits[i] for i in gate.qRegList]))
     qreglist, indexlist = qp_new.Q.toListPair()
-    MeasureZ(qRegList=[qreglist[x] for x in qubits],
-             cRegList=[indexlist[x] for x in qubits])
+    MeasureZ(qRegList=[qreglist[x] for x in qubits], cRegList=[indexlist[x] for x in qubits])
     return qp_new
 
 
@@ -407,26 +393,23 @@ def read_quantum_snapshot(file_name: str, qc_name: str = None) -> QuantumSnapsho
     :param file_name: the name of a file, which contain the information of quantum device
     :param qc_name: the qc_name of return QuantumSnapshot class
     """
-    with open(file_name + '.devinf', 'r') as f:
+    with open(file_name + ".devinf", "r") as f:
         file_data = json.load(f)
     if qc_name is None:
         qc_name = file_name
-    print("Note that the quantum circuit of file `{}.devinf` is: \n{}".format(file_name, file_data['qp']))
-    return QuantumSnapshot(qc_name,
-                           qc=None,
-                           qubits=file_data['qubits'],
-                           counts=file_data['counts'],
-                           unitaries=file_data['unitaries'],
-                           qp=file_data['qp'])
+    print("Note that the quantum circuit of file `{}.devinf` is: \n{}".format(file_name, file_data["qp"]))
+    return QuantumSnapshot(
+        qc_name,
+        qc=None,
+        qubits=file_data["qubits"],
+        counts=file_data["counts"],
+        unitaries=file_data["unitaries"],
+        qp=file_data["qp"],
+    )
 
 
 def hamming_distance(bits1: str, bits2: str) -> int:
-    """Compute the hamming distance between bits1 and bits2.
-
-    """
+    """Compute the hamming distance between bits1 and bits2."""
     bits1 = [int(b) for b in bits1]
     bits2 = [int(b) for b in bits2]
     return hamming(bits1, bits2) * len(bits1)
-
-
-

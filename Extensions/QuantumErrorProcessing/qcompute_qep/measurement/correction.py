@@ -48,13 +48,13 @@ Different kinds of correction procedures will be implemented:
     >>> from QCompute import H
     >>> from QCompute import CX
     >>> from qiskit.providers.fake_provider import FakeSantiago
-    >>> from qcompute_qep.measurement.correction import InverseCorrector
-    >>> from qcompute_qep.measurement.correction import LeastSquareCorrector
-    >>> from qcompute_qep.measurement.correction import IBUCorrector
-    >>> from qcompute_qep.measurement.correction import NeumannCorrector
-    >>> from qcompute_qep.utils.types import get_qc_name
-    >>> from qcompute_qep.utils.circuit import execute
-    >>> from qcompute_qep.utils import expval_from_counts
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import InverseCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import LeastSquareCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import IBUCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.correction import NeumannCorrector
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import get_qc_name
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
+    >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_from_counts
     >>>
     >>> qc_ideal = BackendName.LocalBaiduSim2
     >>> qc_noisy = FakeSantiago()
@@ -107,11 +107,16 @@ import warnings
 import networkx as nx
 
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.measurement.calibration import Calibrator, CompleteCalibrator, TPCalibrator, CTMPCalibrator
-from qcompute_qep.measurement.utils import dict2vector, vector2dict
-from qcompute_qep.utils.types import QComputer
-from qcompute_qep.utils.linalg import normalize
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.calibration import (
+    Calibrator,
+    CompleteCalibrator,
+    TPCalibrator,
+    CTMPCalibrator,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.measurement.utils import dict2vector, vector2dict
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import normalize
 
 
 class Corrector(ABC):
@@ -121,13 +126,16 @@ class Corrector(ABC):
     Concrete measurement error correction methods must inherit this
     abstract class and implement the `correct` method.
     """
-    def __init__(self,
-                 qc: QComputer = None,
-                 calibrator: Union[Calibrator, str] = 'complete',
-                 qubits: List[int] = None,
-                 k: int = 2,
-                 topo: nx.Graph = None,
-                 **kwargs):
+
+    def __init__(
+        self,
+        qc: QComputer = None,
+        calibrator: Union[Calibrator, str] = "complete",
+        qubits: List[int] = None,
+        k: int = 2,
+        topo: nx.Graph = None,
+        **kwargs
+    ):
         """The init function of the Corrector.
 
         :param qc: QComputer, the quantum computer whose measurement device is to be calibrated
@@ -143,23 +151,24 @@ class Corrector(ABC):
         # Parse the input calibrator type.
         # The calibrator can be initialized via string or Calibrator instance.
         if isinstance(calibrator, str):
-            cal_data = kwargs.get('cal_data', None)
-            if calibrator.lower() == 'complete':  # Case-insensitive
+            cal_data = kwargs.get("cal_data", None)
+            if calibrator.lower() == "complete":  # Case-insensitive
                 self._calibrator = CompleteCalibrator(qc=qc, cal_data=cal_data, qubits=self._qubits)
-            elif calibrator.lower() == 'tp':  # Case-insensitive
+            elif calibrator.lower() == "tp":  # Case-insensitive
                 self._calibrator = TPCalibrator(qc=qc, cal_data=cal_data, qubits=self._qubits)
-            elif calibrator.lower() == 'ctmp':  # Case-insensitive
+            elif calibrator.lower() == "ctmp":  # Case-insensitive
                 if self._topo is None:
                     self._topo = nx.complete_graph(len(self._qubits))
-                self._calibrator = CTMPCalibrator(qc=qc, cal_data=cal_data, qubits=self._qubits, topo=self._topo,
-                                                  k=self._k)
+                self._calibrator = CTMPCalibrator(
+                    qc=qc, cal_data=cal_data, qubits=self._qubits, topo=self._topo, k=self._k
+                )
             else:
                 raise ArgumentError("Calibrator with name {} is not defined!".format(calibrator))
         else:
             self._calibrator = calibrator
 
-        if self.__class__.__name__ == 'CTMPCorrector':
-            if calibrator.lower() != 'ctmp':
+        if self.__class__.__name__ == "CTMPCorrector":
+            if calibrator.lower() != "ctmp":
                 raise ArgumentError("CTMPCorrector should combine with CTMPCalibrator!")
 
     @property
@@ -241,7 +250,7 @@ class InverseCorrector(Corrector):
 
             for i in cal_matrix_inv:
                 if (i < 0).any():
-                    warnings.warn('There are negative values in the pseudoinverse matrix, may choose another method.')
+                    warnings.warn("There are negative values in the pseudoinverse matrix, may choose another method.")
             corrected_data = np.matmul(cal_matrix_inv, raw_data)
             # Convert the data back to its input format
             if issubclass(type_mark, dict):
@@ -257,7 +266,7 @@ class LeastSquareCorrector(Corrector):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._tol = kwargs.get('tol', 1e-06)
+        self._tol = kwargs.get("tol", 1e-06)
         self.__opt_info = {}
 
     def __str__(self):
@@ -275,7 +284,7 @@ class LeastSquareCorrector(Corrector):
         :param b: np.ndarray, the dependent variable values, is a :math:`N\times 1` vector
         :return: float, the Euclidean distance between the two vectors
         """
-        return sum((np.ravel(b) - np.ravel(np.matmul(A, x)))**2)
+        return sum((np.ravel(b) - np.ravel(np.matmul(A, x))) ** 2)
 
     def correct(self, raw_data: Union[dict, np.ndarray], **kwargs: Any) -> Union[Dict, np.ndarray]:
         """Use the Least Square method to correct raw data.
@@ -331,18 +340,25 @@ class LeastSquareCorrector(Corrector):
         # Least square
         nqubits = int(math.log2(raw_data.size))
         # Set the initial guess
-        x0 = np.random.rand(2 ** nqubits)
+        x0 = np.random.rand(2**nqubits)
         x0 = x0 / sum(x0)
         nshots = sum(raw_data)
-        constraints = ({'type': 'eq', 'fun': lambda x: nshots - sum(x)})
+        constraints = {"type": "eq", "fun": lambda x: nshots - sum(x)}
         # Set bounds to each random variable x
         bounds = tuple((0, nshots) for x in x0)
-        corrected_data = minimize(self._opt_fun, x0, method='SLSQP', constraints=constraints, bounds=bounds,
-                                  tol=self._tol, args=(self.calibrator.cal_matrix, raw_data))
-        self.__opt_info['number of iterations'] = corrected_data.nit
-        self.__opt_info['tol'] = self._tol
-        self.__opt_info['final value of objective function'] = corrected_data['fun']
-        self.__opt_info['termination status'] = corrected_data['message']
+        corrected_data = minimize(
+            self._opt_fun,
+            x0,
+            method="SLSQP",
+            constraints=constraints,
+            bounds=bounds,
+            tol=self._tol,
+            args=(self.calibrator.cal_matrix, raw_data),
+        )
+        self.__opt_info["number of iterations"] = corrected_data.nit
+        self.__opt_info["tol"] = self._tol
+        self.__opt_info["final value of objective function"] = corrected_data["fun"]
+        self.__opt_info["termination status"] = corrected_data["message"]
         # Convert the data back to its input format
         if issubclass(type_mark, dict):
             return vector2dict(corrected_data.x)
@@ -358,8 +374,8 @@ class IBUCorrector(Corrector):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._k = kwargs.get('max_iter', 100)
-        self._tol = kwargs.get('tol', 1e-6)
+        self._k = kwargs.get("max_iter", 100)
+        self._tol = kwargs.get("tol", 1e-6)
         self.__opt_info = {}
 
     def __str__(self):
@@ -447,7 +463,7 @@ class IBUCorrector(Corrector):
 
         # IBU method.
         size = len(raw_data)
-        corrected_data = np.ones(size, dtype=float)*(sum(raw_data)/size)
+        corrected_data = np.ones(size, dtype=float) * (sum(raw_data) / size)
         gap = 1
         nit = 0
         # Iterate the IBU function according to the max_iter and tol.
@@ -461,9 +477,9 @@ class IBUCorrector(Corrector):
             else:
                 break
 
-        self.__opt_info['number of iterations'] = nit
-        self.__opt_info['tol'] = self._tol
-        self.__opt_info['final gap'] = gap
+        self.__opt_info["number of iterations"] = nit
+        self.__opt_info["tol"] = self._tol
+        self.__opt_info["final gap"] = gap
         # Convert the data back to its input format
         if issubclass(type_mark, dict):
             return vector2dict(corrected_data)
@@ -479,7 +495,7 @@ class NeumannCorrector(Corrector):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._tol = kwargs.get('tol', 1e-6)
+        self._tol = kwargs.get("tol", 1e-6)
 
     def __str__(self):
         return "Neumann Corrector"
@@ -542,9 +558,9 @@ class NeumannCorrector(Corrector):
 
         # Truncated Neumann Series method.
         if not np.isclose(self.calibrator.noise_resist, 0, rtol=1e-05, atol=1e-08, equal_nan=False):
-            optimal_truncated_num = math.ceil(math.log(self._tol)/math.log(self.calibrator.noise_resist)-1)
-            for k in range(optimal_truncated_num+1):
-                c_k = (-1)**k * binom(optimal_truncated_num+1, k+1)
+            optimal_truncated_num = math.ceil(math.log(self._tol) / math.log(self.calibrator.noise_resist) - 1)
+            for k in range(optimal_truncated_num + 1):
+                c_k = (-1) ** k * binom(optimal_truncated_num + 1, k + 1)
                 cal_matrix_inv += c_k * np.linalg.matrix_power(self.calibrator.cal_matrix, k)
 
         # Correct data
@@ -561,8 +577,8 @@ class CTMPCorrector(Corrector):
     """Corrector based on CTMP model."""
 
     def __init__(self, *args: Any, **kwargs: Any):
-        self._tol = kwargs.get('tol', 1e-6)
-        self._topo = kwargs.get('topo', None)
+        self._tol = kwargs.get("tol", 1e-6)
+        self._topo = kwargs.get("topo", None)
         super().__init__(*args, **kwargs)
 
     def __str__(self):
@@ -613,8 +629,11 @@ class CTMPCorrector(Corrector):
 
         # Initialize the inverse calibration matrix
         noise_strength = max(-np.diagonal(self._calibrator.generator_matrix()))
-        T = 4*self._tol**(-2)*math.exp(4*noise_strength)
-        B = np.identity(self.calibrator.cal_matrix.shape[0]) + noise_strength**(-1)*self._calibrator.generator_matrix()
+        T = 4 * self._tol ** (-2) * math.exp(4 * noise_strength)
+        B = (
+            np.identity(self.calibrator.cal_matrix.shape[0])
+            + noise_strength ** (-1) * self._calibrator.generator_matrix()
+        )
 
         # Method 1.
         # a = []
@@ -630,14 +649,18 @@ class CTMPCorrector(Corrector):
         # corrected_data = np.sum(np.array(a), axis=0)
 
         # Method 2.
-        init = [0]*self.calibrator.cal_matrix.shape[0]
+        init = [0] * self.calibrator.cal_matrix.shape[0]
         corrected_data = np.array(init, dtype=float)
         gap = 1
         nit = 0
         while gap > self._tol:
             corrected_data_before = corrected_data.copy()
-            corrected_data += math.exp(noise_strength) * (-noise_strength) ** nit / math.factorial(nit) * np.matmul(
-                np.linalg.matrix_power(B, nit), raw_data)
+            corrected_data += (
+                math.exp(noise_strength)
+                * (-noise_strength) ** nit
+                / math.factorial(nit)
+                * np.matmul(np.linalg.matrix_power(B, nit), raw_data)
+            )
             nit += 1
             gap = np.linalg.norm(corrected_data - corrected_data_before)
 

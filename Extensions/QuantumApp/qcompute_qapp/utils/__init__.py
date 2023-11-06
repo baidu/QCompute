@@ -20,7 +20,4 @@ Some auxiliary functions
 from .hamiltonian_cliques import grouping_hamiltonian
 from .hamiltonian_matrix import pauli_terms_to_matrix
 
-__all__ = [
-    'grouping_hamiltonian',
-    'pauli_terms_to_matrix'
-]
+__all__ = ["grouping_hamiltonian", "pauli_terms_to_matrix"]

@@ -6,11 +6,11 @@
 
 我们同样将首先对该协议的背景和实现原理进行介绍，随后，我们将结合 QNET 对该协议进行仿真实现，并对协议流程展开进一步的介绍。最后，我们将该协议置于一个简单的量子网络场景中进行仿真模拟及验证。
 
-## 1. 背景介绍
+## 背景介绍
 
 在量子网络中，量子纠缠是非常重要的通信资源。通过共享量子纠缠，通信双方可以实现如量子隐形传态等多种协议。对于量子网络中两个互相之间存在直连信道的节点而言，可以通过其中一方制备纠缠并通过直连信道发送纠缠粒子的方式来共享纠缠。此外，也可以由中间节点进行纠缠制备，并通过直连信道分别将纠缠粒子发送给通信方。然而，光子在传输过程中有一定概率会被光纤信道吸收，从而导致信号丢失，且这种损耗会随着传输距离的增加而呈指数级上升，由此限制了光子在信道中直接传输的距离。在这种情况下，通过引入纠缠交换的方法，可以对通信双方之间共享纠缠的距离进行延长。纠缠交换的原理是将多对短距离的纠缠转换成一对长距离的纠缠，从而成功实现通信双方之间的纠缠资源共享 [1]。
 
-## 2. 协议流程
+## 协议流程
 
 在这里我们假定一个简单的量子网络场景：Alice 希望与 Bob 之间共享一对纠缠，但是他们之间没有直连的信道，因此需要由量子中继器来帮助他们完成纠缠交换协议，以实现长距离的纠缠资源共享。该协议的流程大致如下（如图 1 所示）：
 
@@ -27,7 +27,7 @@
 
 接下来，我们使用 QNET 对上述协议进行仿真。
 
-## 3. 协议实现
+## 协议实现
 
 我们在 QPU 模块中提供了 ``EntanglementSwapping`` 类用以对该协议进行仿真，并分别定义了四个子协议来描述该协议中四种角色的行为：负责分发纠缠的纠缠源（``Source``）、发起纠缠交换请求的上游节点（``UpstreamNode``）、根据经典测量结果恢复特定纠缠态的下游节点（``DownstreamNode``）、负责纠缠交换的中继节点（``Repeater``）。
 
@@ -231,14 +231,14 @@ class EntanglementSwapping(Protocol):
                 self.node.send_classical_msg(dst=self.downstream_node, msg=outcome_msg)
 ```
 
-## 4. 代码示例
+## 代码示例
 
 接下来，我们使用 QNET 构建上述场景，对纠缠交换协议进行模拟。
 
 首先，创建一个仿真环境 ``QuantumEnv``。
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # 创建一个仿真环境
 env = QuantumEnv("Repeater", default=True)
@@ -247,9 +247,9 @@ env = QuantumEnv("Repeater", default=True)
 随后，分别创建协议中四种角色所对应的量子节点，设定这些节点的协议栈中预装的协议为 ``EntanglementSwapping``，并配置这些节点之间必要的通信链路。
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import EntanglementSwapping
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import EntanglementSwapping
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # 创建装有量子寄存器的量子节点并指定其中预装的协议类型
 alice = QuantumNode("Alice", qreg_size=1, protocol=EntanglementSwapping)
@@ -270,7 +270,7 @@ link_repeater_source_br = Link("Link_repeater_source_br", ends=(repeater, source
 然后，创建一个量子网络，并将配置好的节点和通信链路装入量子网络中。
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # 创建一个量子网络并将各节点和各链路装入量子网络中
 network = Network("Repeater network")
@@ -293,7 +293,7 @@ repeater.start(role="Repeater", ent_sources=[source_ar, source_br])
 最后，对仿真环境进行初始化并运行，并查看输出结果。
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # 初始化仿真环境并运行仿真
 env.init()

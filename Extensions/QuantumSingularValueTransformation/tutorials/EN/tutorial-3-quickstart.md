@@ -13,7 +13,7 @@ After the installation of QSVT toolkit, we can create a new python script file a
 ```python{.line-numbers}
 import numpy as np
 from QCompute import QEnv, BackendName, MeasureZ
-from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import circ_HS_QSVT
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import circ_HS_QSVT
 ```
 
 In the task of Hamiltonian simulation, we need to input the Hamiltonian to be simulated first. We use Hamiltonians' representations in Pauli basis, that is, to express the Hamiltonians in the form of linear combinations of multi-qubit Pauli matrices. Each term in the linear combinations is given by a double-tuple consisting of a float and a string, where the float represents the coefficient of this term, and the string encodes the information of the Pauli matrix. As an example, Hamiltonian
@@ -99,7 +99,7 @@ Additionally, if users just want to experience Hamiltonian simulation a little, 
 
 ```python{.line-numbers}
 import numpy as np
-from qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import func_HS_QSVT
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Application.HamiltonianSimulation.HamiltonianSimulation import func_HS_QSVT
 print(func_HS_QSVT(list_str_Pauli_rep=[(0.5, 'X0X1'), (0.5, 'X0Z1'), (0.5, 'Z0X1'), (0.5, 'Z0Z1')], 
       num_qubit_sys=2, float_tau=np.pi / 4, float_epsilon = 1e-5, circ_output=False)['counts'])
 ```

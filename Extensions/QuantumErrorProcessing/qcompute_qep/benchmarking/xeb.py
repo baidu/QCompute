@@ -36,12 +36,12 @@ import scipy.stats as st
 import itertools
 import warnings
 
-from qcompute_qep.utils.types import QComputer, get_qc_name
-import qcompute_qep.utils.circuit as circuit
-import qcompute_qep.exceptions.QEPError as QEPError
-import qcompute_qep.benchmarking as rb
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, get_qc_name
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit as circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError as QEPError
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 try:
     from matplotlib import pyplot as plt
@@ -56,6 +56,7 @@ class XEB(rb.RandomizedBenchmarking):
     Cross Entropy Benchmarking aims to benchmark the set of quantum gates
     by a single parameter called ENR (Effective Noise Rate).
     """
+
     def __init__(self, qc: QComputer = None, qubits: List[int] = None, **kwargs):
         r"""init function of the Cross Entropy Benchmarking class.
 
@@ -76,10 +77,10 @@ class XEB(rb.RandomizedBenchmarking):
         super().__init__(**kwargs)
         self._qc = qc
         self._qubits = qubits if qubits is not None else list(range(2))
-        self._seq_lengths = kwargs.get('seq_lengths', [1, 10, 20, 50, 75, 100, 125, 150, 175, 200])
-        self._repeats = kwargs.get('repeats', 6)
-        self._shots = kwargs.get('shots', 4096)
-        self._entropy_type = kwargs.get('entropy_type', 'unbiased')
+        self._seq_lengths = kwargs.get("seq_lengths", [1, 10, 20, 50, 75, 100, 125, 150, 175, 200])
+        self._repeats = kwargs.get("repeats", 6)
+        self._shots = kwargs.get("shots", 4096)
+        self._entropy_type = kwargs.get("entropy_type", "unbiased")
 
         # Store the cross entropy benchmarking results. Initialize to an empty dictionary
         self._results = dict()
@@ -106,16 +107,15 @@ class XEB(rb.RandomizedBenchmarking):
 
     @property
     def params(self) -> dict:
-        r"""Parameters used in cross entropy benchmarking in a dictionary.
-        """
+        r"""Parameters used in cross entropy benchmarking in a dictionary."""
         if not self._params:
             xeb_params = dict()
-            xeb_params['qc'] = get_qc_name(self._qc)
-            xeb_params['qubits'] = self._qubits
-            xeb_params['seq_lengths'] = self._seq_lengths
-            xeb_params['repeats'] = self._repeats
-            xeb_params['shots'] = self._shots
-            xeb_params['entropy_type'] = self._entropy_type
+            xeb_params["qc"] = get_qc_name(self._qc)
+            xeb_params["qubits"] = self._qubits
+            xeb_params["seq_lengths"] = self._seq_lengths
+            xeb_params["repeats"] = self._repeats
+            xeb_params["shots"] = self._shots
+            xeb_params["entropy_type"] = self._entropy_type
             self._params = xeb_params
 
         return self._params
@@ -152,15 +152,21 @@ class XEB(rb.RandomizedBenchmarking):
         :param prob: float, a float value describes the probability
         :return: float, the cross entropy of the corresponding probability
         """
-        if self._entropy_type == 'linear' or self._entropy_type == 'unbiased':
+        if self._entropy_type == "linear" or self._entropy_type == "unbiased":
             return prob
-        elif self._entropy_type == 'log':
-            return - np.log2(prob)
+        elif self._entropy_type == "log":
+            return -np.log2(prob)
         else:
             raise QEPError.ArgumentError("XEB: the cross entropy type {} is invalid!".format(self._entropy_type))
 
-    def benchmark(self, qc: QComputer = None, qubits: List[int] = None,
-                  single_gates: List[str] = None, multi_gates: List[str] = None, **kwargs) -> dict:
+    def benchmark(
+        self,
+        qc: QComputer = None,
+        qubits: List[int] = None,
+        single_gates: List[str] = None,
+        multi_gates: List[str] = None,
+        **kwargs
+    ) -> dict:
         r"""Execute the cross entropy benchmarking procedure on the quantum computer.
 
         The parameters `qc` and `qubits` must be set either by the init() function or here,
@@ -197,7 +203,7 @@ class XEB(rb.RandomizedBenchmarking):
 
             >>> import qiskit
             >>> from qiskit.providers.fake_provider import FakeSantiago
-            >>> from qcompute_qep.benchmarking.xeb import XEB
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking.xeb import XEB
             >>> qc = qiskit.providers.aer.AerSimulator.from_backend(FakeSantiago())
             >>> xeb = XEB()
             >>> xeb_results = xeb.benchmark(qubits=[1], qc=qc)
@@ -207,10 +213,10 @@ class XEB(rb.RandomizedBenchmarking):
         # Parse the arguments from the key list. If not set, use default arguments from the init function
         self._qc = qc if qc is not None else self._qc
         self._qubits = qubits if qubits is not None else self._qubits
-        self._seq_lengths = kwargs.get('seq_lengths', self._seq_lengths)
-        self._repeats = kwargs.get('repeats', self._repeats)
-        self._shots = kwargs.get('shots', self._shots)
-        self._entropy_type = kwargs.get('entropy_type', self._entropy_type)
+        self._seq_lengths = kwargs.get("seq_lengths", self._seq_lengths)
+        self._repeats = kwargs.get("repeats", self._repeats)
+        self._shots = kwargs.get("shots", self._shots)
+        self._entropy_type = kwargs.get("entropy_type", self._entropy_type)
 
         if self._qc is None:
             raise QEPError.ArgumentError("XEB: the quantum computer for benchmarking is not specified!")
@@ -220,17 +226,18 @@ class XEB(rb.RandomizedBenchmarking):
         ###############################################################################################################
         # Step 1. Construct a list of benchmarking quantum circuits.
         ###############################################################################################################
-        pbar = tqdm(total=100, desc='XEB Step 1/4: Constructing benchmarking quantum circuits ...')
+        pbar = tqdm(total=100, desc="XEB Step 1/4: Constructing benchmarking quantum circuits ...")
         pbar.update(0)
         # A list of benchmarking quantum circuits
         xeb_qp_list = []
-        seq_lengths = list(itertools.chain.from_iterable(itertools.repeat(seq, self._repeats)
-                                                         for seq in self._seq_lengths))
+        seq_lengths = list(
+            itertools.chain.from_iterable(itertools.repeat(seq, self._repeats) for seq in self._seq_lengths)
+        )
         for cyc_m in seq_lengths:
             # Generate an n-qubit random quantum circuit with number of cycles cyc_m
-            xeb_qp = circuit.random_circuit(self._qubits, cyc_m,
-                                            single=single_gates, multi=multi_gates,
-                                            neighboring=kwargs.get('neighboring', True))
+            xeb_qp = circuit.random_circuit(
+                self._qubits, cyc_m, single=single_gates, multi=multi_gates, neighboring=kwargs.get("neighboring", True)
+            )
             xeb_qp_list.append(xeb_qp)
         ###############################################################################################################
         # Step 2. Run the quantum circuits in batch.
@@ -259,12 +266,12 @@ class XEB(rb.RandomizedBenchmarking):
             # Compute the XEB fidelity of current cycle from the estimated entropies
             D = 2 ** len(self._qubits)  # the dimension of the quantum system
             m, r = divmod(k, self._repeats)
-            if self._entropy_type == 'linear':
+            if self._entropy_type == "linear":
                 fids[m][r] = D * average_entropy - 1
-            elif self._entropy_type == 'unbiased':
-                ideal_entropy = np.sum(ideal_prob ** 2)
+            elif self._entropy_type == "unbiased":
+                ideal_entropy = np.sum(ideal_prob**2)
                 fids[m][r] = (D * average_entropy - 1) / (D * ideal_entropy - 1)
-            elif self._entropy_type == 'log':
+            elif self._entropy_type == "log":
                 fids[m][r] = np.log2(D) + np.euler_gamma - average_entropy
             else:
                 raise QEPError.ArgumentError("XEB: cross entropy type {} is invalid!".format(self._entropy_type))
@@ -284,12 +291,15 @@ class XEB(rb.RandomizedBenchmarking):
         if len(sigma) - np.count_nonzero(sigma) > 0:
             sigma = None
 
-        p0 = [0.99, 0.5, ]
+        p0 = [
+            0.99,
+            0.5,
+        ]
         alpha_guess = 0
         count = 0
         for j in range(1, len(xdata)):
-            dx = (xdata[j] - xdata[0])
-            dy = (ydata[j] / ydata[0])
+            dx = xdata[j] - xdata[0]
+            dy = ydata[j] / ydata[0]
             if dy > 0:
                 alpha_guess += -np.log(dy) / dx
                 count += 1
@@ -301,7 +311,7 @@ class XEB(rb.RandomizedBenchmarking):
         tmp = 0
         count = 0
         for j in range(len(ydata)):
-            tmp += (ydata[j] / np.exp(-p0[0] * xdata[j]))
+            tmp += ydata[j] / np.exp(-p0[0] * xdata[j])
             count += 1
         if count > 0:
             tmp /= count
@@ -309,17 +319,17 @@ class XEB(rb.RandomizedBenchmarking):
             p0[1] = tmp
 
         # Must call `curve_fit` with `*_` to avoid the error "ValueError: too many values to unpack"
-        popt, pcov, *_ = curve_fit(self._fit_func, xdata, ydata,
-                                   p0=p0, sigma=sigma,
-                                   maxfev=500000, bounds=bounds, method='dogbox')
+        popt, pcov, *_ = curve_fit(
+            self._fit_func, xdata, ydata, p0=p0, sigma=sigma, maxfev=500000, bounds=bounds, method="dogbox"
+        )
 
         # Store the cross entropy benchmarking results
         params_err = np.sqrt(np.diag(pcov))
-        self._results['fids'] = fids
-        self._results['lambda'] = popt[0]
-        self._results['A'] = popt[1]
-        self._results['lambda_err'] = params_err[0]
-        self._results['std'] = sigma
+        self._results["fids"] = fids
+        self._results["lambda"] = popt[0]
+        self._results["A"] = popt[1]
+        self._results["lambda_err"] = params_err[0]
+        self._results["std"] = sigma
 
         pbar.desc = "XEB successfully finished!"
         pbar.update(100 - pbar.n)
@@ -339,54 +349,73 @@ class XEB(rb.RandomizedBenchmarking):
         fig, ax = plt.subplots(figsize=(12, 8))
 
         xdata = self._seq_lengths
-        fids = self.results['fids']
+        fids = self.results["fids"]
 
         # Plot the repeated estimates for each sequence
-        ax.plot(xdata, fids, color='gray', linestyle='none', marker='x')
+        ax.plot(xdata, fids, color="gray", linestyle="none", marker="x")
 
         # Plot the mean of the estimated expectation values
-        ax.plot(xdata, np.mean(fids, axis=1), color='blue', linestyle='none', marker='v', markersize=13)
+        ax.plot(xdata, np.mean(fids, axis=1), color="blue", linestyle="none", marker="v", markersize=13)
 
         # Plot the confidence interval of the fitting curve
-        low_CI_bound, high_CI_bound = st.t.interval(0.95, len(xdata), loc=np.mean(fids, axis=1),
-                                                    scale=st.sem(fids, axis=1))
-        plt.fill_between(xdata, y1=low_CI_bound, y2=high_CI_bound, color='cornflowerblue', alpha=0.3, )
+        low_CI_bound, high_CI_bound = st.t.interval(
+            0.95, len(xdata), loc=np.mean(fids, axis=1), scale=st.sem(fids, axis=1)
+        )
+        plt.fill_between(
+            xdata,
+            y1=low_CI_bound,
+            y2=high_CI_bound,
+            color="cornflowerblue",
+            alpha=0.3,
+        )
 
         # Plot the fitting function
-        ydata = [self._fit_func(x, self.results['lambda'], self.results['A'], )
-                 for x in xdata]
-        ax.plot(xdata, ydata, color='blue', linestyle='-', linewidth=2, label='fitting curve')
-        ax.tick_params(labelsize='medium')
+        ydata = [
+            self._fit_func(
+                x,
+                self.results["lambda"],
+                self.results["A"],
+            )
+            for x in xdata
+        ]
+        ax.plot(xdata, ydata, color="blue", linestyle="-", linewidth=2, label="fitting curve")
+        ax.tick_params(labelsize="medium")
 
         # Set the labels
-        ax.set_xlabel('Random Circuit Cycle', fontsize='large')
-        if self._entropy_type == 'linear':
-            ylabel = 'Estimated Linear Fidelity'
-        elif self._entropy_type == 'unbiased':
-            ylabel = 'Estimated Unbiased Fidelity'
-        elif self._entropy_type == 'log':
-            ylabel = 'Estimated Log Fidelity'
+        ax.set_xlabel("Random Circuit Cycle", fontsize="large")
+        if self._entropy_type == "linear":
+            ylabel = "Estimated Linear Fidelity"
+        elif self._entropy_type == "unbiased":
+            ylabel = "Estimated Unbiased Fidelity"
+        elif self._entropy_type == "log":
+            ylabel = "Estimated Log Fidelity"
         else:
             raise QEPError.ArgumentError("XEB: cross entropy type {} is invalid!".format(self._entropy_type))
-        ax.set_ylabel(ylabel, fontsize='large')
+        ax.set_ylabel(ylabel, fontsize="large")
         ax.grid(True)
 
         # Show the legend
-        plt.legend(loc='lower left', fontsize='large')
+        plt.legend(loc="lower left", fontsize="large")
 
         # Add the estimated fidelity and ENR parameters
-        bbox_props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.5)
-        ax.text(0.8, 0.9,
-                r"Effective Noise Rate: {:.3f}({:.1e})".format(self.results['lambda'],
-                                                               self.results['lambda_err']),
-                ha="center", va="center", fontsize='large', bbox=bbox_props, transform=ax.transAxes)
+        bbox_props = dict(boxstyle="round,pad=0.5", facecolor="wheat", alpha=0.5)
+        ax.text(
+            0.8,
+            0.9,
+            r"Effective Noise Rate: {:.3f}({:.1e})".format(self.results["lambda"], self.results["lambda_err"]),
+            ha="center",
+            va="center",
+            fontsize="large",
+            bbox=bbox_props,
+            transform=ax.transAxes,
+        )
 
         # Set the x-axis locator always be integer
         plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
         # Save the figure if `fname` is set
         if fname is not None:
-            plt.savefig(fname, format='png', dpi=600, bbox_inches='tight', pad_inches=0.1)
+            plt.savefig(fname, format="png", dpi=600, bbox_inches="tight", pad_inches=0.1)
         # Show the figure if `show` is True
         if show:
             plt.show()

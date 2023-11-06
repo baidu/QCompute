@@ -384,7 +384,7 @@ class CHSHGame(Protocol):
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # 创建一个仿真环境
 env = QuantumEnv("CHSH game", default=True)
@@ -394,9 +394,9 @@ env = QuantumEnv("CHSH game", default=True)
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import CHSHGame
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import CHSHGame
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # 创建装有量子寄存器的量子节点并指定其中预装的协议类型
 alice = QuantumNode("Alice", qreg_size=1, protocol=CHSHGame)
@@ -415,7 +415,7 @@ link_br = Link("link_br", ends=(bob, referee), distance=1e3)
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # 创建一个量子网络并将各节点和各链路装入量子网络中
 network = Network("CHSH game network")
@@ -444,7 +444,7 @@ referee.start(role="Referee", players=[alice, bob])
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # 初始化仿真环境并运行仿真
 env.init()

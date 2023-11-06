@@ -24,11 +24,4 @@ from .spsa import SPSA
 from .smo import SMO
 from .powell import Powell
 
-__all__ = [
-    'BasicOptimizer',
-    'SGD',
-    'SLSQP',
-    'SPSA',
-    'SMO',
-    'Powell'
-]
+__all__ = ["BasicOptimizer", "SGD", "SLSQP", "SPSA", "SMO", "Powell"]

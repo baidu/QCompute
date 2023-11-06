@@ -23,8 +23,8 @@ from QCompute.QPlatform.QRegPool import QRegPool
 
 
 class BasicCircuit(ABC):
-    r"""Basic Circuit class
-    """
+    r"""Basic Circuit class"""
+
     def __init__(self, num: int):
         r"""The constructor of the BasicCircuit class
 

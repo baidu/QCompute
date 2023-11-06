@@ -26,8 +26,8 @@ from .basic_optimizer import BasicOptimizer
 
 
 class SGD(BasicOptimizer):
-    r"""SGD Optimizer class
-    """
+    r"""SGD Optimizer class"""
+
     def __init__(self, iterations: int, circuit: BasicCircuit, learning_rate: float):
         r"""The constructor of the SGD class
 
@@ -41,9 +41,10 @@ class SGD(BasicOptimizer):
         self._learning_rate = learning_rate
 
     def minimize(
-            self, shots: int,
-            loss_func: Callable[[np.ndarray, int], float],
-            grad_func: Callable[[np.ndarray, int], np.ndarray]
+        self,
+        shots: int,
+        loss_func: Callable[[np.ndarray, int], float],
+        grad_func: Callable[[np.ndarray, int], np.ndarray],
     ) -> None:
         r"""Minimizes the given loss function
 

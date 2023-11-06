@@ -19,8 +19,10 @@
 __init__ file of the `qcompute_qsvt.QSVT` module.
 """
 
-from qcompute_qsvt.QSVT.QSVT import circ_Pi_double_ctrl_rot, circ_QSVT_from_BE, circ_QSVT_from_BE_inverse
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.QSVT.QSVT import (
+    circ_Pi_double_ctrl_rot,
+    circ_QSVT_from_BE,
+    circ_QSVT_from_BE_inverse,
+)
 
-__all__ = [
-    'circ_Pi_double_ctrl_rot', 'circ_QSVT_from_BE', 'circ_QSVT_from_BE_inverse'
-]
+__all__ = ["circ_Pi_double_ctrl_rot", "circ_QSVT_from_BE", "circ_QSVT_from_BE_inverse"]

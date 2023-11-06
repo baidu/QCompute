@@ -33,9 +33,16 @@ class QAOA:
     r"""
     Quantum Approximate Optimization Algorithm class
     """
+
     def __init__(
-            self, num: int, hamiltonian: list, ansatz: QAOAAnsatz, optimizer: BasicOptimizer,
-            backend: str, measurement: str = 'default', delta: float = 0.1
+        self,
+        num: int,
+        hamiltonian: list,
+        ansatz: QAOAAnsatz,
+        optimizer: BasicOptimizer,
+        backend: str,
+        measurement: str = "default",
+        delta: float = 0.1,
     ):
         r"""The constructor of the QAOA class
 
@@ -58,14 +65,14 @@ class QAOA:
         self._backend = backend
         self._measurement = measurement
         self._delta = delta
-        if measurement == 'default':
+        if measurement == "default":
             self._measurement_circuit = PauliMeasurementCircuit
-        elif measurement == 'ancilla':
+        elif measurement == "ancilla":
             self._measurement_circuit = PauliMeasurementCircuitWithAncilla
-        elif measurement == 'SimMeasure':
+        elif measurement == "SimMeasure":
             self._measurement_circuit = SimultaneousPauliMeasurementCircuit
         else:
-            raise ValueError('Error EA01003(QAPP): Invalid measurement method!')
+            raise ValueError("Error EA01003(QAPP): Invalid measurement method!")
         self._maximum_eigenvalue = "Run QAOA.run() first"
 
     def _pauli_expectation(self, shots: int) -> float:
@@ -100,7 +107,7 @@ class QAOA:
         self._ansatz.add_circuit(q)
         # Measurement
         MeasureZ(q, range(self._num))
-        counts = env.commit(shots, fetchMeasure=True)['counts']
+        counts = env.commit(shots, fetchMeasure=True)["counts"]
 
         return counts
 
@@ -123,7 +130,7 @@ class QAOA:
             param_minus[i] -= self._delta / 2
             loss_plus = self._compute_loss(param_plus, shots)
             loss_minus = self._compute_loss(param_minus, shots)
-            gradient[i] = ((loss_plus - loss_minus) / self._delta)
+            gradient[i] = (loss_plus - loss_minus) / self._delta
         self._ansatz.set_parameters(parameters)
 
         return gradient

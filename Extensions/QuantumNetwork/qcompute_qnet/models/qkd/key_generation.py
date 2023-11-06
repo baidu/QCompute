@@ -23,17 +23,12 @@ from abc import ABC, abstractmethod
 from enum import Enum, unique
 from typing import List, Dict, Tuple
 import numpy as np
-from qcompute_qnet.core.des import EventHandler
-from qcompute_qnet.protocols.protocol import Protocol
-from qcompute_qnet.messages.message import ClassicalMessage
-from qcompute_qnet.quantum.basis import Basis
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.protocols.protocol import Protocol
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import ClassicalMessage
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.basis import Basis
 
-__all__ = [
-    "KeyGeneration",
-    "PrepareAndMeasure",
-    "BB84",
-    "DecoyBB84"
-]
+__all__ = ["KeyGeneration", "PrepareAndMeasure", "BB84", "DecoyBB84"]
 
 
 class KeyGeneration(Protocol, ABC):
@@ -69,8 +64,7 @@ class KeyGeneration(Protocol, ABC):
 
     @unique
     class Status(Enum):
-        r"""Class for the status of the key generation protocol.
-        """
+        r"""Class for the status of the key generation protocol."""
 
         READY = "Ready"
         WORKING = "Working"
@@ -83,25 +77,15 @@ class KeyGeneration(Protocol, ABC):
             upper_protocol (type): upper protocol that sends the message
             **kwargs: received keyword arguments
         """
-        if kwargs['peer'] == self.peer:
+        if kwargs["peer"] == self.peer:
             self.start(**kwargs)
 
-    def receive_quantum_msg(self, msg: "QuantumMessage", **kwargs) -> None:
-        r"""Receive a quantum message from the node.
-
-        Args:
-            msg (Message): received quantum message
-            **kwargs (Any): keyword arguments for receiving the quantum message
-        """
-        self.node.polar_detector.receive(msg)
-
     def finish(self) -> None:
-        r"""Finish the key generation protocol.
-        """
-        from qcompute_qnet.models.qkd.routing import QKDRouting
+        r"""Finish the key generation protocol."""
         self.node.env.logger.info(f"{self.node.name} finished key generation with {self.peer.name}")
-        self.node.env.logger.info(f"{self.node.name}'s sifted keys (with {self.peer.name} in decimal): "
-                                  f"{self.sifted_keys}")
+        self.node.env.logger.info(
+            f"{self.node.name}'s sifted keys (with {self.peer.name} in decimal): " f"{self.sifted_keys}"
+        )
 
         self.status = KeyGeneration.Status.DONE
 
@@ -109,7 +93,12 @@ class KeyGeneration(Protocol, ABC):
             self.node.keys[self.peer] = self.sifted_keys
         else:
             # TODO: only consider QKDRouting as an upper protocol in this version
-            handler = EventHandler(self, "send_upper", [QKDRouting], peer=self.peer, sifted_keys=self.sifted_keys)
+            qkd_routing = type(self.upper_protocols[-1])
+            towards = "up" if self.role == PrepareAndMeasure.Role.TRANSMITTER else "down"
+
+            handler = EventHandler(
+                self, "send_upper", [qkd_routing], peer=self.peer, sifted_keys=self.sifted_keys, towards=towards
+            )
             self.node.scheduler.schedule_now(handler)
 
 
@@ -158,8 +147,7 @@ class PrepareAndMeasure(KeyGeneration, ABC):
 
     @unique
     class Role(Enum):
-        r"""Class for the role of the prepare-and-measure protocol.
-        """
+        r"""Class for the role of the prepare-and-measure protocol."""
 
         TRANSMITTER = "Transmitter"
         RECEIVER = "Receiver"
@@ -181,7 +169,7 @@ class PrepareAndMeasure(KeyGeneration, ABC):
                 raise TypeError(f"Setting {attr} is not allowed in {self.name}")
 
     def receive_classical_msg(self, msg: "ClassicalMessage", **kwargs) -> None:
-        r"""Node receives a classical message.
+        r"""Receive a classical message from the node.
 
         Args:
             msg (ClassicalMessage): classical message used for the prepare-and-measure protocol
@@ -194,6 +182,20 @@ class PrepareAndMeasure(KeyGeneration, ABC):
                 self.transmitter_receive_classical_msg(msg)
             elif self.role == PrepareAndMeasure.Role.RECEIVER:
                 self.receiver_receive_classical_msg(msg)
+
+    def receive_quantum_msg(self, msg: "QuantumMessage", **kwargs) -> None:
+        r"""Receive a quantum message from the node.
+
+        Args:
+            msg (Message): received quantum message
+            **kwargs (Any): keyword arguments for receiving the quantum message
+        """
+        if self.role == PrepareAndMeasure.Role.RECEIVER:
+            if isinstance(self.node.polar_detector, dict):
+                src = kwargs["src"]
+                self.node.polar_detector[src].receive(msg)
+            else:
+                self.node.polar_detector.receive(msg)
 
     @abstractmethod
     def transmitter_receive_classical_msg(self, msg: "ClassicalMessage", **kwargs) -> None:
@@ -215,7 +217,7 @@ class PrepareAndMeasure(KeyGeneration, ABC):
         """
         pass
 
-    def receiver_get_bits(self) -> List:
+    def receiver_get_bits(self, **kwargs) -> List:
         r"""Get bits from the detectors' time records.
 
         Warnings:
@@ -224,13 +226,20 @@ class PrepareAndMeasure(KeyGeneration, ABC):
             However, this makes no much difference to the key rate's estimation.
             Users can override this method if necessary.
 
+        Args:
+            **kwargs: keyword argument to specify the polar detector for different nodes
+
         Returns:
             list: receiver's bits list
         """
         bits = [None] * self.pulse_num
-
-        records_zero = self.node.polar_detector.detectors[0].pop_records()
-        records_one = self.node.polar_detector.detectors[1].pop_records()
+        if isinstance(self.node.polar_detector, dict):
+            peer = kwargs["src"]
+            records_zero = self.node.polar_detector[peer].detectors[0].pop_records()
+            records_one = self.node.polar_detector[peer].detectors[1].pop_records()
+        else:
+            records_zero = self.node.polar_detector.detectors[0].pop_records()
+            records_one = self.node.polar_detector.detectors[1].pop_records()
 
         for record in records_zero:
             index = record[0]
@@ -248,8 +257,9 @@ class PrepareAndMeasure(KeyGeneration, ABC):
         Returns:
             float: estimated sifted key rate
         """
-        self.key_rate = ((len(self.sifted_keys) * self.key_length + len(self.tx_key_bits)) / 1000) / \
-                        ((self.node.env.now - self.start_time) * 1e-12)
+        self.key_rate = ((len(self.sifted_keys) * self.key_length + len(self.tx_key_bits)) / 1000) / (
+            (self.node.env.now - self.start_time) * 1e-12
+        )
         self.node.env.logger.info(f"Sifted key rate: {self.key_rate:.4f} kbit/s")
         return self.key_rate
 
@@ -261,14 +271,14 @@ class PrepareAndMeasure(KeyGeneration, ABC):
         """
         # Find the peer protocol
         for proto in self.peer.protocol_stack.protocols:
-            if isinstance(proto, KeyGeneration) and proto.peer == self.node:
+            if isinstance(proto, KeyGeneration) and proto.peer == self.node and proto.role != self.role:
                 peer_proto = proto
 
         # Calculate error rate of all sifted keys
         num_errors = 0
         for i in range(self.key_num):
             key_xor = self.sifted_keys[i] ^ peer_proto.sifted_keys[i]  # in decimal
-            num_errors += bin(key_xor).count('1')  # count the number of errors
+            num_errors += bin(key_xor).count("1")  # count the number of errors
         self.error_rate = num_errors / (self.key_num * self.key_length)
         self.node.env.logger.info(f"Key error rate: {self.error_rate:.4f}")
         return self.error_rate
@@ -302,8 +312,7 @@ class BB84(PrepareAndMeasure):
         self.basis_encoding = {0: Basis.Z(), 1: Basis.X()}
 
     class Message(ClassicalMessage):
-        r"""Class for the classical control messages in BB84 protocol.
-        """
+        r"""Class for the classical control messages in BB84 protocol."""
 
         def __init__(self, src: "Node", dst: "Node", protocol: type, data: Dict):
             r"""Constructor for Message class.
@@ -318,8 +327,7 @@ class BB84(PrepareAndMeasure):
 
         @unique
         class Type(Enum):
-            r"""Class for Message types.
-            """
+            r"""Class for Message types."""
 
             START = "Start"
             BASES_REQUEST = "Bases request"
@@ -335,11 +343,11 @@ class BB84(PrepareAndMeasure):
         assert self.node is not None and self.peer is not None, f"Should load the protocol stack to a node first!"
 
         # Initial settings
-        self.role = kwargs['role']
+        self.role = kwargs["role"]
         if "key_num" in kwargs.keys():
-            self.key_num = kwargs['key_num']
+            self.key_num = kwargs["key_num"]
         if "key_length" in kwargs.keys():
-            self.key_length = kwargs['key_length']
+            self.key_length = kwargs["key_length"]
         self.status = KeyGeneration.Status.WORKING
         self.sifted_keys = []
         self.round = 0
@@ -367,22 +375,29 @@ class BB84(PrepareAndMeasure):
         and prepares to emit photon pulses.
         """
         self.node.env.logger.info(f"{self.node.name} started BB84 protocol with {self.peer.name}")
+        # Select the corresponding photon source for key generation
+        photon_source = (
+            self.node.photon_source[self.peer] if isinstance(self.node.photon_source, dict) else self.node.photon_source
+        )
 
-        self.pulse_num = round(self.key_length / self.node.photon_source.mean_photon_num)
-        self.light_duration = round(self.pulse_num / self.node.photon_source.frequency * 1e12)
-        self.emission_rest = round(1e12 / self.node.photon_source.frequency)
+        self.pulse_num = round(self.key_length / photon_source.mean_photon_num)
+        self.light_duration = round(self.pulse_num / photon_source.frequency * 1e12)
+        self.emission_rest = round(1e12 / photon_source.frequency)
 
         transmitter_emit_time = self.node.env.now + self.node.cchannel(self.peer).delay
         clock = transmitter_emit_time + self.node.qchannel(self.peer).delay  # clock time for photon reception
-
-        start_msg = BB84.Message(src=self.node,
-                                 dst=self.peer,
-                                 protocol=BB84,
-                                 data={'type': BB84.Message.Type.START,
-                                       'clock': clock,
-                                       'source_frequency': self.node.photon_source.frequency,
-                                       'light_duration': self.light_duration,
-                                       'emission_rest': self.emission_rest})
+        start_msg = BB84.Message(
+            src=self.node,
+            dst=self.peer,
+            protocol=BB84,
+            data={
+                "type": BB84.Message.Type.START,
+                "clock": clock,
+                "source_frequency": photon_source.frequency,
+                "light_duration": self.light_duration,
+                "emission_rest": self.emission_rest,
+            },
+        )
         self.node.send_classical_msg(dst=self.peer, msg=start_msg)
 
         # Transmitter begins photon emission as soon as the receiver receives the message
@@ -396,8 +411,9 @@ class BB84(PrepareAndMeasure):
         """
         if self.status == KeyGeneration.Status.WORKING:
             self.round += 1
-            self.node.env.logger.debug(f"{self.node.name} began photon emission for BB84 with {self.peer.name}"
-                                       f" (Round {self.round})")
+            self.node.env.logger.debug(
+                f"{self.node.name} began photon emission for BB84 with {self.peer.name}" f" (Round {self.round})"
+            )
 
             # Generate transmitter's random bases and bits
             bases = list(np.random.choice([0, 1], self.pulse_num, p=self.tx_bases_ratio))
@@ -411,7 +427,13 @@ class BB84(PrepareAndMeasure):
                 # Prepare states |0>, |1>, |+>, |-> (in the form of density matrices) for photon emission
                 states.append(basis[bits[i]] @ np.conjugate(basis[bits[i]]).T)
 
-            handler = EventHandler(self.node.photon_source, "emit", [self.peer, states])
+            photon_source = (
+                self.node.photon_source[self.peer]
+                if isinstance(self.node.photon_source, dict)
+                else self.node.photon_source
+            )
+
+            handler = EventHandler(photon_source, "emit", [self.peer, states])
             self.scheduler.schedule_now(handler)
 
             # Schedule next round of photon emission
@@ -425,12 +447,20 @@ class BB84(PrepareAndMeasure):
         Receiver pops the measurement outcomes and resets the measurement bases to
         prepare for receiving photon pulses in the next round.
         """
+        # Select the corresponding detector for key generation
+        polar_detector = (
+            self.node.polar_detector[self.peer]
+            if isinstance(self.node.polar_detector, dict)
+            else self.node.polar_detector
+        )
+
         if self.status == KeyGeneration.Status.WORKING:
             self.round += 1
-            self.node.env.logger.debug(f"{self.node.name} finished receiving photons from {self.peer.name}"
-                                       f" (Round {self.round})")
+            self.node.env.logger.debug(
+                f"{self.node.name} finished receiving photons from {self.peer.name}" f" (Round {self.round})"
+            )
 
-            self.rx_bits_list.append(self.receiver_get_bits())
+            self.rx_bits_list.append(self.receiver_get_bits(src=self.peer))
             # Reset measurement bases for the next round of photon reception
             new_bases = list(np.random.choice([0, 1], self.pulse_num, p=self.rx_bases_ratio))
             self.rx_bases_list.append(new_bases)
@@ -438,23 +468,24 @@ class BB84(PrepareAndMeasure):
 
             new_bases = [self.basis_encoding[basis] for basis in new_bases]
             # Reset parameters for polarization detector
-            self.node.polar_detector.set_beamsplitter(clock=clock, bases=new_bases)
+            polar_detector.set_beamsplitter(clock=clock, bases=new_bases)
 
             # Schedule next round of stopping photon reception
             handler = EventHandler(self, "receiver_stop_reception")
             self.scheduler.schedule_at(clock + self.light_duration, handler)
 
-            # Ask the transmitter to announce the bases for key sifting
-            request_bases_msg = BB84.Message(src=self.node,
-                                             dst=self.peer,
-                                             protocol=BB84,
-                                             data={'type': BB84.Message.Type.BASES_REQUEST,
-                                                   'round': self.round})
+            # Ask the transmitter to announce the bases for key generation
+            request_bases_msg = BB84.Message(
+                src=self.node,
+                dst=self.peer,
+                protocol=BB84,
+                data={"type": BB84.Message.Type.BASES_REQUEST, "round": self.round},
+            )
             self.node.send_classical_msg(dst=self.peer, msg=request_bases_msg)
 
         elif self.status == KeyGeneration.Status.DONE:
-            self.node.polar_detector.detectors[0].turn_off()
-            self.node.polar_detector.detectors[1].turn_off()
+            polar_detector.detectors[0].turn_off()
+            polar_detector.detectors[1].turn_off()
 
     def transmitter_receive_classical_msg(self, msg: "BB84.Message", **kwargs) -> None:
         r"""Transmitter receives a BB84 message from the receiver.
@@ -463,35 +494,48 @@ class BB84(PrepareAndMeasure):
             msg (BB84.Message): message for BB84 protocol
             **kwargs (Any): keyword arguments for receiving the classical message
         """
-        photon_round = msg.data['round']
+        # Filter the message that is not intended for this instance
+        if msg.data["type"].name not in ["MATCHING", "BASES_REQUEST"]:
+            return
 
-        if msg.data['type'] == BB84.Message.Type.BASES_REQUEST:
-            self.node.env.logger.debug(f"{self.node.name} received bases request from"
-                                       f" {self.peer.name} (Round {photon_round})")
+        photon_round = msg.data.get("round")
+
+        # Check photon round to filter the outdated messages resulting from BB84 protocol's reusing
+        if photon_round is not None and self.round < photon_round:
+            self.node.env.logger.debug(f"Message with round {photon_round} was discarded at local round {self.round}")
+            return
+
+        if msg.data["type"] == BB84.Message.Type.BASES_REQUEST:
+            self.node.env.logger.debug(
+                f"{self.node.name} received bases request from" f" {self.peer.name} (Round {photon_round})"
+            )
 
             # Pop the earliest bases and send to the receiver
             bases = self.tx_bases_list.pop(0)
-            bases_msg = BB84.Message(src=self.node,
-                                     dst=self.peer,
-                                     protocol=BB84,
-                                     data={'type': BB84.Message.Type.BASES,
-                                           'peer_bases': bases,
-                                           'round': photon_round})
+
+            bases_msg = BB84.Message(
+                src=self.node,
+                dst=self.peer,
+                protocol=BB84,
+                data={"type": BB84.Message.Type.BASES, "peer_bases": bases, "round": photon_round},
+            )
             self.node.send_classical_msg(dst=self.peer, msg=bases_msg)
 
-        elif msg.data['type'] == BB84.Message.Type.MATCHING:
-            self.node.env.logger.debug(f"{self.node.name} received matching indices from {self.peer.name}"
-                                       f" (Round {photon_round})")
+        elif msg.data["type"] == BB84.Message.Type.MATCHING:
+            self.node.env.logger.debug(
+                f"{self.node.name} received matching indices from {self.peer.name}" f" (Round {photon_round})"
+            )
 
-            matching_list = msg.data['matching_list']
+            matching_list = msg.data["matching_list"]
             bits = self.tx_bits_list.pop(0)  # pop the earliest bits for index comparison
             for i in matching_list:
                 self.tx_key_bits.append(bits[i])
 
             # Transmitter generates a valid key successfully
             if len(self.tx_key_bits) >= self.key_length:
-                self.node.env.logger.info(f"{self.node.name} generated a valid key with {self.peer.name}"
-                                          f" (Round {photon_round})")
+                self.node.env.logger.info(
+                    f"{self.node.name} generated a valid key with {self.peer.name}" f" (Round {photon_round})"
+                )
                 self.node.env.logger.info(f"{self.node.name}'s sifted key: {self.tx_key_bits[0: self.key_length]}")
 
                 # Store the generated key as a decimal integer
@@ -511,35 +555,54 @@ class BB84(PrepareAndMeasure):
             msg (BB84.Message): message for BB84 protocol
             **kwargs (Any): keyword arguments for receiving the classical message
         """
-        if msg.data['type'] == BB84.Message.Type.START:
+        # Filter the message that is not intended for this instance
+        if msg.data["type"].name not in ["START", "BASES"]:
+            return
+
+        if msg.data["type"] == BB84.Message.Type.START:
             self.node.env.logger.debug(f"{self.node.name} received message 'START' from {self.peer.name}")
 
-            clock = msg.data['clock']  # time for photon reception
-            frequency = msg.data['source_frequency']  # frequency for beam splitter
-            self.light_duration = msg.data['light_duration']
-            self.emission_rest = msg.data['emission_rest']
+            clock = msg.data["clock"]  # time for photon reception
+            frequency = msg.data["source_frequency"]  # frequency for beam splitter
+            self.light_duration = msg.data["light_duration"]
+            self.emission_rest = msg.data["emission_rest"]
 
             # Generate receiver's random measurement bases
-            self.pulse_num = round(msg.data['light_duration'] * frequency * 1e-12)
+            self.pulse_num = round(msg.data["light_duration"] * frequency * 1e-12)
             bases = list(np.random.choice([0, 1], self.pulse_num, p=self.rx_bases_ratio))
             self.rx_bases_list.append(bases)
 
             bases = [self.basis_encoding[basis] for basis in bases]  # map the bits to bases for measurement
             # Set parameters for polarization detector
-            self.node.polar_detector.set_beamsplitter(clock=clock, frequency=frequency, bases=bases)
-            self.node.polar_detector.detectors[0].turn_on()
-            self.node.polar_detector.detectors[1].turn_on()
+            polar_detector = (
+                self.node.polar_detector[self.peer]
+                if isinstance(self.node.polar_detector, dict)
+                else self.node.polar_detector
+            )
+
+            polar_detector.set_beamsplitter(clock=clock, frequency=frequency, bases=bases)
+            polar_detector.detectors[0].turn_on()
+            polar_detector.detectors[1].turn_on()
 
             # Stop receiving photons after a light duration
             handler = EventHandler(self, "receiver_stop_reception")
             self.scheduler.schedule_at(clock + self.light_duration, handler)
 
-        elif msg.data['type'] == BB84.Message.Type.BASES:
-            photon_round = msg.data['round']
-            self.node.env.logger.debug(f"{self.node.name} received bases from {self.peer.name} "
-                                       f"(Round: {photon_round})")
+        elif msg.data["type"] == BB84.Message.Type.BASES:
+            photon_round = msg.data["round"]
 
-            peer_bases = msg.data['peer_bases']
+            # Check photon round to filter the outdated messages resulting from BB84 protocol's reusing
+            if self.round < photon_round:
+                self.node.env.logger.debug(
+                    f"Message with round {photon_round} was discarded" f" at local round {self.round}."
+                )
+                return
+
+            self.node.env.logger.debug(
+                f"{self.node.name} received bases from {self.peer.name} " f"(Round: {photon_round})"
+            )
+
+            peer_bases = msg.data["peer_bases"]
             bases = self.rx_bases_list.pop(0)  # pop the earliest bases for basis comparison
             bits = self.rx_bits_list.pop(0)
             matching_list = []
@@ -550,18 +613,19 @@ class BB84(PrepareAndMeasure):
                     self.rx_key_bits.append(bits[i])
 
             # Tell the transmitter the matching indices
-            matching_msg = BB84.Message(src=self.node,
-                                        dst=self.peer,
-                                        protocol=BB84,
-                                        data={'type': BB84.Message.Type.MATCHING,
-                                              'matching_list': matching_list,
-                                              'round': photon_round})
+            matching_msg = BB84.Message(
+                src=self.node,
+                dst=self.peer,
+                protocol=BB84,
+                data={"type": BB84.Message.Type.MATCHING, "matching_list": matching_list, "round": photon_round},
+            )
             self.node.send_classical_msg(dst=self.peer, msg=matching_msg)
 
             # Check if the length of key bits is enough for a new key
             if len(self.rx_key_bits) >= self.key_length:
-                self.node.env.logger.info(f"{self.node.name} generated a valid key with {self.peer.name}"
-                                          f" (Round {photon_round})")
+                self.node.env.logger.info(
+                    f"{self.node.name} generated a valid key with {self.peer.name}" f" (Round {photon_round})"
+                )
                 self.node.env.logger.info(f"{self.node.name}'s sifted key: {self.rx_key_bits[0: self.key_length]}")
 
                 # Store the generated key as a decimal integer
@@ -609,16 +673,14 @@ class DecoyBB84(PrepareAndMeasure):
 
     @unique
     class StateType(Enum):
-        r"""Class for the state types of emitted pulses.
-        """
+        r"""Class for the state types of emitted pulses."""
 
         SIGNAL = 0
         DECOY = 1
         VACUUM = 2
 
     class Message(ClassicalMessage):
-        r"""Class for the classical control messages in DecoyBB84 protocol.
-        """
+        r"""Class for the classical control messages in DecoyBB84 protocol."""
 
         def __init__(self, src: "Node", dst: "Node", protocol: type, data: Dict):
             r"""Constructor for Message class.
@@ -633,8 +695,7 @@ class DecoyBB84(PrepareAndMeasure):
 
         @unique
         class Type(Enum):
-            r"""Class for Message types.
-            """
+            r"""Class for Message types."""
 
             START = "Start"
             FINISH_EMISSION = "Finish emission"
@@ -658,11 +719,11 @@ class DecoyBB84(PrepareAndMeasure):
         assert self.node is not None and self.peer is not None, f"Should load the protocol stack to a node first!"
 
         # Initial settings
-        self.role = kwargs['role']
+        self.role = kwargs["role"]
         if "key_num" in kwargs.keys():
-            self.key_num = kwargs['key_num']
+            self.key_num = kwargs["key_num"]
         if "key_length" in kwargs.keys():
-            self.key_length = kwargs['key_length']
+            self.key_length = kwargs["key_length"]
 
         self.status = KeyGeneration.Status.WORKING
         self.sifted_keys = []
@@ -699,14 +760,18 @@ class DecoyBB84(PrepareAndMeasure):
         transmitter_emit_time = self.node.env.now + self.node.cchannel(self.peer).delay
         clock = transmitter_emit_time + self.node.qchannel(self.peer).delay  # clock time for photon reception
 
-        start_msg = DecoyBB84.Message(src=self.node,
-                                      dst=self.peer,
-                                      protocol=DecoyBB84,
-                                      data={'type': DecoyBB84.Message.Type.START,
-                                            'clock': clock,
-                                            'source_frequency': self.node.photon_source.frequency,
-                                            'light_duration': self.light_duration,
-                                            'emission_rest': self.emission_rest})
+        start_msg = DecoyBB84.Message(
+            src=self.node,
+            dst=self.peer,
+            protocol=DecoyBB84,
+            data={
+                "type": DecoyBB84.Message.Type.START,
+                "clock": clock,
+                "source_frequency": self.node.photon_source.frequency,
+                "light_duration": self.light_duration,
+                "emission_rest": self.emission_rest,
+            },
+        )
         self.node.send_classical_msg(dst=self.peer, msg=start_msg)
 
         # Transmitter begins photon emission as soon as the receiver receives the message
@@ -720,8 +785,10 @@ class DecoyBB84(PrepareAndMeasure):
         """
         if self.status == KeyGeneration.Status.WORKING:
             self.round += 1
-            self.node.env.logger.debug(f"{self.node.name} began photon emission for decoy-state BB84 with"
-                                       f" {self.peer.name} (Round {self.round})")
+            self.node.env.logger.debug(
+                f"{self.node.name} began photon emission for decoy-state BB84 with"
+                f" {self.peer.name} (Round {self.round})"
+            )
 
             # Generate transmitter's random bases and bits
             bases = list(np.random.choice([0, 1], self.pulse_num, p=self.tx_bases_ratio))
@@ -736,8 +803,13 @@ class DecoyBB84(PrepareAndMeasure):
                 states.append(basis[bits[i]] @ np.conjugate(basis[bits[i]]).T)
 
             # Randomly choose state types (signal, decoy or vacuum) according to the probabilities of intensities
-            state_types = list(np.random.choice([self.StateType.SIGNAL, self.StateType.DECOY, self.StateType.VACUUM],
-                                                self.pulse_num, p=self.intensities["prob"]))
+            state_types = list(
+                np.random.choice(
+                    [self.StateType.SIGNAL, self.StateType.DECOY, self.StateType.VACUUM],
+                    self.pulse_num,
+                    p=self.intensities["prob"],
+                )
+            )
             # Set related mean photon numbers
             mean_photon_num_list = [self.intensities["mean_photon_num"][state_type.value] for state_type in state_types]
 
@@ -754,11 +826,12 @@ class DecoyBB84(PrepareAndMeasure):
 
             handler = EventHandler(self.node.photon_source, "emit", [self.peer, states, mean_photon_num_list])
             self.scheduler.schedule_now(handler)
-            finish_emission_msg = DecoyBB84.Message(src=self.node,
-                                                    dst=self.peer,
-                                                    protocol=DecoyBB84,
-                                                    data={'type': DecoyBB84.Message.Type.FINISH_EMISSION,
-                                                          'round': self.round})
+            finish_emission_msg = DecoyBB84.Message(
+                src=self.node,
+                dst=self.peer,
+                protocol=DecoyBB84,
+                data={"type": DecoyBB84.Message.Type.FINISH_EMISSION, "round": self.round},
+            )
             handler = EventHandler(self.node, "send_classical_msg", [self.peer, finish_emission_msg])
             self.scheduler.schedule_after(self.light_duration, handler)
 
@@ -775,8 +848,9 @@ class DecoyBB84(PrepareAndMeasure):
         """
         if self.status == KeyGeneration.Status.WORKING:
             self.round += 1
-            self.node.env.logger.debug(f"{self.node.name} finished receiving photons from {self.peer.name}"
-                                       f" (Round {self.round})")
+            self.node.env.logger.debug(
+                f"{self.node.name} finished receiving photons from {self.peer.name}" f" (Round {self.round})"
+            )
 
             bases = self.rx_bases_list.pop(0)
             bits = self.receiver_get_bits()
@@ -786,12 +860,12 @@ class DecoyBB84(PrepareAndMeasure):
                     bases[i] = None
 
             # Send the measurement bases to the transmitter
-            bases_msg = DecoyBB84.Message(src=self.node,
-                                          dst=self.peer,
-                                          protocol=DecoyBB84,
-                                          data={'type': DecoyBB84.Message.Type.BASES,
-                                                'peer_bases': bases,
-                                                'round': self.round})
+            bases_msg = DecoyBB84.Message(
+                src=self.node,
+                dst=self.peer,
+                protocol=DecoyBB84,
+                data={"type": DecoyBB84.Message.Type.BASES, "peer_bases": bases, "round": self.round},
+            )
             self.node.send_classical_msg(dst=self.peer, msg=bases_msg)
 
             # Reset measurement bases for the next round of photon reception
@@ -814,14 +888,15 @@ class DecoyBB84(PrepareAndMeasure):
             msg (DecoyBB84.Message): message for DecoyBB84 protocol
             **kwargs (Any): keyword arguments for receiving the classical message
         """
-        photon_round = msg.data['round']
+        photon_round = msg.data["round"]
 
         # if self.node.env.now < self.end_time:
-        if msg.data['type'] == DecoyBB84.Message.Type.BASES:
-            self.node.env.logger.debug(f"{self.node.name} received bases from {self.peer.name}"
-                                       f" (Round {photon_round})")
+        if msg.data["type"] == DecoyBB84.Message.Type.BASES:
+            self.node.env.logger.debug(
+                f"{self.node.name} received bases from {self.peer.name}" f" (Round {photon_round})"
+            )
 
-            peer_bases = msg.data['peer_bases']
+            peer_bases = msg.data["peer_bases"]
             # Pop the earliest bases and bits for index comparison
             bases = self.tx_bases_list.pop(0)
             bits = self.tx_bits_list.pop(0)
@@ -841,8 +916,9 @@ class DecoyBB84(PrepareAndMeasure):
                         state_pos["vacuum"].remove(ix)  # remove mismatching vacuum states
 
             # Randomly choose 10 percent of signal states for testing
-            testing_signal_pos = list(np.random.choice(state_pos["signal"], round(0.1 * len(state_pos["signal"])),
-                                                       replace=False))
+            testing_signal_pos = list(
+                np.random.choice(state_pos["signal"], round(0.1 * len(state_pos["signal"])), replace=False)
+            )
             decoy_bits = []
             vacuum_bits = []
             testing_signal_bits = []
@@ -859,24 +935,29 @@ class DecoyBB84(PrepareAndMeasure):
                     vacuum_bits.append(bit)
 
             # Send matching bases and testing bits with their positions to the receiver
-            matching_msg = DecoyBB84.Message(src=self.node,
-                                             dst=self.peer,
-                                             protocol=DecoyBB84,
-                                             data={'type': DecoyBB84.Message.Type.MATCHING,
-                                                   'matching_list': matching_list,
-                                                   'decoy_pos': state_pos["decoy"],
-                                                   'vacuum_pos': state_pos["vacuum"],
-                                                   "testing_signal_pos": testing_signal_pos,
-                                                   "decoy_bits": decoy_bits,
-                                                   "vacuum_bits": vacuum_bits,
-                                                   "testing_signal_bits": testing_signal_bits,
-                                                   'round': photon_round})
+            matching_msg = DecoyBB84.Message(
+                src=self.node,
+                dst=self.peer,
+                protocol=DecoyBB84,
+                data={
+                    "type": DecoyBB84.Message.Type.MATCHING,
+                    "matching_list": matching_list,
+                    "decoy_pos": state_pos["decoy"],
+                    "vacuum_pos": state_pos["vacuum"],
+                    "testing_signal_pos": testing_signal_pos,
+                    "decoy_bits": decoy_bits,
+                    "vacuum_bits": vacuum_bits,
+                    "testing_signal_bits": testing_signal_bits,
+                    "round": photon_round,
+                },
+            )
             self.node.send_classical_msg(dst=self.peer, msg=matching_msg)
 
             # Check if the length of key bits is enough for a new key
             if len(self.tx_key_bits) >= self.key_length:
-                self.node.env.logger.info(f"{self.node.name} generated a valid key with {self.peer.name}"
-                                          f" (Round {photon_round})")
+                self.node.env.logger.info(
+                    f"{self.node.name} generated a valid key with {self.peer.name}" f" (Round {photon_round})"
+                )
                 self.node.env.logger.info(f"{self.node.name}'s sifted key: {self.tx_key_bits[0: self.key_length]}")
 
                 # Store the generated key as a decimal integer
@@ -897,16 +978,16 @@ class DecoyBB84(PrepareAndMeasure):
             msg (DecoyBB84.Message): message for DecoyBB84 protocol
             **kwargs (Any): keyword arguments for receiving the classical message
         """
-        if msg.data['type'] == DecoyBB84.Message.Type.START:
+        if msg.data["type"] == DecoyBB84.Message.Type.START:
             self.node.env.logger.debug(f"{self.node.name} received message 'START' from {self.peer.name}")
 
-            clock = msg.data['clock']  # time for photon reception
-            frequency = msg.data['source_frequency']  # frequency for beam splitter
-            self.light_duration = msg.data['light_duration']
-            self.emission_rest = msg.data['emission_rest']
+            clock = msg.data["clock"]  # time for photon reception
+            frequency = msg.data["source_frequency"]  # frequency for beam splitter
+            self.light_duration = msg.data["light_duration"]
+            self.emission_rest = msg.data["emission_rest"]
 
             # Generate receiver's random measurement bases
-            self.pulse_num = round(msg.data['light_duration'] * frequency * 1e-12)
+            self.pulse_num = round(msg.data["light_duration"] * frequency * 1e-12)
             bases = list(np.random.choice([0, 1], self.pulse_num, p=self.rx_bases_ratio))
             self.rx_bases_list.append(bases)
 
@@ -916,23 +997,24 @@ class DecoyBB84(PrepareAndMeasure):
             self.node.polar_detector.detectors[0].turn_on()
             self.node.polar_detector.detectors[1].turn_on()
 
-        elif msg.data['type'] == DecoyBB84.Message.Type.FINISH_EMISSION:
+        elif msg.data["type"] == DecoyBB84.Message.Type.FINISH_EMISSION:
             # Stop receiving photons after a light duration
             handler = EventHandler(self, "receiver_stop_reception")
             self.scheduler.schedule_now(handler)
 
-        elif msg.data['type'] == DecoyBB84.Message.Type.MATCHING:
-            photon_round = msg.data['round']
-            self.node.env.logger.debug(f"{self.node.name} received matching indices from {self.peer.name} "
-                                       f"(Round: {photon_round})")
+        elif msg.data["type"] == DecoyBB84.Message.Type.MATCHING:
+            photon_round = msg.data["round"]
+            self.node.env.logger.debug(
+                f"{self.node.name} received matching indices from {self.peer.name} " f"(Round: {photon_round})"
+            )
 
-            matching_list = msg.data['matching_list']
-            decoy_pos = msg.data['decoy_pos']
-            vacuum_pos = msg.data['vacuum_pos']
-            testing_signal_pos = msg.data['testing_signal_pos']
-            transmitter_decoy_bits = msg.data['decoy_bits']
-            transmitter_vacuum_bits = msg.data['vacuum_bits']
-            transmitter_testing_signal_bits = msg.data['testing_signal_bits']
+            matching_list = msg.data["matching_list"]
+            decoy_pos = msg.data["decoy_pos"]
+            vacuum_pos = msg.data["vacuum_pos"]
+            testing_signal_pos = msg.data["testing_signal_pos"]
+            transmitter_decoy_bits = msg.data["decoy_bits"]
+            transmitter_vacuum_bits = msg.data["vacuum_bits"]
+            transmitter_testing_signal_bits = msg.data["testing_signal_bits"]
 
             bits = self.rx_bits_list.pop(0)
             decoy_bits = []
@@ -957,14 +1039,16 @@ class DecoyBB84(PrepareAndMeasure):
             for vacuum_bit, transmitter_vacuum_bit in zip(vacuum_bits, transmitter_vacuum_bits):
                 if vacuum_bit ^ transmitter_vacuum_bit == 1:
                     num_testing_errors += 1
-            for testing_signal_bit, transmitter_testing_signal_bit in \
-                    zip(testing_signal_bits, transmitter_testing_signal_bits):
+            for testing_signal_bit, transmitter_testing_signal_bit in zip(
+                testing_signal_bits, transmitter_testing_signal_bits
+            ):
                 if testing_signal_bit ^ transmitter_testing_signal_bit == 1:
                     num_testing_errors += 1
             # Avoid ZeroDivisionError
             if len(decoy_bits) + len(vacuum_bits) + len(testing_signal_bits) > 0:
-                testing_error_rate = num_testing_errors / \
-                                     (len(decoy_bits) + len(vacuum_bits) + len(testing_signal_bits))
+                testing_error_rate = num_testing_errors / (
+                    len(decoy_bits) + len(vacuum_bits) + len(testing_signal_bits)
+                )
             self.node.env.logger.debug(f"testing error rate: {testing_error_rate} (Round {photon_round})")
 
             # Set the remained signal bits as key bits
@@ -974,8 +1058,9 @@ class DecoyBB84(PrepareAndMeasure):
 
             # Check if the length of key bits is enough for a new key
             if len(self.rx_key_bits) >= self.key_length:
-                self.node.env.logger.info(f"{self.node.name} generated a valid key with {self.peer.name}"
-                                          f" (Round {photon_round})")
+                self.node.env.logger.info(
+                    f"{self.node.name} generated a valid key with {self.peer.name}" f" (Round {photon_round})"
+                )
                 self.node.env.logger.info(f"{self.node.name}'s sifted key: {self.rx_key_bits[0: self.key_length]}")
 
                 # Store the generated key as a decimal integer
@@ -990,8 +1075,7 @@ class DecoyBB84(PrepareAndMeasure):
 
 
 class B92(PrepareAndMeasure):
-    r"""Class for the B92 key generation protocol.
-    """
+    r"""Class for the B92 key generation protocol."""
 
     def __init__(self, name: str, peer=None):
         r"""Constructor for B92 class.
@@ -1010,8 +1094,7 @@ class B92(PrepareAndMeasure):
 
 
 class SixState(PrepareAndMeasure):
-    r"""Class for the six-state key generation protocol.
-    """
+    r"""Class for the six-state key generation protocol."""
 
     def __init__(self, name: str, peer=None):
         r"""Constructor for SixState class.

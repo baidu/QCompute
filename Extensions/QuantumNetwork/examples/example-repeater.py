@@ -19,15 +19,12 @@ r"""
 An example of entanglement swapping protocol.
 """
 
-import sys
-sys.path.append('..')
-
-from qcompute_qnet.models.qpu.env import QuantumEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import EntanglementSwapping
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import EntanglementSwapping
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 
 # Create an environment for simulation
@@ -50,9 +47,21 @@ link_repeater_source_br = Link("Link_repeater_source_br", ends=(repeater, source
 
 # Create a network, install the nodes and links
 network = Network("Repeater network")
-network.install([alice, bob, repeater, source_ar, source_br,
-                 link_ar, link_br, link_alice_source_ar, link_repeater_source_ar,
-                 link_bob_source_br, link_repeater_source_br])
+network.install(
+    [
+        alice,
+        bob,
+        repeater,
+        source_ar,
+        source_br,
+        link_ar,
+        link_br,
+        link_alice_source_ar,
+        link_repeater_source_ar,
+        link_bob_source_br,
+        link_repeater_source_br,
+    ]
+)
 
 # Start the entanglement swapping protocol
 alice.start(role="UpstreamNode", peer=bob, repeater=repeater)
@@ -69,5 +78,5 @@ print(f"\nCircuit results:\n", results)
 
 # Check the measurement results of Alice and Bob
 reduced_indices = [1, 3]
-reduced_results = network.default_circuit.reduce_results(results['counts'], indices=reduced_indices)
+reduced_results = network.default_circuit.reduce_results(results["counts"], indices=reduced_indices)
 print(f"\nMeasurement results of Alice, Bob:\n", reduced_results)

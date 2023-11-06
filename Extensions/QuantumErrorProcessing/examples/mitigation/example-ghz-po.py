@@ -35,12 +35,12 @@ from qiskit_aer.noise import NoiseModel, depolarizing_error
 from QCompute import *
 from QCompute.QPlatform.QOperation import RotationGate
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.mitigation import Mitigator
-from qcompute_qep.mitigation import ZNEMitigator
-from qcompute_qep.utils import expval_z_from_counts
-from qcompute_qep.utils.types import QComputer, QProgram, get_qc_name
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import Mitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.mitigation import ZNEMitigator
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import expval_z_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, get_qc_name
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 
 # Set the default number of shots
 NUMBER_OF_SHOTS = 4096
@@ -57,7 +57,7 @@ def calculator(qp: QEnv = None, qc: BackendName = None) -> float:
     """
     # Set up the noise model
     noise_model = NoiseModel()
-    noise_model.add_all_qubit_quantum_error(depolarizing_error(0.1, 2), ['cx'])
+    noise_model.add_all_qubit_quantum_error(depolarizing_error(0.1, 2), ["cx"])
     # Obtain the output raw counts
     counts = execute(qp, qc, noise_model=noise_model, shots=NUMBER_OF_SHOTS)
     # Compute the expectation value from counts w.r.t. to the observable :math:`Z\otimes Z`
@@ -78,7 +78,7 @@ def rotation_gate(phi: float) -> RotationGate.RotationGateOP:
     :param phi: float, the angle of the single-qubit rotation gate
     :return: RotationGateOP, the :math:`U_3` representation of the rotation gate
     """
-    return RotationGate.U(math.pi / 2, phi + math.pi / 2, - phi - math.pi / 2)
+    return RotationGate.U(math.pi / 2, phi + math.pi / 2, -phi - math.pi / 2)
 
 
 def setup_po_circuit(n: int, phi: float) -> QProgram:
@@ -122,9 +122,9 @@ def theo_parity_oscillation(n: int, phi: float) -> float:
     elif r == 1:
         po = math.sin(n * phi)
     elif r == 2:
-        po = - math.cos(n * phi)
+        po = -math.cos(n * phi)
     elif r == 3:
-        po = - math.sin(n * phi)
+        po = -math.sin(n * phi)
     else:
         raise ArgumentError("in theo_parity_oscillation(): the number of qubits {} is invalid!".format(n))
     return po
@@ -145,10 +145,9 @@ def parity_oscillation(n: int, phi: float, qc: QComputer = BackendName.LocalBaid
     return calculator(copy.deepcopy(qp), qc)
 
 
-def parity_oscillation_zne(n: int,
-                           phi: float,
-                           qc: QComputer = BackendName.CloudBaiduQPUQian,
-                           mitigator: Mitigator = None) -> float:
+def parity_oscillation_zne(
+    n: int, phi: float, qc: QComputer = BackendName.CloudBaiduQPUQian, mitigator: Mitigator = None
+) -> float:
     """
     Given the number of qubits of the GHZ state and the rotation angle, estimate its parity oscillation
     on the given quantum computer by collecting the outcomes and estimating the expectation value.
@@ -167,8 +166,7 @@ def parity_oscillation_zne(n: int,
     return po
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     n = 4
     START = 0
     STOP = 2 * math.pi / n
@@ -196,21 +194,31 @@ if __name__ == '__main__':
     noisy_po_list = [parity_oscillation(n, phi, qc) for phi in phi_list]
 
     # Use different quantum gate error mitigation techniques to improve the estimation accuracy
-    zne_mitigators = [ZNEMitigator(folder='circuit', extrapolator='linear'),
-                      ZNEMitigator(folder='layer', extrapolator='linear'),
-                      ZNEMitigator(folder='gate', extrapolator='linear'),
-                      ZNEMitigator(folder='circuit', extrapolator='richardson'),
-                      ZNEMitigator(folder='layer', extrapolator='richardson'),
-                      ZNEMitigator(folder='gate', extrapolator='richardson')]
+    zne_mitigators = [
+        ZNEMitigator(folder="circuit", extrapolator="linear"),
+        ZNEMitigator(folder="layer", extrapolator="linear"),
+        ZNEMitigator(folder="gate", extrapolator="linear"),
+        ZNEMitigator(folder="circuit", extrapolator="richardson"),
+        ZNEMitigator(folder="layer", extrapolator="richardson"),
+        ZNEMitigator(folder="gate", extrapolator="richardson"),
+    ]
 
     mitigated_values = []
     for mitigator in zne_mitigators:
         print("====== Current Mitigator is {} ======".format(mitigator.__str__()))
         mitigated_values.append([parity_oscillation_zne(n, phi, qc=qc, mitigator=mitigator) for phi in phi_list])
 
-    zne_mitigator_names = ['Circuit+Linear', 'Layer+Linear', 'Gate+Linear',
-                           'Circuit+Richard', 'Layer+Richard', 'Gate+Richard',
-                           'Circuit+Exp', 'Layer+Exp', 'Gate+Exp']
+    zne_mitigator_names = [
+        "Circuit+Linear",
+        "Layer+Linear",
+        "Gate+Linear",
+        "Circuit+Richard",
+        "Layer+Richard",
+        "Gate+Richard",
+        "Circuit+Exp",
+        "Layer+Exp",
+        "Gate+Exp",
+    ]
 
     ###############################################################################################
     # The following plot visualizes the ideal, noisy, and corrected expectation values
@@ -219,56 +227,69 @@ if __name__ == '__main__':
     ax = plt.gca()
 
     # Set the colormap: https://matplotlib.org/stable/tutorials/colors/colormaps.html
-    cm = pylab.get_cmap('tab20')  # Dark2, Accent, Paired
+    cm = pylab.get_cmap("tab20")  # Dark2, Accent, Paired
     # Get the complete list of available markers and delete the 'pixel' marker
     markers = Line2D.markers
-    markers.pop(',')
+    markers.pop(",")
     markers = iter(Line2D.markers.keys())
 
     # Plot the theoretical reference line
-    plt.plot(phi_list, theo_po_list, '-', color='red', alpha=0.8, linewidth=1, label='Theoretical', zorder=1)
+    plt.plot(phi_list, theo_po_list, "-", color="red", alpha=0.8, linewidth=1, label="Theoretical", zorder=1)
 
     # Plot the noisy parity oscillation values
-    plt.scatter(phi_list, noisy_po_list,
-                marker=next(markers),
-                color=cm(0),
-                edgecolors='none',
-                alpha=1.0,
-                label=qc_name,
-                s=32,
-                zorder=2)
+    plt.scatter(
+        phi_list,
+        noisy_po_list,
+        marker=next(markers),
+        color=cm(0),
+        edgecolors="none",
+        alpha=1.0,
+        label=qc_name,
+        s=32,
+        zorder=2,
+    )
 
     # Plot the error mitigated parity oscillation values
     for i in range(len(zne_mitigators)):
-        plt.scatter(phi_list, mitigated_values[i],
-                    marker=next(markers),
-                    color=cm(i + 1),
-                    alpha=0.9,
-                    label=zne_mitigator_names[i],
-                    s=16,
-                    zorder=2)
+        plt.scatter(
+            phi_list,
+            mitigated_values[i],
+            marker=next(markers),
+            color=cm(i + 1),
+            alpha=0.9,
+            label=zne_mitigator_names[i],
+            s=16,
+            zorder=2,
+        )
 
     # Define the xticklables
     # https://stackoverflow.com/questions/40642061/how-to-set-axis-ticks-in-multiples-of-pi-python-matplotlib
     ax = plt.gca()
     ax.set_xticks(np.arange(START, STOP + 0.01, math.pi / 16))
-    labels = ['$0$', r'$\pi/16$', r'$\pi/8$', r'$3\pi/16$', r'$\pi/4$',
-              r'$5\pi/16$', r'$3\pi/8$', r'$7\pi/16$', r'$\pi/2$']
+    labels = [
+        "$0$",
+        r"$\pi/16$",
+        r"$\pi/8$",
+        r"$3\pi/16$",
+        r"$\pi/4$",
+        r"$5\pi/16$",
+        r"$3\pi/8$",
+        r"$7\pi/16$",
+        r"$\pi/2$",
+    ]
     ax.set_xticklabels(labels)
 
     # Add the theoretical reference line
-    plt.axhline(y=0, color='black', linestyle='-.', linewidth=1, zorder=1)
+    plt.axhline(y=0, color="black", linestyle="-.", linewidth=1, zorder=1)
 
     # Give x and y axis labels
-    plt.xlabel(r'Rotation Angle $\phi$', fontsize=14)
-    plt.ylabel(r'Parity Oscillation Value', fontsize=14)
+    plt.xlabel(r"Rotation Angle $\phi$", fontsize=14)
+    plt.ylabel(r"Parity Oscillation Value", fontsize=14)
     # Legend
-    plt.legend(loc='best', fontsize="small")
+    plt.legend(loc="best", fontsize="small")
 
-    plt.savefig("GHZ_PO_{}_GEM_N{}.png".format(get_qc_name(qc), n),
-                format='png',
-                dpi=600,
-                bbox_inches='tight',
-                pad_inches=0.1)
+    plt.savefig(
+        "GHZ_PO_{}_GEM_N{}.png".format(get_qc_name(qc), n), format="png", dpi=600, bbox_inches="tight", pad_inches=0.1
+    )
 
     plt.show()

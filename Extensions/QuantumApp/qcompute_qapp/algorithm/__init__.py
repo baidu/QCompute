@@ -25,9 +25,4 @@ from .kernel_classifier import KernelClassifier
 
 Define.Settings.outputInfo = False
 
-__all__ = [
-    'VQE',
-    'SSVQE',
-    'QAOA',
-    'KernelClassifier'
-]
+__all__ = ["VQE", "SSVQE", "QAOA", "KernelClassifier"]

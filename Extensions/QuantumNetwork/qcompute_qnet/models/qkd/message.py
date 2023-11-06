@@ -21,22 +21,13 @@ Module for messages in quantum key distribution.
 
 from enum import Enum, unique
 from typing import Dict
-from qcompute_qnet.messages.message import ClassicalMessage
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import ClassicalMessage
 
-__all__ = [
-    "QKDMessage"
-]
+__all__ = ["QKDMessage"]
 
 
 class QKDMessage(ClassicalMessage):
-    r"""Class for the classical control messages in quantum key distribution.
-
-    Attributes:
-        src (Node): source of QKDMessage
-        dst (Node): destination of QKDMessage
-        protocol (type): protocol of QKDMessage
-        data (Dict): message content
-    """
+    r"""Class for the classical control messages in quantum key distribution."""
 
     def __init__(self, src: "Node", dst: "Node", protocol: type, data: Dict):
         r"""Constructor for QKDMessage class.
@@ -51,8 +42,7 @@ class QKDMessage(ClassicalMessage):
 
     @unique
     class Type(Enum):
-        r"""Class for QKDMessage types.
-        """
+        r"""Class for QKDMessage types."""
 
         REQUEST = "Request"
         ACCEPT = "Accept"
@@ -60,3 +50,10 @@ class QKDMessage(ClassicalMessage):
         CIPHERTEXT = "Ciphertext"
         ACKNOWLEDGE = "Acknowledge"
         DONE = "Done"
+        # Types especially for QKD with resource management
+        PATH = "Path"
+        RESERVE = "Reserve"
+        POP = "Pop"
+        CONFIRM = "Confirm"
+        REJECT = "Reject"
+        GENERATE = "Generate"

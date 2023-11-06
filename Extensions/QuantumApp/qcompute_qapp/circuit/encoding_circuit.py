@@ -26,8 +26,8 @@ from .basic_circuit import BasicCircuit
 
 
 class IQPEncodingCircuit(BasicCircuit):
-    r"""IQP Encoding Circuit class
-    """
+    r"""IQP Encoding Circuit class"""
+
     def __init__(self, num: int, inverse: bool = False):
         r"""The constructor of the IQPEncodingCircuit class
 
@@ -48,7 +48,6 @@ class IQPEncodingCircuit(BasicCircuit):
 
         """
         if not self._is_inverse:
-
             # Data encoding layer
             for i in range(self._num):
                 H(q[i])
@@ -93,8 +92,7 @@ class IQPEncodingCircuit(BasicCircuit):
 
 
 class BasisEncodingCircuit(BasicCircuit):
-    r"""Basis Encoding Circuit class
-    """
+    r"""Basis Encoding Circuit class"""
 
     def __init__(self, num: int, bit_string: str):
         r"""The constructor of the BasisEncodingCircuit class
@@ -115,5 +113,5 @@ class BasisEncodingCircuit(BasicCircuit):
 
         """
         for pos, bit in enumerate(self._bit_string):
-            if bit == '1':
+            if bit == "1":
                 X(q[pos])

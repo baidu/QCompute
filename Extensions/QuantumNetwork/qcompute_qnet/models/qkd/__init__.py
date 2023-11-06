@@ -25,5 +25,7 @@ __all__ = [
     "key_generation",
     "message",
     "node",
-    "routing"
+    "resource_management",
+    "routing",
+    "utils",
 ]

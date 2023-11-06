@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.3.5] - Oct-01-2023
+
+### Added
+
+- Commit QASM Circuit directly for execution with an option parameter.
+
+### Changed
+
+- Modify the order of objects within the returned tuple of the controlProcedure function.
+
+## [3.3.4] - Aug-08-2023
+
+### Removed
+
+- Simulator;
+  - The quantum simulators CloudBaiduSim2Thunder (single instance C++ version) and CloudBaiduSim2Lake (single instance GPU version) are deprecated from SDK this version [3.3.4]. Any task to these two cloud simulators would be redirected to CloudBaiduSim2Water.
+
 ## [3.3.3] - Apr-19-2023
 
 ### Added

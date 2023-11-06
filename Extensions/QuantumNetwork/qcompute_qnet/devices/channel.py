@@ -21,7 +21,7 @@ Module for communication channels.
 
 from abc import abstractmethod, ABC
 from numpy import random
-from qcompute_qnet.core.des import Entity, EventHandler
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import Entity, EventHandler
 
 __all__ = [
     "Channel",
@@ -33,7 +33,7 @@ __all__ = [
     "DuplexClassicalFiberChannel",
     "DuplexQuantumFiberChannel",
     "ClassicalFreeSpaceChannel",
-    "QuantumFreeSpaceChannel"
+    "QuantumFreeSpaceChannel",
 ]
 
 
@@ -111,8 +111,9 @@ class Channel(Entity, ABC):
             sender (Node): sender node
             receiver (Node): receiver node
         """
-        assert self.sender is None and self.receiver is None, \
-            f"Channel has been connected to '{self.sender.name}' and '{self.receiver.name}'."
+        assert (
+            self.sender is None and self.receiver is None
+        ), f"Channel has been connected to '{self.sender.name}' and '{self.receiver.name}'."
         self.sender, self.receiver = sender, receiver
 
     @abstractmethod
@@ -267,7 +268,7 @@ class QuantumFiberChannel(QuantumChannel):
         """
         super().__init__(name, distance, loss, env, sender, receiver, delay)
         self.loss = 0.2 * distance * 1e-3 if loss is None else loss  # set default attenuation as 0.2
-        self.lossy_prob = 1 - 10 ** (- self.loss / 10)
+        self.lossy_prob = 1 - 10 ** (-self.loss / 10)
 
     def transmit(self, msg: "QuantumMessage", priority=None) -> None:
         r"""Transmit quantum message from the sender to the receiver.
@@ -385,10 +386,12 @@ class DuplexClassicalFiberChannel(DuplexChannel):
             delay (int): delay of message transmission in picoseconds
         """
         super().__init__(name, distance, loss, env, node1, node2, delay)
-        self.channel1_2 = ClassicalFiberChannel("node1->node2", distance, loss, env=env,
-                                                sender=node1, receiver=node2, delay=delay)
-        self.channel2_1 = ClassicalFiberChannel("node2->node1", distance, loss, env=env,
-                                                sender=node2, receiver=node1, delay=delay)
+        self.channel1_2 = ClassicalFiberChannel(
+            "node1->node2", distance, loss, env=env, sender=node1, receiver=node2, delay=delay
+        )
+        self.channel2_1 = ClassicalFiberChannel(
+            "node2->node1", distance, loss, env=env, sender=node2, receiver=node1, delay=delay
+        )
         self.install([self.channel1_2, self.channel2_1])
 
 
@@ -413,13 +416,15 @@ class DuplexQuantumFiberChannel(DuplexChannel):
             delay (int): delay of message transmission in picoseconds
         """
         super().__init__(name, distance, loss, env, node1, node2, delay)
-        self.channel1_2 = QuantumFiberChannel("node1->node2", distance, loss, env=env,
-                                              sender=node1, receiver=node2, delay=delay)
-        self.channel2_1 = QuantumFiberChannel("node2->node1", distance, loss, env=env,
-                                              sender=node2, receiver=node1, delay=delay)
+        self.channel1_2 = QuantumFiberChannel(
+            "node1->node2", distance, loss, env=env, sender=node1, receiver=node2, delay=delay
+        )
+        self.channel2_1 = QuantumFiberChannel(
+            "node2->node1", distance, loss, env=env, sender=node2, receiver=node1, delay=delay
+        )
         self.install([self.channel1_2, self.channel2_1])
         self.loss = 0.2 * distance * 1e-3 if loss is None else loss  # set default attenuation as 0.2
-        self.lossy_prob = 1 - 10 ** (- self.loss / 10)
+        self.lossy_prob = 1 - 10 ** (-self.loss / 10)
 
 
 class ClassicalFreeSpaceChannel(ClassicalChannel):
@@ -430,8 +435,9 @@ class ClassicalFreeSpaceChannel(ClassicalChannel):
         2. If both of the connected nodes are fixed, we should set a value for ``distance``.
     """
 
-    def __init__(self, name: str, distance=0, loss=0, is_mobile=False,
-                 env=None, sender=None, receiver=None, delay=None):
+    def __init__(
+        self, name: str, distance=0, loss=0, is_mobile=False, env=None, sender=None, receiver=None, delay=None
+    ):
         r"""Constructor for ClassicalFreeSpaceChannel class.
 
         Args:
@@ -459,8 +465,9 @@ class ClassicalFreeSpaceChannel(ClassicalChannel):
         """
         super().connect(sender, receiver)
         if self.is_mobile:
-            assert not (sender.is_mobile and receiver.is_mobile), \
-                f"We do not allow both nodes to be mobile in this version."
+            assert not (
+                sender.is_mobile and receiver.is_mobile
+            ), f"We do not allow both nodes to be mobile in this version."
             if sender.is_mobile:
                 self.mobile_node = sender
             elif receiver.is_mobile:
@@ -503,8 +510,9 @@ class QuantumFreeSpaceChannel(QuantumChannel):
         2. If both of the connected nodes are fixed, we should set a value for ``distance``.
     """
 
-    def __init__(self, name: str, distance=0, loss=None, is_mobile=False,
-                 env=None, sender=None, receiver=None, delay=None):
+    def __init__(
+        self, name: str, distance=0, loss=None, is_mobile=False, env=None, sender=None, receiver=None, delay=None
+    ):
         r"""Constructor for QuantumFreeSpaceChannel class.
 
         Args:
@@ -524,7 +532,7 @@ class QuantumFreeSpaceChannel(QuantumChannel):
         self.is_mobile = is_mobile
         self.mobile_node = None
         super().__init__(name, distance, loss, env, sender, receiver, delay)
-        self.lossy_prob = 1 - 10 ** (- self.loss / 10)
+        self.lossy_prob = 1 - 10 ** (-self.loss / 10)
 
     def connect(self, sender: "Node", receiver: "Node") -> None:
         r"""Connect a sender node and a receiver node.
@@ -535,8 +543,9 @@ class QuantumFreeSpaceChannel(QuantumChannel):
         """
         super().connect(sender, receiver)
         if self.is_mobile:
-            assert not (sender.is_mobile and receiver.is_mobile), \
-                f"We do not allow both nodes to be mobile in this version."
+            assert not (
+                sender.is_mobile and receiver.is_mobile
+            ), f"We do not allow both nodes to be mobile in this version."
             if sender.is_mobile:
                 self.mobile_node = sender
             elif receiver.is_mobile:
@@ -559,7 +568,7 @@ class QuantumFreeSpaceChannel(QuantumChannel):
         self.delay = round(self.get_distance() / LIGHT_SPEED)
         # Update loss and lossy probability of the quantum message
         self.set_loss(loss)
-        self.lossy_prob = 1 - 10 ** (- self.loss / 10)
+        self.lossy_prob = 1 - 10 ** (-self.loss / 10)
 
     def transmit(self, msg: "QuantumMessage", priority=None) -> None:
         r"""Transmit quantum message from the sender to the receiver.

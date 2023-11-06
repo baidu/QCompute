@@ -19,7 +19,4 @@ r"""
 Module for template models.
 """
 
-__all__ = [
-    "qkd",
-    "qpu"
-]
+__all__ = ["qkd", "qpu"]

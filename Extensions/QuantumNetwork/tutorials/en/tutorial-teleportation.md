@@ -4,11 +4,11 @@
 
 In this tutorial, we will demonstrate the usage of QPU module by the quantum teleportation protocol. We will first introduce the background of quantum teleportation. Then we will show how to simulate this protocol with QNET and get the results of its corresponding quantum circuit by running on a simulator or a real quantum hardware device.
 
-## 1. Background
+## Background
 
 Consider a common quantum communication scenario: Alice wants to send an unknown quantum state $|\psi \rangle$ to Bob who is far apart. But there is no quantum channel between them to transmit the quantum state directly. Due to the no-cloning principle, it is impossible for Alice to clone multiple copies of the unknown quantum state and obtain its accurate information by statistical analysis, and then send the information to Bob through a classical channel to restore the quantum state. Therefore, how to realize the long-distance transmission of quantum states becomes a key challenge. In 1993, Charles Bennett and his collaborators proposed the quantum teleportation protocol, which allowed for the long-distance transmission of quantum states utilizing quantum entanglement.
 
-## 2. Protocol
+## Protocol
 
 Quantum teleportation is a key protocol in quantum information theory. The process of the protocol is as follows:
 
@@ -19,7 +19,7 @@ Quantum teleportation is a key protocol in quantum information theory. The proce
 
 Next, we will use QNET to simulate the quantum teleportation protocol, and in particular, demonstrate the QNET syntax for implementing a quantum network protocol.
 
-## 3. Protocol implementation
+## Protocol implementation
 
 In the QPU module, we provide ``Teleportation`` class to simulate the quantum teleportation protocol. Three sub-protocols (``SubProtocol``) are defined to describe the behaviors of three roles in the protocol: ``Source`` is an entanglement source capable of generating and distributing entangled states. ``Sender`` is the sender to teleport the quantum state. ``Receiver`` is the receiver of the teleported state. In ``Teleportation`` protocol, once receiving a quantum state, one will store the state in the local quantum register for subsequent operations.
 
@@ -196,7 +196,7 @@ class Teleportation(Protocol):
             self.node.qreg.measure(address_reception)
 ```
 
-## 4. Code example
+## Code example
 
 Next, we will use QNET to simulate a complete quantum teleportation scenario.
 
@@ -204,7 +204,7 @@ First, we create a simulation environment ``QuantumEnv``. Compared to the freque
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # Create an environment for simulation
 env = QuantumEnv("Teleportation", default=True)
@@ -218,9 +218,9 @@ Here we use the node template ``QuantumNode``. A ``QuantumNode`` pre-installs a 
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import Teleportation
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import Teleportation
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # Create nodes with quantum registers and specify their pre-installed protocols
 alice = QuantumNode("Alice", qreg_size=2, protocol=Teleportation)
@@ -237,7 +237,7 @@ Next, we create a quantum network and install the configured nodes and links. Th
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a network, install the nodes and links
 network = Network("Teleportation network")
@@ -267,11 +267,11 @@ When the simulation is finished, ``QuantumEnv`` will call the ``print_circuit`` 
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # Initialize the environment and run simulation
 env.init()
-results = env.run(shots=1024, backend=Backend.QCompute.LocalBaiduSim2, summary=False)
+results = env.run(shots=1024, backend=Backend.QCompute.LocalBaiduSim2)
 # Print the running results
 print(f"\nCircuit results:\n", results)
 ```
@@ -294,7 +294,7 @@ Circuit results:
 To check the measurement outcome of the qubit held by the receiver, Bob, we can call the ``reduce_results`` method of the ``Circuit`` class. By passing the parameter ``indices`` we can obtain the reduced results. To verify the correctness of the simulation, we can create another circuit and input the same state as Alice initially generated. Finally, we can compare the two results.
 
 ```python
-from qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
 
 # Check the measurement results of the receiver
 reduced_indices = [2]

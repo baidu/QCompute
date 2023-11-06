@@ -387,7 +387,7 @@ First, we create a simulation environment ``QuantumEnv``.
 
 
 ```python
-from qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
 
 # Create an environment for simulation
 env = QuantumEnv("CHSH game", default=True)
@@ -397,9 +397,9 @@ Then, we create the quantum nodes that correspond to the four kinds of roles in 
 
 
 ```python
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import CHSHGame
-from qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import CHSHGame
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
 
 # Create quantum nodes with quantum registers and specify their pre-installed protocols
 alice = QuantumNode("Alice", qreg_size=1, protocol=CHSHGame)
@@ -418,7 +418,7 @@ Next, we create a quantum network and install all the configured nodes and links
 
 
 ```python
-from qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
 
 # Create a network, install the nodes and links
 network = Network("CHSH game network")
@@ -447,7 +447,7 @@ To verify that the optimal quantum strategy does bring a higher winning probabil
 
 
 ```python
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 # Initialize the environment and run simulation
 env.init()

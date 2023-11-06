@@ -19,20 +19,24 @@
 This file aims to collect functions related to quantum state tomography.
 """
 
-from qcompute_qep.utils.circuit import execute
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute
 from typing import List, Union
 import scipy.linalg as la
 import numpy as np
 from tqdm import tqdm
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, MeasurementBasis, init_measurement_basis
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.utils.linalg import dagger
-from qcompute_qep.quantum.pauli import ptm_to_operator
-from qcompute_qep.quantum.metrics import state_fidelity
-from qcompute_qep.utils.utils import expval_from_counts
-from qcompute_qep.utils.circuit import circuit_to_state, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import (
+    Tomography,
+    MeasurementBasis,
+    init_measurement_basis,
+)
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.linalg import dagger
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import ptm_to_operator
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics import state_fidelity
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import expval_from_counts
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_state, map_qubits
 
 
 class StateTomography(Tomography):
@@ -41,6 +45,7 @@ class StateTomography(Tomography):
     Quantum state tomography is the process by which a quantum state is reconstructed
     using measurements on an ensemble of identical quantum states.
     """
+
     def __init__(self, qp: QProgram = None, qc: QComputer = None, **kwargs):
         r"""
         The init function of the Quantum State Tomography class.
@@ -64,12 +69,12 @@ class StateTomography(Tomography):
         super().__init__(qp, qc, **kwargs)
         self._qp: QProgram = qp
         self._qc: QComputer = qc
-        self._method: str = kwargs.get('method', 'inverse')
-        self._shots: int = kwargs.get('shots', 4096)
-        self._ptm: bool = kwargs.get('ptm', False)
-        self._qubits: List[int] = kwargs.get('qubits', None)
+        self._method: str = kwargs.get("method", "inverse")
+        self._shots: int = kwargs.get("shots", 4096)
+        self._ptm: bool = kwargs.get("ptm", False)
+        self._qubits: List[int] = kwargs.get("qubits", None)
         # Set up the measurement basis for quantum state tomography
-        self._basis: Union[str, MeasurementBasis] = init_measurement_basis(kwargs.get('basis', None))
+        self._basis: Union[str, MeasurementBasis] = init_measurement_basis(kwargs.get("basis", None))
         self._noisy_state: np.ndarray = None
 
     def fit(self, qp: QProgram = None, qc: QComputer = None, **kwargs) -> np.ndarray:
@@ -107,9 +112,9 @@ class StateTomography(Tomography):
         **Examples**
 
             >>> import QCompute
-            >>> from qcompute_qep.quantum.pauli import operator_to_ptm, complete_pauli_basis
-            >>> from qcompute_qep.utils.circuit import circuit_to_state
-            >>> from qcompute_qep.quantum.metrics import state_fidelity
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import operator_to_ptm, complete_pauli_basis
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import circuit_to_state
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.metrics import state_fidelity
             >>> qp = QCompute.QEnv()
             >>> qp.Q.createList(2)
             >>> QCompute.H(qp.Q[0])
@@ -128,12 +133,12 @@ class StateTomography(Tomography):
         # Parse the arguments. If not set, use the default arguments set by the init function
         self._qp = qp if qp is not None else self._qp
         self._qc = qc if qc is not None else self._qc
-        self._method = kwargs.get('method', self._method)
-        self._shots = kwargs.get('shots', self._shots)
-        self._ptm = kwargs.get('ptm', self._ptm)
-        self._qubits = kwargs.get('qubits', self._qubits)
+        self._method = kwargs.get("method", self._method)
+        self._shots = kwargs.get("shots", self._shots)
+        self._ptm = kwargs.get("ptm", self._ptm)
+        self._qubits = kwargs.get("qubits", self._qubits)
         # Set up the measurement basis for state tomography
-        self._basis = init_measurement_basis(kwargs.get('basis', self._basis))
+        self._basis = init_measurement_basis(kwargs.get("basis", self._basis))
 
         # If the quantum program or the quantum computer is not set, the state tomography cannot be executed
         if self._qp is None:
@@ -147,14 +152,16 @@ class StateTomography(Tomography):
             raise ArgumentError("StateTomography.fit(): the input qubits are not repeatable!")
         # Check if the number of qubits in @qp and @qubits are equal
         if len(self._qubits) != number_of_qubits(qp):
-            raise ArgumentError("StateTomography.fit(): the number of qubits in '@qp' "
-                                "must be equal to the number of qubits in '@qubits'!")
+            raise ArgumentError(
+                "StateTomography.fit(): the number of qubits in '@qp' "
+                "must be equal to the number of qubits in '@qubits'!"
+            )
 
         # Number of qubits in the quantum program
         n = len(self._qubits)
 
         # Step 1. Construct a list of tomographic quantum circuits from the quantum program
-        pbar = tqdm(total=100, desc='QST Step 1/3: Constructing quantum circuits ...')
+        pbar = tqdm(total=100, desc="QST Step 1/3: Constructing quantum circuits ...")
         pbar.update(0)
         tomo_qps, tomo_obs = self._basis.meas_circuits(self._qp)
 
@@ -178,13 +185,13 @@ class StateTomography(Tomography):
         pbar.update(100 / 3)
         # Obtain the transition matrix for the measurement basis
         tm = self._basis.transition_matrix(n)
-        if self._method.lower() == 'inverse':  # The naive inverse method
+        if self._method.lower() == "inverse":  # The naive inverse method
             # Compute the pseudo-inverse of the transition matrix
             tm_inv = la.pinv(tm)
             rho_ptm = np.dot(tm_inv, np.asarray(ptm))
-        elif self._method.lower() == 'lstsq':  # the ordinary least square method
+        elif self._method.lower() == "lstsq":  # the ordinary least square method
             rho_ptm = la.pinv(dagger(tm) @ tm) @ dagger(tm) @ np.asarray(ptm)
-        elif self._method.lower() == 'mle':  # the maximum likelihood estimation
+        elif self._method.lower() == "mle":  # the maximum likelihood estimation
             raise ArgumentError("StateTomography.fit(), unsupported tomography method '{}'".format(self._method))
         else:
             raise ArgumentError("StateTomography.fit(), unsupported tomography method '{}'".format(self._method))
@@ -204,8 +211,7 @@ class StateTomography(Tomography):
 
     @property
     def ideal_state(self):
-        r"""Ideal state in matrix form from the given quantum program.
-        """
+        r"""Ideal state in matrix form from the given quantum program."""
         if self._qp is None:
             raise ArgumentError("The quantum program characterizing the quantum state is not given!")
 
@@ -213,8 +219,7 @@ class StateTomography(Tomography):
 
     @property
     def noisy_state(self):
-        r"""Noisy state in matrix form obtained via state tomography.
-        """
+        r"""Noisy state in matrix form obtained via state tomography."""
         if self._noisy_state is None:
             raise ArgumentError("Run quantum state tomography first to obtain the noisy state!")
         else:
@@ -222,7 +227,6 @@ class StateTomography(Tomography):
 
     @property
     def fidelity(self):
-        r"""Compute the fidelity between ideal and noisy states.
-        """
+        r"""Compute the fidelity between ideal and noisy states."""
         fid = state_fidelity(self.ideal_state, self.noisy_state)
         return fid if fid < 1.0 else 1.0

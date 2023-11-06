@@ -30,26 +30,21 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name='qcompute-qnet',
-    version='1.1.0',
-    description='A Quantum NETwork toolkit developed by the Institute for Quantum Computing at Baidu Research.',
+    name="qcompute-qnet",
+    version="1.4.0",
+    description="A Quantum NETwork toolkit developed by the Institute for Quantum Computing at Baidu Research.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author='Institute for Quantum Computing, Baidu INC.',
-    author_email='quantum@baidu.com',
+    author="Institute for Quantum Computing, Baidu INC.",
+    author_email="quantum@baidu.com",
     url="https://quantum-hub.baidu.com/qnet/tutorial-introduction",
-    python_requires='>=3.7, <3.10',
+    python_requires=">=3.8",
     packages=find_packages(),
-    install_requires=[
-        'numpy==1.21.3',
-        'pandas==1.4.3',
-        'networkx==2.8.3',
-        'matplotlib==3.5.2'
-    ],
+    install_requires=["qcompute==3.1.0", "numpy>=1.19.3", "pandas>=1.4.2", "networkx>=2.8", "matplotlib>=3.5.1"],
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
     ],
-    license='Apache 2.0',
+    license="Apache 2.0",
 )

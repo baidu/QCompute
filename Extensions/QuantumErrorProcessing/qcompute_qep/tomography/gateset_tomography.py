@@ -48,26 +48,33 @@ import itertools
 import warnings
 
 from QCompute import *
-from qcompute_qep.utils.types import QComputer
-from qcompute_qep.utils.circuit import execute, map_qubits
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.tomography import Tomography, GateSet, STD1Q_GATESET_RXRY, STD2Q_GATESET_RXRYCZ, \
-    GSTOptimizer, LinearInversionOptimizer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import (
+    Tomography,
+    GateSet,
+    STD1Q_GATESET_RXRY,
+    STD2Q_GATESET_RXRYCZ,
+    GSTOptimizer,
+    LinearInversionOptimizer,
+)
 
 # Stop print warning information
 warnings.filterwarnings("ignore")
 
 
 class GateSetTomography(Tomography):
-    r"""The Quantum Gate Set Tomography class.
+    r"""The Quantum Gate Set Tomography class."""
 
-    """
-
-    def __init__(self, qc: QComputer = None,
-                 gate_set: GateSet = None,
-                 qubits: List[int] = None,
-                 optimizer: Union[str, GSTOptimizer] = 'linear_inverse',
-                 **kwargs):
+    def __init__(
+        self,
+        qc: QComputer = None,
+        gate_set: GateSet = None,
+        qubits: List[int] = None,
+        optimizer: Union[str, GSTOptimizer] = "linear_inverse",
+        **kwargs
+    ):
         r"""init function of the Quantum GateSet Tomography class.
 
         Optional keywords list are:
@@ -84,7 +91,7 @@ class GateSetTomography(Tomography):
         self._qc: QComputer = qc
         self._qubits: List[int] = qubits
         self._gateset: GateSet = gate_set
-        self._shots: int = kwargs.get('shots', 8000)
+        self._shots: int = kwargs.get("shots", 8000)
         self._optimizer: GSTOptimizer = None
         self._initialize_optimizer(optimizer)
 
@@ -100,16 +107,20 @@ class GateSetTomography(Tomography):
         :param optimizer: Union[str, GSTOptimizer], default to 'linear_inverse', the GST optimizer to be used
         """
         if isinstance(optimizer, str):
-            if optimizer == 'linear_inverse':
+            if optimizer == "linear_inverse":
                 self._optimizer = LinearInversionOptimizer()
-            elif optimizer == 'mle':
+            elif optimizer == "mle":
                 # self._optimizer = MLEOptimizer()
-                raise ArgumentError("in GateSetTomography(): The maximum likelihood estimation optimizer "
-                                    "will be supported in the next version, "
-                                    "Please use the linear inversion optimizer!")
+                raise ArgumentError(
+                    "in GateSetTomography(): The maximum likelihood estimation optimizer "
+                    "will be supported in the next version, "
+                    "Please use the linear inversion optimizer!"
+                )
             else:
-                raise ArgumentError("in GateSetTomography(): undefined optimizer name {}. "
-                                    "Supported optimizer names are: 'linear_inverse' and 'mle'.".format(optimizer))
+                raise ArgumentError(
+                    "in GateSetTomography(): undefined optimizer name {}. "
+                    "Supported optimizer names are: 'linear_inverse' and 'mle'.".format(optimizer)
+                )
         elif isinstance(optimizer, GSTOptimizer):
             self._optimizer = optimizer
         else:
@@ -120,11 +131,14 @@ class GateSetTomography(Tomography):
     def result(self):
         return self._result
 
-    def fit(self, qc: QComputer = None,
-            gate_set: GateSet = None,
-            qubits: List[int] = None,
-            optimizer: Union[str, GSTOptimizer] = 'linear_inverse',
-            **kwargs) -> GateSet:
+    def fit(
+        self,
+        qc: QComputer = None,
+        gate_set: GateSet = None,
+        qubits: List[int] = None,
+        optimizer: Union[str, GSTOptimizer] = "linear_inverse",
+        **kwargs
+    ) -> GateSet:
         r"""Execute Gate Set Tomography on the quantum computer.
 
         Optional keywords list are:
@@ -170,7 +184,7 @@ class GateSetTomography(Tomography):
 
             >>> import QCompute
             >>> import numpy
-            >>> from qcompute_qep.tomography import GateSetTomography, GateSet, STD1Q_GATESET_RXRY
+            >>> from Extensions.QuantumErrorProcessing.qcompute_qep.tomography import GateSetTomography, GateSet, STD1Q_GATESET_RXRY
             >>> from QCompute.QPlatform.QOperation import CircuitLine
             >>> gateset = GateSet(gates={'G_rx90': CircuitLine(QCompute.RX(numpy.pi / 2), [0]),
             >>>                          'G_ry90': CircuitLine(QCompute.RY(numpy.pi / 2), [0])},
@@ -185,8 +199,8 @@ class GateSetTomography(Tomography):
         self._qc = qc if qc is not None else self._qc
         self._qubits = qubits if qubits is not None else self._qubits
         self._gateset = gate_set if gate_set is not None else self._gateset
-        self._method = kwargs.get('method', self._method)
-        self._shots = kwargs.get('shots', self._shots)
+        self._method = kwargs.get("method", self._method)
+        self._shots = kwargs.get("shots", self._shots)
         self._n = max(self._qubits) + 1 if self._qubits is not None else self._gateset.n
         # Set up the optimizer
         self._optimizer = optimizer if optimizer is not None else self._optimizer
@@ -201,8 +215,10 @@ class GateSetTomography(Tomography):
         if self._qubits is None:
             raise ArgumentError("in GateSetTomography.fit(): the list of qubits to be estimated is not set!")
         if len(self._qubits) != 1 and len(self._qubits) != 2:
-            raise ArgumentError("in GateSetTomography.fit(): too many qubits to be estimated! "
-                                "Currently we only supports single- and two-qubit GST!")
+            raise ArgumentError(
+                "in GateSetTomography.fit(): too many qubits to be estimated! "
+                "Currently we only supports single- and two-qubit GST!"
+            )
         if len(set(self._qubits)) != len(self._qubits):
             raise ArgumentError("in GateSetTomography.fit(): the list of qubits contain repeated indices!")
         self._qubits.sort()
@@ -213,8 +229,10 @@ class GateSetTomography(Tomography):
             self._gateset = STD1Q_GATESET_RXRY if len(self._qubits) == 1 else STD2Q_GATESET_RXRYCZ
         # Case 2. gateset is set, but does not match the number of qubits to be estimated
         if len(self._qubits) != self._gateset.n:
-            raise ArgumentError("in GateSetTomography.fit(): the number of qubits to be estimated in `qubits` "
-                                "does not match the number of qubits in `gateset`!")
+            raise ArgumentError(
+                "in GateSetTomography.fit(): the number of qubits to be estimated in `qubits` "
+                "does not match the number of qubits in `gateset`!"
+            )
         # Case 3. gateset is set, but is not complete
         if not self._gateset.verify_completeness():
             raise ArgumentError("in GateSetTomography.fit(): the given gate set is not complete!")
@@ -223,7 +241,7 @@ class GateSetTomography(Tomography):
         # Step 1. Running tomographic circuits, collect the experimental data,
         #         and construct the experimental accessible gate set \tilde{G}, correspond to Eq. (3.15) in [G15]_.
         ###############################################################################################################
-        pbar = tqdm(total=100, desc='GST Step 1/5: Constructing experimentally accessible gate set ...')
+        pbar = tqdm(total=100, desc="GST Step 1/5: Constructing experimentally accessible gate set ...")
         gateset_exp = self._construct_gateset_exp(shots=self._shots, **kwargs)
         ###############################################################################################################
         # Step 2. Estimate the optimized gate set that matches the experimental data best
@@ -253,7 +271,7 @@ class GateSetTomography(Tomography):
         :param counts: dict, a dictionary records the measurement outcomes and frequencies
         :return: float, the estimated expectation value
         """
-        str_0 = '0'.zfill(len(self._qubits))
+        str_0 = "0".zfill(len(self._qubits))
         count_0 = counts.pop(str_0, 0)
         return float(count_0 / self._shots)
 
@@ -415,24 +433,27 @@ class GateSetTomography(Tomography):
         gateset_exp: Dict[str, np.ndarray] = dict()
 
         # Run tomographic quantum circuits to construct the experimental accessible quantum gate G_tilde_k
-        pbar = tqdm(total=100, desc="GST Step 2/5: Running tomographic quantum circuits for gates, "
-                                    "which is time consuming ...", initial=20)
+        pbar = tqdm(
+            total=100,
+            desc="GST Step 2/5: Running tomographic quantum circuits for gates, " "which is time consuming ...",
+            initial=20,
+        )
         for g_k in self._gateset.gates.keys():
             gateset_exp.update({g_k: self._gate_exp(g_k, **kwargs)})
 
         # Run tomographic quantum circuit to construct the experimental accessible rho_tilde
         pbar.desc = "GST Step 3/5: Running tomographic quantum circuits for rho, which is time consuming ..."
         pbar.update(20)
-        gateset_exp.update({'rho': self._rho_exp(**kwargs)})
+        gateset_exp.update({"rho": self._rho_exp(**kwargs)})
 
         # Run tomographic quantum circuit to construct the experimental accessible E_tilde
         pbar.desc = "GST Step 4/5: Running tomographic quantum circuits for E, which is time consuming ..."
         pbar.update(20)
-        gateset_exp.update({'E': self._meas_exp(**kwargs)})
+        gateset_exp.update({"E": self._meas_exp(**kwargs)})
 
         # Record the results
-        self._result.update({'gateset exp': gateset_exp})
-        self._result.update({'g': gateset_exp[GateSet.NULL_GATE_NAME]})
+        self._result.update({"gateset exp": gateset_exp})
+        self._result.update({"g": gateset_exp[GateSet.NULL_GATE_NAME]})
 
         pbar.close()
         return gateset_exp

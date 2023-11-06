@@ -19,8 +19,4 @@ r"""
 Module for discrete-event simulation.
 """
 
-__all__ = [
-    "des",
-    "log",
-    "utils"
-]
+__all__ = ["des", "log", "utils"]

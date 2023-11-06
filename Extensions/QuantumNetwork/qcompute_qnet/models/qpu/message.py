@@ -19,7 +19,7 @@ r"""
 Module for messages utilized in the qpu module.
 """
 
-from qcompute_qnet.messages.message import QuantumMessage
+from Extensions.QuantumNetwork.qcompute_qnet.messages.message import QuantumMessage
 
 
 class QuantumMsg(QuantumMessage):
@@ -38,4 +38,3 @@ class QuantumMsg(QuantumMessage):
         """
         super().__init__(data)
         self.index = index
-        

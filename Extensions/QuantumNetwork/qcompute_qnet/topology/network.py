@@ -22,16 +22,18 @@ Module for building a quantum network.
 from typing import List
 import networkx
 import matplotlib.pyplot as plt
-from qcompute_qnet.core.des import DESEnv, Entity
-from qcompute_qnet.quantum.circuit import Circuit
-from qcompute_qnet.topology.node import Node
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import Channel, ClassicalChannel, QuantumChannel
-from qcompute_qnet.devices.channel import DuplexChannel, DuplexClassicalFiberChannel, DuplexQuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv, Entity
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.topology.node import Node
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import Channel, ClassicalChannel, QuantumChannel
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import (
+    DuplexChannel,
+    DuplexClassicalFiberChannel,
+    DuplexQuantumFiberChannel,
+)
 
-__all__ = [
-    "Network"
-]
+__all__ = ["Network"]
 
 
 class Network(Entity):
@@ -115,39 +117,98 @@ class Network(Entity):
               in this version.
         """
         import json
+
         topo = json.load(open(filename))
         nodes = []
         links = []
 
-        from qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode, BackboneNode
-        for node in topo['nodes']:
-            if node['type'] == "EndNode":
-                nodes.append(EndNode(node['name'], location=(node['longitude'], node['latitude'])))
-            elif node['type'] == "TrustedRepeaterNode":
-                nodes.append(TrustedRepeaterNode(node['name'], location=(node['longitude'], node['latitude'])))
-            elif node['type'] == "BackboneNode":
-                nodes.append(BackboneNode(node['name'], location=(node['longitude'], node['latitude'])))
-            else:
-                nodes.append(Node(node['name']))
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import (
+            EndNode,
+            TrustedRepeaterNode,
+            BackboneNode,
+            RMPRepeaterNode,
+            RMPEndNode,
+        )
 
-        for link in topo['links']:
+        for node in topo["nodes"]:
+            if node["type"] == "RMPEndNode":
+                nodes.append(
+                    RMPEndNode(
+                        node["name"],
+                        location=(node["longitude"], node["latitude"])
+                        if node.get("longitude") and node.get("latitude")
+                        else None,
+                    )
+                )
+            elif node["type"] == "EndNode":
+                nodes.append(
+                    EndNode(
+                        node["name"],
+                        location=(node["longitude"], node["latitude"])
+                        if node.get("longitude") and node.get("latitude")
+                        else None,
+                    )
+                )
+            elif node["type"] == "RMPRepeaterNode":
+                nodes.append(
+                    RMPRepeaterNode(
+                        node["name"],
+                        location=(node["longitude"], node["latitude"])
+                        if node.get("longitude") and node.get("latitude")
+                        else None,
+                        key_pool_volume=node.get("key_pool_volume", 20),
+                        key_length=node.get("key_length", 32),
+                    )
+                )
+            elif node["type"] == "TrustedRepeaterNode":
+                nodes.append(
+                    TrustedRepeaterNode(
+                        node["name"],
+                        location=(node["longitude"], node["latitude"])
+                        if node.get("longitude") and node.get("latitude")
+                        else None,
+                    )
+                )
+            elif node["type"] == "BackboneNode":
+                nodes.append(
+                    BackboneNode(
+                        node["name"],
+                        location=(node["longitude"], node["latitude"])
+                        if node.get("longitude") and node.get("latitude")
+                        else None,
+                    )
+                )
+
+            else:
+                nodes.append(Node(node["name"]))
+
+        for link in topo["links"]:
             lk = Link(f"{link['node1']}_{link['node2']}")
-            n1 = lk.env.get_node(link['node1'])
-            n2 = lk.env.get_node(link['node2'])
+            n1 = lk.env.get_node(link["node1"])
+            n2 = lk.env.get_node(link["node2"])
             lk.connect(n1, n2)
             # Set a duplex classical channel
-            c_distance = link['cchannel']['distance']
-            c_loss = link['cchannel']['loss'] if "loss" in link['cchannel'].keys() else 0
-            c_delay = link['cchannel']['delay'] if "delay" in link['cchannel'].keys() else None
-            ch = DuplexClassicalFiberChannel(f"c_{link['node1']}_{link['node2']}",
-                                             distance=c_distance, loss=c_loss, delay=c_delay)
+            c_distance = link["cchannel"]["distance"]
+            c_loss = link["cchannel"]["loss"] if "loss" in link["cchannel"].keys() else 0
+            c_delay = link["cchannel"]["delay"] if "delay" in link["cchannel"].keys() else None
+            ch = DuplexClassicalFiberChannel(
+                f"c_{link['node1']}_{link['node2']}", distance=c_distance, loss=c_loss, delay=c_delay
+            )
             ch.connect(n1, n2)
             # Set a duplex quantum channel
-            q_distance = link['qchannel']['distance']
-            q_loss = link['qchannel']['loss'] if "loss" in link['qchannel'].keys() else None
-            q_delay = link['qchannel']['delay'] if "delay" in link['qchannel'].keys() else None
-            qh = DuplexQuantumFiberChannel(f"q_{link['node1']}_{link['node2']}",
-                                           distance=q_distance, loss=q_loss, delay=q_delay)
+            q_distance = link["qchannel"]["distance"]
+
+            if link["qchannel"].get("loss"):
+                q_loss = link["qchannel"]["loss"]
+            elif link["qchannel"].get("attenuation"):
+                q_loss = link["qchannel"]["attenuation"] * q_distance * 1e-3
+            else:
+                q_loss = None
+
+            q_delay = link["qchannel"]["delay"] if "delay" in link["qchannel"].keys() else None
+            qh = DuplexQuantumFiberChannel(
+                f"q_{link['node1']}_{link['node2']}", distance=q_distance, loss=q_loss, delay=q_delay
+            )
             qh.connect(n1, n2)
             lk.install([ch, qh])
             links.append(lk)
@@ -156,20 +217,17 @@ class Network(Entity):
         self.install(links)
 
     def get_topology(self) -> None:
-        r"""Get the classical and quantum topology of the network.
-        """
+        r"""Get the classical and quantum topology of the network."""
         self.get_classical_topology()
         self.get_quantum_topology()
 
     def get_classical_topology(self) -> None:
-        r"""Get the classical topology of the network.
-        """
+        r"""Get the classical topology of the network."""
         self.classical_topology.add_nodes_from(self.nodes)
         self.__add_channels(self.classical_topology, [ClassicalChannel, DuplexClassicalFiberChannel])
 
     def get_quantum_topology(self) -> None:
-        r"""Get the quantum topology of the network.
-        """
+        r"""Get the quantum topology of the network."""
         self.quantum_topology.add_nodes_from(self.nodes)
         self.__add_channels(self.quantum_topology, [QuantumChannel, DuplexQuantumFiberChannel])
 
@@ -184,15 +242,28 @@ class Network(Entity):
             for component in link.components:
                 if type(component) in channel_types:
                     if isinstance(component, Channel):
-                        topology.add_weighted_edges_from([(component.sender, component.receiver,
-                                                           component.get_distance())])
+                        topology.add_weighted_edges_from(
+                            [(component.sender, component.receiver, component.get_distance())]
+                        )
                     elif isinstance(component, DuplexChannel):
-                        topology.add_weighted_edges_from([(component.channel1_2.sender,
-                                                           component.channel1_2.receiver,
-                                                           component.channel1_2.get_distance())])
-                        topology.add_weighted_edges_from([(component.channel2_1.sender,
-                                                           component.channel2_1.receiver,
-                                                           component.channel2_1.get_distance())])
+                        topology.add_weighted_edges_from(
+                            [
+                                (
+                                    component.channel1_2.sender,
+                                    component.channel1_2.receiver,
+                                    component.channel1_2.get_distance(),
+                                )
+                            ]
+                        )
+                        topology.add_weighted_edges_from(
+                            [
+                                (
+                                    component.channel2_1.sender,
+                                    component.channel2_1.receiver,
+                                    component.channel2_1.get_distance(),
+                                )
+                            ]
+                        )
 
     def assign_routing_table(self) -> None:
         r"""Assign routing tables for trusted repeater nodes in the network.
@@ -202,16 +273,19 @@ class Network(Entity):
             The classical and quantum routing tables are computed separately.
             Both routing costs depend on the length of the communication channel.
         """
-        from qcompute_qnet.models.qkd.node import TrustedRepeaterNode
+        from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import TrustedRepeaterNode
+
         for node in self.nodes:
             if isinstance(node, TrustedRepeaterNode):
                 for dst in self.nodes:
                     if node != dst:
-                        classical_path = networkx.dijkstra_path(self.classical_topology,
-                                                                source=node, target=dst, weight='weight')
+                        classical_path = networkx.dijkstra_path(
+                            self.classical_topology, source=node, target=dst, weight="weight"
+                        )
                         node.classical_routing_table[dst] = classical_path[1]
-                        quantum_path = networkx.dijkstra_path(self.quantum_topology,
-                                                              source=node, target=dst, weight='weight')
+                        quantum_path = networkx.dijkstra_path(
+                            self.quantum_topology, source=node, target=dst, weight="weight"
+                        )
                         node.quantum_routing_table[dst] = quantum_path[1]
 
     def print_classical_topology(self, geo=False) -> None:
@@ -246,10 +320,15 @@ class Network(Entity):
         """
         if geo:  # print the topology with locations
             assert all(node.location is not None for node in self.nodes), f"Not all nodes have a geographical location!"
-            plt.rcParams['figure.figsize'] = (16, 12)  # set figure size
+            plt.rcParams["figure.figsize"] = (16, 12)  # set figure size
             nodes_pos = {node: node.location for node in self.nodes}
 
-            from qcompute_qnet.models.qkd.node import EndNode, TrustedRepeaterNode, BackboneNode
+            from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import (
+                EndNode,
+                TrustedRepeaterNode,
+                BackboneNode,
+            )
+
             # End nodes
             end_nodes = [node for node in self.nodes if isinstance(node, EndNode)]
             ends_pos = {node: node.location for node in end_nodes}
@@ -257,13 +336,21 @@ class Network(Entity):
             # Repeater nodes
             repeater_nodes = [node for node in self.nodes if isinstance(node, TrustedRepeaterNode)]
             repeaters_pos = {node: node.location for node in repeater_nodes}
-            repeaters_options = {"nodelist": repeater_nodes, "node_size": 200,
-                                 "node_color": "blue", "edgecolors": "black"}
+            repeaters_options = {
+                "nodelist": repeater_nodes,
+                "node_size": 200,
+                "node_color": "blue",
+                "edgecolors": "black",
+            }
             # Backbone nodes
             backbone_nodes = [node for node in self.nodes if isinstance(node, BackboneNode)]
             backbones_pos = {node: node.location for node in backbone_nodes}
-            backbones_options = {"nodelist": backbone_nodes, "node_size": 200,
-                                 "node_color": "red", "edgecolors": "black"}
+            backbones_options = {
+                "nodelist": backbone_nodes,
+                "node_size": 200,
+                "node_color": "red",
+                "edgecolors": "black",
+            }
             # Labels
             labels = {node: node.name for node in self.nodes}
             labels_pos = {node: (node.location[0], node.location[1] - 0.01) for node in self.nodes}

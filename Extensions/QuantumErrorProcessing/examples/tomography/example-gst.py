@@ -17,8 +17,8 @@
 from typing import List
 
 import QCompute
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
 
 
 def gateset_tomography(qc: types.QComputer, gate_set: tomography.GateSet, qubits: List[int]):
@@ -36,14 +36,16 @@ def gateset_tomography(qc: types.QComputer, gate_set: tomography.GateSet, qubits
         ideal = gate_set.gateset_ptm[name]
         # Get the noisy gate (in PTM representation)
         noisy = gate_set.gateset_opt[name]
-        tomography.compare_process_ptm(ptms=[ideal, noisy, ideal - noisy],
-                                       titles=['Ideal', qc_name, 'Difference'],
-                                       show_labels=True,
-                                       fig_name="GST-{}-{}.png".format(qc_name, name))
+        tomography.compare_process_ptm(
+            ptms=[ideal, noisy, ideal - noisy],
+            titles=["Ideal", qc_name, "Difference"],
+            show_labels=True,
+            fig_name="GST-{}-{}.png".format(qc_name, name),
+        )
         print("+ Average gate fidelity of gate {}: {:.3f}".format(name, gate_set.fidelity(name)))
 
-    print("+ Preparation state fidelity: {:.3f}".format(gate_set.fidelity('rho')))
-    print("+ Computational basis measurement fidelity: {:.3f}".format(gate_set.fidelity('meas')))
+    print("+ Preparation state fidelity: {:.3f}".format(gate_set.fidelity("rho")))
+    print("+ Computational basis measurement fidelity: {:.3f}".format(gate_set.fidelity("meas")))
     print("*******************************************************************************")
 
 

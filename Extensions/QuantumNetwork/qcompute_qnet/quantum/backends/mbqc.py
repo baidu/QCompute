@@ -26,18 +26,14 @@ import networkx
 from networkx import Graph, spring_layout, draw_networkx
 import numpy
 from numpy import reshape, pi, conj, real, random, sqrt
-from qcompute_qnet import EPSILON
-from qcompute_qnet.quantum.basis import Basis
-from qcompute_qnet.quantum.gate import Gate
-from qcompute_qnet.quantum.mcalculus import transpile_to_pattern
-from qcompute_qnet.quantum.pattern import Pattern
-from qcompute_qnet.quantum.state import PureState, Plus
-from qcompute_qnet.quantum.utils import kron, print_progress
+from Extensions.QuantumNetwork.qcompute_qnet import EPSILON
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.basis import Basis
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.gate import Gate
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.pattern import Pattern
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.state import PureState, Plus
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.utils import kron, print_progress
 
-__all__ = [
-    "MBQC",
-    "run_circuit"
-]
+__all__ = ["MBQC", "run_circuit"]
 
 
 class MBQC:
@@ -49,8 +45,7 @@ class MBQC:
     """
 
     def __init__(self):
-        r"""Constructor for MBQC class.
-        """
+        r"""Constructor for MBQC class."""
         self.__graph = None
         self.__pattern = None
         self.vertex = None
@@ -153,7 +148,7 @@ class MBQC:
         cmds = self.__pattern.commands[:]
 
         # Check if the pattern is of a standard EMC form
-        cmd_map = {'E': 1, 'M': 2, 'X': 3, 'Z': 4, 'S': 5}
+        cmd_map = {"E": 1, "M": 2, "X": 3, "Z": 4, "S": 5}
         cmd_num_wild = [cmd_map[cmd.name] for cmd in cmds]
         cmd_num_standard = cmd_num_wild[:]
         cmd_num_standard.sort(reverse=False)
@@ -162,7 +157,7 @@ class MBQC:
             raise ArgumentTypeError(f"Input {pattern} is not a standard EMC pattern.")
 
         # Set graph according to entanglement commands
-        edges = [tuple(cmd.which_qubits) for cmd in cmds if cmd.name == 'E']
+        edges = [tuple(cmd.which_qubit) for cmd in cmds if cmd.name == "E"]
         vertices = list(set([vertex for edge in edges for vertex in list(edge)]))
         graph = [vertices, edges]
         self.set_graph(graph)
@@ -176,8 +171,7 @@ class MBQC:
         return self.__pattern
 
     def __update_history(self) -> None:
-        r"""Update the history and the status of the computation.
-        """
+        r"""Update the history and the status of the computation."""
         self.__history.append(self.__bg_state)
         self.__status = self.__history[-1]
 
@@ -210,7 +204,7 @@ class MBQC:
             state_vector = numpy.array([[1]])
             systems = []
         else:
-            state_vector = state.state
+            state_vector = state.matrix
             # If a pattern is set, map the input state systems to the pattern's input
             if self.__pattern is not None:
                 for label in state.systems:
@@ -228,10 +222,9 @@ class MBQC:
 
         self.__bg_state = PureState(state_vector, systems)
         self.__update_history()
-        self.vertex = self.Vertex(total=vertices,
-                                  pending=list(set(vertices).difference(systems)),
-                                  active=systems,
-                                  measured=[])
+        self.vertex = self.Vertex(
+            total=vertices, pending=list(set(vertices).difference(systems)), active=systems, measured=[]
+        )
         self.max_active = len(self.vertex.active)
 
     def replace_state_on_vertex(self, vertex: Any, state: "PureState") -> None:
@@ -262,27 +255,31 @@ class MBQC:
         """
         for which_qubits in which_qubits_list:
             if not set(which_qubits).issubset(self.vertex.active):
-                raise ArgumentTypeError(f"Invalid qubits: ({which_qubits})!\n"
-                                        f"The qubits in 'which_qubits_list' must be activated first.")
+                raise ArgumentTypeError(
+                    f"Invalid qubits: ({which_qubits})!\n" f"The qubits in 'which_qubits_list' must be activated first."
+                )
             qubit1 = which_qubits[0]
             qubit2 = which_qubits[1]
             if qubit1 == qubit2:
-                raise ArgumentTypeError(f"Invalid qubits: ({which_qubits})!\n"
-                                        f"Control qubit must not be the same as target qubit.")
+                raise ArgumentTypeError(
+                    f"Invalid qubits: ({which_qubits})!\n" f"Control qubit must not be the same as target qubit."
+                )
 
             # Find the control and target qubits and permute them to the front
-            self.__bg_state.permute_to_front(qubit1)
-            self.__bg_state.permute_to_front(qubit2)
+            self.__bg_state.substates[0].permute_to_front(qubit1)
+            self.__bg_state.substates[0].permute_to_front(qubit2)
 
             new_state = self.__bg_state
             new_state_len = new_state.length
             qua_length = int(new_state_len / 4)
             # Reshape the state, apply CZ and reshape it back
-            new_state.state = reshape(Gate.CZ() @ reshape(new_state.state, [4, qua_length]), [new_state_len, 1])
+            new_state.substates[0].matrix = reshape(
+                Gate.CZ() @ reshape(new_state.matrix, [4, qua_length]), [new_state_len, 1]
+            )
 
             # Update the order of active vertices and the background state
             self.vertex.active = new_state.systems
-            self.__bg_state = PureState(new_state.state, new_state.systems)
+            self.__bg_state = PureState(new_state.matrix, new_state.systems)
 
     def __apply_pauli_gate(self, gate: str, which_qubit: Any) -> None:
         r"""Apply Pauli gate.
@@ -291,23 +288,25 @@ class MBQC:
             gate (str): name of the Pauli gate
             which_qubit (Any): qubit to manipulate
         """
-        self.__bg_state.permute_to_front(which_qubit)
+        self.__bg_state.substates[0].permute_to_front(which_qubit)
         new_state = self.__bg_state
         new_state_len = new_state.length
         half_length = int(new_state_len / 2)
 
-        if gate == 'X':
+        if gate == "X":
             gate_mat = Gate.X()
-        elif gate == 'Z':
+        elif gate == "Z":
             gate_mat = Gate.Z()
         else:
             raise ArgumentTypeError(f"Input {gate} should be string 'X' or 'Z'.")
 
         # Reshape the state, apply X and reshape it back
-        new_state.state = reshape(gate_mat @ reshape(new_state.state, [2, half_length]), [new_state_len, 1])
+        new_state.substates[0].matrix = reshape(
+            gate_mat @ reshape(new_state.matrix, [2, half_length]), [new_state_len, 1]
+        )
         # Update the order of active vertices and the background state
         self.vertex.active = new_state.systems
-        self.__bg_state = PureState(new_state.state, new_state.systems)
+        self.__bg_state = PureState(new_state.matrix, new_state.systems)
 
     def __create_graph_state(self, which_qubit: Any) -> None:
         r"""Create a graph state based on the current qubit to measure.
@@ -327,13 +326,14 @@ class MBQC:
         self.vertex.pending = list(set(self.vertex.pending).difference(self.vertex.active))
 
         # Compute the new background state vector
-        new_bg_state_vector = kron([self.__bg_state.state] +
-                                   [self.__vertex_to_state[vertex].state for vertex in append_qubits])
+        new_bg_state_vector = kron(
+            [self.__bg_state.matrix] + [self.__vertex_to_state[vertex].matrix for vertex in append_qubits]
+        )
 
         # Update the background state and apply cz
         self.__bg_state = PureState(new_bg_state_vector, self.vertex.active)
         self.__apply_cz(cz_list)
-        self.__draw_process('active', which_qubit)
+        self.__draw_process("active", which_qubit)
 
     def measure(self, which_qubit: Any, basis: numpy.ndarray) -> None:
         r"""Measure a given qubit.
@@ -342,13 +342,13 @@ class MBQC:
             which_qubit (Any): qubit to measure
             basis (numpy.ndarray): measurement basis
         """
-        self.__draw_process('measuring', which_qubit)
+        self.__draw_process("measuring", which_qubit)
         self.__create_graph_state(which_qubit)
 
         if which_qubit not in self.vertex.active:
             raise ArgumentTypeError(f"Invalid qubit: ({which_qubit})! The qubit must be activated before measurement.")
 
-        self.__bg_state.permute_to_front(which_qubit)
+        self.__bg_state.substates[0].permute_to_front(which_qubit)
         new_bg_state = self.__bg_state
         self.vertex.active = new_bg_state.systems
         half_length = int(new_bg_state.length / 2)
@@ -360,9 +360,9 @@ class MBQC:
         for result in [0, 1]:
             basis_dag = conj(basis[result]).T
             # Reshape the state, multiply the basis and reshape it back
-            state_unnorm[result] = reshape(basis_dag @ reshape(new_bg_state.state, [2, half_length]), [half_length, 1])
+            state_unnorm[result] = reshape(basis_dag @ reshape(new_bg_state.matrix, [2, half_length]), [half_length, 1])
             probability = conj(state_unnorm[result]).T @ state_unnorm[result]
-            prob[result] = real(probability) if probability.dtype.name == 'COMPLEX128' else probability
+            prob[result] = real(probability) if probability.dtype.name == "COMPLEX128" else probability
 
         # Randomly choose a result and its corresponding post-measurement state
         prob_zero = real(prob[0].item())
@@ -389,7 +389,7 @@ class MBQC:
         self.__bg_state = PureState(post_state_vector, self.vertex.active)
         self.__update_history()
 
-        self.__draw_process('measured', which_qubit)
+        self.__draw_process("measured", which_qubit)
 
     def sum_outcomes(self, which_qubits: list, add_number=None) -> int:
         r"""Sum the measurement outcome of given qubits.
@@ -417,7 +417,7 @@ class MBQC:
             which_qubit (Any): qubit to correct
             power (int): power of the correction operator
         """
-        if gate not in ['X', 'Z']:
+        if gate not in ["X", "Z"]:
             raise ArgumentTypeError(f"Input {gate} should be a string 'X' or 'Z'.")
         if not isinstance(power, int):
             raise ArgumentTypeError(f"Input {power} should be an int value.")
@@ -433,11 +433,13 @@ class MBQC:
         Args:
             cmd (Union[Pattern.CommandM, Pattern.CommandX, Pattern.CommandZ]): command to run
         """
-        if cmd.name not in ['M', 'X', 'Z']:
-            raise ArgumentTypeError(f"Invalid command ({cmd}) with the name: ({cmd.name})!\n"
-                                    f"Only 'M', 'X' and 'Z' are supported as the command name.")
+        if cmd.name not in ["M", "X", "Z"]:
+            raise ArgumentTypeError(
+                f"Invalid command ({cmd}) with the name: ({cmd.name})!\n"
+                f"Only 'M', 'X' and 'Z' are supported as the command name."
+            )
 
-        if cmd.name == 'M':  # execute measurement commands
+        if cmd.name == "M":  # execute measurement commands
             signal_s = self.sum_outcomes(cmd.domain_s)
             signal_t = self.sum_outcomes(cmd.domain_t)
 
@@ -477,8 +479,9 @@ class MBQC:
             cmd_s = cmd_s_lst[i]
             # Execute signal shifting commands
             if cmd_s.which_qubit not in self.vertex.measured:
-                raise ArgumentTypeError(f"Invalid vertex index: ({cmd_s.which_qubit})!\n"
-                                        f"This qubit is not measured.")
+                raise ArgumentTypeError(
+                    f"Invalid vertex index: ({cmd_s.which_qubit})!\n" f"This qubit is not measured."
+                )
 
             power = self.sum_outcomes(cmd_s.domain)
             flip[cmd_s.which_qubit] = (self.__outcome[cmd_s.which_qubit] + power % 2) % 2
@@ -502,7 +505,7 @@ class MBQC:
                 self.__create_graph_state(qubit)
                 self.vertex.measured.append(qubit)
                 self.max_active = max(len(self.vertex.active), self.max_active)
-                self.__bg_state = PureState(self.__bg_state.state, self.vertex.active)
+                self.__bg_state = PureState(self.__bg_state.matrix, self.vertex.active)
 
         self.vertex.measured = measured_qubits  # restore the measured qubits
 
@@ -513,13 +516,14 @@ class MBQC:
             This method is called after ``set_pattern``.
         """
         if self.__pattern is None:
-            raise ArgumentTypeError(f"Invalid pattern: ({self.__pattern})!\n"
-                                    f"Please set 'pattern' before calling 'run_pattern'.")
+            raise ArgumentTypeError(
+                f"Invalid pattern: ({self.__pattern})!\n" f"Please set 'pattern' before calling 'run_pattern'."
+            )
 
         # Execute measurement commands and correction commands
-        cmd_m_lst = [cmd for cmd in self.__pattern.commands if cmd.name == 'M']
-        cmd_c_lst = [cmd for cmd in self.__pattern.commands if cmd.name in ['X', 'Z']]
-        cmd_s_lst = [cmd for cmd in self.__pattern.commands if cmd.name == 'S']
+        cmd_m_lst = [cmd for cmd in self.__pattern.commands if cmd.name == "M"]
+        cmd_c_lst = [cmd for cmd in self.__pattern.commands if cmd.name in ["X", "Z"]]
+        cmd_s_lst = [cmd for cmd in self.__pattern.commands if cmd.name == "S"]
         bar_end = len(cmd_m_lst + cmd_c_lst + cmd_s_lst)
 
         self.__run_cmd_lst(cmd_m_lst, 0, bar_end)
@@ -534,7 +538,7 @@ class MBQC:
         # The output state's label is messy (e.g. [(2, 0), (0, 1), (1, 3)...]),
         # so we permute the systems in order
         q_output = self.__pattern.output_[1]
-        self.__status.permute_systems(q_output)
+        self.__status.substates[0].permute_systems(q_output)
         self.__bg_state = self.__status
 
         self.__update_history()
@@ -571,10 +575,8 @@ class MBQC:
             row2qubit = self.__map_qubit_to_row(output_lst)
 
             # Mark the classical outputs with their measurement outcomes
-            # Mark a quantum register with a place holder '_'
-            # bit_lst = [str(self.__outcome[row2qubit[i]]) if row2qubit[i] in c_output else '_' for i in range(width)]
-            bit_lst = [str(self.__outcome[row2qubit[i]]) if row2qubit[i] in c_output else '' for i in range(width)]
-            bit_str = ''.join(bit_lst)
+            bit_lst = [str(self.__outcome[row2qubit[i]]) if row2qubit[i] in c_output else "" for i in range(width)]
+            bit_str = "".join(bit_lst)
             return bit_str
 
         # If the input is a graph, return the outcome dictionary
@@ -601,12 +603,14 @@ class MBQC:
             if pos:
                 self.__pos = {}
                 for vertex in list(self.__graph.nodes):
-                    self.__pos[vertex] = [vertex[1], - vertex[0]]
+                    self.__pos[vertex] = [vertex[1], -vertex[0]]
             else:
                 self.__pos = spring_layout(self.__graph)  # use 'spring_layout' method
         else:
-            raise ArgumentTypeError(f"Invalid position ({pos}) with the type: ({type(pos)})!\n"
-                                    f"Only `Bool` and `Dict` are supported as the type of position.")
+            raise ArgumentTypeError(
+                f"Invalid position ({pos}) with the type: ({type(pos)})!\n"
+                f"Only `Bool` and `Dict` are supported as the type of position."
+            )
 
     def __draw_process(self, which_process: str, which_qubit: Any) -> None:
         r"""Draw the computational process of MBQC.
@@ -616,9 +620,11 @@ class MBQC:
             which_qubit (Any): current vertex to focus on
         """
         if self.__draw:
-            if which_process not in ['measuring', 'active', 'measured']:
-                raise ArgumentTypeError(f"Invalid process name: ({which_process})!\n"
-                                        f"Only `measuring`, 'active' and `measured` are supported as the process name.")
+            if which_process not in ["measuring", "active", "measured"]:
+                raise ArgumentTypeError(
+                    f"Invalid process name: ({which_process})!\n"
+                    f"Only `measuring`, 'active' and `measured` are supported as the process name."
+                )
 
             # Find where the 'which_qubit' is
             if which_qubit in self.vertex.pending:
@@ -650,20 +656,20 @@ class MBQC:
             plt.grid()
             # mngr = plt.get_current_fig_manager()
             # mngr.window.setGeometry(500, 100, 800, 600)
-            colors = ['tab:blue', 'tab:green', 'tab:red', 'tab:gray']
+            colors = ["tab:blue", "tab:green", "tab:red", "tab:gray"]
             for j in range(4):
                 for vertex in vertex_sets[j]:
                     options = {
-                        'nodelist': [vertex],
-                        'node_color': colors[j],
-                        'node_shape': '8' if vertex in ancilla_qubits else 'o',
-                        'with_labels': False,
-                        'width': 3,
+                        "nodelist": [vertex],
+                        "node_color": colors[j],
+                        "node_shape": "8" if vertex in ancilla_qubits else "o",
+                        "with_labels": False,
+                        "width": 3,
                     }
                     draw_networkx(self.__graph, self.__pos, **options)
                     ax = plt.gca()
                     ax.margins(0.20)
-                    plt.axis('on')
+                    plt.axis("on")
                     ax.set_axisbelow(True)
             plt.pause(self.__pause_time)
 
@@ -681,11 +687,14 @@ class MBQC:
             raise ArgumentTypeError(f"Input {draw} should be a bool value.")
         if not isinstance(pos, bool):
             if not isinstance(pos, Dict):
-                raise ArgumentTypeError(f"Invalid position ({pos}) with the type: ({type(pos)})!\n"
-                                        f"Only `Bool` and `Dict` are supported as the type of position.")
+                raise ArgumentTypeError(
+                    f"Invalid position ({pos}) with the type: ({type(pos)})!\n"
+                    f"Only `Bool` and `Dict` are supported as the type of position."
+                )
         if pause_time <= 0:
-            raise ArgumentTypeError(f"Invalid drawing pause time: ({pause_time})!\n"
-                                    f"Drawing pause time must be a positive float value.")
+            raise ArgumentTypeError(
+                f"Invalid drawing pause time: ({pause_time})!\n" f"Drawing pause time must be a positive float value."
+            )
 
         self.__draw = draw
         self.__pause_time = pause_time
@@ -696,7 +705,7 @@ class MBQC:
             self.__set_position(pos)
 
     def track_progress(self, track=True) -> None:
-        r""" Track the progress of MBQC running.
+        r"""Track the progress of MBQC running.
 
         Args:
             track (bool, optional): whether to track the progress
@@ -707,13 +716,12 @@ class MBQC:
         self.__track = track
 
 
-def run_circuit(circuit: "Circuit", shots=1024, input_state=None, optimize=True) -> dict:
+def run_circuit(circuit: "Circuit", shots=1024, input_state=None, optimize=None) -> dict:
     r"""Run a quantum circuit by its equivalent MBQC model.
 
     Note:
         This method transpiles a quantum circuit to its equivalent MBQC model first
         and then runs the MBQC pattern to get equivalent sampling result.
-        It can work well for large-scale quantum shallow circuits with the option ``optimize=True``.
 
     Warnings:
         We should check if the circuit has sequential registers first.
@@ -723,7 +731,7 @@ def run_circuit(circuit: "Circuit", shots=1024, input_state=None, optimize=True)
         circuit (Circuit): quantum circuit to run
         shots (int, optional): number of sampling
         input_state (PureState, optional): input quantum state
-        optimize (bool): whether to optimize the measurement order
+        optimize (str): optimize the measurement order
 
     Returns:
         dict: classical results
@@ -736,25 +744,14 @@ def run_circuit(circuit: "Circuit", shots=1024, input_state=None, optimize=True)
 
     # Add a layer of H gates to start from zero states
     if input_state is None:
-        h_layer = [{"name": 'h', "which_qubit": [i], "params": None} for i in range(circuit.width)]
+        h_layer = [{"name": "h", "which_qubit": [i]} for i in range(circuit.width)]
         new_circuit = circuit.copy()
         new_circuit._history = h_layer + circuit.gate_history
         circuit = new_circuit
 
-    pattern = transpile_to_pattern(circuit, shift_signal=True, optimize=optimize, track=False)
-
-    samples = []
-
-    for shot in range(shots):
-        mbqc = MBQC()
-        mbqc.set_pattern(pattern)
-        mbqc.set_input_state(input_state)
-        mbqc.run_pattern()
-        c_output = mbqc.get_classical_output()
-        samples.append(c_output)
-
-    sample_dict = {}
-    for string in list(set(samples)):
-        sample_dict[string] = samples.count(string)
+    # circuit.print_list()
+    pattern = circuit.to_pattern(shift_signal=True, optimize=optimize, track=False)
+    results = pattern.run(shots=shots, input_state=input_state)
+    sample_dict = results["counts"]
 
     return sample_dict

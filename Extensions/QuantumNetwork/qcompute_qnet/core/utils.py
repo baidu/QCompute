@@ -23,10 +23,7 @@ import math
 from typing import List
 from io import StringIO
 
-__all__ = [
-    "show_heap",
-    "is_heap"
-]
+__all__ = ["show_heap", "is_heap"]
 
 
 def show_heap(heap: List["Event"]) -> None:
@@ -45,13 +42,16 @@ def show_heap(heap: List["Event"]) -> None:
         else:
             row = 0
         if row != last_row:
-            output.write('\n')
-        columns = 2 ** row
+            output.write("\n")
+        columns = 2**row
         col_width = int(math.floor((width * 1.0) / columns))
-        output.write(f"ev {i}: '{n.handler.owner.name}.{n.handler.method}' (t = {n.time}, p = {n.priority})"
-                     .center(col_width, " "))
+        output.write(
+            f"ev {i}: '{n.handler.owner.name}.{n.handler.method}' (t = {n.time}, p = {n.priority})".center(
+                col_width, " "
+            )
+        )
         last_row = row
-    print('-' * width + "\nEvent list heap:" + output.getvalue() + '\n' + '-' * width)
+    print("-" * width + "\nEvent list heap:" + output.getvalue() + "\n" + "-" * width)
 
 
 def is_heap(list_: list) -> bool:

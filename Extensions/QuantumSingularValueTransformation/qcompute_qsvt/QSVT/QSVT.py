@@ -70,13 +70,18 @@ from typing import List, Optional, Tuple
 from QCompute import X, Z, RZ, CZ, CRZ
 from QCompute.QPlatform.QRegPool import QRegStorage
 
-from qcompute_qsvt.Oracle.BlockEncoding import circ_block_encoding
-from qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Oracle.BlockEncoding import circ_block_encoding
+from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.Gate.MultiCtrlGates import circ_multictrl_X
 
 
-def circ_Pi_double_ctrl_rot(qubit_target: QRegStorage, reg_ctrlling: List[QRegStorage], qubit_ctrlling: QRegStorage,
-                            float_angle_0: float, float_angle_1: float,
-                            reg_borrowed: Optional[List[QRegStorage]] = None) -> None:
+def circ_Pi_double_ctrl_rot(
+    qubit_target: QRegStorage,
+    reg_ctrlling: List[QRegStorage],
+    qubit_ctrlling: QRegStorage,
+    float_angle_0: float,
+    float_angle_1: float,
+    reg_borrowed: Optional[List[QRegStorage]] = None,
+) -> None:
     r"""A quantum circuit implementing a class of multictrl rotation gate.
 
     In math, this circuit implement a quantum operation, which could be represented as following in computing basis:
@@ -107,7 +112,7 @@ def circ_Pi_double_ctrl_rot(qubit_target: QRegStorage, reg_ctrlling: List[QRegSt
 
         >>> from numpy import pi
         >>> from QCompute import QEnv
-        >>> from qcompute_qsvt.QSVT.QSVT import circ_Pi_double_ctrl_rot
+        >>> from Extensions.QuantumSingularValueTransformation.qcompute_qsvt.QSVT.QSVT import circ_Pi_double_ctrl_rot
         >>> env = QEnv()
         >>> qubit_c = env.Q[0]
         >>> reg_c = [env.Q[1], env.Q[2]]
@@ -132,9 +137,16 @@ def circ_Pi_double_ctrl_rot(qubit_target: QRegStorage, reg_ctrlling: List[QRegSt
         X(idx_qubit)
 
 
-def circ_QSVT_from_BE(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], qubit_ancilla_b: QRegStorage,
-                      qubit_ancilla_c: QRegStorage, list_str_Pauli_rep: List[Tuple[float, str]],
-                      list_float_target_state: List[float], list_re: List[float], list_im: List[float]) -> None:
+def circ_QSVT_from_BE(
+    reg_sys: List[QRegStorage],
+    reg_blocking: List[QRegStorage],
+    qubit_ancilla_b: QRegStorage,
+    qubit_ancilla_c: QRegStorage,
+    list_str_Pauli_rep: List[Tuple[float, str]],
+    list_float_target_state: List[float],
+    list_re: List[float],
+    list_im: List[float],
+) -> None:
     r"""A quantum circuit implementing a case of QSVT circuit.
 
     Given a quantum signal processing function
@@ -182,26 +194,47 @@ def circ_QSVT_from_BE(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage
     CZ(qubit_ancilla_c, qubit_ancilla_b)
     Z(qubit_ancilla_c)
 
-    circ_Pi_double_ctrl_rot(qubit_ancilla_b, reg_blocking, qubit_ancilla_c, list_re[0], list_im[0],
-                            reg_borrowed=reg_sys)
+    circ_Pi_double_ctrl_rot(
+        qubit_ancilla_b, reg_blocking, qubit_ancilla_c, list_re[0], list_im[0], reg_borrowed=reg_sys
+    )
 
     for idx in range(1, len(list_re)):
-        circ_block_encoding(reg_sys, reg_blocking, None, list_str_Pauli_rep, list_float_target_state,
-                            reg_borrowed=[qubit_ancilla_b, qubit_ancilla_c])
-        circ_Pi_double_ctrl_rot(qubit_ancilla_b, reg_blocking, qubit_ancilla_c, list_re[idx], list_im[idx],
-                                reg_borrowed=reg_sys)
+        circ_block_encoding(
+            reg_sys,
+            reg_blocking,
+            None,
+            list_str_Pauli_rep,
+            list_float_target_state,
+            reg_borrowed=[qubit_ancilla_b, qubit_ancilla_c],
+        )
+        circ_Pi_double_ctrl_rot(
+            qubit_ancilla_b, reg_blocking, qubit_ancilla_c, list_re[idx], list_im[idx], reg_borrowed=reg_sys
+        )
 
-    circ_block_encoding(reg_sys, reg_blocking, qubit_ancilla_c, list_str_Pauli_rep,
-                        list_float_target_state, reg_borrowed=[qubit_ancilla_b])
+    circ_block_encoding(
+        reg_sys,
+        reg_blocking,
+        qubit_ancilla_c,
+        list_str_Pauli_rep,
+        list_float_target_state,
+        reg_borrowed=[qubit_ancilla_b],
+    )
 
     circ_Pi_double_ctrl_rot(qubit_ancilla_b, reg_blocking, qubit_ancilla_c, 0, list_im[-1], reg_borrowed=reg_sys)
 
 
-def circ_QSVT_from_BE_inverse(reg_sys: List[QRegStorage], reg_blocking: List[QRegStorage], qubit_ancilla_b: QRegStorage,
-                              qubit_ancilla_c: QRegStorage, list_str_Pauli_rep: List[Tuple[float, str]],
-                              list_float_target_state: List[float], list_re: List[float], list_im: List[float]) -> None:
+def circ_QSVT_from_BE_inverse(
+    reg_sys: List[QRegStorage],
+    reg_blocking: List[QRegStorage],
+    qubit_ancilla_b: QRegStorage,
+    qubit_ancilla_c: QRegStorage,
+    list_str_Pauli_rep: List[Tuple[float, str]],
+    list_float_target_state: List[float],
+    list_re: List[float],
+    list_im: List[float],
+) -> None:
     r"""The inverse of such quantum circuit implementing by **circ_QSVT_from_BE** with the same input.
-    
+
     :param reg_sys: :math:`|s\rangle`, `List[QRegStorage]`, the system register for block-encoding
     :param reg_blocking: :math:`|a\rangle`, `List[QRegStorage]`, the ancilla register introduced in block-encoding step
     :param qubit_ancilla_b: :math:`|b\rangle`, `QRegStorage`,
@@ -225,16 +258,30 @@ def circ_QSVT_from_BE_inverse(reg_sys: List[QRegStorage], reg_blocking: List[QRe
     """
     circ_Pi_double_ctrl_rot(qubit_ancilla_b, reg_blocking, qubit_ancilla_c, 0, -list_im[-1], reg_borrowed=reg_sys)
 
-    circ_block_encoding(reg_sys, reg_blocking, qubit_ancilla_c, list_str_Pauli_rep,
-                        list_float_target_state, reg_borrowed=[qubit_ancilla_b])
+    circ_block_encoding(
+        reg_sys,
+        reg_blocking,
+        qubit_ancilla_c,
+        list_str_Pauli_rep,
+        list_float_target_state,
+        reg_borrowed=[qubit_ancilla_b],
+    )
 
     for idx in reversed(range(1, len(list_re))):
-        circ_Pi_double_ctrl_rot(qubit_ancilla_b, reg_blocking, qubit_ancilla_c, -list_re[idx], -list_im[idx],
-                                reg_borrowed=reg_sys)
-        circ_block_encoding(reg_sys, reg_blocking, None, list_str_Pauli_rep, list_float_target_state,
-                            reg_borrowed=[qubit_ancilla_b, qubit_ancilla_c])
+        circ_Pi_double_ctrl_rot(
+            qubit_ancilla_b, reg_blocking, qubit_ancilla_c, -list_re[idx], -list_im[idx], reg_borrowed=reg_sys
+        )
+        circ_block_encoding(
+            reg_sys,
+            reg_blocking,
+            None,
+            list_str_Pauli_rep,
+            list_float_target_state,
+            reg_borrowed=[qubit_ancilla_b, qubit_ancilla_c],
+        )
 
-    circ_Pi_double_ctrl_rot(qubit_ancilla_b, reg_blocking, qubit_ancilla_c, -list_re[0], -list_im[0],
-                            reg_borrowed=reg_sys)
+    circ_Pi_double_ctrl_rot(
+        qubit_ancilla_b, reg_blocking, qubit_ancilla_c, -list_re[0], -list_im[0], reg_borrowed=reg_sys
+    )
     CZ(qubit_ancilla_c, qubit_ancilla_b)
     Z(qubit_ancilla_c)

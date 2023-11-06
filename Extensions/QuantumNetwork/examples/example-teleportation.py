@@ -19,18 +19,15 @@ r"""
 An example of quantum teleportation protocol.
 """
 
-import sys
-sys.path.append('..')
-
 import numpy
 
-from qcompute_qnet.models.qpu.env import QuantumEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qpu.node import QuantumNode
-from qcompute_qnet.models.qpu.protocol import Teleportation
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.quantum.circuit import Circuit
-from qcompute_qnet.quantum.backends import Backend
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.env import QuantumEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.node import QuantumNode
+from Extensions.QuantumNetwork.qcompute_qnet.models.qpu.protocol import Teleportation
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.circuit import Circuit
+from Extensions.QuantumNetwork.qcompute_qnet.quantum.backends import Backend
 
 
 # Create an environment for simulation
@@ -68,7 +65,7 @@ print(f"\nCircuit results:\n", results)
 
 # Check the measurement results of the receiver
 reduced_indices = [2]
-reduced_results = network.default_circuit.reduce_results(results['counts'], indices=reduced_indices)
+reduced_results = network.default_circuit.reduce_results(results["counts"], indices=reduced_indices)
 print(f"\nMeasurement results of the receiver:\n", reduced_results)
 
 # Create a circuit and apply a U3 gate with the same parameters
@@ -78,4 +75,4 @@ comp_cir.measure(0)
 
 # Check the results of the circuit
 results = comp_cir.run(shots=1024, backend=Backend.QCompute.LocalBaiduSim2)
-print(f"\nMeasurement results of the origin state for verification:\n", results['counts'])
+print(f"\nMeasurement results of the origin state for verification:\n", results["counts"])

@@ -19,9 +19,9 @@
 An example to demonstrate the Interleaved Randomized Benchmarking protocol.
 """
 from QCompute import *
-import qcompute_qep.benchmarking as rb
-import qcompute_qep.utils.types as types
-import qcompute_qep.quantum.clifford as clifford
+import Extensions.QuantumErrorProcessing.qcompute_qep.benchmarking as rb
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.types as types
+import Extensions.QuantumErrorProcessing.qcompute_qep.quantum.clifford as clifford
 
 ##########################################################################################
 # Step 1. Set the quantum computer (instance of QComputer).
@@ -49,17 +49,13 @@ target_gate = clifford.Clifford(1)
 
 # Call the randomized benchmarking procedure and obtain estimated error rate
 qubits = [0]
-irb.benchmark(target_gate=target_gate,
-              qc=qc,
-              qubits=qubits,
-              seq_lengths=[1, 2, 3, 4, 5],
-              repeats=5)
+irb.benchmark(target_gate=target_gate, qc=qc, qubits=qubits, seq_lengths=[1, 2, 3, 4, 5], repeats=5)
 print("*******************************************************************************")
 print("* Interleaved RB on qubits: {}".format(qubits))
-print("* Estimated interleaved gate fidelity parameter: {}".format(irb.results['InterleavedRB']['f']))
-print("* Standard deviation error of interleaved estimation: {}".format(irb.results['InterleavedRB']['f_err']))
-print("* Estimated average gate fidelity parameter: {}".format(irb.results['StandardRB']['f']))
-print("* Standard deviation error of average estimation: {}".format(irb.results['StandardRB']['f_err']))
+print("* Estimated interleaved gate fidelity parameter: {}".format(irb.results["InterleavedRB"]["f"]))
+print("* Standard deviation error of interleaved estimation: {}".format(irb.results["InterleavedRB"]["f_err"]))
+print("* Estimated average gate fidelity parameter: {}".format(irb.results["StandardRB"]["f"]))
+print("* Standard deviation error of average estimation: {}".format(irb.results["StandardRB"]["f_err"]))
 fname = "InterleavedRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* InterleavedRB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results
@@ -68,17 +64,13 @@ print("*************************************************************************
 
 # You can also perform the randomized benchmarking procedure on other qubits, for example [q2]
 qubits = [2]
-irb.benchmark(target_gate=target_gate,
-              qc=qc,
-              qubits=qubits,
-              seq_lengths=[1, 2, 3, 4, 5],
-              repeats=5)
+irb.benchmark(target_gate=target_gate, qc=qc, qubits=qubits, seq_lengths=[1, 2, 3, 4, 5], repeats=5)
 print("*******************************************************************************")
 print("* Interleaved RB on qubits: {}".format(qubits))
-print("* Estimated interleaved gate fidelity parameter: {}".format(irb.results['InterleavedRB']['f']))
-print("* Standard deviation error of interleaved estimation: {}".format(irb.results['InterleavedRB']['f_err']))
-print("* Estimated average gate fidelity parameter: {}".format(irb.results['StandardRB']['f']))
-print("* Standard deviation error of average estimation: {}".format(irb.results['StandardRB']['f_err']))
+print("* Estimated interleaved gate fidelity parameter: {}".format(irb.results["InterleavedRB"]["f"]))
+print("* Standard deviation error of interleaved estimation: {}".format(irb.results["InterleavedRB"]["f_err"]))
+print("* Estimated average gate fidelity parameter: {}".format(irb.results["StandardRB"]["f"]))
+print("* Standard deviation error of average estimation: {}".format(irb.results["StandardRB"]["f_err"]))
 fname = "InterleavedRB-{}-qubits{}.png".format(types.get_qc_name(qc), qubits)
 print("* InterleavedRB data is visualized in figure '{}'.".format(fname))
 # Plot the randomized benchmarking results

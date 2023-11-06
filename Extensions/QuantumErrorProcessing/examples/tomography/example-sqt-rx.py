@@ -30,9 +30,9 @@ import numpy as np
 
 from QCompute import *
 
-import qcompute_qep.quantum.channel
-import qcompute_qep.tomography as tomography
-import qcompute_qep.utils.circuit
+import Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel
+import Extensions.QuantumErrorProcessing.qcompute_qep.tomography as tomography
+import Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit
 
 
 #######################################################################################################################
@@ -59,8 +59,8 @@ qp.Q.createList(2)
 RX(np.math.pi / 4)(qp.Q[1])
 
 # Compute numerically the ideal CNOT for reference
-ideal_cnot = qcompute_qep.utils.circuit.circuit_to_unitary(qp)
-ideal_ptm = qcompute_qep.quantum.channel.unitary_to_ptm(ideal_cnot).data
+ideal_cnot = Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit.circuit_to_unitary(qp)
+ideal_ptm = Extensions.QuantumErrorProcessing.qcompute_qep.quantum.channel.unitary_to_ptm(ideal_cnot).data
 # Calculate the eigenvalues of PTM representation
 ideal_eigvals, _ = np.linalg.eig(ideal_ptm)
 
@@ -88,7 +88,7 @@ for i, val in enumerate(noisy_eigvals):
 for i, val in enumerate(ideal_eigvals):
     ideal_data[:, i] = np.asarray(polar(val))
 
-ax.scatter(noisy_data[1, :], noisy_data[0, :], c='blue', label='noisy')
-ax.scatter(ideal_data[1, :], ideal_data[0, :], c='red', label='ideal')
+ax.scatter(noisy_data[1, :], noisy_data[0, :], c="blue", label="noisy")
+ax.scatter(ideal_data[1, :], ideal_data[0, :], c="red", label="ideal")
 plt.legend()
 plt.show()

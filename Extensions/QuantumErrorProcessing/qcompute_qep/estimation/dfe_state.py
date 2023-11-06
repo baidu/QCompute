@@ -34,12 +34,12 @@ import statistics
 from tqdm import tqdm
 import collections
 
-from qcompute_qep.exceptions.QEPError import ArgumentError
-from qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
-from qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
-from qcompute_qep.utils.circuit import execute, circuit_to_state, map_qubits
-from qcompute_qep.utils.utils import expval_from_counts
-import qcompute_qep.estimation as estimation
+from Extensions.QuantumErrorProcessing.qcompute_qep.exceptions.QEPError import ArgumentError
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QComputer, QProgram, number_of_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.quantum.pauli import complete_pauli_basis, from_name_to_matrix
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.circuit import execute, circuit_to_state, map_qubits
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.utils import expval_from_counts
+import Extensions.QuantumErrorProcessing.qcompute_qep.estimation as estimation
 
 
 class DFEState(estimation.Estimation):
@@ -56,6 +56,7 @@ class DFEState(estimation.Estimation):
     where :math:`\epsilon` is the estimation error and :math:`\delta` is the failure probability.
 
     """
+
     def __init__(self, qp: QProgram = None, qc: QComputer = None, **kwargs):
         r"""The init function of the DFEState class.
 
@@ -69,9 +70,9 @@ class DFEState(estimation.Estimation):
         :param qc: QComputer, the quantum computer
         """
         super().__init__(qp, qc, **kwargs)
-        self._epsilon: float = kwargs.get('epsilon', 0.05)
-        self._delta: float = kwargs.get('delta', 0.05)
-        self._qubits: List[int] = kwargs.get('qubits', None)
+        self._epsilon: float = kwargs.get("epsilon", 0.05)
+        self._delta: float = kwargs.get("delta", 0.05)
+        self._qubits: List[int] = kwargs.get("qubits", None)
         self._fidelity: float = -1.0
         self._std: float = -1.0
 
@@ -96,9 +97,9 @@ class DFEState(estimation.Estimation):
         """
         self._qp = qp if qp is not None else self._qp
         self._qc = qc if qc is not None else self._qc
-        self._epsilon = kwargs.get('epsilon', self._epsilon)
-        self._delta = kwargs.get('delta', self._delta)
-        self._qubits = kwargs.get('qubits', self._qubits)
+        self._epsilon = kwargs.get("epsilon", self._epsilon)
+        self._delta = kwargs.get("delta", self._delta)
+        self._qubits = kwargs.get("qubits", self._qubits)
 
         # If the quantum program or the quantum computer is not set, then DFE cannot be executed
         if self._qp is None:
@@ -112,20 +113,22 @@ class DFEState(estimation.Estimation):
             raise ArgumentError("DFEState.estimate(): the input qubits are not repeatable!")
         # Check if the number of qubits in @qp and @qubits are equal
         if len(self._qubits) != number_of_qubits(qp):
-            raise ArgumentError("DFEState.estimate(): the number of qubits in '@qp' "
-                                "must be equal to the number of qubits in '@qubits'!")
+            raise ArgumentError(
+                "DFEState.estimate(): the number of qubits in '@qp' "
+                "must be equal to the number of qubits in '@qubits'!"
+            )
 
         # Number of qubits under consideration
         n = len(self._qubits)
 
         # Step 1. Compute the ideal quantum state and its expectation values of Pauli operators
-        pbar = tqdm(total=100, desc='DFEState Step 1/3 : Sampling Pauli operators ...', ncols=80)
+        pbar = tqdm(total=100, desc="DFEState Step 1/3 : Sampling Pauli operators ...", ncols=80)
         complete_pauli = complete_pauli_basis(n)
         ptm_ideal = [np.real(np.trace(from_name_to_matrix(p.name[::-1]) @ self.ideal_state)) for p in complete_pauli]
 
         # Step 2. Sampling Pauli operators according to the probability distribution
-        sample_times = math.ceil(1.0 / (self._epsilon ** 2 * self._delta))
-        pauli_list = np.random.choice(complete_pauli, sample_times, p=[coe ** 2 for coe in ptm_ideal]).tolist()
+        sample_times = math.ceil(1.0 / (self._epsilon**2 * self._delta))
+        pauli_list = np.random.choice(complete_pauli, sample_times, p=[coe**2 for coe in ptm_ideal]).tolist()
         pauli_dic = dict(collections.Counter(pauli_list))
 
         # Step 3. Estimate the expectation values of the sampled Pauli operators w.r.t. the noisy state
@@ -135,12 +138,11 @@ class DFEState(estimation.Estimation):
 
         for p, num in pauli_dic.items():
             # Obtain the expectation value (the corresponding coefficient) of the Pauli operator
-            pbar.update(100/3/len(pauli_list))
+            pbar.update(100 / 3 / len(pauli_list))
             coe = ptm_ideal[complete_pauli.index(p)]
 
             # Compute the number of shots must be carried out
-            shots = math.ceil(2 * np.log2(2 / self._delta)
-                              / (2 ** n * coe ** 2 * sample_times * self._epsilon ** 2))
+            shots = math.ceil(2 * np.log2(2 / self._delta) / (2**n * coe**2 * sample_times * self._epsilon**2))
 
             # Modify the circuit to implement the Pauli measurement and run it on the noisy quantum computer
             p_qp, p_ob = p.meas_circuit(self._qp)
@@ -149,8 +151,8 @@ class DFEState(estimation.Estimation):
             p_qp = map_qubits(qp=p_qp, qubits=self._qubits)
 
             # Execute the quantum circuits
-            counts = execute(qp=p_qp, qc=self._qc, shots=num*shots, **kwargs)
-            fids.append(expval_from_counts(A=p_ob, counts=counts) / coe / np.sqrt(2 ** n))
+            counts = execute(qp=p_qp, qc=self._qc, shots=num * shots, **kwargs)
+            fids.append(expval_from_counts(A=p_ob, counts=counts) / coe / np.sqrt(2**n))
 
         # Step 4. Obtain the estimated fidelity by computing the mean
         pbar.desc = "DFEState Step 3/3 : Processing experimental data ..."
@@ -163,8 +165,7 @@ class DFEState(estimation.Estimation):
 
     @property
     def ideal_state(self):
-        r"""Ideal state in matrix form of the given quantum program.
-        """
+        r"""Ideal state in matrix form of the given quantum program."""
         if self._qp is None:
             raise ArgumentError("The quantum program characterizing the quantum state is not given!")
 

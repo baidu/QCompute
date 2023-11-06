@@ -22,12 +22,12 @@ The implementations of various stabilizer codes must inherit this abstract class
 import abc
 from typing import Any, List
 
-from qcompute_qep.utils.types import QProgram
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils.types import QProgram
 
 
 class StabilizerCode(abc.ABC):
-    r"""The stabilizer error correction code abstract class.
-    """
+    r"""The stabilizer error correction code abstract class."""
+
     def __init__(self, stabilizers: List[str], **kwargs: Any):
         r"""init function of the `StabilizerCode` class.
 
@@ -37,90 +37,75 @@ class StabilizerCode(abc.ABC):
 
     @property
     def n(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def k(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def r(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def syndrome_dict(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def n_k_d(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def stabilizers(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def check_matrix(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def standard_form(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def logical_xs(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def logical_zs(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @property
     def name(self):
-        r"""The name of the stabilizer code.
-        """
+        r"""The name of the stabilizer code."""
         raise NotImplementedError
 
     @abc.abstractmethod
     def sanity_check(self, **kwargs):
-        r"""
-        """
+        r""" """
         raise NotImplementedError
 
     @abc.abstractmethod
     def encode(self, qp: QProgram, **kwargs):
-        r"""Append the encoding circuit to the quantum program.
-        """
+        r"""Append the encoding circuit to the quantum program."""
         raise NotImplementedError
 
     @abc.abstractmethod
     def correct(self, qp: QProgram, **kwargs):
-        r"""Append the correction circuit to the quantum program.
-        """
+        r"""Append the correction circuit to the quantum program."""
         raise NotImplementedError
 
     @abc.abstractmethod
     def decode(self, qp: QProgram, **kwargs):
-        r"""Append the decoding circuit to the quantum program.
-        """
+        r"""Append the decoding circuit to the quantum program."""
         raise NotImplementedError

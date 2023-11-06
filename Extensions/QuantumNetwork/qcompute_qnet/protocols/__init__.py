@@ -19,7 +19,4 @@ r"""
 Module for protocols.
 """
 
-__all__ = [
-    "protocol",
-    "routing"
-]
+__all__ = ["protocol", "resource", "routing"]

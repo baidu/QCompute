@@ -24,7 +24,7 @@ import numpy as np
 from skimage.transform import resize
 from QCompute import Define
 from QCompute.QPlatform import BackendName
-from qcompute_qapp.algorithm.kernel_classifier import KernelClassifier
+from Extensions.QuantumApp.qcompute_qapp.algorithm.kernel_classifier import KernelClassifier
 
 # If user have a Quantum-hub account and wish to use a cloud simulator/qpu, please
 
@@ -37,18 +37,15 @@ backend = BackendName.LocalBaiduSim2
 myKernelClassifier = KernelClassifier(backend=backend)
 
 # Load local MNIST data
-print('Loading local MNIST data...')
-fp = open('./data/MNIST_data.json', 'rt+')
+print("Loading local MNIST data...")
+fp = open("./data/MNIST_data.json", "rt+")
 mnist = json.load(fp)
 fp.close()
-print('Complete!')
+print("Complete!")
 
 
 # A utility function used to generate the data set
-def get_data(first_num=1,
-             second_num=8,
-             data_size=10,
-             scale=2):
+def get_data(first_num=1, second_num=8, data_size=10, scale=2):
     """function used to generate a bi-classification dataset from the MNIST data set with reduced scale and size
 
     :param first_num: The label of the first class
@@ -57,8 +54,8 @@ def get_data(first_num=1,
     :param scale: n, the returned data will be a set of nxn pictures
     :return: data, label
     """
-    data_first_num = np.array(mnist['data'])[np.array(mnist['target']) == str(first_num)]
-    data_second_num = np.array(mnist['data'])[np.array(mnist['target']) == str(second_num)]
+    data_first_num = np.array(mnist["data"])[np.array(mnist["target"]) == str(first_num)]
+    data_second_num = np.array(mnist["data"])[np.array(mnist["target"]) == str(second_num)]
 
     data_unsampled = np.vstack([data_first_num, data_second_num])
     label_unsampled = np.hstack([np.zeros(len(data_first_num)), np.ones(len(data_second_num))])
@@ -82,18 +79,18 @@ data_test, label_test = get_data(data_size=10, scale=3)
 start = time.time()
 
 # Train the classifier with the training set
-print('Training the classifier...')
+print("Training the classifier...")
 myKernelClassifier.fit(data_train, label_train)
-print('Complete!')
+print("Complete!")
 
 # Make prediction on the testing set
-print('Predicting on testing data...')
+print("Predicting on testing data...")
 predict_svm_qke_test = myKernelClassifier.predict(data_test)
-print('Complete!')
+print("Complete!")
 
 run_time = time.time() - start
-print('Kernel classification run time:', run_time)
+print("Kernel classification run time:", run_time)
 
 # Calculate the error rate
 error_rate_test = sum(abs(predict_svm_qke_test - label_test)) / len(predict_svm_qke_test)
-print('Testing Error Rate:', error_rate_test)
+print("Testing Error Rate:", error_rate_test)

@@ -29,8 +29,8 @@ We will illustrate how to construct and simulate this code in QEP.
 import copy
 
 import QCompute
-from qcompute_qep.correction import FiveQubitCode, ColorTable
-from qcompute_qep.utils import circuit
+from Extensions.QuantumErrorProcessing.qcompute_qep.correction import FiveQubitCode, ColorTable
+from Extensions.QuantumErrorProcessing.qcompute_qep.utils import circuit
 
 
 def print_counts(counts: dict, n: int, k: int):
@@ -45,19 +45,18 @@ def print_counts(counts: dict, n: int, k: int):
         # Print ancilla qubits
         print("'", end="")
         if n - k > 0:
-            print("{}".format(ColorTable.ANCILLA + key[0:n - k] + ColorTable.END), end='')
-            print("{}".format(ColorTable.PHYSICAL + key[n - k:2 * (n - k)] + ColorTable.END), end='')
-        print("{}".format(ColorTable.ORIGINAL + key[2 * (n - k):2 * n - k] + ColorTable.END), end='')
+            print("{}".format(ColorTable.ANCILLA + key[0 : n - k] + ColorTable.END), end="")
+            print("{}".format(ColorTable.PHYSICAL + key[n - k : 2 * (n - k)] + ColorTable.END), end="")
+        print("{}".format(ColorTable.ORIGINAL + key[2 * (n - k) : 2 * n - k] + ColorTable.END), end="")
         print("': {}".format(val))
 
 
 def state_without_qec(qp: QCompute.QEnv, idx: int):
-    r"""Test without correction.
-    """
+    r"""Test without correction."""
     qp = copy.deepcopy(qp)
     # Add Noise
     QCompute.ID(qp.Q[idx])
-    qp.noise(gateNameList=['ID'], noiseList=[QCompute.Depolarizing(bits=1, probability=1)], qRegList=[idx])
+    qp.noise(gateNameList=["ID"], noiseList=[QCompute.Depolarizing(bits=1, probability=1)], qRegList=[idx])
 
     # Step 5. measure
     QCompute.MeasureZ(*qp.Q.toListPair())
@@ -70,16 +69,13 @@ def state_without_qec(qp: QCompute.QEnv, idx: int):
 
 
 def state_with_qec(qp: QCompute.QEnv, idx: int):
-    r"""Test five-qubit code error correction.
-    """
+    r"""Test five-qubit code error correction."""
     qec_code = FiveQubitCode()
     # Step 1. encode
     enc_qp = qec_code.encode(qp)
     # Step 2. Damaged by depolarizing error in the i-th qubit
     QCompute.ID(enc_qp.Q[idx])
-    enc_qp.noise(gateNameList=['ID'],
-                 noiseList=[QCompute.Depolarizing(bits=1, probability=1)],
-                 qRegList=[idx])
+    enc_qp.noise(gateNameList=["ID"], noiseList=[QCompute.Depolarizing(bits=1, probability=1)], qRegList=[idx])
     # Step 3. detect and correct
     cor_qp = qec_code.detect_and_correct(enc_qp)
     # Step 4. decode
@@ -91,11 +87,12 @@ def state_with_qec(qp: QCompute.QEnv, idx: int):
     print_counts(counts, n=qec_code.n, k=qec_code.k)
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     print("*******************************************************************************")
-    print("We demonstrate a simple example that uses the five-qubit code to \n"
-          "protect quantum state. Here is the five-qubit code information:")
+    print(
+        "We demonstrate a simple example that uses the five-qubit code to \n"
+        "protect quantum state. Here is the five-qubit code information:"
+    )
     print(FiveQubitCode().info)
 
     # Assume we have the following single-qubit quantum state to be protected
@@ -116,7 +113,11 @@ if __name__ == '__main__':
         print("Assume that Q[{}] suffers from the completely depolarizing error.".format(idx))
         print("With QEC, the measurement results are (shots=8192):")
         state_with_qec(qp, idx=idx)
-        print("Qubits Order: [{}][{}][{}]".format(ColorTable.ANCILLA + "Ancilla" + ColorTable.END,
-                                                  ColorTable.PHYSICAL + "Physical" + ColorTable.END,
-                                                  ColorTable.ORIGINAL + "Original" + ColorTable.END))
+        print(
+            "Qubits Order: [{}][{}][{}]".format(
+                ColorTable.ANCILLA + "Ancilla" + ColorTable.END,
+                ColorTable.PHYSICAL + "Physical" + ColorTable.END,
+                ColorTable.ORIGINAL + "Original" + ColorTable.END,
+            )
+        )
         print("We see that the error is successfully detected and corrected.")

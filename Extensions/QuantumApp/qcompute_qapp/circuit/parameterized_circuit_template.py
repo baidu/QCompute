@@ -26,8 +26,8 @@ from .parameterized_circuit import ParameterizedCircuit
 
 
 class UniversalCircuit(ParameterizedCircuit):
-    r"""Universal Circuit class
-    """
+    r"""Universal Circuit class"""
+
     def __init__(self, num: int, parameters: np.ndarray):
         r"""The constructor of the UniversalCircuit class
 
@@ -65,8 +65,8 @@ class UniversalCircuit(ParameterizedCircuit):
 
 
 class RealEntangledCircuit(ParameterizedCircuit):
-    r"""Real Entangled Circuit class
-    """
+    r"""Real Entangled Circuit class"""
+
     def __init__(self, num: int, layer: int, parameters: np.ndarray):
         """The constructor of the RealEntangledCircuit class
 
@@ -98,8 +98,8 @@ class RealEntangledCircuit(ParameterizedCircuit):
 
 
 class ComplexEntangledCircuit(ParameterizedCircuit):
-    r"""Complex Entangled Circuit class
-    """
+    r"""Complex Entangled Circuit class"""
+
     def __init__(self, num: int, layer: int, parameters: np.ndarray):
         r"""The constructor of the ComplexEntangledCircuit class
 
@@ -120,8 +120,9 @@ class ComplexEntangledCircuit(ParameterizedCircuit):
             q (QRegPool): Quantum register to which this circuit is added
 
         """
-        assert self._param_shape == (2 * self._num * self._layer,),\
-            "The shape of parameters should be (2 * num * layer,)."
+        assert self._param_shape == (
+            2 * self._num * self._layer,
+        ), "The shape of parameters should be (2 * num * layer,)."
         for j in range(self._layer):
             for k in range(self._num):
                 RX(self._parameters[2 * self._num * j + 2 * k])(q[k])
@@ -135,8 +136,8 @@ class ComplexEntangledCircuit(ParameterizedCircuit):
 
 
 class RealAlternatingLayeredCircuit(ParameterizedCircuit):
-    r"""Real Alternating Layered Circuit class
-    """
+    r"""Real Alternating Layered Circuit class"""
+
     def __init__(self, num: int, layer: int, parameters: np.ndarray):
         r"""The constructor of the RealAlternatingLayeredCircuit class
 
@@ -158,8 +159,9 @@ class RealAlternatingLayeredCircuit(ParameterizedCircuit):
             q (QRegPool): Quantum register to which this circuit is added
 
         """
-        assert self._param_shape == ((2 * self._num - 2) * self._layer,), (
-            "The shape of parameters should be ((2 * num - 2) * layer,).")
+        assert self._param_shape == (
+            (2 * self._num - 2) * self._layer,
+        ), "The shape of parameters should be ((2 * num - 2) * layer,)."
         if self._num % 2 == 0:
             for j in range(self._layer):
                 for k in range(self._num):
@@ -187,8 +189,8 @@ class RealAlternatingLayeredCircuit(ParameterizedCircuit):
 
 
 class ComplexAlternatingLayeredCircuit(ParameterizedCircuit):
-    r"""Complex Alternating Layered Circuit class
-    """
+    r"""Complex Alternating Layered Circuit class"""
+
     def __init__(self, num: int, layer: int, parameters: np.ndarray):
         r"""The constructor of the ComplexAlternatingLayeredCircuit class
 
@@ -210,8 +212,9 @@ class ComplexAlternatingLayeredCircuit(ParameterizedCircuit):
             q (QRegPool): Quantum register to which this circuit is added
 
         """
-        assert self._param_shape == ((4 * self._num - 4) * self._layer,), (
-            "The shape of parameters should be ((4 * num - 4) * layer,).")
+        assert self._param_shape == (
+            (4 * self._num - 4) * self._layer,
+        ), "The shape of parameters should be ((4 * num - 4) * layer,)."
         if self._num % 2 == 0:
             for j in range(self._layer):
                 for k in range(self._num):

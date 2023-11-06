@@ -25,16 +25,13 @@ Gobby, C., ZL Yuan, and A. J. Shields.
 Applied Physics Letters 84.19 (2004): 3762-3764.
 """
 
-import sys
-sys.path.append('..')
-
 import pandas as pd
-from qcompute_qnet.core.des import DESEnv
-from qcompute_qnet.topology.network import Network
-from qcompute_qnet.models.qkd.node import QKDNode
-from qcompute_qnet.topology.link import Link
-from qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
-from qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
+from Extensions.QuantumNetwork.qcompute_qnet.core.des import DESEnv
+from Extensions.QuantumNetwork.qcompute_qnet.topology.network import Network
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.node import QKDNode
+from Extensions.QuantumNetwork.qcompute_qnet.topology.link import Link
+from Extensions.QuantumNetwork.qcompute_qnet.devices.channel import ClassicalFiberChannel, QuantumFiberChannel
+from Extensions.QuantumNetwork.qcompute_qnet.models.qkd.key_generation import PrepareAndMeasure
 
 
 # Experimental devices configuration
@@ -44,15 +41,7 @@ detector_options = {"efficiency": 0.045, "dark_count": 0.0, "count_rate": 10e6, 
 key_rate = []
 
 
-def gys04(distance: float) -> float:
-    r"""Compute the sifted key rate for given distance.
-
-    Args:
-        distance (float): distance of the experiment
-
-    Returns:
-        float: sifted key rate
-    """
+def gys04(distance):
     # Create a simulation environment
     env = DESEnv("GYS04", default=True)
 
