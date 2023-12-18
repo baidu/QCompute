@@ -207,3 +207,15 @@ We welcome developers to use QComputeSDK for quantum application development. If
 ## Copyright and License
 
 QComputeSDK uses [Apache-2.0 license](./LICENSE).
+
+## Authors:
+- Shusen Liu
+- Yang He
+- Yunfan Jiang
+- Wenxue Zhang
+- Wenyun Sun
+- Yongfan Fu
+- Jianxiao Chen
+- Haojie Shen
+- Shenjin Lv
+- Youqi Wang

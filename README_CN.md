@@ -22,7 +22,7 @@
 
 ![](https://release-data.cdn.bcebos.com/github-qleaf%2F%E9%87%8F%E6%98%93%E4%BC%8F%E5%9B%BE%E6%A0%87.png)
 
-[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) ![](https://img.shields.io/badge/build-passing-green) ![](https://img.shields.io/badge/Python-3.9--3.11-blue) ![](https://img.shields.io/badge/release-v3.3.5-blue) 
+[![](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE) ![](https://img.shields.io/badge/build-passing-green) ![](https://img.shields.io/badge/Python-3.9--3.11-blue) ![](https://img.shields.io/badge/release-v3.3.0-blue) 
 
 ![](https://img.shields.io/badge/OS-MacOS%20|%20Windows%20|%20Linux-lightgrey.svg?style=flat-square)
 
@@ -205,3 +205,15 @@ QComputeSDK 中包括量子计算架构、量子模拟器、量子案例以及�
 ## Copyright and License
 
 QComputeSDK 使用 [Apache-2.0 license](./LICENSE) 许可证。
+
+## 作者
+- 刘树森
+- 贺旸
+- 江云帆
+- 张文学
+- 孙文赟
+- 付永凡
+- 陈建萧
+- 沈豪杰
+- 吕申进
+- 王友琪
